@@ -1,11 +1,12 @@
 # PureRecruitment-TAMO-bupter
 
+Group·16
 
+# 资源文件服务端部署挂载
 
-
-G·16
-
-
+```txt
+见目录 mountDataTAMObupter/README.md
+```
 
 # 一阶段任务要求
 
