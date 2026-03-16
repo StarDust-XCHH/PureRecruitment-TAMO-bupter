@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "settings",
     "version": "1.0",
-    "updatedAt": "2026-03-16T13:28:45.273077800Z"
+    "updatedAt": "2026-03-16T19:15:37.104001200Z"
   },
   "items": [
     {
@@ -18,7 +18,17 @@
       "id": "SETTING-TA-10258",
       "taId": "TA-10258",
       "theme": "dark",
-      "createdAt": "2026-03-16T13:28:45.257077Z"
+      "createdAt": "2026-03-16T13:28:45.257077Z",
+      "onboardingStep": 0.0,
+      "guideCompleted": false,
+      "profileSaved": true,
+      "profileSavedAt": "2026-03-16T19:15:37.101489700Z",
+      "lastProfileSyncStatus": "success",
+      "lastProfileSyncMessage": "资料保存成功",
+      "updatedAt": "2026-03-16T19:15:37.101489700Z",
+      "avatar": "image/TA-10258_1773688536990_cbe066f0e82c43b8ab7b5f6623eda88b.png",
+      "onboardingCompletedAt": "",
+      "onboardingDismissed": false
     }
   ]
 }

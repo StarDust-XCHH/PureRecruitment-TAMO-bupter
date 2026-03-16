@@ -1,0 +1,59 @@
+<div class="card">
+    <div class="overview-top">
+        <div>
+            <h1>TA 工作台总览</h1>
+            <p class="muted">保留首页四卡片容器骨架，后续阶段补视觉、动效与数据接入。</p>
+        </div>
+        <div class="overview-badges">
+            <span class="pill">阶段 1</span>
+            <span class="pill">页面骨架</span>
+            <span class="pill">设置入口已预留</span>
+        </div>
+    </div>
+    <div class="stat-grid insight-grid" style="margin-top: 16px;">
+        <div class="insight-card track-card" data-modal-target="track">
+            <div class="insight-card-header">
+                <span class="insight-icon plane-icon" aria-hidden="true">🛰️</span>
+                <div>
+                    <p class="insight-label">投递追踪</p>
+                    <p class="insight-subtitle">工作台卡片容器一</p>
+                </div>
+            </div>
+            <div class="insight-core-number">3</div>
+            <p class="insight-meta muted">保留后续追踪详情 modal 入口</p>
+        </div>
+        <div class="insight-card radar-card" data-modal-target="recommend">
+            <div class="insight-card-header">
+                <span class="insight-icon radar-icon" aria-hidden="true">📡</span>
+                <div>
+                    <p class="insight-label">岗位雷达</p>
+                    <p class="insight-subtitle">工作台卡片容器二</p>
+                </div>
+            </div>
+            <div class="insight-core-number">+5</div>
+            <p class="insight-meta muted">保留推荐岗位列表骨架</p>
+        </div>
+        <div class="insight-card profile-strength-card" data-modal-target="checklist">
+            <div class="insight-card-header">
+                <span class="insight-icon badge-icon" aria-hidden="true">🏅</span>
+                <div>
+                    <p class="insight-label">资料完善度</p>
+                    <p class="insight-subtitle">工作台卡片容器三</p>
+                </div>
+            </div>
+            <div class="insight-core-number">84%</div>
+            <p class="insight-meta muted">保留资料检查清单骨架</p>
+        </div>
+        <div class="insight-card upcoming-card" data-modal-target="planner">
+            <div class="insight-card-header">
+                <span class="insight-icon calendar-icon" aria-hidden="true">📅</span>
+                <div>
+                    <p class="insight-label">待办日程</p>
+                    <p class="insight-subtitle">工作台卡片容器四</p>
+                </div>
+            </div>
+            <div class="insight-core-number">2</div>
+            <p class="insight-meta muted">保留日程规划抽屉骨架</p>
+        </div>
+    </div>
+</div>

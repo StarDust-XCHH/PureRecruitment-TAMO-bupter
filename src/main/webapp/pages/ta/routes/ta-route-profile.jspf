@@ -1,0 +1,77 @@
+<div class="route active" id="route-profile" data-route="profile">
+    <div class="card">
+        <div class="overview-top">
+            <div>
+                <h1>我的 TA 工作台</h1>
+                <p class="muted">实时同步档案概览，并为设置中心、投递追踪与详情弹窗预留入口。</p>
+            </div>
+            <div class="overview-badges">
+                <span class="pill">身份：Teaching Assistant</span>
+                <span class="pill">学期：2026 Spring</span>
+                <span class="pill">状态：申请活跃</span>
+            </div>
+        </div>
+        <div class="stat-grid insight-grid" style="margin-top:16px;">
+            <div class="insight-card track-card" data-modal-target="track">
+                <div class="insight-card-header">
+                    <span aria-hidden="true">🛰️</span>
+                    <div>
+                        <p class="insight-label">投递追踪</p>
+                        <p class="insight-subtitle">查看当前申请推进情况</p>
+                    </div>
+                </div>
+                <div class="insight-core-number">3</div>
+                <p class="insight-meta muted">2 待处理 ｜ 1 面试中</p>
+            </div>
+            <div class="insight-card radar-card" data-modal-target="recommend">
+                <div class="insight-card-header">
+                    <span aria-hidden="true">📡</span>
+                    <div>
+                        <p class="insight-label">岗位雷达</p>
+                        <p class="insight-subtitle">保留推荐职位详情骨架</p>
+                    </div>
+                </div>
+                <div class="insight-core-number">+5</div>
+                <p class="insight-meta muted">匹配技能：Java / Python / 数据结构</p>
+            </div>
+            <div class="insight-card profile-strength-card" data-modal-target="checklist">
+                <div class="insight-card-header">
+                    <span aria-hidden="true">🏅</span>
+                    <div>
+                        <p class="insight-label">资料完善度</p>
+                        <p class="insight-subtitle">设置中心后续联动入口</p>
+                    </div>
+                </div>
+                <div class="insight-core-number">84%</div>
+                <p class="insight-meta muted">评级：极佳（S）</p>
+            </div>
+            <div class="insight-card upcoming-card" data-modal-target="planner">
+                <div class="insight-card-header">
+                    <span aria-hidden="true">📅</span>
+                    <div>
+                        <p class="insight-label">待办日程</p>
+                        <p class="insight-subtitle">后续接入日程与任务规划</p>
+                    </div>
+                </div>
+                <div class="insight-core-number">2</div>
+                <p class="insight-meta muted">明日：1 场助教面试 ｜ 1 门课程</p>
+            </div>
+        </div>
+        <div class="hero-card" id="heroCard" aria-live="polite">
+            <div class="hero-panel">
+                <div class="hero-content">
+                    <span class="badge" id="heroBadge">⏰ 紧急待办</span>
+                    <h3 class="hero-title" id="heroTitle">Seele，明天下午有一场微处理器课程的 TA 面试。</h3>
+                    <p class="hero-desc muted" id="heroDesc">页面骨架阶段先保留重点提醒区，后续再接入真实提醒数据与动效。</p>
+                    <div class="hero-actions">
+                        <button class="hero-btn primary" type="button" id="heroPrimary">查看面试详情</button>
+                        <button class="hero-btn ghost" type="button" id="heroSecondary">已准备妥当</button>
+                    </div>
+                </div>
+                <div class="hero-visual" aria-hidden="true">
+                    Focus · Next Best Action
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
