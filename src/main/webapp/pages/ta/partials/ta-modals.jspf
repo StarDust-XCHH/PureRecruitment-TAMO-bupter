@@ -1,0 +1,377 @@
+<div class="ta-modal-overlay" id="taModalOverlay" aria-hidden="true">
+    <div class="ta-modal-panel" data-modal="track" role="dialog" aria-labelledby="modalTrackTitle">
+        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <div class="modal-head">
+            <h3 id="modalTrackTitle">投递追踪详情</h3>
+            <p class="muted">查看每个岗位的里程碑，快速定位卡点并安排下一步动作。</p>
+        </div>
+        <div class="modal-body">
+            <div class="timeline">
+                <div class="timeline-item open">
+                    <span class="timeline-node success"></span>
+                    <div class="timeline-title">EBU6304 · 数据结构实验班</div>
+                    <p class="muted">当前状态：面试已完成（02-16）</p>
+                    <div class="accordion-content">
+                        <p>阶段：已投递 → 简历初筛 → 面试 → 待 Offer</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-node warn"></span>
+                    <div class="timeline-title">EBU6402 · 信号分析助教</div>
+                    <p class="muted">当前状态：等待笔试材料</p>
+                    <div class="accordion-content">
+                        <p>阶段：已投递 → 需补交成绩单 → 待笔试 → 未安排面试</p>
+                    </div>
+                </div>
+                <div class="timeline-item">
+                    <span class="timeline-node"></span>
+                    <div class="timeline-title">EBU6310 · 智能系统 TA</div>
+                    <p class="muted">当前状态：简历初筛中</p>
+                    <div class="accordion-content">
+                        <p>阶段：已投递 → 等待匹配 → 待人工审核 → 未开始</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ta-modal-panel wide" data-modal="recommend" role="dialog" aria-labelledby="modalRecommendTitle">
+        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <div class="modal-head">
+            <h3 id="modalRecommendTitle">推荐岗位列表</h3>
+            <p class="muted">根据你的技能画像与空闲时间筛出的岗位，当前阶段保留详情与后续申请入口骨架。</p>
+        </div>
+        <div class="modal-body">
+            <div class="modal-list">
+                <div class="modal-list-item">
+                    <div>
+                        <p class="list-title">EBU6402 信号处理 / Lab TA</p>
+                        <span class="match-tag high">匹配度 92%</span>
+                    </div>
+                    <button class="pill-btn" type="button">一键申请</button>
+                </div>
+                <div class="modal-list-item">
+                    <div>
+                        <p class="list-title">EBU6310 智能系统 / 课程助教</p>
+                        <span class="match-tag">匹配度 88%</span>
+                    </div>
+                    <button class="pill-btn" type="button">加入候选</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="ta-modal-panel" data-modal="checklist" role="dialog" aria-labelledby="modalChecklistTitle">
+        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <div class="modal-head">
+            <h3 id="modalChecklistTitle">简历完善检查清单</h3>
+            <p class="muted">根据最新扫描结果，需要补齐如下信息项以提升通过率。</p>
+        </div>
+        <div class="modal-body">
+            <ul class="resume-checklist">
+                <li>
+                    <div>
+                        <strong>缺少项目经历</strong>
+                        <span class="impact">-10%</span>
+                        <p class="muted">建议补充近期课程项目或科研成果。</p>
+                    </div>
+                    <a class="jump-link" href="#bio">跳转到自我介绍</a>
+                </li>
+                <li>
+                    <div>
+                        <strong>教育背景未细化</strong>
+                        <span class="impact">-5%</span>
+                        <p class="muted">建议标注 GPA / 主修核心课程。</p>
+                    </div>
+                    <a class="jump-link" href="#fullName">前往基本信息</a>
+                </li>
+                <li>
+                    <div>
+                        <strong>技能标签缺少 TA 技能</strong>
+                        <span class="impact">-3%</span>
+                        <p class="muted">可补充“课堂管理”、“作业批改”等关键词。</p>
+                    </div>
+                    <a class="jump-link" href="#skillsInput">补充技能标签</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="ta-modal-panel drawer" data-modal="planner" role="dialog" aria-labelledby="modalPlannerTitle">
+        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <div class="modal-head">
+            <h3 id="modalPlannerTitle">日程与任务规划</h3>
+            <p class="muted">集中管理课程、TA 任务与空闲时间，实时评估排班负荷。</p>
+        </div>
+        <div class="modal-body">
+            <div class="planner-layout">
+                <section class="calendar-pane">
+                    <div class="calendar-header">
+                        <strong>Week 08 · 2026</strong>
+                        <span class="muted">03/16 - 03/22</span>
+                    </div>
+                    <div class="calendar-grid">
+                        <div class="calendar-cell">
+                            <span class="day-label">Mon</span>
+                            <div class="calendar-slot busy">09:00 - 11:00 · 数据结构助教</div>
+                            <div class="calendar-slot">14:00 - 15:00 · 自习</div>
+                        </div>
+                        <div class="calendar-cell">
+                            <span class="day-label">Tue</span>
+                            <div class="calendar-slot">10:00 - 11:30 · 面试模拟</div>
+                        </div>
+                        <div class="calendar-cell">
+                            <span class="day-label">Wed</span>
+                            <div class="calendar-slot busy">13:30 - 16:30 · 信号处理实验班</div>
+                        </div>
+                    </div>
+                </section>
+                <section class="planner-form">
+                    <h4>添加日程</h4>
+                    <label class="planner-field">
+                        <span>事件名称</span>
+                        <input type="text" placeholder="如：EBU6304 课堂演练">
+                    </label>
+                    <label class="planner-field">
+                        <span>事件类型</span>
+                        <select>
+                            <option value="course">课程</option>
+                            <option value="ta">TA 任务</option>
+                            <option value="interview">面试/沟通</option>
+                        </select>
+                    </label>
+                    <div class="planner-field grid">
+                        <label>
+                            <span>开始时间</span>
+                            <input type="time" value="09:00">
+                        </label>
+                        <label>
+                            <span>结束时间</span>
+                            <input type="time" value="11:00">
+                        </label>
+                    </div>
+                    <label class="planner-field">
+                        <span>日期</span>
+                        <input type="date">
+                    </label>
+                    <label class="planner-field">
+                        <span>备注</span>
+                        <textarea rows="3" placeholder="可记录授课内容、准备物料等"></textarea>
+                    </label>
+                    <button class="pill-btn" type="button">保存日程</button>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <div class="ta-modal-panel wide job-detail-modal" data-modal="course-detail" role="dialog" aria-labelledby="modalCourseDetailTitle">
+        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <div class="modal-head">
+            <h3 id="modalCourseDetailTitle">课程招聘详情</h3>
+            <p class="muted">查看课程介绍、招聘重点与申请说明，确认后即可一键申请。</p>
+        </div>
+        <div class="modal-body">
+            <div class="job-detail-shell">
+                <section class="job-detail-main">
+                    <div class="job-detail-hero">
+                        <div class="job-detail-title-row">
+                            <div>
+                                <div class="job-code" id="jobDetailCode">MO-SE-628</div>
+                                <h4 id="jobDetailName">软件工程基础训练营</h4>
+                            </div>
+                            <span class="pill" id="jobDetailMo">开课 MO</span>
+                        </div>
+                        <p class="job-detail-summary" id="jobDetailDescription">课程结合企业用人需求设计，围绕软件工程基础训练营组织学习任务，适合作为招聘前置储备课程进行训练。</p>
+                        <div class="job-detail-meta-grid">
+                            <div class="job-detail-meta">
+                                <span>课程日期</span>
+                                <strong id="jobDetailDate">2026-03-20</strong>
+                            </div>
+                            <div class="job-detail-meta">
+                                <span>课程时间</span>
+                                <strong id="jobDetailTime">17:00-19:00</strong>
+                            </div>
+                            <div class="job-detail-meta">
+                                <span>上课地点</span>
+                                <strong id="jobDetailLocation">教一楼 A201</strong>
+                            </div>
+                            <div class="job-detail-meta">
+                                <span>学生人数</span>
+                                <strong id="jobDetailStudentCount">36 人</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="job-detail-section">
+                        <h5>课程标签</h5>
+                        <div class="job-detail-tags" id="jobDetailTags">
+                            <span class="pill">软件工程</span>
+                            <span class="pill">基础训练营</span>
+                            <span class="pill">3月课程</span>
+                        </div>
+                    </div>
+                    <div class="job-detail-section">
+                        <h5>TA 工作内容</h5>
+                        <ul class="job-detail-checklist" id="jobDetailChecklist">
+                            <li>协助 MO 完成课程准备与签到组织</li>
+                            <li>维护课堂互动，支持作业与实验答疑</li>
+                            <li>课后整理反馈，配合完成学习效果跟踪</li>
+                        </ul>
+                    </div>
+                </section>
+                <aside class="job-detail-side">
+                    <div class="job-detail-side-card">
+                        <h5>申请建议</h5>
+                        <p id="jobDetailSuggestion">若你近期在软件工程、课程助教或项目实践方向有相关经历，建议优先申请该课程。</p>
+                        <button class="pill-btn" type="button" id="jobDetailApplyBtn">Apply for this course</button>
+                    </div>
+                    <div class="job-detail-side-card">
+                        <h5>投递提醒</h5>
+                        <p>提交申请后，系统会自动记录到投递追踪，并根据课程标签更新推荐匹配权重。</p>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+
+    <div class="ta-modal-panel ta-settings-modal" data-modal="settings" role="dialog" aria-labelledby="modalSettingsTitle">
+        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <div class="modal-head">
+            <h3 id="modalSettingsTitle">个人设置中心</h3>
+            <p class="muted">快速更新档案、账号安全与偏好设置，资料修改需点击保存后才会写入。</p>
+        </div>
+        <div class="modal-body settings-body">
+            <aside class="settings-tabs" role="tablist" aria-label="设置菜单">
+                <button class="settings-tab active" type="button" data-settings-tab="profile" role="tab" aria-selected="true">
+                    <span>👤</span> 基础资料
+                </button>
+                <button class="settings-tab" type="button" data-settings-tab="security" role="tab" aria-selected="false">
+                    <span>🔒</span> 账号与安全
+                </button>
+                <button class="settings-tab" type="button" data-settings-tab="preferences" role="tab" aria-selected="false">
+                    <span>⚙️</span> 系统偏好
+                </button>
+            </aside>
+            <section class="settings-content">
+                <div class="settings-panel active" data-settings-panel="profile" role="tabpanel">
+                    <div class="settings-section">
+                        <div class="settings-profile-toolbar">
+                            <div class="settings-status-group">
+                                <span class="settings-status-badge" id="profileSyncStatus">已加载</span>
+                                <small class="muted" id="profileLastUpdated">最近更新：--</small>
+                            </div>
+                            <div class="settings-action-group">
+                                <button class="pill-btn" type="button" id="saveProfileBtn">保存</button>
+                            </div>
+                        </div>
+                        <div class="settings-avatar" role="button" tabindex="0" id="profileAvatarBox" aria-label="更换头像">S</div>
+                        <label class="settings-field full settings-avatar-upload-field" for="avatarFile">
+                            <span>头像上传</span>
+                            <input id="avatarFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+                            <small class="muted" id="avatarUploadHint">支持 PNG / JPG / WEBP / GIF，大小限制 10MB。点击头像即可更换。</small>
+                        </label>
+                        <div class="settings-grid">
+                            <label class="settings-field">
+                                <span>真实姓名</span>
+                                <input id="fullName" type="text" placeholder="请输入真实姓名">
+                            </label>
+                            <label class="settings-field">
+                                <span>申请意向</span>
+                                <input id="applicationIntent" type="text" placeholder="如：数据库 / 操作系统 / 计算机网络">
+                            </label>
+                            <label class="settings-field">
+                                <span>学号</span>
+                                <input id="studentId" type="text" placeholder="系统自动分配" readonly disabled>
+                            </label>
+                            <label class="settings-field">
+                                <span>联系邮箱</span>
+                                <input id="contactEmail" type="email" placeholder="name@bupt.edu.cn">
+                            </label>
+                        </div>
+                        <label class="settings-field full">
+                            <span>自我介绍</span>
+                            <textarea id="bio" rows="4" placeholder="简单介绍你的研究方向、授课经验或教学风格"></textarea>
+                        </label>
+                        <div class="settings-field full">
+                            <span>技能标签</span>
+                            <div class="skills-input" id="skillsInput" data-readonly="false">
+                                <input id="skillEntry" type="text" placeholder="输入技能后回车">
+                            </div>
+                            <small class="muted">回车可新增标签，点击标签右侧 × 可删除。</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-panel" data-settings-panel="security" role="tabpanel">
+                    <div class="settings-section">
+                        <div class="settings-subtitle">修改密码</div>
+                        <div class="settings-grid stack">
+                            <label class="settings-field">
+                                <span>当前密码</span>
+                                <input id="currentPassword" type="password" placeholder="请输入当前密码">
+                            </label>
+                            <label class="settings-field">
+                                <span>新密码</span>
+                                <input id="newPassword" type="password" placeholder="至少 6 位">
+                            </label>
+                            <label class="settings-field">
+                                <span>确认新密码</span>
+                                <input id="confirmPassword" type="password" placeholder="再次输入新密码">
+                            </label>
+                        </div>
+                        <div class="settings-action-row">
+                            <span class="muted" id="passwordSaveStatus">尚未保存</span>
+                            <button class="pill-btn" type="button" id="savePasswordBtn">保存</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="settings-panel" data-settings-panel="preferences" role="tabpanel">
+                    <div class="settings-section">
+                        <label class="settings-field full">
+                            <span>界面主题</span>
+                            <select id="themeSelect">
+                                <option value="system">跟随系统</option>
+                                <option value="light">浅色模式</option>
+                                <option value="dark">深色模式</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="ta-modal-panel wide ta-avatar-crop-modal" data-modal="avatar-crop" role="dialog" aria-labelledby="avatarCropTitle" aria-modal="true">
+        <button class="modal-close" type="button" aria-label="关闭头像裁切窗口" data-avatar-crop-close>&times;</button>
+        <div class="modal-head">
+            <h3 id="avatarCropTitle">裁切头像</h3>
+            <p class="muted">请先将头像裁切为 1:1 正方形，确认后系统才会继续上传。</p>
+        </div>
+        <div class="modal-body avatar-crop-body">
+            <div class="avatar-crop-layout">
+                <div class="avatar-crop-stage-wrap">
+                    <div class="avatar-crop-stage" id="avatarCropStage" aria-label="头像裁切区域">
+                        <img id="avatarCropImage" class="avatar-crop-image" alt="头像裁切预览" hidden>
+                        <div class="avatar-crop-mask" aria-hidden="true"></div>
+                        <div class="avatar-crop-frame" aria-hidden="true"></div>
+                    </div>
+                </div>
+                <aside class="avatar-crop-side">
+                    <div class="avatar-crop-preview-card">
+                        <span class="avatar-crop-side-title">裁切结果预览</span>
+                        <div class="avatar-crop-preview-box">
+                            <canvas id="avatarCropPreviewCanvas" width="160" height="160" aria-label="裁切结果预览"></canvas>
+                        </div>
+                    </div>
+                    <label class="settings-field full avatar-crop-zoom-field" for="avatarCropZoomRange">
+                        <span>缩放</span>
+                        <input id="avatarCropZoomRange" type="range" min="1" max="3" step="0.01" value="1">
+                    </label>
+                    <small class="muted" id="avatarCropHint">拖动图片调整取景，滑动缩放条可放大或缩小。</small>
+                    <div class="avatar-crop-actions">
+                        <button class="pill-btn ghost" type="button" id="avatarCropCancelBtn">取消</button>
+                        <button class="pill-btn" type="button" id="avatarCropConfirmBtn">确认裁切</button>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+</div>

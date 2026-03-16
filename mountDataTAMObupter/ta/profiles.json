@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "profiles",
     "version": "1.0",
-    "updatedAt": "2026-03-16T13:28:45.272078700Z"
+    "updatedAt": "2026-03-16T19:15:37.102994800Z"
   },
   "items": [
     {
@@ -26,7 +26,15 @@
       "taId": "TA-10258",
       "studentId": "TA-10258",
       "skills": [],
-      "lastUpdatedAt": "2026-03-16T13:28:45.257077Z"
+      "lastUpdatedAt": "2026-03-16T19:15:37.101489700Z",
+      "avatar": "image/TA-10258_1773688536990_cbe066f0e82c43b8ab7b5f6623eda88b.png",
+      "realName": "Seele Vollerei",
+      "applicationIntent": "",
+      "contactEmail": "Seele520@honkai.com",
+      "bio": "",
+      "availabilityHoursPerWeek": 0.0,
+      "semester": "",
+      "title": "TA"
     }
   ]
 }

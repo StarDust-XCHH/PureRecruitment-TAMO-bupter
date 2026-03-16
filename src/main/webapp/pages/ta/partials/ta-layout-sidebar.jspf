@@ -1,0 +1,21 @@
+<div class="brand">
+    <div class="logo">TA</div>
+    <div>
+        <div>Teaching Assistant</div>
+        <small style="color: var(--muted)">Recruitment Suite</small>
+    </div>
+</div>
+<nav class="nav" aria-label="TA 工作台导航">
+    <div class="nav-item active" data-route="profile">
+        <span>👤</span>
+        <span>个人档案</span>
+    </div>
+    <div class="nav-item" data-route="jobs">
+        <span>🛰️</span>
+        <span>职位大厅</span>
+    </div>
+    <div class="nav-item" data-route="status">
+        <span>🧭</span>
+        <span>申请状态</span>
+    </div>
+</nav>

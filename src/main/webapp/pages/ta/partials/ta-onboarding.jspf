@@ -1,0 +1,16 @@
+<div class="onboarding" id="onboarding">
+    <div class="guide-highlight" id="guideHighlight"></div>
+    <div class="guide-arrow" id="guideArrow"></div>
+    <div class="guide-card" id="guideCard">
+        <div class="guide-progress" id="guideProgress">引导 1 / 3</div>
+        <h3 id="guideTitle">欢迎加入 TA 星轨之旅</h3>
+        <p class="muted" id="guideDesc">本阶段先保留导航、设置中心、工作台卡片与三大 route 的页面骨架。</p>
+        <div class="guide-actions">
+            <button class="guide-btn ghost" id="guideBack" type="button">上一步</button>
+            <div style="display:flex; gap:10px;">
+                <button class="guide-btn ghost" id="skipBtn" type="button">跳过指引</button>
+                <button class="guide-btn primary" id="guideNext" type="button">下一步</button>
+            </div>
+        </div>
+    </div>
+</div>
