@@ -25,8 +25,9 @@ public class TaRegisterServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String normalizedTaId = registrationService.normalizeTaId(req.getParameter("taId"));
         TaRegisterRequest registerRequest = new TaRegisterRequest(
-                req.getParameter("taId"),
+                normalizedTaId,
                 req.getParameter("name"),
                 req.getParameter("username"),
                 req.getParameter("email"),
@@ -42,7 +43,7 @@ public class TaRegisterServlet extends HttpServlet {
         }
 
         TaAccountDao.TaRegisterResult result = taAccountDao.register(
-                registerRequest.getTaId().trim(),
+                normalizedTaId,
                 registerRequest.getName().trim(),
                 registerRequest.getUsername().trim(),
                 registerRequest.getEmail().trim(),

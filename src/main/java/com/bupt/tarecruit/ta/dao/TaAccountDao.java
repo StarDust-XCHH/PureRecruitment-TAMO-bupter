@@ -1,6 +1,12 @@
 package com.bupt.tarecruit.ta.dao;
 
 import com.bupt.tarecruit.common.util.AuthUtils;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -11,12 +17,15 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+/**
+ * 助教账户数据访问对象
+ * 修复了 ID 匹配逻辑和密码处理一致性问题
+ */
 public class TaAccountDao {
     private static final String DATA_MOUNT_ENV = "mountDataTAMObupter";
     private static final Path DEFAULT_DATA_ROOT = Path.of("mountDataTAMObupter");
+
     private static final String TA_SCHEMA = "ta";
     private static final String TA_ENTITY = "tas";
     private static final String PROFILE_SCHEMA = "ta";
@@ -24,15 +33,25 @@ public class TaAccountDao {
     private static final String SETTINGS_SCHEMA = "ta";
     private static final String SETTINGS_ENTITY = "settings";
 
-    private static final Path TA_DATA_PATH = resolveDataPath("ta", "tas.json");
-    private static final Path PROFILE_DATA_PATH = resolveDataPath("ta", "profiles.json");
-    private static final Path SETTINGS_DATA_PATH = resolveDataPath("ta", "settings.json");
+    private static final ResolvedDataRoot RESOLVED_DATA_ROOT = resolveDataRoot();
+    private static final Path TA_DATA_PATH = RESOLVED_DATA_ROOT.rootPath().resolve("ta").resolve("tas.json");
+    private static final Path PROFILE_DATA_PATH = RESOLVED_DATA_ROOT.rootPath().resolve("ta").resolve("profiles.json");
+    private static final Path SETTINGS_DATA_PATH = RESOLVED_DATA_ROOT.rootPath().resolve("ta").resolve("settings.json");
 
-    public TaLoginResult login(String identifier, String password) throws IOException {
+    private static final Gson GSON = new GsonBuilder()
+            .setPrettyPrinting()
+            .disableHtmlEscaping()
+            .create();
+
+    /**
+     * 用户登录逻辑
+     */
+    public synchronized TaLoginResult login(String identifier, String password) throws IOException {
         String normalizedIdentifier = trim(identifier);
-        String normalizedPassword = password == null ? "" : password;
+        // 注意：这里不使用 trim()，确保与注册时保存的原始密码（可能包含空格）一致
+        String rawPassword = password == null ? "" : password;
 
-        if (normalizedIdentifier.isEmpty() || normalizedPassword.isEmpty()) {
+        if (normalizedIdentifier.isEmpty() || rawPassword.isEmpty()) {
             return TaLoginResult.failure(400, "请输入账号和密码");
         }
 
@@ -56,13 +75,17 @@ public class TaAccountDao {
         String passwordHash = asString(auth.get("passwordHash"));
         String currentTime = AuthUtils.nowIso();
 
-        if (!AuthUtils.hashPassword(normalizedPassword, salt).equals(passwordHash)) {
-            auth.put("failedAttempts", asInt(auth.get("failedAttempts")) + 1);
+        // 校验密码哈希
+        if (!AuthUtils.hashPassword(rawPassword, salt).equals(passwordHash)) {
+            // 失败次数增加，并处理可能存在的 Double 类型
+            int currentFailures = asInt(auth.get("failedAttempts"));
+            auth.put("failedAttempts", currentFailures + 1);
             matchedAccount.put("updatedAt", currentTime);
             saveRecords(TA_DATA_PATH, TA_SCHEMA, TA_ENTITY, accounts);
             return TaLoginResult.failure(401, "账号或密码错误");
         }
 
+        // 登录成功，重置失败次数
         auth.put("failedAttempts", 0);
         auth.put("lastLoginAt", currentTime);
         matchedAccount.put("updatedAt", currentTime);
@@ -81,35 +104,24 @@ public class TaAccountDao {
         return TaLoginResult.success(data);
     }
 
-    public TaRegisterResult register(String taId, String name, String username, String email, String phone, String password) throws IOException {
+    /**
+     * 用户注册逻辑
+     */
+    public synchronized TaRegisterResult register(String taId, String name, String username, String email, String phone, String password) throws IOException {
         List<Map<String, Object>> accounts = loadRecords(TA_DATA_PATH, TA_SCHEMA, TA_ENTITY);
         List<Map<String, Object>> profiles = loadRecords(PROFILE_DATA_PATH, PROFILE_SCHEMA, PROFILE_ENTITY);
         List<Map<String, Object>> settings = loadRecords(SETTINGS_DATA_PATH, SETTINGS_SCHEMA, SETTINGS_ENTITY);
 
         for (Map<String, Object> account : accounts) {
-            if (asString(account.get("id")).equals(taId)) {
-                return TaRegisterResult.failure(409, "TA ID 已存在，请刷新后重试");
-            }
-            if (asString(account.get("username")).equalsIgnoreCase(username)) {
-                return TaRegisterResult.failure(409, "用户名已被占用");
-            }
-            if (asString(account.get("email")).equalsIgnoreCase(email)) {
-                return TaRegisterResult.failure(409, "邮箱已被注册");
-            }
-            if (asString(account.get("phone")).equals(phone)) {
-                return TaRegisterResult.failure(409, "手机号已被注册");
-            }
+            if (asString(account.get("id")).equalsIgnoreCase(taId)) return TaRegisterResult.failure(409, "TA ID 已存在");
+            if (asString(account.get("username")).equalsIgnoreCase(username)) return TaRegisterResult.failure(409, "用户名已被占用");
+            if (asString(account.get("email")).equalsIgnoreCase(email)) return TaRegisterResult.failure(409, "邮箱已被注册");
+            if (asString(account.get("phone")).equals(phone)) return TaRegisterResult.failure(409, "手机号已被注册");
         }
 
         String currentTime = AuthUtils.nowIso();
         String salt = AuthUtils.generateSalt();
         String passwordHash = AuthUtils.hashPassword(password, salt);
-
-        Map<String, Object> auth = new LinkedHashMap<>();
-        auth.put("passwordHash", passwordHash);
-        auth.put("passwordSalt", salt);
-        auth.put("lastLoginAt", currentTime);
-        auth.put("failedAttempts", 0);
 
         Map<String, Object> account = new LinkedHashMap<>();
         account.put("id", taId);
@@ -121,22 +133,20 @@ public class TaAccountDao {
         account.put("status", "active");
         account.put("createdAt", currentTime);
         account.put("updatedAt", currentTime);
+
+        Map<String, Object> auth = new LinkedHashMap<>();
+        auth.put("passwordHash", passwordHash);
+        auth.put("passwordSalt", salt);
+        auth.put("lastLoginAt", currentTime);
+        auth.put("failedAttempts", 0);
         account.put("auth", auth);
         accounts.add(account);
 
         Map<String, Object> profile = new LinkedHashMap<>();
         profile.put("id", "PROFILE-" + taId);
         profile.put("taId", taId);
-        profile.put("avatar", "");
-        profile.put("realName", "");
-        profile.put("applicationIntent", "");
         profile.put("studentId", taId);
-        profile.put("contactEmail", "");
-        profile.put("bio", "");
         profile.put("skills", new ArrayList<>());
-        profile.put("availabilityHoursPerWeek", 0);
-        profile.put("semester", "");
-        profile.put("title", "TA");
         profile.put("lastUpdatedAt", currentTime);
         profiles.add(profile);
 
@@ -144,8 +154,6 @@ public class TaAccountDao {
         setting.put("id", "SETTING-" + taId);
         setting.put("taId", taId);
         setting.put("theme", "dark");
-        setting.put("onboardingStep", 0);
-        setting.put("guideCompleted", false);
         setting.put("createdAt", currentTime);
         settings.add(setting);
 
@@ -155,134 +163,106 @@ public class TaAccountDao {
 
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("taId", taId);
-        data.put("name", name);
         data.put("username", username);
-        data.put("email", email);
-        data.put("phone", phone);
         data.put("createdAt", currentTime);
         return TaRegisterResult.success(data);
-    }
-
-    private boolean matchesIdentifier(Map<String, Object> account, String identifier) {
-        return asString(account.get("username")).equalsIgnoreCase(identifier)
-                || asString(account.get("email")).equalsIgnoreCase(identifier)
-                || asString(account.get("phone")).equals(identifier);
     }
 
     private List<Map<String, Object>> loadRecords(Path path, String schema, String entity) throws IOException {
         ensureDataFile(path, schema, entity);
         String content = Files.readString(path, StandardCharsets.UTF_8).trim();
-        if (content.isEmpty() || content.equals("[]")) {
-            return new ArrayList<>();
-        }
-        if (content.startsWith("{")) {
-            Map<String, Object> root = SimpleJsonParser.parseObject(content);
-            Object items = root.get("items");
-            if (items instanceof List<?> list) {
-                return castRecordList(list);
+        if (content.isEmpty() || content.equals("[]")) return new ArrayList<>();
+
+        try {
+            JsonObject root = JsonParser.parseString(content).getAsJsonObject();
+            if (root.has("items")) {
+                JsonArray itemsArray = root.getAsJsonArray("items");
+                return GSON.fromJson(itemsArray, new TypeToken<List<Map<String, Object>>>() {}.getType());
             }
-            return new ArrayList<>();
+        } catch (Exception e) {
+            System.err.println("[TA-DATA] JSON 解析失败: " + path);
         }
-        return SimpleJsonParser.parseArray(content);
+        return new ArrayList<>();
     }
 
     private void saveRecords(Path path, String schema, String entity, List<Map<String, Object>> records) throws IOException {
-        ensureDataFile(path, schema, entity);
-        Files.writeString(path, SimpleJsonWriter.writeRootObject(schema, entity, records), StandardCharsets.UTF_8);
+        Map<String, Object> root = new LinkedHashMap<>();
+        Map<String, Object> meta = new LinkedHashMap<>();
+        meta.put("schema", schema);
+        meta.put("entity", entity);
+        meta.put("version", "1.0");
+        meta.put("updatedAt", Instant.now().toString());
+
+        root.put("meta", meta);
+        root.put("items", records);
+        Files.writeString(path, GSON.toJson(root), StandardCharsets.UTF_8);
     }
 
     private void ensureDataFile(Path path, String schema, String entity) throws IOException {
-        if (Files.notExists(path.getParent())) {
-            Files.createDirectories(path.getParent());
-        }
-        if (Files.notExists(path)) {
-            Files.writeString(path, SimpleJsonWriter.writeRootObject(schema, entity, new ArrayList<>()), StandardCharsets.UTF_8);
-            return;
-        }
-
-        String content = Files.readString(path, StandardCharsets.UTF_8).trim();
-        if (content.isEmpty() || content.equals("[]")) {
-            Files.writeString(path, SimpleJsonWriter.writeRootObject(schema, entity, new ArrayList<>()), StandardCharsets.UTF_8);
-        }
+        if (Files.notExists(path.getParent())) Files.createDirectories(path.getParent());
+        if (Files.notExists(path)) saveRecords(path, schema, entity, new ArrayList<>());
     }
 
-    @SuppressWarnings("unchecked")
-    private List<Map<String, Object>> castRecordList(List<?> list) {
-        List<Map<String, Object>> results = new ArrayList<>();
-        for (Object item : list) {
-            if (item instanceof Map<?, ?> map) {
-                results.add((Map<String, Object>) map);
-            }
-        }
-        return results;
+    /**
+     * 【核心匹配逻辑修复】
+     * 顺序：完整 ID -> 简写 ID -> 用户名 -> 邮箱 -> 手机号
+     */
+    private boolean matchesIdentifier(Map<String, Object> account, String identifier) {
+        String storedId = asString(account.get("id")); // "TA-10258"
+        String storedUsername = asString(account.get("username")); // "Seele"
+        String storedEmail = asString(account.get("email"));
+        String storedPhone = asString(account.get("phone"));
+
+        return storedId.equalsIgnoreCase(identifier)                // 匹配 TA-10258
+                || storedId.equalsIgnoreCase("TA-" + identifier)    // 匹配 10258
+                || storedUsername.equalsIgnoreCase(identifier)      // 匹配 Seele
+                || storedEmail.equalsIgnoreCase(identifier)         // 匹配邮箱
+                || storedPhone.equals(identifier);                   // 匹配手机号
     }
 
-    private static Path resolveDataPath(String subDirectory, String fileName) {
+    private static ResolvedDataRoot resolveDataRoot() {
         String envValue = System.getenv(DATA_MOUNT_ENV);
-        Path root = (envValue == null || envValue.trim().isEmpty())
-                ? DEFAULT_DATA_ROOT
-                : Path.of(envValue.trim());
-        return root.resolve(subDirectory).resolve(fileName);
+        if (envValue == null || envValue.trim().isEmpty()) {
+            return new ResolvedDataRoot(false, DEFAULT_DATA_ROOT.toAbsolutePath().normalize());
+        }
+        return new ResolvedDataRoot(true, Path.of(envValue.trim()).toAbsolutePath().normalize());
     }
 
-    private String trim(String value) {
-        return value == null ? "" : value.trim();
+    public static String getDataMountStatusMessage() {
+        return "[TA-DATA] 环境变量 " + DATA_MOUNT_ENV + " "
+                + (RESOLVED_DATA_ROOT.fromEnvironment() ? "已挂载" : "未挂载，使用默认目录")
+                + "；数据根目录=" + RESOLVED_DATA_ROOT.rootPath();
     }
 
-    private String asString(Object value) {
-        return value == null ? "" : String.valueOf(value);
-    }
+    private String trim(String value) { return value == null ? "" : value.trim(); }
+    private String asString(Object value) { return value == null ? "" : String.valueOf(value); }
 
+    /**
+     * 解决 Gson 将数字解析为 Double (如 0.0) 的兼容性转换
+     */
     private int asInt(Object value) {
-        if (value instanceof Number number) {
-            return number.intValue();
-        }
-        if (value == null) {
-            return 0;
-        }
+        if (value instanceof Number num) return num.intValue();
         try {
-            return Integer.parseInt(String.valueOf(value));
-        } catch (NumberFormatException ex) {
-            return 0;
-        }
+            return (int) Double.parseDouble(asString(value));
+        } catch (Exception e) { return 0; }
     }
+
+    private record ResolvedDataRoot(boolean fromEnvironment, Path rootPath) {}
 
     public static class TaLoginResult {
         private final boolean success;
         private final int status;
         private final String message;
         private final Map<String, Object> data;
-
         private TaLoginResult(boolean success, int status, String message, Map<String, Object> data) {
-            this.success = success;
-            this.status = status;
-            this.message = message;
-            this.data = data;
+            this.success = success; this.status = status; this.message = message; this.data = data;
         }
-
-        public static TaLoginResult success(Map<String, Object> data) {
-            return new TaLoginResult(true, 200, "登录成功", data);
-        }
-
-        public static TaLoginResult failure(int status, String message) {
-            return new TaLoginResult(false, status, message, null);
-        }
-
-        public boolean isSuccess() {
-            return success;
-        }
-
-        public int getStatus() {
-            return status;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public Map<String, Object> getData() {
-            return data;
-        }
+        public static TaLoginResult success(Map<String, Object> data) { return new TaLoginResult(true, 200, "登录成功", data); }
+        public static TaLoginResult failure(int status, String message) { return new TaLoginResult(false, status, message, null); }
+        public boolean isSuccess() { return success; }
+        public int getStatus() { return status; }
+        public String getMessage() { return message; }
+        public Map<String, Object> getData() { return data; }
     }
 
     public static class TaRegisterResult {
@@ -290,282 +270,14 @@ public class TaAccountDao {
         private final int status;
         private final String message;
         private final Map<String, Object> data;
-
         private TaRegisterResult(boolean success, int status, String message, Map<String, Object> data) {
-            this.success = success;
-            this.status = status;
-            this.message = message;
-            this.data = data;
+            this.success = success; this.status = status; this.message = message; this.data = data;
         }
-
-        public static TaRegisterResult success(Map<String, Object> data) {
-            return new TaRegisterResult(true, 200, "注册成功", data);
-        }
-
-        public static TaRegisterResult failure(int status, String message) {
-            return new TaRegisterResult(false, status, message, null);
-        }
-
-        public boolean isSuccess() {
-            return success;
-        }
-
-        public int getStatus() {
-            return status;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public Map<String, Object> getData() {
-            return data;
-        }
-    }
-
-    static final class SimpleJsonWriter {
-        private SimpleJsonWriter() {
-        }
-
-        static String writeRootObject(String schema, String entity, List<Map<String, Object>> records) {
-            Map<String, Object> meta = new LinkedHashMap<>();
-            meta.put("schema", schema);
-            meta.put("entity", entity);
-            meta.put("version", "1.0");
-            meta.put("updatedAt", Instant.now().toString());
-
-            Map<String, Object> root = new LinkedHashMap<>();
-            root.put("meta", meta);
-            root.put("items", records);
-            return writeObject(root, 0);
-        }
-
-        static String writeArray(List<Map<String, Object>> records) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("[\n");
-            for (int i = 0; i < records.size(); i++) {
-                builder.append("  ").append(writeObject(records.get(i), 1));
-                if (i < records.size() - 1) {
-                    builder.append(',');
-                }
-                builder.append('\n');
-            }
-            builder.append(']');
-            return builder.toString();
-        }
-
-        @SuppressWarnings("unchecked")
-        private static String writeValue(Object value, int indent) {
-            if (value == null) {
-                return "null";
-            }
-            if (value instanceof String stringValue) {
-                return quote(stringValue);
-            }
-            if (value instanceof Number || value instanceof Boolean) {
-                return String.valueOf(value);
-            }
-            if (value instanceof Map<?, ?> map) {
-                return writeObject((Map<String, Object>) map, indent);
-            }
-            if (value instanceof List<?> list) {
-                StringBuilder builder = new StringBuilder();
-                if (list.isEmpty()) {
-                    builder.append("[]");
-                    return builder.toString();
-                }
-                builder.append("[\n");
-                for (int i = 0; i < list.size(); i++) {
-                    builder.append("  ".repeat(indent + 1))
-                            .append(writeValue(list.get(i), indent + 1));
-                    if (i < list.size() - 1) {
-                        builder.append(',');
-                    }
-                    builder.append('\n');
-                }
-                builder.append("  ".repeat(indent)).append(']');
-                return builder.toString();
-            }
-            return quote(String.valueOf(value));
-        }
-
-        private static String writeObject(Map<String, Object> map, int indent) {
-            StringBuilder builder = new StringBuilder();
-            builder.append("{\n");
-            int index = 0;
-            for (Map.Entry<String, Object> entry : map.entrySet()) {
-                builder.append("  ".repeat(indent + 1))
-                        .append(quote(entry.getKey()))
-                        .append(": ")
-                        .append(writeValue(entry.getValue(), indent + 1));
-                if (index < map.size() - 1) {
-                    builder.append(',');
-                }
-                builder.append('\n');
-                index++;
-            }
-            builder.append("  ".repeat(indent)).append('}');
-            return builder.toString();
-        }
-
-        private static String quote(String value) {
-            return '"' + value
-                    .replace("\\", "\\\\")
-                    .replace("\"", "\\\"")
-                    .replace("\n", "\\n")
-                    .replace("\r", "\\r")
-                    .replace("\t", "\\t") + '"';
-        }
-    }
-
-    static final class SimpleJsonParser {
-        private static final Pattern FIELD_PATTERN = Pattern.compile("\\\"([^\\\"]+)\\\"\\s*:\\s*(.+)");
-
-        private SimpleJsonParser() {
-        }
-
-        static List<Map<String, Object>> parseArray(String json) {
-            String trimmed = json.trim();
-            if (trimmed.length() < 2) {
-                return new ArrayList<>();
-            }
-            String body = trimmed.substring(1, trimmed.length() - 1).trim();
-            List<Map<String, Object>> results = new ArrayList<>();
-            if (body.isEmpty()) {
-                return results;
-            }
-
-            int depth = 0;
-            int start = -1;
-            for (int i = 0; i < body.length(); i++) {
-                char ch = body.charAt(i);
-                if (ch == '{') {
-                    if (depth == 0) {
-                        start = i;
-                    }
-                    depth++;
-                } else if (ch == '}') {
-                    depth--;
-                    if (depth == 0 && start >= 0) {
-                        results.add(parseObject(body.substring(start, i + 1)));
-                        start = -1;
-                    }
-                }
-            }
-            return results;
-        }
-
-        static Map<String, Object> parseObject(String json) {
-            Map<String, Object> result = new LinkedHashMap<>();
-            String body = json.trim();
-            body = body.substring(1, body.length() - 1).trim();
-            List<String> fields = splitTopLevel(body);
-            for (String field : fields) {
-                Matcher matcher = FIELD_PATTERN.matcher(field.trim());
-                if (!matcher.matches()) {
-                    continue;
-                }
-                String key = matcher.group(1);
-                String value = matcher.group(2).trim();
-                result.put(key, parseValue(value));
-            }
-            return result;
-        }
-
-        private static Object parseValue(String value) {
-            if (value.startsWith("\"") && value.endsWith("\"")) {
-                return unquote(value);
-            }
-            if (value.startsWith("{")) {
-                return parseObject(value);
-            }
-            if (value.startsWith("[")) {
-                return parseList(value);
-            }
-            if ("null".equals(value)) {
-                return null;
-            }
-            if ("true".equalsIgnoreCase(value) || "false".equalsIgnoreCase(value)) {
-                return Boolean.parseBoolean(value);
-            }
-            try {
-                if (value.contains(".")) {
-                    return Double.parseDouble(value);
-                }
-                return Integer.parseInt(value);
-            } catch (NumberFormatException ex) {
-                return value;
-            }
-        }
-
-        private static List<Object> parseList(String json) {
-            String body = json.substring(1, json.length() - 1).trim();
-            List<Object> result = new ArrayList<>();
-            if (body.isEmpty()) {
-                return result;
-            }
-            List<String> values = splitTopLevel(body);
-            for (String value : values) {
-                result.add(parseValue(value.trim()));
-            }
-            return result;
-        }
-
-        private static List<String> splitTopLevel(String body) {
-            List<String> parts = new ArrayList<>();
-            StringBuilder current = new StringBuilder();
-            int objectDepth = 0;
-            int arrayDepth = 0;
-            boolean inString = false;
-            boolean escaping = false;
-
-            for (int i = 0; i < body.length(); i++) {
-                char ch = body.charAt(i);
-                current.append(ch);
-
-                if (escaping) {
-                    escaping = false;
-                    continue;
-                }
-                if (ch == '\\') {
-                    escaping = true;
-                    continue;
-                }
-                if (ch == '"') {
-                    inString = !inString;
-                    continue;
-                }
-                if (inString) {
-                    continue;
-                }
-                if (ch == '{') {
-                    objectDepth++;
-                } else if (ch == '}') {
-                    objectDepth--;
-                } else if (ch == '[') {
-                    arrayDepth++;
-                } else if (ch == ']') {
-                    arrayDepth--;
-                } else if (ch == ',' && objectDepth == 0 && arrayDepth == 0) {
-                    current.deleteCharAt(current.length() - 1);
-                    parts.add(current.toString());
-                    current.setLength(0);
-                }
-            }
-            if (!current.isEmpty()) {
-                parts.add(current.toString());
-            }
-            return parts;
-        }
-
-        private static String unquote(String value) {
-            String body = value.substring(1, value.length() - 1);
-            return body
-                    .replace("\\\"", "\"")
-                    .replace("\\n", "\n")
-                    .replace("\\r", "\r")
-                    .replace("\\t", "\t")
-                    .replace("\\\\", "\\");
-        }
+        public static TaRegisterResult success(Map<String, Object> data) { return new TaRegisterResult(true, 200, "注册成功", data); }
+        public static TaRegisterResult failure(int status, String message) { return new TaRegisterResult(false, status, message, null); }
+        public boolean isSuccess() { return success; }
+        public int getStatus() { return status; }
+        public String getMessage() { return message; }
+        public Map<String, Object> getData() { return data; }
     }
 }

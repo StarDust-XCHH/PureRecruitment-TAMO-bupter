@@ -14,12 +14,17 @@ public class TaRegistrationService {
             return ApiResponse.failure("注册信息不能为空");
         }
 
+        String taId = trim(request.getTaId());
         String name = trim(request.getName());
         String username = trim(request.getUsername());
         String email = trim(request.getEmail());
         String phone = trim(request.getPhone());
         String password = request.getPassword() == null ? "" : request.getPassword();
         String confirmPassword = request.getConfirmPassword() == null ? "" : request.getConfirmPassword();
+
+        if (taId.isEmpty()) {
+            return ApiResponse.failure("TA ID 缺失，请重新打开注册面板后再试");
+        }
 
         if (name.isEmpty() || username.isEmpty() || email.isEmpty() || phone.isEmpty()) {
             return ApiResponse.failure("姓名、用户名、邮箱、手机号不能为空");
@@ -42,6 +47,17 @@ public class TaRegistrationService {
         }
 
         return ApiResponse.success("校验通过", null);
+    }
+
+    public String normalizeTaId(String taId) {
+        String normalized = trim(taId).toUpperCase();
+        if (normalized.isEmpty()) {
+            return "";
+        }
+        if (normalized.startsWith("TA-")) {
+            return normalized;
+        }
+        return "TA-" + normalized.replaceAll("^TA", "");
     }
 
     private String trim(String value) {
