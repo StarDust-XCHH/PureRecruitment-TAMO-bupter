@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -14,9 +15,18 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TaAccountDao {
-    private static final Path TA_DATA_PATH = Path.of("mountDataTAMObupter", "ta", "tas.json");
-    private static final Path PROFILE_DATA_PATH = Path.of("mountDataTAMObupter", "ta", "profiles.json");
-    private static final Path SETTINGS_DATA_PATH = Path.of("mountDataTAMObupter", "ta", "settings.json");
+    private static final String DATA_MOUNT_ENV = "mountDataTAMObupter";
+    private static final Path DEFAULT_DATA_ROOT = Path.of("mountDataTAMObupter");
+    private static final String TA_SCHEMA = "ta";
+    private static final String TA_ENTITY = "tas";
+    private static final String PROFILE_SCHEMA = "ta";
+    private static final String PROFILE_ENTITY = "profiles";
+    private static final String SETTINGS_SCHEMA = "ta";
+    private static final String SETTINGS_ENTITY = "settings";
+
+    private static final Path TA_DATA_PATH = resolveDataPath("ta", "tas.json");
+    private static final Path PROFILE_DATA_PATH = resolveDataPath("ta", "profiles.json");
+    private static final Path SETTINGS_DATA_PATH = resolveDataPath("ta", "settings.json");
 
     public TaLoginResult login(String identifier, String password) throws IOException {
         String normalizedIdentifier = trim(identifier);
@@ -26,7 +36,7 @@ public class TaAccountDao {
             return TaLoginResult.failure(400, "请输入账号和密码");
         }
 
-        List<Map<String, Object>> accounts = loadRecords(TA_DATA_PATH);
+        List<Map<String, Object>> accounts = loadRecords(TA_DATA_PATH, TA_SCHEMA, TA_ENTITY);
         Map<String, Object> matchedAccount = null;
 
         for (Map<String, Object> account : accounts) {
@@ -49,14 +59,14 @@ public class TaAccountDao {
         if (!AuthUtils.hashPassword(normalizedPassword, salt).equals(passwordHash)) {
             auth.put("failedAttempts", asInt(auth.get("failedAttempts")) + 1);
             matchedAccount.put("updatedAt", currentTime);
-            saveRecords(TA_DATA_PATH, accounts);
+            saveRecords(TA_DATA_PATH, TA_SCHEMA, TA_ENTITY, accounts);
             return TaLoginResult.failure(401, "账号或密码错误");
         }
 
         auth.put("failedAttempts", 0);
         auth.put("lastLoginAt", currentTime);
         matchedAccount.put("updatedAt", currentTime);
-        saveRecords(TA_DATA_PATH, accounts);
+        saveRecords(TA_DATA_PATH, TA_SCHEMA, TA_ENTITY, accounts);
 
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("taId", asString(matchedAccount.get("id")));
@@ -72,9 +82,9 @@ public class TaAccountDao {
     }
 
     public TaRegisterResult register(String taId, String name, String username, String email, String phone, String password) throws IOException {
-        List<Map<String, Object>> accounts = loadRecords(TA_DATA_PATH);
-        List<Map<String, Object>> profiles = loadRecords(PROFILE_DATA_PATH);
-        List<Map<String, Object>> settings = loadRecords(SETTINGS_DATA_PATH);
+        List<Map<String, Object>> accounts = loadRecords(TA_DATA_PATH, TA_SCHEMA, TA_ENTITY);
+        List<Map<String, Object>> profiles = loadRecords(PROFILE_DATA_PATH, PROFILE_SCHEMA, PROFILE_ENTITY);
+        List<Map<String, Object>> settings = loadRecords(SETTINGS_DATA_PATH, SETTINGS_SCHEMA, SETTINGS_ENTITY);
 
         for (Map<String, Object> account : accounts) {
             if (asString(account.get("id")).equals(taId)) {
@@ -100,7 +110,6 @@ public class TaAccountDao {
         auth.put("passwordSalt", salt);
         auth.put("lastLoginAt", currentTime);
         auth.put("failedAttempts", 0);
-        auth.put("lockedUntil", null);
 
         Map<String, Object> account = new LinkedHashMap<>();
         account.put("id", taId);
@@ -140,9 +149,9 @@ public class TaAccountDao {
         setting.put("createdAt", currentTime);
         settings.add(setting);
 
-        saveRecords(TA_DATA_PATH, accounts);
-        saveRecords(PROFILE_DATA_PATH, profiles);
-        saveRecords(SETTINGS_DATA_PATH, settings);
+        saveRecords(TA_DATA_PATH, TA_SCHEMA, TA_ENTITY, accounts);
+        saveRecords(PROFILE_DATA_PATH, PROFILE_SCHEMA, PROFILE_ENTITY, profiles);
+        saveRecords(SETTINGS_DATA_PATH, SETTINGS_SCHEMA, SETTINGS_ENTITY, settings);
 
         Map<String, Object> data = new LinkedHashMap<>();
         data.put("taId", taId);
@@ -160,27 +169,60 @@ public class TaAccountDao {
                 || asString(account.get("phone")).equals(identifier);
     }
 
-    private List<Map<String, Object>> loadRecords(Path path) throws IOException {
-        ensureDataFile(path);
+    private List<Map<String, Object>> loadRecords(Path path, String schema, String entity) throws IOException {
+        ensureDataFile(path, schema, entity);
         String content = Files.readString(path, StandardCharsets.UTF_8).trim();
         if (content.isEmpty() || content.equals("[]")) {
+            return new ArrayList<>();
+        }
+        if (content.startsWith("{")) {
+            Map<String, Object> root = SimpleJsonParser.parseObject(content);
+            Object items = root.get("items");
+            if (items instanceof List<?> list) {
+                return castRecordList(list);
+            }
             return new ArrayList<>();
         }
         return SimpleJsonParser.parseArray(content);
     }
 
-    private void saveRecords(Path path, List<Map<String, Object>> records) throws IOException {
-        ensureDataFile(path);
-        Files.writeString(path, SimpleJsonWriter.writeArray(records), StandardCharsets.UTF_8);
+    private void saveRecords(Path path, String schema, String entity, List<Map<String, Object>> records) throws IOException {
+        ensureDataFile(path, schema, entity);
+        Files.writeString(path, SimpleJsonWriter.writeRootObject(schema, entity, records), StandardCharsets.UTF_8);
     }
 
-    private void ensureDataFile(Path path) throws IOException {
+    private void ensureDataFile(Path path, String schema, String entity) throws IOException {
         if (Files.notExists(path.getParent())) {
             Files.createDirectories(path.getParent());
         }
         if (Files.notExists(path)) {
-            Files.writeString(path, "[]", StandardCharsets.UTF_8);
+            Files.writeString(path, SimpleJsonWriter.writeRootObject(schema, entity, new ArrayList<>()), StandardCharsets.UTF_8);
+            return;
         }
+
+        String content = Files.readString(path, StandardCharsets.UTF_8).trim();
+        if (content.isEmpty() || content.equals("[]")) {
+            Files.writeString(path, SimpleJsonWriter.writeRootObject(schema, entity, new ArrayList<>()), StandardCharsets.UTF_8);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<Map<String, Object>> castRecordList(List<?> list) {
+        List<Map<String, Object>> results = new ArrayList<>();
+        for (Object item : list) {
+            if (item instanceof Map<?, ?> map) {
+                results.add((Map<String, Object>) map);
+            }
+        }
+        return results;
+    }
+
+    private static Path resolveDataPath(String subDirectory, String fileName) {
+        String envValue = System.getenv(DATA_MOUNT_ENV);
+        Path root = (envValue == null || envValue.trim().isEmpty())
+                ? DEFAULT_DATA_ROOT
+                : Path.of(envValue.trim());
+        return root.resolve(subDirectory).resolve(fileName);
     }
 
     private String trim(String value) {
@@ -285,6 +327,19 @@ public class TaAccountDao {
         private SimpleJsonWriter() {
         }
 
+        static String writeRootObject(String schema, String entity, List<Map<String, Object>> records) {
+            Map<String, Object> meta = new LinkedHashMap<>();
+            meta.put("schema", schema);
+            meta.put("entity", entity);
+            meta.put("version", "1.0");
+            meta.put("updatedAt", Instant.now().toString());
+
+            Map<String, Object> root = new LinkedHashMap<>();
+            root.put("meta", meta);
+            root.put("items", records);
+            return writeObject(root, 0);
+        }
+
         static String writeArray(List<Map<String, Object>> records) {
             StringBuilder builder = new StringBuilder();
             builder.append("[\n");
@@ -315,14 +370,20 @@ public class TaAccountDao {
             }
             if (value instanceof List<?> list) {
                 StringBuilder builder = new StringBuilder();
-                builder.append('[');
+                if (list.isEmpty()) {
+                    builder.append("[]");
+                    return builder.toString();
+                }
+                builder.append("[\n");
                 for (int i = 0; i < list.size(); i++) {
-                    builder.append(writeValue(list.get(i), indent + 1));
+                    builder.append("  ".repeat(indent + 1))
+                            .append(writeValue(list.get(i), indent + 1));
                     if (i < list.size() - 1) {
                         builder.append(',');
                     }
+                    builder.append('\n');
                 }
-                builder.append(']');
+                builder.append("  ".repeat(indent)).append(']');
                 return builder.toString();
             }
             return quote(String.valueOf(value));
@@ -394,7 +455,7 @@ public class TaAccountDao {
             return results;
         }
 
-        private static Map<String, Object> parseObject(String json) {
+        static Map<String, Object> parseObject(String json) {
             Map<String, Object> result = new LinkedHashMap<>();
             String body = json.trim();
             body = body.substring(1, body.length() - 1).trim();
