@@ -2,6 +2,7 @@
         const root = document.documentElement;
         const loginCard = document.getElementById('loginCard');
         const registerCard = document.getElementById('registerCard');
+        const modalOverlay = document.getElementById('modalOverlay');
         const loginForm = document.getElementById('loginForm');
         const registerForm = document.getElementById('registerForm');
         const roleInput = document.getElementById('roleInput');
@@ -82,6 +83,12 @@
             localStorage.setItem('ta-user', serialized);
         }
 
+        function setOverlayState(isActive) {
+            modalOverlay.classList.toggle('hidden', !isActive);
+            modalOverlay.classList.toggle('active', isActive);
+            modalOverlay.setAttribute('aria-hidden', String(!isActive));
+        }
+
         function showCard(cardToShow, cardToHide) {
             setInlineMessage(loginError, '');
             setInlineMessage(registerError, '');
@@ -90,6 +97,7 @@
             cardToShow.classList.remove('fade-in');
             void cardToShow.offsetWidth;
             cardToShow.classList.add('fade-in');
+            setOverlayState(cardToShow === registerCard);
         }
 
         function setLoading(button, loadingText, isLoading, fallbackText) {
@@ -99,6 +107,7 @@
 
         const savedTheme = localStorage.getItem('ta-theme');
         applyTheme(savedTheme === 'light' ? 'light' : 'dark');
+        setOverlayState(false);
 
         tabs.forEach(function (tab) {
             tab.addEventListener('click', function () {
@@ -161,6 +170,13 @@
 
         backToLogin.addEventListener('click', function (event) {
             event.preventDefault();
+            showCard(loginCard, registerCard);
+            if (registerUsername.value.trim()) {
+                loginUsername.value = registerUsername.value.trim();
+            }
+        });
+
+        modalOverlay.addEventListener('click', function () {
             showCard(loginCard, registerCard);
             if (registerUsername.value.trim()) {
                 loginUsername.value = registerUsername.value.trim();

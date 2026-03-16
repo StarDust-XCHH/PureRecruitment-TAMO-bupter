@@ -13,6 +13,8 @@
             --input-border: rgba(255, 255, 255, 0.15);
             --danger-bg: rgba(255, 120, 120, 0.15);
             --danger-text: #ffb4b4;
+            --overlay-bg: rgba(4, 8, 20, 0.42);
+            --overlay-border: rgba(255, 255, 255, 0.08);
         }
 
         :root[data-theme='light'] {
@@ -30,6 +32,8 @@
             --input-border: rgba(15, 20, 35, 0.2);
             --danger-bg: rgba(220, 80, 80, 0.12);
             --danger-text: #a11616;
+            --overlay-bg: rgba(232, 237, 247, 0.45);
+            --overlay-border: rgba(255, 255, 255, 0.35);
         }
 
         * {
@@ -80,16 +84,37 @@
             animation-delay: 1.6s;
         }
 
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: var(--overlay-bg);
+            backdrop-filter: blur(14px) saturate(140%);
+            -webkit-backdrop-filter: blur(14px) saturate(140%);
+            border: 1px solid transparent;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease;
+            z-index: 10;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+            border-color: var(--overlay-border);
+        }
+
         .auth-shell {
             position: relative;
             width: min(420px, 92vw);
             min-height: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 20;
         }
 
         .card {
-            position: absolute;
-            top: 50%;
-            left: 0;
+            position: relative;
             width: min(420px, 92vw);
             padding: 32px 28px;
             background: var(--card);
@@ -97,13 +122,13 @@
             border-radius: 18px;
             backdrop-filter: blur(14px);
             box-shadow: 0 18px 40px rgba(3, 6, 20, 0.45);
-            transform: translateY(-50%);
+            transform: translateY(0);
             transform-style: preserve-3d;
             transition: transform 0.4s ease, box-shadow 0.4s ease, background 0.35s ease, border-color 0.35s ease;
         }
 
         .card:hover {
-            transform: translateY(calc(-50% - 6px)) rotateX(2deg) rotateY(-2deg);
+            transform: translateY(-6px) rotateX(2deg) rotateY(-2deg);
             box-shadow: 0 24px 50px rgba(5, 10, 30, 0.55);
         }
 
@@ -402,21 +427,29 @@
         @keyframes cardFadeIn {
             from {
                 opacity: 0;
-                transform: translateY(15px);
+                transform: translateY(18px) scale(0.98);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
         }
 
         @media (max-width: 560px) {
+            body {
+                padding: 16px 0;
+            }
+
             .page-shell {
                 padding: 20px 12px;
             }
 
             .auth-shell {
-                min-height: auto;
+                width: min(100%, 92vw);
+            }
+
+            .card {
+                padding: 28px 20px;
             }
 
             .field-row {

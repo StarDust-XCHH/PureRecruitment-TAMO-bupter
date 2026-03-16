@@ -10,6 +10,7 @@
 <body>
 <div class="glow"></div>
 <div class="glow two"></div>
+<div class="modal-overlay hidden" id="modalOverlay" aria-hidden="true"></div>
 
 <div class="page-shell">
     <div class="auth-shell">
