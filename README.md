@@ -1,6 +1,6 @@
 # PureRecruitment-TAMO-bupter
 
-Group·16
+Group分支合并冲突测试-16
 
 # 资源文件服务端部署挂载
 
