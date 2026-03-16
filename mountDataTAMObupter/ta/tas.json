@@ -3,23 +3,40 @@
     "schema": "ta",
     "entity": "tas",
     "version": "1.0",
-    "updatedAt": "2026-03-16T12:07:52.546899300Z"
+    "updatedAt": "2026-03-16T13:47:17.786537400Z"
   },
   "items": [
     {
-      "id": "TA-57411",
+      "id": "TA-45935",
+      "name": "AAA",
+      "username": "AAA",
+      "email": "AAA@qa.c",
+      "phone": "12312312",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-03-16T13:19:06.884221300Z",
+      "updatedAt": "2026-03-16T13:19:06.884221300Z",
+      "auth": {
+        "passwordHash": "c9aeea9499f161f9e307d8f4a8cb4c0d5a1393dcd466b49b630fb060f281defe",
+        "passwordSalt": "fecc6463-14f5-4e25-a015-bfd2eb448afb",
+        "lastLoginAt": "2026-03-16T13:19:06.884221300Z",
+        "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "TA-10258",
       "name": "Seele Vollerei",
       "username": "Seele",
       "email": "Seele520@honkai.com",
       "phone": "520520520",
       "department": "",
       "status": "active",
-      "createdAt": "2026-03-16T12:07:52.538876300Z",
-      "updatedAt": "2026-03-16T12:07:52.538876300Z",
+      "createdAt": "2026-03-16T13:28:45.257077Z",
+      "updatedAt": "2026-03-16T13:47:17.783247900Z",
       "auth": {
-        "passwordHash": "6c697fed40b0cd234d9de38e17c24a8f4fd283a76bf231e74accf44812377876",
-        "passwordSalt": "e1e24b0d-898d-4a88-acd7-648928395bbe",
-        "lastLoginAt": "2026-03-16T12:07:52.538876300Z",
+        "passwordHash": "8b5361414eb8fa038ca9279a55be8b3b44791939d89475d1618d50230c01d65f",
+        "passwordSalt": "cebb50b5-9797-4732-a22a-df78ae1c88da",
+        "lastLoginAt": "2026-03-16T13:47:17.783247900Z",
         "failedAttempts": 0
       }
     }

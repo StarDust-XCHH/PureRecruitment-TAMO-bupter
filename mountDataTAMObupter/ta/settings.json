@@ -3,16 +3,22 @@
     "schema": "ta",
     "entity": "settings",
     "version": "1.0",
-    "updatedAt": "2026-03-16T12:07:52.552910600Z"
+    "updatedAt": "2026-03-16T13:28:45.273077800Z"
   },
   "items": [
     {
-      "id": "SETTING-TA-57411",
-      "taId": "TA-57411",
+      "id": "SETTING-TA-45935",
+      "taId": "TA-45935",
       "theme": "dark",
-      "onboardingStep": 0,
+      "onboardingStep": 0.0,
       "guideCompleted": false,
-      "createdAt": "2026-03-16T12:07:52.538876300Z"
+      "createdAt": "2026-03-16T13:19:06.884221300Z"
+    },
+    {
+      "id": "SETTING-TA-10258",
+      "taId": "TA-10258",
+      "theme": "dark",
+      "createdAt": "2026-03-16T13:28:45.257077Z"
     }
   ]
 }

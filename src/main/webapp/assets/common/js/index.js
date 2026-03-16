@@ -189,28 +189,24 @@
             clearFieldErrors([loginUsername, loginPassword]);
 
             const username = loginUsername.value.trim();
-            const password = loginPassword.value.trim();
-            const role = roleInput.value;
+            const password = loginPassword.value; // 保持原始密码不 trim
+
+            // 【前端调试日志】
+            console.group("--- 登录请求调试 ---");
+            console.log("请求 URL:", "api/ta/login");
+            console.log("识别码 (identifier):", username);
+            console.log("密码长度:", password ? password.length : 0);
+            console.groupEnd();
 
             if (!username || !password) {
-                if (!username) {
-                    markInvalid(loginUsername);
-                }
-                if (!password) {
-                    markInvalid(loginPassword);
-                }
                 setInlineMessage(loginError, '请输入用户名和密码');
-                return;
-            }
-
-            if (role !== 'TA') {
-                setInlineMessage(loginError, '当前仅支持 TA 账号登录');
                 return;
             }
 
             setLoading(loginSubmit, '登录中...', true, '进入系统');
 
             try {
+                // 【核心修改】：去掉开头的 /，改用相对路径以适配 Context Path
                 const response = await fetch('api/ta/login', {
                     method: 'POST',
                     headers: {
@@ -222,37 +218,37 @@
                     })
                 });
 
-                let payload = {};
-                try {
-                    payload = await response.json();
-                } catch (error) {
-                    payload = {};
-                }
+                console.log("[JS] 原始响应状态码:", response.status);
 
-                if (!response.ok || !payload.success) {
-                    setInlineMessage(loginError, payload.message || '登录失败，请检查账号或密码');
+                if (response.status === 404) {
+                    console.error("[JS] 错误：接口地址不存在 (404)。请检查 Servlet 映射或 Context Path。");
+                    setInlineMessage(loginError, '服务器接口未找到 (404)');
                     return;
                 }
 
+                const payload = await response.json();
+                console.log("[JS] 解析后的响应体:", payload);
+
+                if (!response.ok || !payload.success) {
+                    setInlineMessage(loginError, payload.message || '登录失败');
+                    return;
+                }
+
+                // 成功逻辑
                 const data = payload.data || {};
                 const user = {
-                    taId: data.taId || '',
-                    name: data.name || '',
-                    username: data.username || '',
-                    email: data.email || '',
-                    phone: data.phone || '',
-                    department: data.department || '',
-                    status: data.status || '',
-                    account: data.username || username,
+                    taId: data.taId,
+                    name: data.name,
+                    username: data.username,
                     role: 'TA',
-                    loginAt: data.loginAt || new Date().toISOString(),
-                    isFirstLogin: Boolean(data.isFirstLogin)
+                    loginAt: data.loginAt
                 };
-
                 saveTaUser(user);
                 window.location.replace('pages/ta/ta-home.jsp');
+
             } catch (error) {
-                setInlineMessage(loginError, '登录请求失败，请稍后再试');
+                console.error("[JS] 网络请求异常:", error);
+                setInlineMessage(loginError, '连接服务器失败，请检查后端是否启动');
             } finally {
                 setLoading(loginSubmit, '登录中...', false, '进入系统');
             }

@@ -3,23 +3,30 @@
     "schema": "ta",
     "entity": "profiles",
     "version": "1.0",
-    "updatedAt": "2026-03-16T12:07:52.549908200Z"
+    "updatedAt": "2026-03-16T13:28:45.272078700Z"
   },
   "items": [
     {
-      "id": "PROFILE-TA-57411",
-      "taId": "TA-57411",
+      "id": "PROFILE-TA-45935",
+      "taId": "TA-45935",
       "avatar": "",
       "realName": "",
       "applicationIntent": "",
-      "studentId": "TA-57411",
+      "studentId": "TA-45935",
       "contactEmail": "",
       "bio": "",
       "skills": [],
-      "availabilityHoursPerWeek": 0,
+      "availabilityHoursPerWeek": 0.0,
       "semester": "",
       "title": "TA",
-      "lastUpdatedAt": "2026-03-16T12:07:52.538876300Z"
+      "lastUpdatedAt": "2026-03-16T13:19:06.884221300Z"
+    },
+    {
+      "id": "PROFILE-TA-10258",
+      "taId": "TA-10258",
+      "studentId": "TA-10258",
+      "skills": [],
+      "lastUpdatedAt": "2026-03-16T13:28:45.257077Z"
     }
   ]
 }
