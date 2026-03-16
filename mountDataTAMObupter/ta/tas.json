@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "tas",
     "version": "1.0",
-    "updatedAt": "2026-03-16T19:15:37.101489700Z"
+    "updatedAt": "2026-03-16T19:20:24.985251800Z"
   },
   "items": [
     {
@@ -38,6 +38,23 @@
         "passwordSalt": "cebb50b5-9797-4732-a22a-df78ae1c88da",
         "lastLoginAt": "2026-03-16T19:14:28.427193500Z",
         "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "TA-93749",
+      "name": "Aiaa",
+      "username": "Aiaa",
+      "email": "Aiaa@a.com",
+      "phone": "123112312",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-03-16T19:20:24.983252300Z",
+      "updatedAt": "2026-03-16T19:20:24.983252300Z",
+      "auth": {
+        "passwordHash": "0f20dea3ed76b2e1ed5eeb240b41e300267a962fd4f48a2b32237ba1aa4fcd42",
+        "passwordSalt": "5f6ffe56-2f50-4b86-9bc3-a317fbe9cd0f",
+        "lastLoginAt": "",
+        "failedAttempts": 0
       }
     }
   ]

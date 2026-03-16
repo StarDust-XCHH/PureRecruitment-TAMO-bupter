@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "settings",
     "version": "1.0",
-    "updatedAt": "2026-03-16T19:15:37.104001200Z"
+    "updatedAt": "2026-03-16T19:20:25.930456100Z"
   },
   "items": [
     {
@@ -29,6 +29,22 @@
       "avatar": "image/TA-10258_1773688536990_cbe066f0e82c43b8ab7b5f6623eda88b.png",
       "onboardingCompletedAt": "",
       "onboardingDismissed": false
+    },
+    {
+      "id": "SETTING-TA-93749",
+      "taId": "TA-93749",
+      "theme": "dark",
+      "avatar": "",
+      "onboardingStep": 0.0,
+      "guideCompleted": false,
+      "onboardingCompletedAt": "",
+      "onboardingDismissed": false,
+      "profileSaved": false,
+      "profileSavedAt": "",
+      "lastProfileSyncStatus": "idle",
+      "lastProfileSyncMessage": "",
+      "createdAt": "2026-03-16T19:20:24.983252300Z",
+      "updatedAt": "2026-03-16T19:20:24.983252300Z"
     }
   ]
 }

@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "profiles",
     "version": "1.0",
-    "updatedAt": "2026-03-16T19:15:37.102994800Z"
+    "updatedAt": "2026-03-16T19:20:25.928447800Z"
   },
   "items": [
     {
@@ -35,6 +35,21 @@
       "availabilityHoursPerWeek": 0.0,
       "semester": "",
       "title": "TA"
+    },
+    {
+      "id": "PROFILE-TA-93749",
+      "taId": "TA-93749",
+      "avatar": "",
+      "realName": "Aiaa",
+      "applicationIntent": "",
+      "studentId": "TA-93749",
+      "contactEmail": "Aiaa@a.com",
+      "bio": "",
+      "skills": [],
+      "availabilityHoursPerWeek": 0.0,
+      "semester": "",
+      "title": "TA",
+      "lastUpdatedAt": "2026-03-16T19:20:24.983252300Z"
     }
   ]
 }
