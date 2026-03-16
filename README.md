@@ -1,6 +1,10 @@
 # PureRecruitment-TAMO-bupter
 
-Group-16
+# Group-16 成员
+
+- StarDust-XCHH: 管宇涵-Yuhan Guan
+
+
 
 # 资源文件服务端部署挂载
 
