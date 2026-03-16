@@ -1,1 +1,18 @@
-[]
+{
+  "meta": {
+    "schema": "ta",
+    "entity": "settings",
+    "version": "1.0",
+    "updatedAt": "2026-03-16T12:07:52.552910600Z"
+  },
+  "items": [
+    {
+      "id": "SETTING-TA-57411",
+      "taId": "TA-57411",
+      "theme": "dark",
+      "onboardingStep": 0,
+      "guideCompleted": false,
+      "createdAt": "2026-03-16T12:07:52.538876300Z"
+    }
+  ]
+}

@@ -1,1 +1,27 @@
-[]
+{
+  "meta": {
+    "schema": "ta",
+    "entity": "tas",
+    "version": "1.0",
+    "updatedAt": "2026-03-16T12:07:52.546899300Z"
+  },
+  "items": [
+    {
+      "id": "TA-57411",
+      "name": "Seele Vollerei",
+      "username": "Seele",
+      "email": "Seele520@honkai.com",
+      "phone": "520520520",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-03-16T12:07:52.538876300Z",
+      "updatedAt": "2026-03-16T12:07:52.538876300Z",
+      "auth": {
+        "passwordHash": "6c697fed40b0cd234d9de38e17c24a8f4fd283a76bf231e74accf44812377876",
+        "passwordSalt": "e1e24b0d-898d-4a88-acd7-648928395bbe",
+        "lastLoginAt": "2026-03-16T12:07:52.538876300Z",
+        "failedAttempts": 0
+      }
+    }
+  ]
+}
