@@ -23,7 +23,7 @@
             { title: '完善你的档案信息', desc: '先补全个人资料与技能标签，让岗位推荐更精准。', selector: '.nav-item[data-route="profile"]', route: 'profile' },
             { title: '筛选并申请岗位', desc: '在职位大厅查看匹配度、职位详情与投递入口。', selector: '.nav-item[data-route="jobs"]', route: 'jobs' },
             { title: '查看申请状态', desc: '随时跟踪各个岗位的申请状态与反馈。', selector: '.nav-item[data-route="status"]', route: 'status' },
-            { title: '打开设置中心', desc: '点击右上角用户入口，随时修改资料、头像、密码与主题。', selector: '#userTrigger', route: 'profile' }
+            { title: '打开设置中心', desc: '点击右上角用户入口，随时修改资料、头像、密码与主题。', selector: '#userTrigger', route: 'profile', align: 'left', scrollTarget: 'topbar', overlayMode: 'focus-topbar' }
         ];
 
         const guideRouteLookup = new Map(guideSteps.filter((step) => step.route).map((step, index) => [step.route, index]));
@@ -32,10 +32,51 @@
 
         let guideIndex = 0;
         const guidePadding = 12;
+        const guideCardGap = 40;
+        const guideArrowGap = 20;
+        const viewportPadding = 24;
 
         function setGuideActive(active) {
             if (app.state.settings) {
                 app.state.settings.guideActive = active;
+            }
+        }
+
+        function getCurrentStep() {
+            return guideSteps[guideIndex] || null;
+        }
+
+        function syncOverlayMode() {
+            if (!onboarding) return;
+            const step = getCurrentStep();
+            onboarding.dataset.overlayMode = step?.overlayMode || 'default';
+        }
+
+        function setWindowScrollTop(top) {
+            const safeTop = Math.max(0, Math.round(top || 0));
+            document.documentElement.scrollTop = safeTop;
+            document.body.scrollTop = safeTop;
+            try {
+                window.scrollTo({ top: safeTop, behavior: 'auto' });
+            } catch (error) {
+                window.scrollTo(0, safeTop);
+            }
+        }
+
+        function scrollGuideStepIntoView(step) {
+            if (!step?.scrollTarget) return;
+
+            if (step.scrollTarget === 'topbar') {
+                const topbar = document.querySelector('.topbar');
+                const topbarTop = topbar ? topbar.offsetTop : 0;
+                setWindowScrollTop(topbarTop);
+                requestAnimationFrame(() => setWindowScrollTop(topbarTop));
+                setTimeout(() => setWindowScrollTop(topbarTop), 80);
+                return;
+            }
+
+            if (step.scrollTarget === 'top') {
+                setWindowScrollTop(0);
             }
         }
 
@@ -51,22 +92,58 @@
             };
         }
 
+        function getGuidePlacement(rect) {
+            if (!rect || !guideCard) return null;
+
+            const step = getCurrentStep();
+            const cardWidth = Math.min(guideCard.offsetWidth || guideCard.getBoundingClientRect().width || 460, window.innerWidth - viewportPadding * 2);
+            const cardHeight = guideCard.offsetHeight || guideCard.getBoundingClientRect().height || 0;
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            const targetCenterY = rect.top + rect.height / 2;
+            const maxTop = Math.max(viewportPadding, viewportHeight - cardHeight - viewportPadding);
+            const preferredTop = targetCenterY - cardHeight / 2;
+            const top = Math.min(Math.max(preferredTop, viewportPadding), maxTop);
+
+            const canPlaceRight = rect.right + guideCardGap + cardWidth <= viewportWidth - viewportPadding;
+            const canPlaceLeft = rect.left - guideCardGap - cardWidth >= viewportPadding;
+            const forceLeft = step?.align === 'left';
+            const placeLeft = forceLeft ? (canPlaceLeft || !canPlaceRight) : (!canPlaceRight && canPlaceLeft);
+
+            const left = placeLeft
+                ? Math.max(viewportPadding, rect.left - guideCardGap - cardWidth)
+                : Math.min(viewportWidth - viewportPadding - cardWidth, rect.right + guideCardGap);
+
+            return {
+                left,
+                top,
+                placeLeft,
+                targetCenterY
+            };
+        }
+
         function placeGuideCard(rect) {
             if (!rect || !guideCard) return;
-            const leftPos = rect.right + 40;
-            const topPos = rect.top + rect.height / 2;
+            const placement = getGuidePlacement(rect);
+            if (!placement) return;
+
             guideCard.style.position = 'fixed';
-            guideCard.style.left = leftPos + 'px';
-            guideCard.style.top = topPos + 'px';
-            guideCard.style.transform = 'translateY(-50%)';
+            guideCard.style.left = placement.left + 'px';
+            guideCard.style.top = placement.top + 'px';
+            guideCard.style.transform = 'none';
             guideCard.style.margin = '0';
         }
 
         function setArrow(rect) {
             if (!rect || !guideArrow) return;
-            guideArrow.className = 'guide-arrow';
-            const leftPos = rect.right + 20;
-            const topPos = rect.top + rect.height / 2 - 10;
+            const placement = getGuidePlacement(rect);
+            if (!placement) return;
+
+            guideArrow.className = placement.placeLeft ? 'guide-arrow guide-arrow-right' : 'guide-arrow';
+            const leftPos = placement.placeLeft
+                ? placement.left + (guideCard.offsetWidth || guideCard.getBoundingClientRect().width || 0) + guideArrowGap
+                : rect.right + guideArrowGap;
+            const topPos = placement.targetCenterY - 10;
             guideArrow.style.position = 'fixed';
             guideArrow.style.left = leftPos + 'px';
             guideArrow.style.top = topPos + 'px';
@@ -86,10 +163,11 @@
         }
 
         function positionGuide() {
-            const step = guideSteps[guideIndex];
-            const target = document.querySelector(step.selector);
+            const step = getCurrentStep();
+            const target = step ? document.querySelector(step.selector) : null;
             if (!target || !guideHighlight || !guideTitle || !guideDesc || !guideProgress || !guideBack) return;
 
+            syncOverlayMode();
             const rect = getSafeRect(target);
             guideHighlight.style.width = (rect.width + guidePadding) + 'px';
             guideHighlight.style.height = (rect.height + guidePadding) + 'px';
@@ -114,7 +192,9 @@
             setTimeout(() => {
                 onboarding?.classList.remove('show');
                 if (onboarding) onboarding.style.display = 'none';
+                if (onboarding) delete onboarding.dataset.overlayMode;
                 appRoot?.classList.remove('dimmed');
+                appRoot?.classList.remove('dimmed-topbar-focus');
                 appRoot?.classList.add('pop');
                 setTimeout(() => appRoot?.classList.remove('pop'), 400);
             }, 400);
@@ -146,17 +226,25 @@
         function goToStep(stepIndex) {
             if (stepIndex < 0 || stepIndex >= guideSteps.length) return;
             guideIndex = stepIndex;
-            const step = guideSteps[guideIndex];
+            const step = getCurrentStep();
 
-            if (step.route) {
+            syncOverlayMode();
+            appRoot?.classList.toggle('dimmed-topbar-focus', step?.overlayMode === 'focus-topbar');
+            scrollGuideStepIntoView(step);
+
+            if (step?.route) {
                 const targetNav = document.querySelector('.nav-item[data-route="' + step.route + '"]');
                 if (targetNav && !targetNav.classList.contains('active')) {
                     targetNav.click();
                 }
             }
             requestAnimationFrame(() => {
+                scrollGuideStepIntoView(step);
                 positionGuide();
-                setTimeout(positionGuide, 120);
+                setTimeout(() => {
+                    scrollGuideStepIntoView(step);
+                    positionGuide();
+                }, 120);
             });
         }
 
@@ -165,7 +253,14 @@
             const index = guideRouteLookup.get(route);
             if (index !== undefined && index !== guideIndex) {
                 guideIndex = index;
-                requestAnimationFrame(() => positionGuide());
+                const step = getCurrentStep();
+                syncOverlayMode();
+                appRoot?.classList.toggle('dimmed-topbar-focus', step?.overlayMode === 'focus-topbar');
+                scrollGuideStepIntoView(step);
+                requestAnimationFrame(() => {
+                    scrollGuideStepIntoView(step);
+                    positionGuide();
+                });
             }
         }
 
@@ -194,9 +289,13 @@
             setGuideActive(true);
             if (onboarding) onboarding.style.display = 'block';
             appRoot?.classList.add('dimmed');
+            syncOverlayMode();
+            appRoot?.classList.toggle('dimmed-topbar-focus', getCurrentStep()?.overlayMode === 'focus-topbar');
+            scrollGuideStepIntoView(getCurrentStep());
 
             requestAnimationFrame(() => {
                 setTimeout(() => {
+                    scrollGuideStepIntoView(getCurrentStep());
                     positionGuide();
                     onboarding?.classList.add('show');
 

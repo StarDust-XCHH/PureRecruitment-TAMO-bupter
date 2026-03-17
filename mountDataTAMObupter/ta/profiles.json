@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "profiles",
     "version": "1.0",
-    "updatedAt": "2026-03-16T19:15:37.102994800Z"
+    "updatedAt": "2026-03-17T04:32:46.885810700Z"
   },
   "items": [
     {
@@ -35,6 +35,51 @@
       "availabilityHoursPerWeek": 0.0,
       "semester": "",
       "title": "TA"
+    },
+    {
+      "id": "PROFILE-TA-14845",
+      "taId": "TA-14845",
+      "avatar": "",
+      "realName": "qwe",
+      "applicationIntent": "",
+      "studentId": "TA-14845",
+      "contactEmail": "qwe@qq.w",
+      "bio": "",
+      "skills": [],
+      "availabilityHoursPerWeek": 0.0,
+      "semester": "",
+      "title": "TA",
+      "lastUpdatedAt": "2026-03-17T04:15:55.179005200Z"
+    },
+    {
+      "id": "PROFILE-TA-29882",
+      "taId": "TA-29882",
+      "avatar": "",
+      "realName": "asd",
+      "applicationIntent": "",
+      "studentId": "TA-29882",
+      "contactEmail": "asd@S.s",
+      "bio": "",
+      "skills": [],
+      "availabilityHoursPerWeek": 0.0,
+      "semester": "",
+      "title": "TA",
+      "lastUpdatedAt": "2026-03-17T04:25:53.818352Z"
+    },
+    {
+      "id": "PROFILE-TA-71124",
+      "taId": "TA-71124",
+      "avatar": "",
+      "realName": "poi",
+      "applicationIntent": "",
+      "studentId": "TA-71124",
+      "contactEmail": "poi@2.k",
+      "bio": "",
+      "skills": [],
+      "availabilityHoursPerWeek": 0.0,
+      "semester": "",
+      "title": "TA",
+      "lastUpdatedAt": "2026-03-17T04:32:45.767427100Z"
     }
   ]
 }

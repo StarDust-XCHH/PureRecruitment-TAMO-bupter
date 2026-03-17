@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "application-status",
     "version": "1.0",
-    "updatedAt": "2026-03-16T19:06:05.760320200Z"
+    "updatedAt": "2026-03-17T04:32:46.851451400Z"
   },
   "items": [
     {
@@ -324,6 +324,582 @@
     {
       "applicationId": "APP-TA-10258-03",
       "taId": "TA-10258",
+      "courseName": "EBU6402 数据库助教",
+      "status": "已录用",
+      "statusTone": "success",
+      "summary": "教学经验与数据库项目经历匹配度较高。",
+      "nextAction": "请留意后续签约通知和首次排班安排。",
+      "updatedAt": "2026-03-14T08:00:00Z",
+      "jobSlug": "database-ta",
+      "category": "数据库 / 实验辅导",
+      "matchLevel": "高",
+      "tags": [
+        "已投递",
+        "初筛通过",
+        "完成面试",
+        "已录用"
+      ],
+      "timeline": [
+        {
+          "label": "已投递申请",
+          "content": "系统已记录你的岗位投递信息。",
+          "time": "2026-03-10T10:00:00Z",
+          "done": true
+        },
+        {
+          "label": "初筛通过",
+          "content": "岗位匹配度评估结果良好。",
+          "time": "2026-03-11T15:00:00Z",
+          "done": true
+        },
+        {
+          "label": "完成面试",
+          "content": "你已完成课程理解与答疑模拟面试。",
+          "time": "2026-03-13T16:00:00Z",
+          "done": true
+        },
+        {
+          "label": "已录用",
+          "content": "请等待签约与排班通知。",
+          "time": "2026-03-14T08:00:00Z",
+          "done": true
+        }
+      ],
+      "details": [
+        {
+          "label": "岗位编号",
+          "value": "EBU6402"
+        },
+        {
+          "label": "课程方向",
+          "value": "数据库"
+        },
+        {
+          "label": "预计到岗",
+          "value": "2026-03-21"
+        }
+      ],
+      "notifications": [
+        {
+          "title": "录用通知",
+          "content": "恭喜你已通过该岗位全部流程。",
+          "tone": "success",
+          "createdAt": "2026-03-14T08:05:00Z"
+        }
+      ],
+      "moComment": "教学经验与数据库项目经历匹配度较高。",
+      "nextStep": "请留意后续签约通知和首次排班安排。"
+    },
+    {
+      "applicationId": "APP-TA-14845-01",
+      "taId": "TA-14845",
+      "courseName": "EBU6304 软件工程助教",
+      "status": "审核中",
+      "statusTone": "warn",
+      "summary": "已完成简历初筛，正在安排课程理解面试。",
+      "nextAction": "请保持手机和邮箱畅通，等待面试通知。",
+      "updatedAt": "2026-03-16T10:00:00Z",
+      "jobSlug": "software-engineering-ta",
+      "category": "教学支持 / 软件工程",
+      "matchLevel": "高",
+      "tags": [
+        "已投递",
+        "简历通过",
+        "等待面试"
+      ],
+      "timeline": [
+        {
+          "label": "已投递申请",
+          "content": "系统已记录你的岗位投递信息。",
+          "time": "2026-03-13T09:30:00Z",
+          "done": true
+        },
+        {
+          "label": "简历初筛通过",
+          "content": "MO 认为课程相关经历匹配度较高。",
+          "time": "2026-03-14T14:00:00Z",
+          "done": true
+        },
+        {
+          "label": "等待面试安排",
+          "content": "预计 3-5 个工作日内发送面试通知。",
+          "time": "2026-03-16T10:00:00Z",
+          "done": false
+        }
+      ],
+      "details": [
+        {
+          "label": "岗位编号",
+          "value": "EBU6304"
+        },
+        {
+          "label": "课程方向",
+          "value": "软件工程"
+        },
+        {
+          "label": "授课地点",
+          "value": "教一楼 A305"
+        }
+      ],
+      "notifications": [
+        {
+          "title": "MO 提醒",
+          "content": "请提前准备课程项目截图和可讲解案例。",
+          "tone": "info",
+          "createdAt": "2026-03-16T10:05:00Z"
+        },
+        {
+          "title": "系统通知",
+          "content": "你的申请已进入后续推进阶段。",
+          "tone": "success",
+          "createdAt": "2026-03-16T10:06:00Z"
+        }
+      ],
+      "moComment": "已完成简历初筛，正在安排课程理解面试。",
+      "nextStep": "请保持手机和邮箱畅通，等待面试通知。"
+    },
+    {
+      "applicationId": "APP-TA-14845-02",
+      "taId": "TA-14845",
+      "courseName": "EBU6301 计算机网络助教",
+      "status": "待补充资料",
+      "statusTone": "warn",
+      "summary": "需要补充一份能够体现网络实验经验的材料。",
+      "nextAction": "请在 24 小时内上传课程实验截图或项目链接。",
+      "updatedAt": "2026-03-15T09:00:00Z",
+      "jobSlug": "computer-network-ta",
+      "category": "网络实验 / 教学答疑",
+      "matchLevel": "中",
+      "tags": [
+        "已投递",
+        "待补充资料"
+      ],
+      "timeline": [
+        {
+          "label": "已投递申请",
+          "content": "系统已记录你的岗位投递信息。",
+          "time": "2026-03-12T11:00:00Z",
+          "done": true
+        },
+        {
+          "label": "待补充资料",
+          "content": "MO 请求补充网络实验相关证明材料。",
+          "time": "2026-03-15T09:00:00Z",
+          "done": false
+        }
+      ],
+      "details": [
+        {
+          "label": "岗位编号",
+          "value": "EBU6301"
+        },
+        {
+          "label": "课程方向",
+          "value": "计算机网络"
+        },
+        {
+          "label": "材料要求",
+          "value": "网络实验截图 / 项目仓库链接"
+        }
+      ],
+      "notifications": [
+        {
+          "title": "材料提醒",
+          "content": "补充材料后将重新进入审核队列。",
+          "tone": "warn",
+          "createdAt": "2026-03-15T09:05:00Z"
+        }
+      ],
+      "moComment": "需要补充一份能够体现网络实验经验的材料。",
+      "nextStep": "请在 24 小时内上传课程实验截图或项目链接。"
+    },
+    {
+      "applicationId": "APP-TA-14845-03",
+      "taId": "TA-14845",
+      "courseName": "EBU6402 数据库助教",
+      "status": "已录用",
+      "statusTone": "success",
+      "summary": "教学经验与数据库项目经历匹配度较高。",
+      "nextAction": "请留意后续签约通知和首次排班安排。",
+      "updatedAt": "2026-03-14T08:00:00Z",
+      "jobSlug": "database-ta",
+      "category": "数据库 / 实验辅导",
+      "matchLevel": "高",
+      "tags": [
+        "已投递",
+        "初筛通过",
+        "完成面试",
+        "已录用"
+      ],
+      "timeline": [
+        {
+          "label": "已投递申请",
+          "content": "系统已记录你的岗位投递信息。",
+          "time": "2026-03-10T10:00:00Z",
+          "done": true
+        },
+        {
+          "label": "初筛通过",
+          "content": "岗位匹配度评估结果良好。",
+          "time": "2026-03-11T15:00:00Z",
+          "done": true
+        },
+        {
+          "label": "完成面试",
+          "content": "你已完成课程理解与答疑模拟面试。",
+          "time": "2026-03-13T16:00:00Z",
+          "done": true
+        },
+        {
+          "label": "已录用",
+          "content": "请等待签约与排班通知。",
+          "time": "2026-03-14T08:00:00Z",
+          "done": true
+        }
+      ],
+      "details": [
+        {
+          "label": "岗位编号",
+          "value": "EBU6402"
+        },
+        {
+          "label": "课程方向",
+          "value": "数据库"
+        },
+        {
+          "label": "预计到岗",
+          "value": "2026-03-21"
+        }
+      ],
+      "notifications": [
+        {
+          "title": "录用通知",
+          "content": "恭喜你已通过该岗位全部流程。",
+          "tone": "success",
+          "createdAt": "2026-03-14T08:05:00Z"
+        }
+      ],
+      "moComment": "教学经验与数据库项目经历匹配度较高。",
+      "nextStep": "请留意后续签约通知和首次排班安排。"
+    },
+    {
+      "applicationId": "APP-TA-29882-01",
+      "taId": "TA-29882",
+      "courseName": "EBU6304 软件工程助教",
+      "status": "审核中",
+      "statusTone": "warn",
+      "summary": "已完成简历初筛，正在安排课程理解面试。",
+      "nextAction": "请保持手机和邮箱畅通，等待面试通知。",
+      "updatedAt": "2026-03-16T10:00:00Z",
+      "jobSlug": "software-engineering-ta",
+      "category": "教学支持 / 软件工程",
+      "matchLevel": "高",
+      "tags": [
+        "已投递",
+        "简历通过",
+        "等待面试"
+      ],
+      "timeline": [
+        {
+          "label": "已投递申请",
+          "content": "系统已记录你的岗位投递信息。",
+          "time": "2026-03-13T09:30:00Z",
+          "done": true
+        },
+        {
+          "label": "简历初筛通过",
+          "content": "MO 认为课程相关经历匹配度较高。",
+          "time": "2026-03-14T14:00:00Z",
+          "done": true
+        },
+        {
+          "label": "等待面试安排",
+          "content": "预计 3-5 个工作日内发送面试通知。",
+          "time": "2026-03-16T10:00:00Z",
+          "done": false
+        }
+      ],
+      "details": [
+        {
+          "label": "岗位编号",
+          "value": "EBU6304"
+        },
+        {
+          "label": "课程方向",
+          "value": "软件工程"
+        },
+        {
+          "label": "授课地点",
+          "value": "教一楼 A305"
+        }
+      ],
+      "notifications": [
+        {
+          "title": "MO 提醒",
+          "content": "请提前准备课程项目截图和可讲解案例。",
+          "tone": "info",
+          "createdAt": "2026-03-16T10:05:00Z"
+        },
+        {
+          "title": "系统通知",
+          "content": "你的申请已进入后续推进阶段。",
+          "tone": "success",
+          "createdAt": "2026-03-16T10:06:00Z"
+        }
+      ],
+      "moComment": "已完成简历初筛，正在安排课程理解面试。",
+      "nextStep": "请保持手机和邮箱畅通，等待面试通知。"
+    },
+    {
+      "applicationId": "APP-TA-29882-02",
+      "taId": "TA-29882",
+      "courseName": "EBU6301 计算机网络助教",
+      "status": "待补充资料",
+      "statusTone": "warn",
+      "summary": "需要补充一份能够体现网络实验经验的材料。",
+      "nextAction": "请在 24 小时内上传课程实验截图或项目链接。",
+      "updatedAt": "2026-03-15T09:00:00Z",
+      "jobSlug": "computer-network-ta",
+      "category": "网络实验 / 教学答疑",
+      "matchLevel": "中",
+      "tags": [
+        "已投递",
+        "待补充资料"
+      ],
+      "timeline": [
+        {
+          "label": "已投递申请",
+          "content": "系统已记录你的岗位投递信息。",
+          "time": "2026-03-12T11:00:00Z",
+          "done": true
+        },
+        {
+          "label": "待补充资料",
+          "content": "MO 请求补充网络实验相关证明材料。",
+          "time": "2026-03-15T09:00:00Z",
+          "done": false
+        }
+      ],
+      "details": [
+        {
+          "label": "岗位编号",
+          "value": "EBU6301"
+        },
+        {
+          "label": "课程方向",
+          "value": "计算机网络"
+        },
+        {
+          "label": "材料要求",
+          "value": "网络实验截图 / 项目仓库链接"
+        }
+      ],
+      "notifications": [
+        {
+          "title": "材料提醒",
+          "content": "补充材料后将重新进入审核队列。",
+          "tone": "warn",
+          "createdAt": "2026-03-15T09:05:00Z"
+        }
+      ],
+      "moComment": "需要补充一份能够体现网络实验经验的材料。",
+      "nextStep": "请在 24 小时内上传课程实验截图或项目链接。"
+    },
+    {
+      "applicationId": "APP-TA-29882-03",
+      "taId": "TA-29882",
+      "courseName": "EBU6402 数据库助教",
+      "status": "已录用",
+      "statusTone": "success",
+      "summary": "教学经验与数据库项目经历匹配度较高。",
+      "nextAction": "请留意后续签约通知和首次排班安排。",
+      "updatedAt": "2026-03-14T08:00:00Z",
+      "jobSlug": "database-ta",
+      "category": "数据库 / 实验辅导",
+      "matchLevel": "高",
+      "tags": [
+        "已投递",
+        "初筛通过",
+        "完成面试",
+        "已录用"
+      ],
+      "timeline": [
+        {
+          "label": "已投递申请",
+          "content": "系统已记录你的岗位投递信息。",
+          "time": "2026-03-10T10:00:00Z",
+          "done": true
+        },
+        {
+          "label": "初筛通过",
+          "content": "岗位匹配度评估结果良好。",
+          "time": "2026-03-11T15:00:00Z",
+          "done": true
+        },
+        {
+          "label": "完成面试",
+          "content": "你已完成课程理解与答疑模拟面试。",
+          "time": "2026-03-13T16:00:00Z",
+          "done": true
+        },
+        {
+          "label": "已录用",
+          "content": "请等待签约与排班通知。",
+          "time": "2026-03-14T08:00:00Z",
+          "done": true
+        }
+      ],
+      "details": [
+        {
+          "label": "岗位编号",
+          "value": "EBU6402"
+        },
+        {
+          "label": "课程方向",
+          "value": "数据库"
+        },
+        {
+          "label": "预计到岗",
+          "value": "2026-03-21"
+        }
+      ],
+      "notifications": [
+        {
+          "title": "录用通知",
+          "content": "恭喜你已通过该岗位全部流程。",
+          "tone": "success",
+          "createdAt": "2026-03-14T08:05:00Z"
+        }
+      ],
+      "moComment": "教学经验与数据库项目经历匹配度较高。",
+      "nextStep": "请留意后续签约通知和首次排班安排。"
+    },
+    {
+      "applicationId": "APP-TA-71124-01",
+      "taId": "TA-71124",
+      "courseName": "EBU6304 软件工程助教",
+      "status": "审核中",
+      "statusTone": "warn",
+      "summary": "已完成简历初筛，正在安排课程理解面试。",
+      "nextAction": "请保持手机和邮箱畅通，等待面试通知。",
+      "updatedAt": "2026-03-16T10:00:00Z",
+      "jobSlug": "software-engineering-ta",
+      "category": "教学支持 / 软件工程",
+      "matchLevel": "高",
+      "tags": [
+        "已投递",
+        "简历通过",
+        "等待面试"
+      ],
+      "timeline": [
+        {
+          "label": "已投递申请",
+          "content": "系统已记录你的岗位投递信息。",
+          "time": "2026-03-13T09:30:00Z",
+          "done": true
+        },
+        {
+          "label": "简历初筛通过",
+          "content": "MO 认为课程相关经历匹配度较高。",
+          "time": "2026-03-14T14:00:00Z",
+          "done": true
+        },
+        {
+          "label": "等待面试安排",
+          "content": "预计 3-5 个工作日内发送面试通知。",
+          "time": "2026-03-16T10:00:00Z",
+          "done": false
+        }
+      ],
+      "details": [
+        {
+          "label": "岗位编号",
+          "value": "EBU6304"
+        },
+        {
+          "label": "课程方向",
+          "value": "软件工程"
+        },
+        {
+          "label": "授课地点",
+          "value": "教一楼 A305"
+        }
+      ],
+      "notifications": [
+        {
+          "title": "MO 提醒",
+          "content": "请提前准备课程项目截图和可讲解案例。",
+          "tone": "info",
+          "createdAt": "2026-03-16T10:05:00Z"
+        },
+        {
+          "title": "系统通知",
+          "content": "你的申请已进入后续推进阶段。",
+          "tone": "success",
+          "createdAt": "2026-03-16T10:06:00Z"
+        }
+      ],
+      "moComment": "已完成简历初筛，正在安排课程理解面试。",
+      "nextStep": "请保持手机和邮箱畅通，等待面试通知。"
+    },
+    {
+      "applicationId": "APP-TA-71124-02",
+      "taId": "TA-71124",
+      "courseName": "EBU6301 计算机网络助教",
+      "status": "待补充资料",
+      "statusTone": "warn",
+      "summary": "需要补充一份能够体现网络实验经验的材料。",
+      "nextAction": "请在 24 小时内上传课程实验截图或项目链接。",
+      "updatedAt": "2026-03-15T09:00:00Z",
+      "jobSlug": "computer-network-ta",
+      "category": "网络实验 / 教学答疑",
+      "matchLevel": "中",
+      "tags": [
+        "已投递",
+        "待补充资料"
+      ],
+      "timeline": [
+        {
+          "label": "已投递申请",
+          "content": "系统已记录你的岗位投递信息。",
+          "time": "2026-03-12T11:00:00Z",
+          "done": true
+        },
+        {
+          "label": "待补充资料",
+          "content": "MO 请求补充网络实验相关证明材料。",
+          "time": "2026-03-15T09:00:00Z",
+          "done": false
+        }
+      ],
+      "details": [
+        {
+          "label": "岗位编号",
+          "value": "EBU6301"
+        },
+        {
+          "label": "课程方向",
+          "value": "计算机网络"
+        },
+        {
+          "label": "材料要求",
+          "value": "网络实验截图 / 项目仓库链接"
+        }
+      ],
+      "notifications": [
+        {
+          "title": "材料提醒",
+          "content": "补充材料后将重新进入审核队列。",
+          "tone": "warn",
+          "createdAt": "2026-03-15T09:05:00Z"
+        }
+      ],
+      "moComment": "需要补充一份能够体现网络实验经验的材料。",
+      "nextStep": "请在 24 小时内上传课程实验截图或项目链接。"
+    },
+    {
+      "applicationId": "APP-TA-71124-03",
+      "taId": "TA-71124",
       "courseName": "EBU6402 数据库助教",
       "status": "已录用",
       "statusTone": "success",

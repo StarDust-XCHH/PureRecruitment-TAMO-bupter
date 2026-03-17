@@ -87,6 +87,12 @@
     animation: pointLeft 1.5s infinite ease-in-out;
 }
 
+.guide-arrow-right {
+    border-right: none;
+    border-left: 18px solid var(--primary);
+    animation: pointRight 1.5s infinite ease-in-out;
+}
+
 @keyframes pointLeft {
     0%,
     100% {
@@ -95,6 +101,17 @@
 
     50% {
         transform: translateX(-8px);
+    }
+}
+
+@keyframes pointRight {
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(8px);
     }
 }
 
@@ -145,6 +162,19 @@
 .app.dimmed .main::after {
     opacity: 1;
     pointer-events: none;
+}
+
+.app.dimmed.dimmed-topbar-focus .main::after {
+    opacity: 0.18;
+    backdrop-filter: blur(2px);
+}
+
+.onboarding[data-overlay-mode="focus-topbar"] {
+    background: linear-gradient(180deg, rgba(5, 8, 15, 0.08) 0%, rgba(5, 8, 15, 0.16) 100%) !important;
+}
+
+[data-theme="light"] .onboarding[data-overlay-mode="focus-topbar"] {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.12) 100%) !important;
 }
 
 .onboarding {
