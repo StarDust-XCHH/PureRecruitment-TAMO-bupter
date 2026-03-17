@@ -189,6 +189,12 @@
     border-color: rgba(34, 197, 94, 0.35);
 }
 
+.timeline-meta {
+    color: var(--muted);
+    font-size: 12px;
+    margin-top: 6px;
+}
+
 [data-theme="light"] .message-item,
 [data-theme="light"] .status-detail-row,
 [data-theme="light"] .status-step {

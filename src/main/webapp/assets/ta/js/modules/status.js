@@ -166,7 +166,7 @@
                     + '<div class="timeline-item' + (index === 0 ? ' open' : '') + '" data-status="' + escapeHtml(item.statusTone) + '" data-application-id="' + escapeHtml(item.applicationId) + '">'
                     + '  <div class="timeline-node ' + escapeHtml(item.statusTone) + '"></div>'
                     + '  <strong>' + escapeHtml(item.courseName) + '</strong>'
-                    + '  <div style="color: var(--muted); font-size: 12px; margin-top: 6px;">' + escapeHtml(item.status) + ' · ' + escapeHtml(item.updatedAt || '--') + '</div>'
+                    + '  <div class="timeline-meta">' + escapeHtml(item.status) + ' · ' + escapeHtml(item.updatedAt || '--') + '</div>'
                     + '  <div class="accordion-content">'
                     + '      <p>' + escapeHtml(item.summary || '暂无状态说明。') + '</p>'
                     + '      <p>' + escapeHtml(item.nextAction || '暂无下一步提示。') + '</p>'

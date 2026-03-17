@@ -2,20 +2,20 @@
     <div class="logo">TA</div>
     <div>
         <div>Teaching Assistant</div>
-        <small style="color: var(--muted)">Recruitment Suite</small>
+        <small class="brand-subtitle">Recruitment Suite</small>
     </div>
 </div>
 <nav class="nav" aria-label="TA 工作台导航">
-    <div class="nav-item active" data-route="profile">
+    <button class="nav-item active" type="button" data-route="profile" aria-current="page">
         <span>👤</span>
         <span>个人档案</span>
-    </div>
-    <div class="nav-item" data-route="jobs">
+    </button>
+    <button class="nav-item" type="button" data-route="jobs" aria-current="false">
         <span>🛰️</span>
         <span>职位大厅</span>
-    </div>
-    <div class="nav-item" data-route="status">
+    </button>
+    <button class="nav-item" type="button" data-route="status" aria-current="false">
         <span>🧭</span>
         <span>申请状态</span>
-    </div>
+    </button>
 </nav>

@@ -11,7 +11,11 @@
     background: rgba(15, 23, 42, 0.25); /* 降低深色模式下的背景透明度，使其更内敛 */
     color: var(--text, #e2e8f0);
     display: grid;
+    grid-template-rows: auto 1fr auto;
+    align-content: start;
     gap: 12px;
+    min-width: 0;
+    min-height: 100%;
     cursor: pointer;
     transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, filter 0.25s ease;
     position: relative;
@@ -79,10 +83,28 @@
 .profile-strength-content {
     display: flex;
     gap: 12px;
-    align-items: center;
+    align-items: flex-start;
+    justify-content: space-between;
     color: inherit;
     position: relative;
     z-index: 1;
+    min-width: 0;
+}
+
+.profile-strength-card {
+    grid-template-rows: 1fr;
+}
+
+.profile-strength-content {
+    display: grid;
+    grid-template-columns: minmax(84px, 110px) minmax(0, 1fr);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+        "donut header"
+        "donut meta";
+    column-gap: 16px;
+    row-gap: 10px;
+    align-items: start;
 }
 
 .insight-label,
@@ -129,13 +151,26 @@
 .accent-positive { color: #0d9488; text-shadow: 0 0 16px rgba(13, 148, 136, 0.35); }
 .accent-warn { color: #f97316; text-shadow: 0 0 14px rgba(249, 115, 22, 0.3); }
 
-.insight-meta { margin: 0; font-size: 13px; }
-.insight-subtext { margin: 2px 0 0; font-size: 12px; color: rgba(255, 255, 255, 0.5); }
-[data-theme="light"] .insight-subtext { color: rgba(15, 23, 42, 0.45); }
+.insight-meta {
+    margin: 0;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.insight-subtext {
+    margin: 2px 0 0;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+[data-theme="light"] .insight-subtext {
+    color: rgba(15, 23, 42, 0.45);
+}
 
 .insight-icon {
     width: 34px;
     height: 34px;
+    flex: 0 0 34px;
     border-radius: 12px;
     display: inline-flex;
     align-items: center;
@@ -145,17 +180,27 @@
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
+.insight-card-header > div {
+    min-width: 0;
+    flex: 1;
+}
+
 .plane-icon::before { content: "✈"; color: #93c5fd; font-size: 18px; }
 .radar-icon::before { content: "◉"; font-size: 18px; color: #2dd4bf; }
 .badge-icon::before { content: "👑"; }
 .calendar-icon::before { content: "📅"; font-size: 18px; color: #fdba74; }
 
 .donut-chart {
-    width: 110px;
-    height: 110px;
+    grid-area: donut;
+    align-self: end;
+    width: clamp(84px, 7vw, 110px);
+    aspect-ratio: 1;
     border-radius: 50%;
-    --donut-degree: 0deg; /* 初始化变量，消除警告 */
-    background: conic-gradient(#a855f7 var(--donut-degree, 0deg), rgba(255, 255, 255, 0.08) 0deg);    display: flex;
+    min-width: 84px;
+    max-width: 110px;
+    --donut-degree: 0deg;
+    background: conic-gradient(#a855f7 var(--donut-degree, 0deg), rgba(255, 255, 255, 0.08) 0deg);
+    display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
@@ -163,22 +208,85 @@
 .donut-chart::after {
     content: "";
     position: absolute;
-    width: 70px;
-    height: 70px;
+    inset: 18%;
     border-radius: 50%;
     --card-bg: #0f172a; /* 或者是您需要的其他颜色 */
     background: var(--card-bg, #0f172a);
 }
 .donut-chart span {
     position: relative;
+    z-index: 1;
     font-weight: 700;
-    font-size: 20px;
+    font-size: clamp(16px, 1.4vw, 20px);
     color: #f8fafc;
 }
 [data-theme="light"] .donut-chart::after { background: #fff; }
 [data-theme="light"] .donut-chart span { color: #0f172a; }
 
-.profile-strength-text { display: grid; gap: 6px; }
+.profile-strength-text {
+    grid-area: header / header / meta / meta;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    align-self: start;
+}
+
+.profile-strength-card {
+    min-width: 0;
+}
+
+.profile-strength-text .insight-card-header {
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+.profile-strength-text .insight-meta,
+.profile-strength-text .insight-subtext {
+    margin-top: 0;
+}
+
+@media (max-width: 1140px) {
+    .profile-strength-content {
+        grid-template-columns: 96px minmax(0, 1fr);
+    }
+}
+
+@media (max-width: 960px) {
+    .stat-grid.insight-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    .stat-grid.insight-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .insight-card {
+        padding: 16px;
+    }
+
+    .profile-strength-content {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        grid-template-areas:
+            "header"
+            "donut";
+    }
+
+    .profile-strength-text {
+        grid-area: header;
+    }
+
+    .donut-chart {
+        justify-self: start;
+        align-self: start;
+        width: 96px;
+        min-width: 96px;
+        max-width: 96px;
+    }
+}
 
 
 /* ==========================================================================
