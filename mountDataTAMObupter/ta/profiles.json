@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "profiles",
     "version": "1.0",
-    "updatedAt": "2026-03-16T19:20:25.928447800Z"
+    "updatedAt": "2026-03-17T04:40:32.977950500Z"
   },
   "items": [
     {
@@ -37,19 +37,79 @@
       "title": "TA"
     },
     {
-      "id": "PROFILE-TA-93749",
-      "taId": "TA-93749",
+      "id": "PROFILE-TA-14845",
+      "taId": "TA-14845",
       "avatar": "",
-      "realName": "Aiaa",
+      "realName": "qwe",
       "applicationIntent": "",
-      "studentId": "TA-93749",
-      "contactEmail": "Aiaa@a.com",
+      "studentId": "TA-14845",
+      "contactEmail": "qwe@qq.w",
       "bio": "",
       "skills": [],
       "availabilityHoursPerWeek": 0.0,
       "semester": "",
       "title": "TA",
-      "lastUpdatedAt": "2026-03-16T19:20:24.983252300Z"
+      "lastUpdatedAt": "2026-03-17T04:15:55.179005200Z"
+    },
+    {
+      "id": "PROFILE-TA-29882",
+      "taId": "TA-29882",
+      "avatar": "",
+      "realName": "asd",
+      "applicationIntent": "",
+      "studentId": "TA-29882",
+      "contactEmail": "asd@S.s",
+      "bio": "",
+      "skills": [],
+      "availabilityHoursPerWeek": 0.0,
+      "semester": "",
+      "title": "TA",
+      "lastUpdatedAt": "2026-03-17T04:25:53.818352Z"
+    },
+    {
+      "id": "PROFILE-TA-71124",
+      "taId": "TA-71124",
+      "avatar": "",
+      "realName": "poi",
+      "applicationIntent": "",
+      "studentId": "TA-71124",
+      "contactEmail": "poi@2.k",
+      "bio": "",
+      "skills": [],
+      "availabilityHoursPerWeek": 0.0,
+      "semester": "",
+      "title": "TA",
+      "lastUpdatedAt": "2026-03-17T04:32:45.767427100Z"
+    },
+    {
+      "id": "PROFILE-TA-60215",
+      "taId": "TA-60215",
+      "avatar": "",
+      "realName": "wqe",
+      "applicationIntent": "",
+      "studentId": "TA-60215",
+      "contactEmail": "wqe@qw.m",
+      "bio": "",
+      "skills": [],
+      "availabilityHoursPerWeek": 0.0,
+      "semester": "",
+      "title": "TA",
+      "lastUpdatedAt": "2026-03-17T04:39:27.462996500Z"
+    },
+    {
+      "id": "PROFILE-TA-91741",
+      "taId": "TA-91741",
+      "avatar": "",
+      "realName": "plk",
+      "applicationIntent": "",
+      "studentId": "TA-91741",
+      "contactEmail": "plk@2.kj",
+      "bio": "",
+      "skills": [],
+      "availabilityHoursPerWeek": 0.0,
+      "semester": "",
+      "title": "TA",
+      "lastUpdatedAt": "2026-03-17T04:40:32.757519Z"
     }
   ]
 }
