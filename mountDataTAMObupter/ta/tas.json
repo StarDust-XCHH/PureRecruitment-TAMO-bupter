@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "tas",
     "version": "1.0",
-    "updatedAt": "2026-03-17T04:32:45.771421200Z"
+    "updatedAt": "2026-03-17T04:40:32.758528Z"
   },
   "items": [
     {
@@ -87,6 +87,40 @@
       "auth": {
         "passwordHash": "5fc897df4e183e280490d13c851e57a8d7c1972aac76c2182040193f67a94f32",
         "passwordSalt": "48d29ee6-b061-44b3-96ad-a59d37737690",
+        "lastLoginAt": "",
+        "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "TA-60215",
+      "name": "wqe",
+      "username": "wqe",
+      "email": "wqe@qw.m",
+      "phone": "9647769567",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-03-17T04:39:27.462996500Z",
+      "updatedAt": "2026-03-17T04:39:27.462996500Z",
+      "auth": {
+        "passwordHash": "d2f4da49590a0307682d6f3a7a7b3640990300549cd6194d566b6f22d57d4ca3",
+        "passwordSalt": "826bacdc-aee2-4ce7-afae-b76b1da50b48",
+        "lastLoginAt": "",
+        "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "TA-91741",
+      "name": "plk",
+      "username": "plk",
+      "email": "plk@2.kj",
+      "phone": "12569876",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-03-17T04:40:32.757519Z",
+      "updatedAt": "2026-03-17T04:40:32.757519Z",
+      "auth": {
+        "passwordHash": "82d96dd1ccc97f482ee57f7603166d69f909f35141516620dc7678a103ea3ad3",
+        "passwordSalt": "3d48b56f-58fd-4e69-a1ce-4b34325540ff",
         "lastLoginAt": "",
         "failedAttempts": 0
       }

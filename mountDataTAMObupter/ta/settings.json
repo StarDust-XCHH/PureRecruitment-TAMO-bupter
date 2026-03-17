@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "settings",
     "version": "1.0",
-    "updatedAt": "2026-03-17T04:32:46.889163Z"
+    "updatedAt": "2026-03-17T04:40:32.979951200Z"
   },
   "items": [
     {
@@ -77,6 +77,38 @@
       "lastProfileSyncMessage": "",
       "createdAt": "2026-03-17T04:32:45.767427100Z",
       "updatedAt": "2026-03-17T04:32:45.767427100Z"
+    },
+    {
+      "id": "SETTING-TA-60215",
+      "taId": "TA-60215",
+      "theme": "dark",
+      "avatar": "",
+      "onboardingStep": 0.0,
+      "guideCompleted": false,
+      "onboardingCompletedAt": "",
+      "onboardingDismissed": false,
+      "profileSaved": false,
+      "profileSavedAt": "",
+      "lastProfileSyncStatus": "idle",
+      "lastProfileSyncMessage": "",
+      "createdAt": "2026-03-17T04:39:27.462996500Z",
+      "updatedAt": "2026-03-17T04:39:27.462996500Z"
+    },
+    {
+      "id": "SETTING-TA-91741",
+      "taId": "TA-91741",
+      "theme": "dark",
+      "avatar": "",
+      "onboardingStep": 0.0,
+      "guideCompleted": false,
+      "onboardingCompletedAt": "",
+      "onboardingDismissed": false,
+      "profileSaved": false,
+      "profileSavedAt": "",
+      "lastProfileSyncStatus": "idle",
+      "lastProfileSyncMessage": "",
+      "createdAt": "2026-03-17T04:40:32.757519Z",
+      "updatedAt": "2026-03-17T04:40:32.757519Z"
     }
   ]
 }

@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "profiles",
     "version": "1.0",
-    "updatedAt": "2026-03-17T04:32:46.885810700Z"
+    "updatedAt": "2026-03-17T04:40:32.977950500Z"
   },
   "items": [
     {
@@ -80,6 +80,36 @@
       "semester": "",
       "title": "TA",
       "lastUpdatedAt": "2026-03-17T04:32:45.767427100Z"
+    },
+    {
+      "id": "PROFILE-TA-60215",
+      "taId": "TA-60215",
+      "avatar": "",
+      "realName": "wqe",
+      "applicationIntent": "",
+      "studentId": "TA-60215",
+      "contactEmail": "wqe@qw.m",
+      "bio": "",
+      "skills": [],
+      "availabilityHoursPerWeek": 0.0,
+      "semester": "",
+      "title": "TA",
+      "lastUpdatedAt": "2026-03-17T04:39:27.462996500Z"
+    },
+    {
+      "id": "PROFILE-TA-91741",
+      "taId": "TA-91741",
+      "avatar": "",
+      "realName": "plk",
+      "applicationIntent": "",
+      "studentId": "TA-91741",
+      "contactEmail": "plk@2.kj",
+      "bio": "",
+      "skills": [],
+      "availabilityHoursPerWeek": 0.0,
+      "semester": "",
+      "title": "TA",
+      "lastUpdatedAt": "2026-03-17T04:40:32.757519Z"
     }
   ]
 }
