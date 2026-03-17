@@ -4,11 +4,11 @@
         <p>在这里管理你的档案、申请与工作台设置入口。</p>
     </div>
     <div class="topbar-actions">
-        <div class="user-trigger" id="userTrigger" role="button" tabindex="0" aria-haspopup="dialog" aria-expanded="false">
+        <button class="user-trigger" id="userTrigger" type="button" aria-haspopup="dialog" aria-expanded="false">
             <div class="user-avatar" aria-hidden="true">S</div>
             <span class="user-name" id="userName">Seele</span>
             <span class="user-caret" aria-hidden="true">▾</span>
-        </div>
+        </button>
         <button class="logout-btn" id="logoutBtn" type="button">退出登录</button>
         <button class="theme-toggle" id="themeToggle" aria-label="切换主题" type="button">🌙</button>
     </div>

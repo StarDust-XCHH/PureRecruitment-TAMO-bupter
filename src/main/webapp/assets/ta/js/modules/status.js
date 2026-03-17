@@ -20,15 +20,14 @@
         };
 
         function escapeHtml(value) {
-            // 处理 null 或 undefined，确保返回字符串
             const str = value == null ? '' : String(value);
 
             return str
-                .replace(/&/g, '&amp;')   // 必须最先替换 &
-                .replace(/</g, '&lt;')    // 替换 <
-                .replace(/>/g, '&gt;')    // 替换 >
-                .replace(/"/g, '&quot;')  // 替换 "
-                .replace(/'/g, '&#39;');  // 修复了这里的单引号报错，并转义为实体
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
         }
 
         function safeText(value, fallback) {
@@ -166,7 +165,7 @@
                     + '<div class="timeline-item' + (index === 0 ? ' open' : '') + '" data-status="' + escapeHtml(item.statusTone) + '" data-application-id="' + escapeHtml(item.applicationId) + '">'
                     + '  <div class="timeline-node ' + escapeHtml(item.statusTone) + '"></div>'
                     + '  <strong>' + escapeHtml(item.courseName) + '</strong>'
-                    + '  <div style="color: var(--muted); font-size: 12px; margin-top: 6px;">' + escapeHtml(item.status) + ' · ' + escapeHtml(item.updatedAt || '--') + '</div>'
+                    + '  <div class="timeline-meta">' + escapeHtml(item.status) + ' · ' + escapeHtml(item.updatedAt || '--') + '</div>'
                     + '  <div class="accordion-content">'
                     + '      <p>' + escapeHtml(item.summary || '暂无状态说明。') + '</p>'
                     + '      <p>' + escapeHtml(item.nextAction || '暂无下一步提示。') + '</p>'
@@ -185,6 +184,24 @@
                 item.addEventListener('click', (event) => {
                     if (event.target.closest('.status-detail-row, .status-step, .pill')) return;
                     item.classList.toggle('open');
+                });
+            });
+        }
+
+        function bindSidePanelToggle(scope) {
+            (scope || document).querySelectorAll('[data-collapsible]').forEach((panel) => {
+                if (panel.dataset.collapsibleBound === 'true') return;
+                const toggle = panel.querySelector('.status-box-toggle');
+                const body = panel.querySelector('.status-box-body');
+                if (!toggle || !body) return;
+
+                panel.dataset.collapsibleBound = 'true';
+                toggle.addEventListener('click', () => {
+                    const expanded = toggle.getAttribute('aria-expanded') !== 'false';
+                    const nextExpanded = !expanded;
+                    toggle.setAttribute('aria-expanded', String(nextExpanded));
+                    body.hidden = !nextExpanded;
+                    panel.classList.toggle('is-collapsed', !nextExpanded);
                 });
             });
         }
@@ -213,6 +230,7 @@
                 renderSummary(payload.summary);
                 renderNotifications(items, payload.notifications || payload.messages);
                 bindTimelineToggle(route);
+                bindSidePanelToggle(route);
 
                 if (!items.length) {
                     if (emptyState) emptyState.hidden = false;
@@ -234,8 +252,10 @@
         }
 
         bindTimelineToggle(document);
+        bindSidePanelToggle(document);
         loadStatusData();
         app.bindTimelineToggle = bindTimelineToggle;
+        app.bindSidePanelToggle = bindSidePanelToggle;
         app.loadStatusData = loadStatusData;
         app.state.status = state;
     };

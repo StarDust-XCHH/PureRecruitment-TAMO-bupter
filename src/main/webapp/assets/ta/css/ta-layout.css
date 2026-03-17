@@ -65,6 +65,10 @@ textarea {
     font: inherit;
 }
 
+button {
+    border: none;
+}
+
 .app {
     display: grid;
     grid-template-columns: 260px 1fr;
@@ -103,6 +107,10 @@ textarea {
     font-size: 18px;
 }
 
+.brand-subtitle {
+    color: var(--muted);
+}
+
 .brand .logo,
 .logo {
     width: 40px;
@@ -131,6 +139,10 @@ textarea {
     color: var(--muted);
     transition: all 0.3s ease;
     position: relative;
+    width: 100%;
+    background: transparent;
+    border: 1px solid transparent;
+    text-align: left;
 }
 
 .nav-item.active,
@@ -257,6 +269,15 @@ textarea {
 .welcome-card .hint-link {
     cursor: pointer;
     transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    background: transparent;
+}
+
+.welcome-card .hint-link:hover,
+.welcome-card .hint-link:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 0 12px var(--primary-glow);
+    border-color: var(--primary);
+    outline: none;
 }
 
 .welcome-card .hint-link:hover,
@@ -342,6 +363,7 @@ textarea {
 .user-name {
     font-size: 13px;
     font-weight: 600;
+    color: var(--text);
 }
 
 .user-caret {
