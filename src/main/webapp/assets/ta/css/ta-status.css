@@ -1,5 +1,33 @@
 @charset "UTF-8";
 
+/* =========================================
+   1. 整体布局与左侧时间线 (方案1修改区)
+========================================= */
+
+/* 剥离出的卡片容器样式 */
+.route-card {
+    padding: 24px;
+    border-radius: 18px;
+    border: 1px solid var(--card-border);
+    background: var(--card);
+    box-shadow: 0 18px 40px var(--shadow);
+    backdrop-filter: blur(10px);
+}
+
+/* 剥离出的网格布局样式，确保内容区两列对齐 */
+.status-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.9fr) minmax(280px, 0.95fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.route-main {
+    display: grid;
+    gap: 18px;
+    min-width: 0;
+}
+
 .timeline {
     display: flex;
     flex-direction: column;
@@ -82,40 +110,110 @@
     padding-top: 12px;
 }
 
-.status-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.9fr) minmax(280px, 0.95fr);
-    gap: 24px;
-    align-items: start;
-}
-
-.route-main {
-    display: grid;
-    gap: 18px;
-    min-width: 0;
-}
+/* =========================================
+   2. 右侧面板区视觉重构 (在此处向下开始修改)
+========================================= */
 
 .status-side {
-    display: grid;
-    gap: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
     position: sticky;
     top: 24px;
 }
 
+/* 基础卡片框架：缩减圆角，引入溢出隐藏 */
 .status-box {
-    display: grid;
-    gap: 16px;
-    padding: 20px;
-    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 14px;
     background: var(--card);
     border: 1px solid var(--card-border);
-    box-shadow: var(--lift-shadow-soft);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow: hidden;
 }
 
-.status-box h3 {
-    margin: 0;
-    font-size: 16px;
+/* 💡 折叠状态：拍扁，弱化存在感 */
+.status-box.is-collapsed {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
 }
+
+[data-theme="light"] .status-box.is-collapsed {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
+
+/* 💡 展开状态：浮起，增强视觉层级 */
+.status-box:not(.is-collapsed) {
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+    background: var(--card);
+}
+
+[data-theme="light"] .status-box:not(.is-collapsed) {
+    background: #ffffff;
+    box-shadow: 0 12px 32px rgba(148, 163, 184, 0.12);
+}
+
+/* 切换按钮：更像 Header */
+.status-box-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 20px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
+    text-align: left;
+    transition: background 0.2s ease;
+}
+
+.status-box-toggle:hover,
+.status-box-toggle:focus-visible {
+    background: rgba(0, 0, 0, 0.02);
+    outline: none;
+}
+
+[data-theme="light"] .status-box-toggle:hover,
+[data-theme="light"] .status-box-toggle:focus-visible {
+    background: rgba(15, 23, 42, 0.02);
+}
+
+/* 展开时底部出现边界线区分内容 */
+.status-box:not(.is-collapsed) .status-box-toggle {
+    border-bottom: 1px solid var(--card-border);
+    padding-bottom: 14px;
+    margin-bottom: 14px;
+}
+
+.status-box-toggle-icon {
+    font-size: 12px;
+    color: var(--muted);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.status-box-toggle[aria-expanded="false"] .status-box-toggle-icon {
+    transform: rotate(180deg);
+}
+
+.status-box-body {
+    display: grid;
+    gap: 16px;
+    padding: 0 20px 20px;
+}
+
+.status-box.is-collapsed .status-box-body {
+    display: none;
+}
+
+
+/* =========================================
+   3. 面板内部内容细节 (保留你的原有代码)
+========================================= */
 
 .status-lines {
     display: grid;
@@ -201,6 +299,7 @@
     background: rgba(15, 23, 42, 0.03);
 }
 
+/* 响应式调整 */
 @media (max-width: 1080px) {
     .status-grid {
         grid-template-columns: 1fr;
