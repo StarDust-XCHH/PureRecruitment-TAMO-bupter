@@ -58,18 +58,23 @@
             </div>
         </div>
         <div class="hero-card" id="heroCard" aria-live="polite">
-            <div class="hero-panel">
+            <div class="hero-panel" data-theme="light">
                 <div class="hero-content">
-                    <span class="badge" id="heroBadge">⏰ 紧急待办</span>
-                    <h3 class="hero-title" id="heroTitle">Seele，明天下午有一场微处理器课程的 TA 面试。</h3>
-                    <p class="hero-desc muted" id="heroDesc">页面骨架阶段先保留重点提醒区，后续再接入真实提醒数据与动效。</p>
+                    <span class="hero-badge" id="heroBadge">💡 竞争力提升</span>
+
+                    <h3 class="hero-title" id="heroTitle">你的硬件开发经历很棒，但还可以更出彩。</h3>
+                    <p class="hero-desc muted" id="heroDesc">目前简历的整体竞争力为 84%。如果在简历中补充一下你最近在做的那个带有 2D 激光雷达和 IMU 传感器融合的项目细节，击败率有望突破 90%。</p>
+
                     <div class="hero-actions">
-                        <button class="hero-btn primary" type="button" id="heroPrimary">查看面试详情</button>
-                        <button class="hero-btn ghost" type="button" id="heroSecondary">已准备妥当</button>
+                        <button class="hero-btn primary" type="button" id="heroPrimary">立即去更新简历</button>
+                        <button class="hero-btn ghost" type="button" id="heroSecondary">稍后处理</button>
                     </div>
                 </div>
+
                 <div class="hero-visual" aria-hidden="true">
-                    Focus · Next Best Action
+                    <div class="hero-orb"></div>
+                    <div class="hero-lines"></div>
+                    <div class="hero-visual-text">Focus · Next Best Action</div>
                 </div>
             </div>
         </div>

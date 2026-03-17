@@ -1,10 +1,14 @@
 @charset "UTF-8";
 
+/* ==========================================================================
+   1. 上方数据卡片 (Insight Cards)
+   优化目标：做减法，弱化视觉权重，使其不抢夺主卡片焦点
+   ========================================================================== */
 .insight-card {
     padding: 18px;
     border-radius: 18px;
-    border: 1px solid var(--card-border);
-    background: rgba(15, 23, 42, 0.35);
+    border: 1px solid rgba(148, 163, 184, 0.15); /* 减弱默认边框亮度 */
+    background: rgba(15, 23, 42, 0.25); /* 降低深色模式下的背景透明度，使其更内敛 */
     color: var(--text, #e2e8f0);
     display: grid;
     gap: 12px;
@@ -18,9 +22,10 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at top right, rgba(0, 242, 254, 0.16), transparent 42%),
-        linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 58%);
-    opacity: 0.8;
+    /* 弱化深色模式下的光晕干扰 */
+    background: radial-gradient(circle at top right, rgba(0, 242, 254, 0.08), transparent 42%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 58%);
+    opacity: 0.6;
     pointer-events: none;
     transition: opacity 0.25s ease;
 }
@@ -30,7 +35,7 @@
     position: absolute;
     inset: 1px;
     border-radius: 17px;
-    border: 1px solid rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.04);
     pointer-events: none;
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
@@ -38,9 +43,8 @@
 .insight-card:hover,
 .insight-card:focus-visible {
     transform: translateY(-4px);
-    box-shadow: var(--lift-shadow);
-    border-color: var(--lift-border);
-    filter: var(--lift-filter);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    border-color: rgba(148, 163, 184, 0.3);
     outline: none;
 }
 
@@ -51,14 +55,26 @@
 
 .insight-card:hover::after,
 .insight-card:focus-visible::after {
-    border-color: rgba(0, 242, 254, 0.28);
-    box-shadow: 0 0 24px rgba(0, 242, 254, 0.12) inset;
+    border-color: rgba(0, 242, 254, 0.15);
+    box-shadow: 0 0 20px rgba(0, 242, 254, 0.08) inset;
 }
 
+/* --- 浅色模式下的上方卡片（纯白、去杂色） --- */
 [data-theme="light"] .insight-card {
-    background: rgba(255, 255, 255, 0.8);
+    background: #ffffff;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+}
+[data-theme="light"] .insight-card::before {
+    display: none; /* 移除浅色模式下多余的光晕 */
+}
+[data-theme="light"] .insight-card:hover {
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
+    border-color: rgba(15, 23, 42, 0.12);
 }
 
+
+/* --- 卡片内部文字元素 --- */
 .insight-card-header,
 .profile-strength-content {
     display: flex;
@@ -83,60 +99,39 @@
     font-size: 13px;
     letter-spacing: 0.02em;
     text-transform: uppercase;
-    color: rgba(226, 232, 240, 0.9);
+    color: rgba(226, 232, 240, 0.75);
 }
-
-[data-theme="light"] .insight-card .insight-label {
-    color: rgba(15, 23, 42, 0.75);
+[data-theme="light"] .insight-label {
+    color: rgba(15, 23, 42, 0.65);
 }
 
 .insight-subtitle {
     margin: 4px 0 0;
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.78);
+    color: rgba(255, 255, 255, 0.6);
 }
-
 [data-theme="light"] .insight-subtitle {
-    color: rgba(15, 23, 42, 0.7);
+    color: rgba(15, 23, 42, 0.55);
 }
 
 .insight-core-number {
     font-size: clamp(36px, 4vw, 48px);
     font-weight: 800;
     line-height: 1;
-    color: #e2e8f0;
-    text-shadow: 0 0 18px rgba(148, 163, 184, 0.18);
+    color: #f8fafc;
+    text-shadow: 0 0 18px rgba(148, 163, 184, 0.12);
 }
-
-[data-theme="light"] .insight-card .insight-core-number {
+[data-theme="light"] .insight-core-number {
     color: #0f172a;
     text-shadow: none;
 }
 
-.accent-positive {
-    color: #0d9488;
-    text-shadow: 0 0 16px rgba(13, 148, 136, 0.35);
-}
+.accent-positive { color: #0d9488; text-shadow: 0 0 16px rgba(13, 148, 136, 0.35); }
+.accent-warn { color: #f97316; text-shadow: 0 0 14px rgba(249, 115, 22, 0.3); }
 
-.accent-warn {
-    color: #f97316;
-    text-shadow: 0 0 14px rgba(249, 115, 22, 0.3);
-}
-
-.insight-meta {
-    margin: 0;
-    font-size: 13px;
-}
-
-.insight-subtext {
-    margin: 2px 0 0;
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.65);
-}
-
-[data-theme="light"] .insight-subtext {
-    color: rgba(15, 23, 42, 0.55);
-}
+.insight-meta { margin: 0; font-size: 13px; }
+.insight-subtext { margin: 2px 0 0; font-size: 12px; color: rgba(255, 255, 255, 0.5); }
+[data-theme="light"] .insight-subtext { color: rgba(15, 23, 42, 0.45); }
 
 .insight-icon {
     width: 34px;
@@ -145,69 +140,51 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: rgba(59, 130, 246, 0.18);
+    background: rgba(59, 130, 246, 0.15);
     color: inherit;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
-.plane-icon::before {
-    content: "✈";
-    color: #93c5fd;
-    font-size: 18px;
-}
-
-.radar-icon::before {
-    content: "◉";
-    font-size: 18px;
-    color: #2dd4bf;
-}
-
-.badge-icon::before {
-    content: "👑";
-}
-
-.calendar-icon::before {
-    content: "📅";
-    font-size: 18px;
-    color: #fdba74;
-}
+.plane-icon::before { content: "✈"; color: #93c5fd; font-size: 18px; }
+.radar-icon::before { content: "◉"; font-size: 18px; color: #2dd4bf; }
+.badge-icon::before { content: "👑"; }
+.calendar-icon::before { content: "📅"; font-size: 18px; color: #fdba74; }
 
 .donut-chart {
     width: 110px;
     height: 110px;
     border-radius: 50%;
-    background: conic-gradient(#a855f7 var(--donut-degree), rgba(255, 255, 255, 0.08) 0deg);
-    display: flex;
+    --donut-degree: 0deg; /* 初始化变量，消除警告 */
+    background: conic-gradient(#a855f7 var(--donut-degree, 0deg), rgba(255, 255, 255, 0.08) 0deg);    display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
 }
-
 .donut-chart::after {
     content: "";
     position: absolute;
     width: 70px;
     height: 70px;
     border-radius: 50%;
+    --card-bg: #0f172a; /* 或者是您需要的其他颜色 */
     background: var(--card-bg, #0f172a);
 }
-
 .donut-chart span {
     position: relative;
     font-weight: 700;
     font-size: 20px;
     color: #f8fafc;
 }
+[data-theme="light"] .donut-chart::after { background: #fff; }
+[data-theme="light"] .donut-chart span { color: #0f172a; }
 
-[data-theme="light"] .donut-chart::after {
-    background: #fff;
-}
+.profile-strength-text { display: grid; gap: 6px; }
 
-.profile-strength-text {
-    display: grid;
-    gap: 6px;
-}
 
+/* ==========================================================================
+   2. 英雄卡片主视觉 (Hero Panel)
+   优化目标：做加法，加深对比，提升质感，修复右侧排版与动画
+   ========================================================================== */
 .hero-card {
     margin-top: 22px;
     padding: 0;
@@ -220,34 +197,34 @@
     display: grid;
     grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
     gap: 28px;
-    padding: 28px 32px;
+    padding: 32px 36px;
     border-radius: 24px;
-    border: 1px solid rgba(148, 163, 184, 0.22);
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.82) 0%, rgba(17, 24, 39, 0.88) 48%, rgba(2, 6, 23, 0.9) 100%);
-    box-shadow: 0 24px 50px rgba(2, 6, 23, 0.45);
+    /* 深色模式：加深对比，使用更有深度的暗夜蓝 */
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(9, 14, 23, 0.98) 50%, rgba(2, 6, 23, 1) 100%);
+    border: 1px solid rgba(56, 189, 248, 0.15); /* 微弱的青蓝边框 */
+    box-shadow: 0 24px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     position: relative;
     overflow: hidden;
     color: #e2e8f0;
     width: 100%;
     max-width: 100%;
     margin: 0;
-    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, filter 0.25s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
 }
 
 .hero-panel:hover,
 .hero-panel:focus-within {
-    transform: translateY(-6px);
-    box-shadow: var(--lift-shadow);
-    border-color: var(--lift-border);
-    filter: var(--lift-filter);
+    transform: translateY(-4px);
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(56, 189, 248, 0.05);
+    border-color: rgba(56, 189, 248, 0.3);
 }
 
 .hero-panel::before {
     content: "";
     position: absolute;
     inset: 0;
-    background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.18), transparent 55%),
-        linear-gradient(120deg, rgba(226, 232, 240, 0.08), transparent 60%);
+    background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.15), transparent 60%),
+    linear-gradient(120deg, rgba(226, 232, 240, 0.05), transparent 70%);
     pointer-events: none;
 }
 
@@ -255,175 +232,223 @@
     content: "";
     position: absolute;
     inset: 0;
-    background-image: linear-gradient(rgba(148, 163, 184, 0.18) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(148, 163, 184, 0.18) 1px, transparent 1px);
+    background-image: linear-gradient(rgba(148, 163, 184, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.1) 1px, transparent 1px);
     background-size: 32px 32px;
-    opacity: 0.25;
+    opacity: 0.3;
     pointer-events: none;
-    mask-image: radial-gradient(circle at 30% 20%, rgba(0, 0, 0, 0.7), transparent 55%);
+    mask-image: radial-gradient(circle at 30% 20%, rgba(0, 0, 0, 0.8), transparent 60%);
 }
 
+/* --- 浅色模式下的英雄卡片（清透靓丽的蓝青渐变） --- */
+[data-theme="light"] .hero-panel {
+    background: linear-gradient(135deg, #eef2ff 0%, #f0f9ff 50%, #e0f2fe 100%);
+    border: 1px solid rgba(186, 230, 253, 0.8);
+    box-shadow: 0 16px 36px rgba(56, 189, 248, 0.08);
+    color: #0f172a;
+}
+[data-theme="light"] .hero-panel:hover,
+[data-theme="light"] .hero-panel:focus-within {
+    box-shadow: 0 22px 46px rgba(56, 189, 248, 0.15);
+    border-color: rgba(125, 211, 252, 0.9);
+}
+
+
+/* --- 英雄卡片内容区 --- */
 .hero-content {
     display: grid;
-    gap: 14px;
+    gap: 16px;
     position: relative;
     z-index: 1;
 }
 
+/* 优化：竞争力提升标签 */
 .hero-badge {
     align-self: flex-start;
-    padding: 6px 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 16px;
     border-radius: 999px;
-    background: rgba(56, 189, 248, 0.16);
-    color: #7dd3fc;
-    font-size: 12px;
+    background: rgba(56, 189, 248, 0.15);
+    color: #38bdf8;
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    font-size: 13px;
     font-weight: 600;
     letter-spacing: 0.02em;
 }
+[data-theme="light"] .hero-badge {
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    color: #1e40af;
+    border: 1px solid #93c5fd;
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.15);
+}
 
+/* 优化：更粗更有分量感的标题 */
 .hero-title {
     margin: 0;
-    font-size: clamp(22px, 2vw, 28px);
+    font-size: clamp(24px, 2.2vw, 30px);
+    font-weight: 800; /* 加粗 */
     line-height: 1.35;
     color: #f8fafc;
+}
+[data-theme="light"] .hero-title {
+    color: #0f172a;
 }
 
 .hero-desc {
     margin: 0;
-    color: rgba(226, 232, 240, 0.78);
-    font-size: 14px;
+    color: rgba(226, 232, 240, 0.85);
+    font-size: 15px;
     line-height: 1.6;
 }
+[data-theme="light"] .hero-desc {
+    color: rgba(15, 23, 42, 0.75);
+}
 
+/* --- 英雄卡片按钮 --- */
 .hero-actions {
     display: flex;
-    gap: 12px;
+    gap: 14px;
     flex-wrap: wrap;
+    margin-top: 8px;
 }
 
 .hero-btn {
-    padding: 12px 22px;
-    border-radius: 14px;
+    padding: 12px 24px;
+    border-radius: 12px;
     border: 1px solid transparent;
     font-weight: 600;
+    font-size: 14px;
     cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.3s ease;
+    transition: all 0.2s ease;
 }
 
+/* 主按钮 */
 .hero-btn.primary {
-    background: linear-gradient(135deg, #2563eb, #38bdf8);
+    background: linear-gradient(135deg, #2563eb, #0ea5e9);
     color: #fff;
-    box-shadow: 0 14px 24px rgba(37, 99, 235, 0.25);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
 }
-
 .hero-btn.primary:hover {
     transform: translateY(-2px);
-    box-shadow: 0 18px 30px rgba(37, 99, 235, 0.35);
+    box-shadow: 0 12px 24px rgba(37, 99, 235, 0.4);
+    filter: brightness(1.1);
 }
 
+/* 次要按钮 */
 .hero-btn.ghost {
-    background: transparent;
-    border-color: rgba(148, 163, 184, 0.35);
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(148, 163, 184, 0.3);
     color: rgba(226, 232, 240, 0.9);
 }
-
 .hero-btn.ghost:hover {
-    background: rgba(148, 163, 184, 0.16);
+    background: rgba(148, 163, 184, 0.15);
+    color: #fff;
+}
+[data-theme="light"] .hero-btn.ghost {
+    background: rgba(255, 255, 255, 0.6);
+    border-color: #93c5fd;
+    color: #1d4ed8;
+}
+[data-theme="light"] .hero-btn.ghost:hover {
+    background: #eff6ff;
+    border-color: #60a5fa;
 }
 
+
+/* ==========================================================================
+   3. 右侧视觉区与动效 (Hero Visual & Animations)
+   优化目标：居中对齐、增加呼吸动画、修复文字排版突兀感
+   ========================================================================== */
 .hero-visual {
     position: relative;
-    display: grid;
-    place-items: center;
-    min-height: 180px;
+    display: flex;
+    flex-direction: column; /* 垂直排列 */
+    align-items: center;
+    justify-content: center;
+    gap: 24px; /* 拉开光球与文字的间距 */
+    min-height: 200px;
     z-index: 1;
 }
 
 .hero-orb {
-    width: 160px;
-    height: 160px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(56, 189, 248, 0.2), rgba(2, 6, 23, 0));
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.25), rgba(2, 6, 23, 0));
     filter: blur(0.5px);
     position: relative;
+    animation: orbPulse 4s infinite alternate ease-in-out; /* 添加呼吸动画 */
 }
 
 .hero-orb::before,
 .hero-orb::after {
     content: "";
     position: absolute;
-    inset: 18px;
+    inset: -10px; /* 向外扩展 */
     border-radius: 50%;
-    border: 1px dashed rgba(125, 211, 252, 0.4);
+    border: 1px dashed rgba(125, 211, 252, 0.3);
 }
 
 .hero-orb::after {
-    inset: 38px;
-    border-color: rgba(125, 211, 252, 0.2);
+    inset: 15px; /* 向内收缩 */
+    border-style: solid;
+    border-width: 1px;
+    border-color: rgba(125, 211, 252, 0.15);
 }
 
 .hero-lines {
     position: absolute;
-    width: 180px;
-    height: 180px;
+    width: 160px;
+    height: 160px;
     border-radius: 30px;
-    border: 1px solid rgba(125, 211, 252, 0.2);
+    border: 1px solid rgba(125, 211, 252, 0.15);
     transform: rotate(12deg);
+    animation: lineRotate 20s infinite linear; /* 缓慢旋转 */
 }
 
+/* 优化：右侧文字排版 */
 .hero-visual-text {
-    position: absolute;
-    bottom: 12px;
-    font-size: 12px;
-    color: rgba(226, 232, 240, 0.55);
-    letter-spacing: 0.08em;
+    position: relative; /* 取消原本的 absolute */
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(226, 232, 240, 0.6);
+    letter-spacing: 0.2em; /* 增大字间距，提升高级感 */
     text-transform: uppercase;
 }
 
-[data-theme="light"] .hero-panel {
-    background: linear-gradient(135deg, rgba(226, 232, 240, 0.35) 0%, rgba(255, 255, 255, 0.95) 48%, rgba(248, 250, 252, 0.85) 100%);
-    color: #0f172a;
-    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+/* --- 浅色模式下的右侧视觉 --- */
+[data-theme="light"] .hero-orb {
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.35), rgba(255, 255, 255, 0));
+    box-shadow: 0 0 40px rgba(56, 189, 248, 0.15);
+}
+[data-theme="light"] .hero-orb::before { border-color: rgba(56, 189, 248, 0.4); }
+[data-theme="light"] .hero-orb::after { border-color: rgba(56, 189, 248, 0.2); }
+[data-theme="light"] .hero-lines { border-color: rgba(56, 189, 248, 0.25); }
+[data-theme="light"] .hero-visual-text { color: #64748b; }
+
+/* 关键帧动画 */
+@keyframes orbPulse {
+    0% { transform: scale(0.95); opacity: 0.8; }
+    100% { transform: scale(1.05); opacity: 1; }
 }
 
-[data-theme="light"] .hero-panel:hover,
-[data-theme="light"] .hero-panel:focus-within {
-    box-shadow: 0 22px 46px rgba(15, 23, 42, 0.16);
-    border-color: rgba(15, 23, 42, 0.12);
-    filter: brightness(1.01);
+@keyframes lineRotate {
+    0% { transform: rotate(12deg); }
+    100% { transform: rotate(372deg); }
 }
 
-[data-theme="light"] .hero-badge {
-    background: rgba(59, 130, 246, 0.12);
-    color: #1d4ed8;
-}
-
-[data-theme="light"] .hero-title {
-    color: #0f172a;
-}
-
-[data-theme="light"] .hero-desc {
-    color: rgba(15, 23, 42, 0.65);
-}
-
-[data-theme="light"] .hero-btn.ghost {
-    border-color: rgba(37, 99, 235, 0.35);
-    color: #1e40af;
-}
-
-[data-theme="light"] .hero-visual-text {
-    color: rgba(15, 23, 42, 0.5);
-}
-
+/* 响应式调整 */
 @media (max-width: 960px) {
     .hero-panel {
         grid-template-columns: 1fr;
-        max-width: 100%;
+        padding: 24px;
         text-align: left;
     }
 
     .hero-visual {
-        min-height: 140px;
-        order: -1;
+        min-height: 160px;
+        order: -1; /* 小屏幕时，视觉区移到上方 */
     }
 }
