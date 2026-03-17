@@ -9,9 +9,14 @@
         </div>
 
         <div class="status-grid">
+
+            <div class="status-banner" id="statusMessage" data-tone="muted">
+                已同步 3 条申请状态。
+            </div>
+
             <div class="route-main">
-                <div class="status-banner" id="statusMessage" data-tone="muted">申请状态加载中...</div>
-                <div class="timeline" id="timeline"></div>
+                <div class="timeline" id="timeline">
+                </div>
                 <div class="empty-state" id="statusEmptyState" hidden>
                     <div class="empty-state__icon">📭</div>
                     <h3>暂无申请记录</h3>
