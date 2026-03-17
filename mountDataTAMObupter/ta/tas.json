@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "tas",
     "version": "1.0",
-    "updatedAt": "2026-03-17T11:01:54.114557300Z"
+    "updatedAt": "2026-03-17T12:24:49.470697800Z"
   },
   "items": [
     {
@@ -32,11 +32,11 @@
       "department": "",
       "status": "active",
       "createdAt": "2026-03-16T13:28:45.257077Z",
-      "updatedAt": "2026-03-17T11:01:54.112558400Z",
+      "updatedAt": "2026-03-17T12:24:49.469699300Z",
       "auth": {
         "passwordHash": "8b5361414eb8fa038ca9279a55be8b3b44791939d89475d1618d50230c01d65f",
         "passwordSalt": "cebb50b5-9797-4732-a22a-df78ae1c88da",
-        "lastLoginAt": "2026-03-17T11:01:54.112558400Z",
+        "lastLoginAt": "2026-03-17T12:24:49.469699300Z",
         "failedAttempts": 0
       }
     },
@@ -87,6 +87,23 @@
       "auth": {
         "passwordHash": "dfcac071b6652e42a1d7ae52ec7a3ec6d28520b11146b1adf927cd98c4ae2232",
         "passwordSalt": "c8cbb751-9eb7-40a8-9b9b-c5a860ef44d8",
+        "lastLoginAt": "",
+        "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "TA-70803",
+      "name": "Aqq",
+      "username": "Aqq",
+      "email": "Aqq@11.1",
+      "phone": "124352456",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-03-17T12:23:50.090144200Z",
+      "updatedAt": "2026-03-17T12:23:50.090144200Z",
+      "auth": {
+        "passwordHash": "e78d03a59ba53965a7022e5ebc8c3e4b8b8de01a29a29b08a9faf594452ae89f",
+        "passwordSalt": "1ebe6ef2-4c62-40d8-a2f4-4f24dd59a321",
         "lastLoginAt": "",
         "failedAttempts": 0.0
       }
