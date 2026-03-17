@@ -7,8 +7,8 @@
 .insight-card {
     padding: 18px;
     border-radius: 18px;
-    border: 1px solid rgba(148, 163, 184, 0.15); /* 减弱默认边框亮度 */
-    background: rgba(15, 23, 42, 0.25); /* 降低深色模式下的背景透明度，使其更内敛 */
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    background: rgba(15, 23, 42, 0.25);
     color: var(--text, #e2e8f0);
     display: grid;
     grid-template-rows: auto 1fr auto;
@@ -26,7 +26,6 @@
     content: "";
     position: absolute;
     inset: 0;
-    /* 弱化深色模式下的光晕干扰 */
     background: radial-gradient(circle at top right, rgba(0, 242, 254, 0.08), transparent 42%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 58%);
     opacity: 0.6;
@@ -63,24 +62,22 @@
     box-shadow: 0 0 20px rgba(0, 242, 254, 0.08) inset;
 }
 
-/* --- 浅色模式下的上方卡片（纯白、去杂色） --- */
+/* --- 浅色模式下的上方卡片 --- */
 [data-theme="light"] .insight-card {
     background: #ffffff;
     border: 1px solid rgba(15, 23, 42, 0.06);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
 }
 [data-theme="light"] .insight-card::before {
-    display: none; /* 移除浅色模式下多余的光晕 */
+    display: none;
 }
 [data-theme="light"] .insight-card:hover {
     box-shadow: 0 12px 24px rgba(15, 23, 42, 0.06);
     border-color: rgba(15, 23, 42, 0.12);
 }
 
-
-/* --- 卡片内部文字元素 --- */
-.insight-card-header,
-.profile-strength-content {
+/* --- 卡片内部文字通用元素 --- */
+.insight-card-header {
     display: flex;
     gap: 12px;
     align-items: flex-start;
@@ -90,21 +87,9 @@
     z-index: 1;
     min-width: 0;
 }
-
-.profile-strength-card {
-    grid-template-rows: 1fr;
-}
-
-.profile-strength-content {
-    display: grid;
-    grid-template-columns: minmax(84px, 110px) minmax(0, 1fr);
-    grid-template-rows: auto 1fr;
-    grid-template-areas:
-        "donut header"
-        "donut meta";
-    column-gap: 16px;
-    row-gap: 10px;
-    align-items: start;
+.insight-card-header > div {
+    min-width: 0;
+    flex: 1;
 }
 
 .insight-label,
@@ -162,11 +147,11 @@
     font-size: 12px;
     color: rgba(255, 255, 255, 0.5);
 }
-
 [data-theme="light"] .insight-subtext {
     color: rgba(15, 23, 42, 0.45);
 }
 
+/* --- 图标库 --- */
 .insight-icon {
     width: 34px;
     height: 34px;
@@ -180,118 +165,138 @@
     box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
 }
 
-.insight-card-header > div {
-    min-width: 0;
-    flex: 1;
-}
-
 .plane-icon::before { content: "✈"; color: #93c5fd; font-size: 18px; }
 .radar-icon::before { content: "◉"; font-size: 18px; color: #2dd4bf; }
 .badge-icon::before { content: "👑"; }
 .calendar-icon::before { content: "📅"; font-size: 18px; color: #fdba74; }
 
+/* ==========================================================================
+   资料完善度卡片 - 终极物理与视觉双重对齐版
+   ========================================================================== */
+
+.profile-strength-content {
+    display: grid;
+    grid-template-columns: 58px minmax(0, 1fr); /* 稍微收敛圆环尺寸，使其与大数字的视觉体量对等 */
+
+    /* 🚨 核心：强制三段式网格（顶端自适应、中间弹性、底端自适应） */
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas:
+        "header header"
+        "donut  meta"
+        "subtext subtext";
+    column-gap: 16px;
+    row-gap: 12px; /* 严格等于外层卡   片的标准间距，不差1px */
+    height: 100%;
+    /* 👇 新增这一行：强制该容器跨越外层 .insight-card 的所有 3 行（auto 1fr auto） */
+    grid-row: 1 / -1;
+}
+
+.profile-strength-text {
+    display: contents;
+}
+
+.profile-strength-content .insight-card-header {
+    grid-area: header;
+    display: flex;
+    align-items: flex-start;
+}
+
+/* 图标还原 */
+.profile-strength-content .insight-icon {
+    position: relative !important;
+    margin: 0;
+}
+
+/* 🚨 中间层：圆环 */
 .donut-chart {
     grid-area: donut;
-    align-self: end;
-    width: clamp(84px, 7vw, 110px);
+    width: 100%;
     aspect-ratio: 1;
-    border-radius: 50%;
-    min-width: 84px;
-    max-width: 110px;
+    margin: 0;
+
+    /* 👇 关键点 1：必须强行顶对齐（start），不能居中！这样才能与旁边数字的“起跑线”锁死，无视底部文字的影响 */
+    align-self: start;
+    /* 👇 关键点 2：视错觉修正。下推 4px，抵消掉旁边大数字体自带来的“空气顶宽”，达到视觉上的绝对平齐 */
+    margin-top: 4px;
+
     --donut-degree: 0deg;
     background: conic-gradient(#a855f7 var(--donut-degree, 0deg), rgba(255, 255, 255, 0.08) 0deg);
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
+    border-radius: 50%;
 }
+
 .donut-chart::after {
     content: "";
     position: absolute;
     inset: 18%;
     border-radius: 50%;
-    --card-bg: #0f172a; /* 或者是您需要的其他颜色 */
-    background: var(--card-bg, #0f172a);
+    --card-bg: var(--card-bg);
+    background: var(--card-bg, #ffffff);
 }
+
 .donut-chart span {
     position: relative;
     z-index: 1;
     font-weight: 700;
-    font-size: clamp(16px, 1.4vw, 20px);
-    color: #f8fafc;
+    font-size: clamp(14px, 1.2vw, 16px);
+    color: #0f172a;
 }
-[data-theme="light"] .donut-chart::after { background: #fff; }
-[data-theme="light"] .donut-chart span { color: #0f172a; }
 
-.profile-strength-text {
-    grid-area: header / header / meta / meta;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    min-width: 0;
+/* 🚨 中间层：评级文字 */
+.profile-strength-content .insight-meta {
+    grid-area: meta;
+
+    /* 同样跟随顶部对齐的原则 */
     align-self: start;
+    /* 精确计算：下推 20px，刚好将这行字对齐在 58px 圆环的垂直中心！ */
+    margin: 0;
+    margin-top: 20px;
+
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e293b;
 }
 
-.profile-strength-card {
-    min-width: 0;
+/* 🚨 底部层：补充说明 */
+.profile-strength-content .insight-subtext {
+    grid-area: subtext;
+    /* 强制沉降到剩余空间的最低端，完美贴合别的卡片的 Footer */
+    align-self: end;
+    margin: 0;
+    font-size: 13px;
+    color: #64748b;
+    line-height: 1.6;
 }
 
-.profile-strength-text .insight-card-header {
-    justify-content: flex-start;
-    gap: 10px;
-}
-
-.profile-strength-text .insight-meta,
-.profile-strength-text .insight-subtext {
-    margin-top: 0;
-}
-
-@media (max-width: 1140px) {
-    .profile-strength-content {
-        grid-template-columns: 96px minmax(0, 1fr);
-    }
-}
-
-@media (max-width: 960px) {
-    .stat-grid.insight-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
+/* --- 手机端响应式 --- */
 @media (max-width: 640px) {
-    .stat-grid.insight-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .insight-card {
-        padding: 16px;
-    }
-
     .profile-strength-content {
         grid-template-columns: 1fr;
-        grid-template-rows: auto auto;
         grid-template-areas:
             "header"
-            "donut";
+            "donut"
+            "meta"
+            "subtext";
+        justify-items: center;
+        text-align: center;
+        gap: 12px;
     }
-
-    .profile-strength-text {
-        grid-area: header;
+    .profile-strength-content .insight-card-header {
+        margin-bottom: 4px;
+        text-align: left; /* 手机端头部仍保持左对齐比较稳 */
+        width: 100%;
     }
-
     .donut-chart {
-        justify-self: start;
-        align-self: start;
-        width: 96px;
-        min-width: 96px;
-        max-width: 96px;
+        width: 84px;
     }
 }
 
 
 /* ==========================================================================
    2. 英雄卡片主视觉 (Hero Panel)
-   优化目标：做加法，加深对比，提升质感，修复右侧排版与动画
    ========================================================================== */
 .hero-card {
     margin-top: 22px;
@@ -307,9 +312,8 @@
     gap: 28px;
     padding: 32px 36px;
     border-radius: 24px;
-    /* 深色模式：加深对比，使用更有深度的暗夜蓝 */
     background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(9, 14, 23, 0.98) 50%, rgba(2, 6, 23, 1) 100%);
-    border: 1px solid rgba(56, 189, 248, 0.15); /* 微弱的青蓝边框 */
+    border: 1px solid rgba(56, 189, 248, 0.15);
     box-shadow: 0 24px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
     position: relative;
     overflow: hidden;
@@ -348,7 +352,7 @@
     mask-image: radial-gradient(circle at 30% 20%, rgba(0, 0, 0, 0.8), transparent 60%);
 }
 
-/* --- 浅色模式下的英雄卡片（清透靓丽的蓝青渐变） --- */
+/* --- 浅色模式下的英雄卡片 --- */
 [data-theme="light"] .hero-panel {
     background: linear-gradient(135deg, #eef2ff 0%, #f0f9ff 50%, #e0f2fe 100%);
     border: 1px solid rgba(186, 230, 253, 0.8);
@@ -361,7 +365,6 @@
     border-color: rgba(125, 211, 252, 0.9);
 }
 
-
 /* --- 英雄卡片内容区 --- */
 .hero-content {
     display: grid;
@@ -370,7 +373,6 @@
     z-index: 1;
 }
 
-/* 优化：竞争力提升标签 */
 .hero-badge {
     align-self: flex-start;
     display: inline-flex;
@@ -392,11 +394,10 @@
     box-shadow: 0 4px 10px rgba(59, 130, 246, 0.15);
 }
 
-/* 优化：更粗更有分量感的标题 */
 .hero-title {
     margin: 0;
     font-size: clamp(24px, 2.2vw, 30px);
-    font-weight: 800; /* 加粗 */
+    font-weight: 800;
     line-height: 1.35;
     color: #f8fafc;
 }
@@ -432,7 +433,6 @@
     transition: all 0.2s ease;
 }
 
-/* 主按钮 */
 .hero-btn.primary {
     background: linear-gradient(135deg, #2563eb, #0ea5e9);
     color: #fff;
@@ -444,7 +444,6 @@
     filter: brightness(1.1);
 }
 
-/* 次要按钮 */
 .hero-btn.ghost {
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(148, 163, 184, 0.3);
@@ -467,15 +466,14 @@
 
 /* ==========================================================================
    3. 右侧视觉区与动效 (Hero Visual & Animations)
-   优化目标：居中对齐、增加呼吸动画、修复文字排版突兀感
    ========================================================================== */
 .hero-visual {
     position: relative;
     display: flex;
-    flex-direction: column; /* 垂直排列 */
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 24px; /* 拉开光球与文字的间距 */
+    gap: 24px;
     min-height: 200px;
     z-index: 1;
 }
@@ -487,20 +485,20 @@
     background: radial-gradient(circle, rgba(56, 189, 248, 0.25), rgba(2, 6, 23, 0));
     filter: blur(0.5px);
     position: relative;
-    animation: orbPulse 4s infinite alternate ease-in-out; /* 添加呼吸动画 */
+    animation: orbPulse 4s infinite alternate ease-in-out;
 }
 
 .hero-orb::before,
 .hero-orb::after {
     content: "";
     position: absolute;
-    inset: -10px; /* 向外扩展 */
+    inset: -10px;
     border-radius: 50%;
     border: 1px dashed rgba(125, 211, 252, 0.3);
 }
 
 .hero-orb::after {
-    inset: 15px; /* 向内收缩 */
+    inset: 15px;
     border-style: solid;
     border-width: 1px;
     border-color: rgba(125, 211, 252, 0.15);
@@ -513,16 +511,15 @@
     border-radius: 30px;
     border: 1px solid rgba(125, 211, 252, 0.15);
     transform: rotate(12deg);
-    animation: lineRotate 20s infinite linear; /* 缓慢旋转 */
+    animation: lineRotate 20s infinite linear;
 }
 
-/* 优化：右侧文字排版 */
 .hero-visual-text {
-    position: relative; /* 取消原本的 absolute */
+    position: relative;
     font-size: 13px;
     font-weight: 600;
     color: rgba(226, 232, 240, 0.6);
-    letter-spacing: 0.2em; /* 增大字间距，提升高级感 */
+    letter-spacing: 0.2em;
     text-transform: uppercase;
 }
 
@@ -557,6 +554,6 @@
 
     .hero-visual {
         min-height: 160px;
-        order: -1; /* 小屏幕时，视觉区移到上方 */
+        order: -1;
     }
 }
