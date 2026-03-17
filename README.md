@@ -32,6 +32,14 @@
 文案内容请上传到独属于个人分支的https://github.com/StarDust-XCHH/PureRecruitment-TAMO-bupter/blob/e68036ff47aa010577c8fe5cc642046171900416/peojectFile文件夹（推荐新建子文件夹）
 
 
+## 一阶段完成内容
+
+- TA+LogOn=story+prototype<——StarDust——>`projectFile/StarDustXCHH/imgStage1Prototype`
+
+
+
+
+
 # 项目架构
 
 ```txt
