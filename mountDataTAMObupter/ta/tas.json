@@ -107,6 +107,23 @@
         "lastLoginAt": "",
         "failedAttempts": 0.0
       }
+    },
+    {
+      "id": "TA-24341",
+      "name": "Ton",
+      "username": "12345",
+      "email": "12334@a.com",
+      "phone": "12339989999",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-03-21T13:12:54.282282500Z",
+      "updatedAt": "2026-03-21T13:12:54.282282500Z",
+      "auth": {
+        "passwordHash": "5ffe2b47aa70ecc089b7d9311ef3ff2fb72195411b1b98d210d2b686afaf5ee9",
+        "passwordSalt": "08a2d292-32bc-46e7-936a-45a132381204",
+        "lastLoginAt": "",
+        "failedAttempts": 0
+      }
     }
   ]
 }

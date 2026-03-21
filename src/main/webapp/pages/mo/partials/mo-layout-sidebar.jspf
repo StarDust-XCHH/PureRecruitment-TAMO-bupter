@@ -1,0 +1,21 @@
+<div class="brand">
+    <div class="logo">MO</div>
+    <div>
+        <div>Module Organizer</div>
+        <small class="brand-subtitle">Recruitment Suite</small>
+    </div>
+</div>
+<nav class="nav" aria-label="MO 工作台导航">
+    <button class="nav-item active" type="button" data-route="dashboard" aria-current="page">
+        <span>📊</span>
+        <span>岗位概览</span>
+    </button>
+    <button class="nav-item" type="button" data-route="jobs" aria-current="false">
+        <span>🧩</span>
+        <span>岗位发布</span>
+    </button>
+    <button class="nav-item" type="button" data-route="applicants" aria-current="false">
+        <span>🧑‍🎓</span>
+        <span>应聘筛选</span>
+    </button>
+</nav>

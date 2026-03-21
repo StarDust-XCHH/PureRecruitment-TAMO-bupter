@@ -93,6 +93,22 @@
       "lastProfileSyncMessage": "",
       "createdAt": "2026-03-17T12:23:50.090144200Z",
       "updatedAt": "2026-03-17T12:23:50.090144200Z"
+    },
+    {
+      "id": "SETTING-TA-24341",
+      "taId": "TA-24341",
+      "theme": "dark",
+      "avatar": "",
+      "onboardingStep": 0.0,
+      "guideCompleted": false,
+      "onboardingCompletedAt": "",
+      "onboardingDismissed": false,
+      "profileSaved": false,
+      "profileSavedAt": "",
+      "lastProfileSyncStatus": "idle",
+      "lastProfileSyncMessage": "",
+      "createdAt": "2026-03-21T13:12:54.282282500Z",
+      "updatedAt": "2026-03-21T13:12:54.282282500Z"
     }
   ]
 }

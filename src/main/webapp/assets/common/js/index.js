@@ -1,4 +1,4 @@
-﻿(function () {
+(function () {
         const root = document.documentElement;
         const loginCard = document.getElementById('loginCard');
         const registerCard = document.getElementById('registerCard');
@@ -214,6 +214,12 @@
             }
         });
 
+        function saveMoUser(user) {
+            const serialized = JSON.stringify(user);
+            sessionStorage.setItem('mo-user', serialized);
+            localStorage.setItem('mo-user', serialized);
+        }
+
         loginForm.addEventListener('submit', async function (event) {
             event.preventDefault();
             setInlineMessage(loginError, '');
@@ -221,6 +227,7 @@
 
             const username = loginUsername.value.trim();
             const password = loginPassword.value; // 保持原始密码不 trim
+            const role = roleInput.value || 'TA';
 
             // 【前端调试日志】
             console.group("--- 登录请求调试 ---");
@@ -231,6 +238,16 @@
 
             if (!username || !password) {
                 setInlineMessage(loginError, '请输入用户名和密码');
+                return;
+            }
+
+            if (role === 'MO') {
+                saveMoUser({
+                    username: username,
+                    role: 'MO',
+                    loginAt: new Date().toISOString()
+                });
+                window.location.replace('pages/mo/mo-home.jsp');
                 return;
             }
 
