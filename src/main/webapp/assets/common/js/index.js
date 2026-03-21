@@ -18,6 +18,8 @@
         const openRegister = document.getElementById('openRegister');
         const backToLogin = document.getElementById('backToLogin');
         const adminLogin = document.getElementById('adminLogin');
+        const adminAccount = document.getElementById('adminAccount');
+        const adminPassword = document.getElementById('adminPassword');
         const loginSubmit = document.getElementById('loginSubmit');
         const registerSubmit = document.getElementById('registerSubmit');
         const registerTaId = document.getElementById('registerTaId');
@@ -154,8 +156,37 @@
 
         brandTrigger.addEventListener('click', handleBrandTap);
 
-        adminLogin.addEventListener('click', function () {
-            setInlineMessage(adminError, '当前仅保留管理员入口彩蛋，暂未接入管理员登录接口');
+        adminLogin.addEventListener('click', async function () {
+            setInlineMessage(adminError, '');
+            const adminAccount = document.getElementById('adminAccount').value.trim();
+            const adminPassword = document.getElementById('adminPassword').value;
+
+            if (!adminAccount || !adminPassword) {
+                setInlineMessage(adminError, '请输入管理员账号和密码');
+                return;
+            }
+
+            setLoading(adminLogin, '登录中...', true, '管理员登录');
+
+            try {
+                // 模拟管理员登录 - 实际应调用后端接口
+                if (adminAccount === 'admin' && adminPassword === 'admin123') {
+                    const adminUser = {
+                        username: 'admin',
+                        role: 'ADMIN',
+                        loginAt: new Date().toISOString()
+                    };
+                    localStorage.setItem('admin-user', JSON.stringify(adminUser));
+                    window.location.replace('pages/admin/admin-home.jsp');
+                } else {
+                    setInlineMessage(adminError, '账号或密码错误（测试账号: admin/admin123）');
+                }
+            } catch (error) {
+                console.error("[JS] 管理员登录异常:", error);
+                setInlineMessage(adminError, '登录失败，请重试');
+            } finally {
+                setLoading(adminLogin, '登录中...', false, '管理员登录');
+            }
         });
 
         openRegister.addEventListener('click', function (event) {
