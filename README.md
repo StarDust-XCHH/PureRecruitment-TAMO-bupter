@@ -1,11 +1,18 @@
 # PureRecruitment-TAMO-bupter
 
-# Group-16 成员
+# Group-16 Members 成员
+|Github UserName|Chinese Name|Name in English|BUPT ID|QM ID|Email|
+|---|---|---|---|---|---|
+|StarDust-XCHH|管宇涵|Yuhan Guan|2023213116|231220725|lmtgyh@163.com|
+|zfh53|张峰豪|Fenghao Zhang|2023213136|231221216|zhang.fenghao@qq.com|
+|6a696c6c|李玉峰|Yufeng Li|2023213131|231222556|3171506351@qq.com|
+|StellaWang309|汪以琳|Yilin Wang|2023213143|231222305|1938508113@qq.com|
+|TTslmy|刘慧颖|Huiying Liu|2023213172|231221788|2497604794@qq.com|
+|Au2789|庞博文|Bowen Pang|2023213124|231220998|pbw3319@163.com|
 
-- StarDust-XCHH: 管宇涵-Yuhan Guan-2023213116
-- zfh53:张峰豪-Fenghao Zhang-231221216
+
 - Yuxuan:yuxuanwwang@outlook.com    (Support TA)
-- 6a696c6c:李玉峰-Yufeng Li
+
 
 
 # 资源文件服务端部署挂载
