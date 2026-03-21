@@ -1,0 +1,99 @@
+@charset "UTF-8";
+
+.mo-form-grid {
+    margin: 14px 0 18px;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.mo-form-grid label {
+    display: grid;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.mo-form-grid input,
+.mo-form-grid textarea,
+.mo-form-grid select {
+    border-radius: 10px;
+    border: 1px solid var(--card-border);
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--text);
+    padding: 10px 12px;
+}
+
+[data-theme="light"] .mo-form-grid input,
+[data-theme="light"] .mo-form-grid textarea,
+[data-theme="light"] .mo-form-grid select {
+    background: rgba(255, 255, 255, 0.75);
+}
+
+.mo-form-grid .full {
+    grid-column: 1 / -1;
+}
+
+.mo-applicants-toolbar {
+    margin: 14px 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.mo-applicants-toolbar select {
+    min-width: 220px;
+    border-radius: 10px;
+    border: 1px solid var(--card-border);
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--text);
+    padding: 8px 10px;
+}
+
+.mo-applicant-list {
+    display: grid;
+    gap: 12px;
+}
+
+.mo-applicant-card {
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 14px;
+    background: rgba(0, 0, 0, 0.2);
+    display: grid;
+    gap: 10px;
+}
+
+[data-theme="light"] .mo-applicant-card {
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.mo-applicant-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: flex-start;
+}
+
+.mo-applicant-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+.mo-applicant-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.mo-status-ok {
+    color: #22c55e;
+}
+
+.mo-status-warn {
+    color: #fbbf24;
+}
