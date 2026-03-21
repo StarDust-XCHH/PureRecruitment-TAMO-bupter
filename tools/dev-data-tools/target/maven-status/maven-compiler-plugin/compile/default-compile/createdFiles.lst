@@ -1,0 +1,8 @@
+com\bupt\tools\cli\DevDataToolsApplication.class
+com\bupt\tools\model\DiffEntry.class
+com\bupt\tools\model\CommandResult.class
+com\bupt\tools\support\FileSupport.class
+com\bupt\tools\support\SyncRules.class
+com\bupt\tools\core\WorkspacePaths.class
+com\bupt\tools\core\WorkspaceService.class
+com\bupt\tools\support\JsonSupport.class
