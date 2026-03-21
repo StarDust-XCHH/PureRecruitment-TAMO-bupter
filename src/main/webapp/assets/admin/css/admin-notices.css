@@ -1,0 +1,71 @@
+/* Notice Styles */
+
+.notice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.notice-card {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.notice-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+}
+
+.notice-title {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.notice-meta {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.notice-content {
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin-bottom: 12px;
+}
+
+.notice-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notice-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.notice-priority {
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.notice-priority.high {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--danger-color);
+}
+
+.notice-priority.medium {
+    background: rgba(245, 158, 11, 0.2);
+    color: var(--warning-color);
+}
+
+.notice-priority.low {
+    background: rgba(99, 102, 241, 0.2);
+    color: var(--primary-color);
+}

@@ -2,9 +2,10 @@
 
 # Group-16 成员
 
-- StarDust-XCHH: 管宇涵-Yuhan Guan
+- StarDust-XCHH: 管宇涵-Yuhan Guan-2023213116
 - zfh53:张峰豪-Fenghao Zhang-231221216
 - Yuxuan:yuxuanwwang@outlook.com    (Support TA)
+- 6a696c6c:李玉峰-Yufeng Li
 
 
 # 资源文件服务端部署挂载
