@@ -22,7 +22,7 @@ public class MoApplicantsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String courseCode = req.getParameter("courseCode");
         if (courseCode == null || courseCode.trim().isBlank()) {
-            writeJson(resp, 400, gson.toJsonTree(ApiResponse.failure("缺少 courseCode 参数")).getAsJsonObject());
+            writeJson(resp, 400, gson.toJsonTree(ApiResponse.failure("Missing courseCode parameter")).getAsJsonObject());
             return;
         }
 
@@ -35,7 +35,7 @@ public class MoApplicantsServlet extends HttpServlet {
             payload.add("items", items);
             writeJson(resp, 200, payload);
         } catch (Exception ex) {
-            writeJson(resp, 500, gson.toJsonTree(ApiResponse.failure("读取应聘者数据失败: " + ex.getMessage())).getAsJsonObject());
+            writeJson(resp, 500, gson.toJsonTree(ApiResponse.failure("Failed to load applicants: " + ex.getMessage())).getAsJsonObject());
         }
     }
 

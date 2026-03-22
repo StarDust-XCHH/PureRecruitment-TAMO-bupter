@@ -126,7 +126,7 @@
             if (!value) return '--';
             const date = new Date(value);
             if (Number.isNaN(date.getTime())) return value;
-            return date.toLocaleString('zh-CN', { hour12: false });
+            return date.toLocaleString('en-GB', { hour12: false });
         }
 
         function setProfileStatus(text, tone) {
@@ -137,7 +137,7 @@
         }
 
         function updateProfileLastUpdated(value) {
-            if (profileLastUpdated) profileLastUpdated.textContent = '最近更新：' + formatUpdatedTime(value);
+            if (profileLastUpdated) profileLastUpdated.textContent = 'Last updated: ' + formatUpdatedTime(value);
         }
 
         function buildAvatarAssetUrl(value) {
@@ -160,11 +160,11 @@
                 avatarEl.style.backgroundPosition = 'center';
                 avatarEl.style.backgroundRepeat = 'no-repeat';
                 avatarEl.textContent = '';
-                avatarEl.setAttribute('aria-label', displayName + ' 的头像');
+                avatarEl.setAttribute('aria-label', displayName + ' avatar');
             } else {
                 avatarEl.style.backgroundImage = '';
                 avatarEl.textContent = fallbackLetter;
-                avatarEl.setAttribute('aria-label', displayName + ' 的头像占位');
+                avatarEl.setAttribute('aria-label', displayName + ' avatar placeholder');
             }
         }
 
@@ -190,7 +190,7 @@
                 profileAvatarBox.style.backgroundPosition = 'center';
                 profileAvatarBox.style.backgroundRepeat = 'no-repeat';
                 profileAvatarBox.textContent = '';
-                profileAvatarBox.setAttribute('aria-label', displayName + ' 的头像，点击可更换');
+                profileAvatarBox.setAttribute('aria-label', displayName + ' avatar, click to change');
             } else {
                 profileAvatarBox.classList.remove('has-image');
                 profileAvatarBox.style.backgroundImage = '';
@@ -198,7 +198,7 @@
                 profileAvatarBox.style.backgroundPosition = '';
                 profileAvatarBox.style.backgroundRepeat = '';
                 profileAvatarBox.textContent = fallbackLetter;
-                profileAvatarBox.setAttribute('aria-label', displayName + ' 的头像占位，点击可更换');
+                profileAvatarBox.setAttribute('aria-label', displayName + ' avatar placeholder, click to change');
             }
         }
 
@@ -221,7 +221,7 @@
             span.className = 'skill-tag' + (editable ? ' skill-tag-editable' : '');
             span.dataset.skill = skill;
             if (editable) {
-                span.innerHTML = '<span>' + escapeHtml(skill) + '</span><button type="button" class="skill-tag-remove" aria-label="删除技能 ' + escapeHtml(skill) + '">×</button>';
+                span.innerHTML = '<span>' + escapeHtml(skill) + '</span><button type="button" class="skill-tag-remove" aria-label="Remove skill ' + escapeHtml(skill) + '">×</button>';
                 span.querySelector('.skill-tag-remove')?.addEventListener('click', () => {
                     if (!profileState.editable || !profileState.current) return;
                     profileState.current.skills = profileState.current.skills.filter((item) => item !== skill);
@@ -256,7 +256,7 @@
             if (avatarFileInput) avatarFileInput.disabled = !editable;
             if (skillEntry) {
                 skillEntry.readOnly = !editable;
-                skillEntry.placeholder = editable ? '输入技能后回车' : '资料暂不可编辑';
+                skillEntry.placeholder = editable ? 'Type a skill and press Enter' : 'Profile is read-only';
             }
             if (saveProfileBtn) saveProfileBtn.disabled = !editable;
             if (profileState.current) renderSkillTags(profileState.current.skills, editable);
@@ -299,11 +299,11 @@
             if (!profileState.current) return;
             profileState.current = readProfileFromForm();
             if (!profileState.editable) {
-                setProfileStatus('已加载', null);
+                setProfileStatus('Loaded', null);
                 return;
             }
             const dirty = !profilesEqual(profileState.current, profileState.original);
-            setProfileStatus(dirty ? '待保存' : '编辑中', dirty ? 'is-dirty' : null);
+            setProfileStatus(dirty ? 'Unsaved changes' : 'Editing', dirty ? 'is-dirty' : null);
         }
 
         function resetPendingAvatarState(options) {
@@ -411,7 +411,7 @@
             teardownAvatarCropState();
             if (cancelled) {
                 if (avatarFileInput) avatarFileInput.value = '';
-                setAvatarHint('已取消裁切，当前头像未变更。', null);
+                setAvatarHint('Crop cancelled; avatar unchanged.', null);
             }
         }
 
@@ -425,7 +425,7 @@
                 const stageRect = avatarCropStage.getBoundingClientRect();
                 const stageSize = stageRect.width || avatarCropStage.clientWidth || 0;
                 if (!stageSize) {
-                    setAvatarCropHint('裁切区域初始化失败，请重试。', 'is-error');
+                    setAvatarCropHint('Could not initialize crop area. Try again.', 'is-error');
                     closeAvatarCropModal(true);
                     return;
                 }
@@ -444,11 +444,11 @@
                     avatarCropZoomRange.value = String(avatarCropState.scale);
                 }
                 avatarCropImage.hidden = false;
-                setAvatarCropHint('拖动图片调整取景，滑动缩放条可放大或缩小。', null);
+                setAvatarCropHint('Drag the image to frame it; use the zoom slider to scale.', null);
                 renderAvatarCropStage();
             };
             avatarCropImage.onerror = function () {
-                setAvatarCropHint('图片读取失败，请更换文件后重试。', 'is-error');
+                setAvatarCropHint('Could not read the image. Try another file.', 'is-error');
                 closeAvatarCropModal(true);
             };
             avatarCropImage.src = avatarCropState.objectUrl;
@@ -456,15 +456,15 @@
         }
 
         async function exportCroppedAvatarFile() {
-            if (!avatarCropStage || !avatarCropImage) throw new Error('裁切区域未初始化');
+            if (!avatarCropStage || !avatarCropImage) throw new Error('Crop area not initialized');
             const canvas = document.createElement('canvas');
             canvas.width = AVATAR_CROP_OUTPUT_SIZE;
             canvas.height = AVATAR_CROP_OUTPUT_SIZE;
             const ctx = canvas.getContext('2d');
-            if (!ctx) throw new Error('浏览器不支持头像裁切');
+            if (!ctx) throw new Error('This browser does not support avatar cropping');
 
             const stageSize = avatarCropStage.clientWidth || avatarCropStage.getBoundingClientRect().width || 0;
-            if (!stageSize) throw new Error('裁切区域尺寸异常');
+            if (!stageSize) throw new Error('Invalid crop area size');
 
             const scaledWidth = avatarCropState.naturalWidth * avatarCropState.baseScale * avatarCropState.scale;
             const scaledHeight = avatarCropState.naturalHeight * avatarCropState.baseScale * avatarCropState.scale;
@@ -485,7 +485,7 @@
             const blob = await new Promise((resolve) => {
                 canvas.toBlob(resolve, 'image/png', 0.92);
             });
-            if (!blob) throw new Error('头像导出失败，请重试');
+            if (!blob) throw new Error('Could not export avatar; try again');
 
             return new File([blob], avatarCropState.outputFileName || 'avatar-square.png', {
                 type: 'image/png',
@@ -522,18 +522,18 @@
             }
 
             const response = await fetch(url, options);
-            const result = await response.json().catch(() => ({ success: false, message: '返回数据解析失败' }));
-            if (!response.ok || !result.success) throw new Error(result.message || '请求失败');
+            const result = await response.json().catch(() => ({ success: false, message: 'Invalid response payload' }));
+            if (!response.ok || !result.success) throw new Error(result.message || 'Request failed');
             return result.data || {};
         }
 
         async function loadProfileSettings() {
             if (!profileState.taId) {
-                setProfileStatus('缺少登录信息', 'is-error');
+                setProfileStatus('Missing sign-in information', 'is-error');
                 return;
             }
             profileState.loading = true;
-            setProfileStatus('加载中...', null);
+            setProfileStatus('Loading...', null);
             try {
                 const data = await requestProfileSettings('GET', { taId: profileState.taId });
                 const normalized = normalizeProfileData(data);
@@ -545,8 +545,8 @@
                 if (avatarFileInput) avatarFileInput.value = '';
                 fillProfileForm(normalized);
                 setProfileEditable(true);
-                setProfileStatus('已加载', null);
-                setAvatarHint('支持 PNG / JPG / WEBP / GIF，大小限制 10MB。点击头像即可更换。', null);
+                setProfileStatus('Loaded', null);
+                setAvatarHint('PNG, JPG, WEBP, or GIF up to 10MB. Click the avatar to change it.', null);
 
                 updateTopbarAvatar(normalized.avatar);
                 if (userData) {
@@ -555,7 +555,7 @@
                 }
             } catch (error) {
                 console.error('[TA-PROFILE] load failed', error);
-                setProfileStatus('加载失败', 'is-error');
+                setProfileStatus('Load failed', 'is-error');
             } finally {
                 profileState.loading = false;
             }
@@ -566,7 +566,7 @@
             const payload = readProfileFromForm();
             payload.avatarFile = profileState.pendingAvatarFile;
             profileState.saving = true;
-            setProfileStatus('保存中...', null);
+            setProfileStatus('Saving…', null);
             try {
                 const saved = await requestProfileSettings('POST', payload);
                 const normalized = normalizeProfileData(saved);
@@ -578,8 +578,8 @@
                 if (avatarFileInput) avatarFileInput.value = '';
                 fillProfileForm(normalized);
                 setProfileEditable(true);
-                setProfileStatus('保存成功', 'is-success');
-                setAvatarHint('头像已同步到服务器。', 'is-success');
+                setProfileStatus('Saved', 'is-success');
+                setAvatarHint('Avatar synced to the server.', 'is-success');
                 const mergedUser = {
                     ...(refreshUserData() || {}),
                     taId: normalized.taId || profileState.taId,
@@ -595,7 +595,7 @@
                 updateTopbarAvatar(normalized.avatar);
             } catch (error) {
                 console.error('[TA-PROFILE] save failed', error);
-                setProfileStatus(error.message || '保存失败', 'is-error');
+                setProfileStatus(error.message || 'Save failed', 'is-error');
             } finally {
                 profileState.saving = false;
             }
@@ -607,7 +607,7 @@
             try {
                 const croppedFile = await exportCroppedAvatarFile();
                 if (croppedFile.size > MAX_AVATAR_SIZE) {
-                    throw new Error('裁切后的头像超过 10MB，请缩小后重试');
+                    throw new Error('Cropped avatar exceeds 10MB; reduce size and try again');
                 }
                 revokeProfilePreviewUrl();
                 const objectUrl = URL.createObjectURL(croppedFile);
@@ -616,13 +616,13 @@
                 profileState.avatarChanged = true;
                 if (profileState.current) profileState.current.avatar = objectUrl;
                 updateAvatarPreview(objectUrl);
-                setAvatarHint('已完成 1:1 裁切，正在自动保存头像...', 'is-success');
+                setAvatarHint('1:1 crop complete; saving avatar…', 'is-success');
                 closeAvatarCropModal(false);
                 syncDirtyState();
                 await saveProfileSettings();
             } catch (error) {
                 console.error('[TA-PROFILE] crop confirm failed', error);
-                setAvatarCropHint(error.message || '裁切失败，请重试。', 'is-error');
+                setAvatarCropHint(error.message || 'Crop failed. Try again.', 'is-error');
                 if (error && error.message) {
                     setAvatarHint(error.message, 'is-error');
                 }
@@ -682,23 +682,23 @@
             const file = avatarFileInput.files?.[0] || null;
             if (!file) {
                 resetPendingAvatarState({ restoreAvatar: true });
-                setAvatarHint('支持 PNG / JPG / WEBP / GIF，大小限制 10MB。点击头像即可更换。', null);
+                setAvatarHint('PNG, JPG, WEBP, or GIF up to 10MB. Click the avatar to change it.', null);
                 return;
             }
 
             if (file.size > MAX_AVATAR_SIZE) {
                 resetPendingAvatarState({ restoreAvatar: true });
-                setAvatarHint('头像大小不能超过 10MB。', 'is-error');
+                setAvatarHint('Avatar must be 10MB or smaller.', 'is-error');
                 return;
             }
 
             if (!/^image\/(png|jpeg|webp|gif)$/i.test(file.type || '')) {
                 resetPendingAvatarState({ restoreAvatar: true });
-                setAvatarHint('头像格式仅支持 PNG / JPG / WEBP / GIF。', 'is-error');
+                setAvatarHint('Only PNG, JPG, WEBP, or GIF are supported.', 'is-error');
                 return;
             }
 
-            setAvatarHint('图片已选择，请先完成 1:1 裁切。', null);
+            setAvatarHint('Image selected; complete the 1:1 crop.', null);
             openAvatarCropModal(file);
         });
 

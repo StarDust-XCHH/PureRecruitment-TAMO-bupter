@@ -35,7 +35,7 @@ public class TaApplicationStatusServlet extends HttpServlet {
             e.printStackTrace();
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             try (PrintWriter writer = resp.getWriter()) {
-                writer.write(buildErrorResponse("读取申请状态失败: " + e.getMessage()));
+                writer.write(buildErrorResponse("Failed to load application status: " + e.getMessage()));
             }
         }
     }
@@ -45,7 +45,7 @@ public class TaApplicationStatusServlet extends HttpServlet {
         resp.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
         resp.setContentType("application/json;charset=UTF-8");
         try (PrintWriter writer = resp.getWriter()) {
-            writer.write(buildErrorResponse("请使用 GET 请求读取申请状态"));
+            writer.write(buildErrorResponse("Use GET to read application status"));
         }
     }
 

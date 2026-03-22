@@ -51,7 +51,7 @@ public class TaProfileSettingsServlet extends HttpServlet {
         try {
             Files.createDirectories(avatarDir);
         } catch (IOException e) {
-            throw new ServletException("初始化头像目录失败", e);
+            throw new ServletException("Failed to initialize avatar directory", e);
         }
         System.out.println("[TA-PROFILE] dataDir=" + taDataDir.toAbsolutePath());
     }
@@ -67,7 +67,7 @@ public class TaProfileSettingsServlet extends HttpServlet {
         String taId = trim(req.getParameter("taId"));
         String action = trim(req.getParameter("action"));
         if ("password".equalsIgnoreCase(action)) {
-            ServletJsonResponseWriter.write(resp, 405, ApiResponse.failure("请使用 POST 更新密码"));
+            ServletJsonResponseWriter.write(resp, 405, ApiResponse.failure("Use POST to update password"));
             return;
         }
 
@@ -80,7 +80,7 @@ public class TaProfileSettingsServlet extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            ServletJsonResponseWriter.write(resp, 500, ApiResponse.failure("读取设置中心资料失败: " + e.getMessage()));
+            ServletJsonResponseWriter.write(resp, 500, ApiResponse.failure("Failed to load profile settings: " + e.getMessage()));
         }
     }
 
@@ -114,7 +114,7 @@ public class TaProfileSettingsServlet extends HttpServlet {
                 avatarPath = storeAvatar(taId, avatarPart);
             }
         } catch (IllegalStateException ex) {
-            ServletJsonResponseWriter.write(resp, 400, ApiResponse.failure("头像大小不能超过 10MB"));
+            ServletJsonResponseWriter.write(resp, 400, ApiResponse.failure("Avatar must be 10MB or smaller"));
             return;
         }
 
@@ -146,7 +146,7 @@ public class TaProfileSettingsServlet extends HttpServlet {
                 deleteStoredAvatarQuietly(avatarPath);
             }
             e.printStackTrace();
-            ServletJsonResponseWriter.write(resp, 500, ApiResponse.failure("保存设置中心资料失败: " + e.getMessage()));
+            ServletJsonResponseWriter.write(resp, 500, ApiResponse.failure("Failed to save profile settings: " + e.getMessage()));
         }
     }
 
@@ -162,7 +162,7 @@ public class TaProfileSettingsServlet extends HttpServlet {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            ServletJsonResponseWriter.write(resp, 500, ApiResponse.failure("密码更新失败: " + e.getMessage()));
+            ServletJsonResponseWriter.write(resp, 500, ApiResponse.failure("Password update failed: " + e.getMessage()));
         }
     }
 
@@ -199,15 +199,15 @@ public class TaProfileSettingsServlet extends HttpServlet {
 
     private String storeAvatar(String taId, Part avatarPart) throws IOException, ServletException {
         if (trim(taId).isEmpty()) {
-            throw new ServletException("缺少 TA 标识，无法保存头像");
+            throw new ServletException("TA identifier is required to save avatar");
         }
         if (avatarPart.getSize() > MAX_AVATAR_SIZE) {
-            throw new ServletException("头像大小不能超过 10MB");
+            throw new ServletException("Avatar must be 10MB or smaller");
         }
 
         String contentType = trim(avatarPart.getContentType()).toLowerCase();
         if (!ALLOWED_IMAGE_TYPES.contains(contentType)) {
-            throw new ServletException("头像格式仅支持 PNG / JPG / WEBP / GIF");
+            throw new ServletException("Avatar type must be PNG, JPG, WEBP, or GIF");
         }
 
         String extension = switch (contentType) {
@@ -225,14 +225,14 @@ public class TaProfileSettingsServlet extends HttpServlet {
         try (InputStream inputStream = avatarPart.getInputStream()) {
             BufferedImage originalImage = ImageIO.read(inputStream);
             if (originalImage == null) {
-                throw new ServletException("无法解析上传的图片，请检查图片格式");
+                throw new ServletException("Could not read the uploaded image—check the file format");
             }
             BufferedImage croppedSquare = cropToSquare(originalImage);
             BufferedImage resizedImage = resizeAvatar(croppedSquare, AVATAR_SIZE, AVATAR_SIZE);
             String format = resolveOutputFormat(extension);
             boolean writeSuccess = ImageIO.write(resizedImage, format, target.toFile());
             if (!writeSuccess) {
-                throw new ServletException("头像写入失败，请稍后重试");
+                throw new ServletException("Failed to write avatar file—try again later");
             }
         }
 
@@ -301,7 +301,7 @@ public class TaProfileSettingsServlet extends HttpServlet {
         try {
             Files.deleteIfExists(targetAvatar);
         } catch (IOException ex) {
-            System.err.println("[TA-PROFILE] 删除头像失败: " + targetAvatar + ", reason=" + ex.getMessage());
+            System.err.println("[TA-PROFILE] Failed to delete avatar: " + targetAvatar + ", reason=" + ex.getMessage());
         }
     }
 

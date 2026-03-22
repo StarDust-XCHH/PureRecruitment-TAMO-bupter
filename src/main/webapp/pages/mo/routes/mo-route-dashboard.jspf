@@ -2,12 +2,12 @@
     <div class="card">
         <div class="overview-top">
             <div>
-                <h1>MO 招聘总览</h1>
-                <p class="muted">面向用户故事 7/8/9：发布岗位、查看应聘、完成选择。</p>
+                <h1>MO hiring overview</h1>
+                <p class="muted">Stories 7/8/9: publish postings, review applicants, finalize selection.</p>
             </div>
             <div class="overview-badges">
-                <span class="pill">角色：Module Organizer</span>
-                <span class="pill">学期：2026 Spring</span>
+                <span class="pill">Role: Module Organizer</span>
+                <span class="pill">Term: 2026 Spring</span>
             </div>
         </div>
         <div class="stat-grid insight-grid insight-grid-spaced">
@@ -15,8 +15,8 @@
                 <div class="insight-card-header">
                     <span class="insight-icon">📌</span>
                     <div>
-                        <p class="insight-label">开放岗位</p>
-                        <p class="insight-subtitle">可点击查看摘要</p>
+                        <p class="insight-label">Open postings</p>
+                        <p class="insight-subtitle">Click for summary</p>
                     </div>
                 </div>
                 <div class="insight-core-number" id="dashOpenJobs">--</div>
@@ -25,8 +25,8 @@
                 <div class="insight-card-header">
                     <span class="insight-icon">👥</span>
                     <div>
-                        <p class="insight-label">候选池规模</p>
-                        <p class="insight-subtitle">按 TA 档案聚合</p>
+                        <p class="insight-label">Candidate pool</p>
+                        <p class="insight-subtitle">Aggregated from TA profiles</p>
                     </div>
                 </div>
                 <div class="insight-core-number" id="dashCandidates">--</div>
@@ -35,8 +35,8 @@
                 <div class="insight-card-header">
                     <span class="insight-icon">✅</span>
                     <div>
-                        <p class="insight-label">已录用</p>
-                        <p class="insight-subtitle">来自 TA 状态文件</p>
+                        <p class="insight-label">Hired</p>
+                        <p class="insight-subtitle">From TA status files</p>
                     </div>
                 </div>
                 <div class="insight-core-number" id="dashAccepted">--</div>
@@ -45,8 +45,8 @@
                 <div class="insight-card-header">
                     <span class="insight-icon">🕒</span>
                     <div>
-                        <p class="insight-label">待决策</p>
-                        <p class="insight-subtitle">建议优先处理</p>
+                        <p class="insight-label">Pending decisions</p>
+                        <p class="insight-subtitle">Handle these first</p>
                     </div>
                 </div>
                 <div class="insight-core-number" id="dashPending">--</div>

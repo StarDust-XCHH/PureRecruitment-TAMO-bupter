@@ -20,10 +20,10 @@
         const navItems = Array.from(document.querySelectorAll('.nav-item'));
 
         const guideSteps = [
-            { title: '完善你的档案信息', desc: '先补全个人资料与技能标签，让岗位推荐更精准。', selector: '.nav-item[data-route="profile"]', route: 'profile' },
-            { title: '筛选并申请岗位', desc: '在职位大厅查看匹配度、职位详情与投递入口。', selector: '.nav-item[data-route="jobs"]', route: 'jobs' },
-            { title: '查看申请状态', desc: '随时跟踪各个岗位的申请状态与反馈。', selector: '.nav-item[data-route="status"]', route: 'status' },
-            { title: '打开设置中心', desc: '点击右上角用户入口，随时修改资料、头像、密码与主题。', selector: '#userTrigger', route: 'profile', align: 'left', scrollTarget: 'topbar', overlayMode: 'focus-topbar' }
+            { title: 'Complete your profile', desc: 'Add your details and skills so job recommendations stay relevant.', selector: '.nav-item[data-route="profile"]', route: 'profile' },
+            { title: 'Browse and apply', desc: 'Use the job hall to review fit, details, and how to apply.', selector: '.nav-item[data-route="jobs"]', route: 'jobs' },
+            { title: 'Track applications', desc: 'Follow status and feedback for each role you applied to.', selector: '.nav-item[data-route="status"]', route: 'status' },
+            { title: 'Open settings', desc: 'Use the user menu (top right) to edit profile, avatar, password, and theme.', selector: '#userTrigger', route: 'profile', align: 'left', scrollTarget: 'topbar', overlayMode: 'focus-topbar' }
         ];
 
         const guideRouteLookup = new Map(guideSteps.filter((step) => step.route).map((step, index) => [step.route, index]));
@@ -179,7 +179,7 @@
 
             guideTitle.textContent = step.title;
             guideDesc.textContent = step.desc;
-            guideProgress.innerHTML = '引导 ' + (guideIndex + 1) + ' / ' + guideSteps.length;
+            guideProgress.innerHTML = 'Step ' + (guideIndex + 1) + ' / ' + guideSteps.length;
             guideBack.disabled = guideIndex === 0;
             guideBack.style.opacity = guideIndex === 0 ? '0.4' : '1';
 

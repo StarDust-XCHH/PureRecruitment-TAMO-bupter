@@ -40,7 +40,7 @@ public class MoApplicationDecisionServlet extends HttpServlet {
         } catch (IllegalArgumentException ex) {
             writeJson(resp, 400, gson.toJsonTree(ApiResponse.failure(ex.getMessage())).getAsJsonObject());
         } catch (Exception ex) {
-            writeJson(resp, 500, gson.toJsonTree(ApiResponse.failure("保存筛选结果失败: " + ex.getMessage())).getAsJsonObject());
+            writeJson(resp, 500, gson.toJsonTree(ApiResponse.failure("Failed to save decision: " + ex.getMessage())).getAsJsonObject());
         }
     }
 

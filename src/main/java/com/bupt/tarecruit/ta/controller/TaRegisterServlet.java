@@ -20,7 +20,7 @@ public class TaRegisterServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        ServletJsonResponseWriter.write(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, ApiResponse.failure("请使用 POST 请求"));
+        ServletJsonResponseWriter.write(resp, HttpServletResponse.SC_METHOD_NOT_ALLOWED, ApiResponse.failure("Use POST for registration"));
     }
 
     @Override

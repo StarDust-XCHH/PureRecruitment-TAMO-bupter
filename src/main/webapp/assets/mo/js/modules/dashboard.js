@@ -15,8 +15,8 @@
         function render() {
             const jobs = typeof app.getJobs === 'function' ? app.getJobs() : [];
             const applicants = Array.isArray(latestApplicants) ? latestApplicants : [];
-            const accepted = applicants.filter(function (item) { return item.status === '已录用'; }).length;
-            const pending = applicants.filter(function (item) { return item.status !== '已录用' && item.status !== '未录用'; }).length;
+            const accepted = applicants.filter(function (item) { return item.status === 'Hired'; }).length;
+            const pending = applicants.filter(function (item) { return item.status !== 'Hired' && item.status !== 'Not selected'; }).length;
 
             dashOpenJobs.textContent = String(jobs.length);
             dashCandidates.textContent = String(applicants.length);

@@ -22,7 +22,7 @@
 
     function runModule(name) {
         if (typeof modules[name] !== 'function') {
-            throw new Error('[TA-HOME] 模块未注册：' + name);
+            throw new Error('[TA-HOME] module not registered: ' + name);
         }
         modules[name](taApp);
     }

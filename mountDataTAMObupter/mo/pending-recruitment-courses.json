@@ -4,229 +4,409 @@
   "count": 15,
   "items": [
     {
-      "courseName": "机器学习基础训练营",
+      "courseName": "Machine Learning Fundamentals Bootcamp",
       "courseCode": "MO-ML-918",
-      "moName": "胡老师",
+      "moName": "Prof. Hu",
       "courseDate": "2026-03-17",
       "courseTime": "17:00-20:00",
-      "courseLocation": "科研楼 512",
+      "courseLocation": "Research Building 512",
       "studentCount": 54,
-      "status": "等待招聘 TA",
-      "workload": "实验答疑 + SQL 调优 + 机器学习基础训练营课堂协助",
-      "courseDescription": "课程结合企业用人需求设计，围绕机器学习基础训练营组织学习任务，适合作为招聘前置储备课程进行训练。",
-      "keywordTags": ["机器学习", "基础训练营", "3月课程", "岗位匹配", "课程介绍", "课程报名"],
-      "checklist": ["组织小组讨论", "维护课堂互动秩序", "汇总学生问题", "协助支持机器学习基础训练营相关课堂任务"],
-      "suggestion": "近期投递方向与课程主题接近，建议优先关注，具备机器学习或基础训练营相关经历更匹配"
+      "status": "Recruiting TA",
+      "workload": "Lab Q&A, SQL tuning, and ML bootcamp support",
+      "courseDescription": "Industry-aligned tasks centered on a machine learning bootcamp, suitable as pre-placement training.",
+      "keywordTags": [
+        "Machine learning",
+        "Bootcamp",
+        "March intake",
+        "Role fit",
+        "Course overview",
+        "Enrollment"
+      ],
+      "checklist": [
+        "Facilitate group discussion",
+        "Keep in-class participation on track",
+        "Collect student questions",
+        "Support in-class tasks for Machine Learning Fundamentals Bootcamp"
+      ],
+      "suggestion": "Strong fit if your recent applications align with machine learning or bootcamp-style courses."
     },
     {
-      "courseName": "数据科学案例研修",
+      "courseName": "Data Science Case Studio",
       "courseCode": "MO-DS-457",
-      "moName": "张老师",
+      "moName": "Prof. Zhang",
       "courseDate": "2026-03-16",
       "courseTime": "09:00-12:00",
-      "courseLocation": "综合楼 C203",
+      "courseLocation": "Complex Building C, Room 203",
       "studentCount": 60,
-      "status": "等待招聘 TA",
-      "workload": "页面调优辅助 + Demo 演示",
-      "courseDescription": "该课程强调数据科学案例研修的应用能力培养，内容涵盖概念讲解、工具使用、项目拆解以及结果展示。",
-      "keywordTags": ["数据科学", "案例研修", "3月课程", "岗位训练", "综合提升", "案例分析"],
-      "checklist": ["准备 Demo 或案例素材", "跟进重点同学学习情况", "反馈课堂参与表现", "协助支持数据科学案例研修相关课堂任务"],
-      "suggestion": "擅长原理分析与表达的候选人更适合，可重点突出标签：案例分析"
+      "status": "Recruiting TA",
+      "workload": "UI polish support and demo walkthroughs",
+      "courseDescription": "Builds applied data science skills: concepts, tools, project breakdown, and presenting outcomes.",
+      "keywordTags": [
+        "Data science",
+        "Case studio",
+        "March intake",
+        "Role training",
+        "Skill building",
+        "Case analysis"
+      ],
+      "checklist": [
+        "Prepare demos or case materials",
+        "Follow up with students who need extra help",
+        "Report participation and engagement",
+        "Support in-class tasks for Data Science Case Studio"
+      ],
+      "suggestion": "Best for candidates strong in concepts and communication; highlight case analysis."
     },
     {
-      "courseName": "人机交互进阶实战",
+      "courseName": "Advanced HCI Practicum",
       "courseCode": "MO-HCI-440",
-      "moName": "李老师",
+      "moName": "Prof. Li",
       "courseDate": "2026-03-20",
       "courseTime": "15:30-17:30",
-      "courseLocation": "图书馆报告厅",
+      "courseLocation": "Library Auditorium",
       "studentCount": 48,
-      "status": "等待招聘 TA",
-      "workload": "实验答疑 + SQL 调优",
-      "courseDescription": "课程结合企业用人需求设计，围绕人机交互进阶实战组织学习任务，适合作为招聘前置储备课程进行训练。",
-      "keywordTags": ["人机交互", "进阶实战", "3月课程", "校招", "能力评估", "MO发布"],
-      "checklist": ["协助 MO 完成课程准备", "整理课堂演示材料", "记录课堂反馈并同步", "协助支持人机交互进阶实战相关课堂任务"],
-      "suggestion": "有课程助教或带教经验优先，具备人机交互或进阶实战相关经历更匹配"
+      "status": "Recruiting TA",
+      "workload": "Lab Q&A and SQL tuning",
+      "courseDescription": "Industry-aligned tasks around advanced HCI practice, suitable as pre-placement training.",
+      "keywordTags": [
+        "HCI",
+        "Advanced practicum",
+        "March intake",
+        "Campus hiring",
+        "Skills assessment",
+        "MO-led"
+      ],
+      "checklist": [
+        "Help the MO prepare sessions",
+        "Organize in-class demo materials",
+        "Capture feedback and share with the MO",
+        "Support in-class tasks for Advanced HCI Practicum"
+      ],
+      "suggestion": "TA or tutoring experience preferred; HCI or advanced practicum background is a plus."
     },
     {
-      "courseName": "自然语言处理方法论专题",
+      "courseName": "Natural Language Processing Methods Studio",
       "courseCode": "MO-NLP-383",
-      "moName": "胡老师",
+      "moName": "Prof. Hu",
       "courseDate": "2026-03-19",
       "courseTime": "15:00-17:00",
-      "courseLocation": "科研楼 512",
+      "courseLocation": "Research Building 512",
       "studentCount": 54,
-      "status": "等待招聘 TA",
-      "workload": "案例拆解 + 服务排障 + 自然语言处理方法论专题课堂协助",
-      "courseDescription": "本课程由MO发布，面向具备基础知识的候选人，聚焦自然语言处理方法论专题，帮助学生建立完整的问题分析与解决思路。",
-      "keywordTags": ["自然语言处理", "方法论专题", "3月课程", "实训课程", "课程预约", "学习路径"],
-      "checklist": ["协助完成环境检查", "支持课堂实操演示", "整理课后复盘要点", "协助支持自然语言处理方法论专题相关课堂任务"],
-      "suggestion": "熟悉对应技术栈并具备答疑能力者优先，可重点突出标签：学习路径"
+      "status": "Recruiting TA",
+      "workload": "Case triage, troubleshooting, and NLP methods studio support",
+      "courseDescription": "MO-led course for candidates with basics; focuses on NLP methods and structured problem solving.",
+      "keywordTags": [
+        "NLP",
+        "Methods studio",
+        "March intake",
+        "Hands-on studio",
+        "Scheduling",
+        "Learning path"
+      ],
+      "checklist": [
+        "Help with environment checks",
+        "Support hands-on demos",
+        "Summarize post-class takeaways",
+        "Support in-class tasks for NLP Methods Studio"
+      ],
+      "suggestion": "Prefer stack familiarity and Q&A skills; highlight your learning path."
     },
     {
-      "courseName": "云计算岗位能力提升",
+      "courseName": "Cloud Computing Skills Lab",
       "courseCode": "MO-CC-748",
-      "moName": "黄老师",
+      "moName": "Prof. Huang",
       "courseDate": "2026-03-25",
       "courseTime": "13:30-15:30",
-      "courseLocation": "教一楼 A305",
+      "courseLocation": "Teaching Building 1, Room A305",
       "studentCount": 48,
-      "status": "等待招聘 TA",
-      "workload": "互动组织 + 课堂记录 + 课后答疑",
-      "courseDescription": "该课程强调云计算岗位能力提升的应用能力培养，内容涵盖概念讲解、工具使用、项目拆解以及结果展示。",
-      "keywordTags": ["云计算", "岗位能力提升", "3月课程", "课程介绍", "课程报名", "人才选拔"],
-      "checklist": ["准备 Demo 或案例素材", "跟进重点同学学习情况", "反馈课堂参与表现", "协助支持云计算岗位能力提升相关课堂任务"],
-      "suggestion": "擅长原理分析与表达的候选人更适合，具备云计算或岗位能力提升相关经历更匹配"
+      "status": "Recruiting TA",
+      "workload": "Facilitation, notes, and after-class Q&A",
+      "courseDescription": "Builds cloud role skills: concepts, tools, project breakdown, and presenting outcomes.",
+      "keywordTags": [
+        "Cloud computing",
+        "Skills lab",
+        "March intake",
+        "Course overview",
+        "Enrollment",
+        "Talent screening"
+      ],
+      "checklist": [
+        "Prepare demos or case materials",
+        "Follow up with students who need extra help",
+        "Report participation and engagement",
+        "Support in-class tasks for Cloud Computing Skills Lab"
+      ],
+      "suggestion": "Best for conceptual depth; cloud computing or skills-lab experience helps."
     },
     {
-      "courseName": "人工智能项目制工作坊",
+      "courseName": "AI Project Workshop",
       "courseCode": "MO-AI-116",
-      "moName": "杨老师",
+      "moName": "Prof. Yang",
       "courseDate": "2026-03-20",
       "courseTime": "15:00-18:00",
-      "courseLocation": "图书馆报告厅",
+      "courseLocation": "Library Auditorium",
       "studentCount": 66,
-      "status": "等待招聘 TA",
-      "workload": "课堂支持 + 实验辅导",
-      "courseDescription": "本课程由MO发布，面向具备基础知识的候选人，聚焦人工智能项目制工作坊，帮助学生建立完整的问题分析与解决思路。",
-      "keywordTags": ["人工智能", "项目制工作坊", "3月课程", "面试准备", "项目实践", "岗位训练"],
-      "checklist": ["准备 Demo 或案例素材", "跟进重点同学学习情况", "反馈课堂参与表现", "协助支持人工智能项目制工作坊相关课堂任务"],
-      "suggestion": "近期投递方向与课程主题接近，建议优先关注，可重点突出标签：岗位训练"
+      "status": "Recruiting TA",
+      "workload": "In-class support and lab tutoring",
+      "courseDescription": "MO-led AI project workshop helping students build end-to-end problem-solving habits.",
+      "keywordTags": [
+        "Artificial intelligence",
+        "Project workshop",
+        "March intake",
+        "Interview prep",
+        "Project practice",
+        "Role training"
+      ],
+      "checklist": [
+        "Prepare demos or case materials",
+        "Follow up with students who need extra help",
+        "Report participation and engagement",
+        "Support in-class tasks for AI Project Workshop"
+      ],
+      "suggestion": "Strong fit if your recent applications align with the theme; emphasize role-training experience."
     },
     {
-      "courseName": "软件工程案例研修",
+      "courseName": "Software Engineering Case Studio",
       "courseCode": "MO-SE-206",
-      "moName": "周老师",
+      "moName": "Prof. Zhou",
       "courseDate": "2026-03-30",
       "courseTime": "09:00-12:00",
-      "courseLocation": "实验楼 301",
+      "courseLocation": "Laboratory Building, Room 301",
       "studentCount": 48,
-      "status": "等待招聘 TA",
-      "workload": "互动组织 + 课堂记录 + 课后答疑 + 软件工程案例研修课堂协助",
-      "courseDescription": "本课程由MO发布，面向具备基础知识的候选人，聚焦软件工程案例研修，帮助学生建立完整的问题分析与解决思路。",
-      "keywordTags": ["软件工程", "案例研修", "3月课程", "课程介绍", "岗位匹配", "教学计划"],
-      "checklist": ["协助完成环境检查", "支持课堂实操演示", "整理课后复盘要点", "协助支持软件工程案例研修相关课堂任务"],
-      "suggestion": "相关经历建议申请，具备软件工程或案例研修相关经历更匹配"
+      "status": "Recruiting TA",
+      "workload": "Facilitation, notes, after-class Q&A, and SE case studio support",
+      "courseDescription": "MO-led software engineering case studio with structured analysis and delivery.",
+      "keywordTags": [
+        "Software engineering",
+        "Case studio",
+        "March intake",
+        "Course overview",
+        "Role fit",
+        "Syllabus planning"
+      ],
+      "checklist": [
+        "Help with environment checks",
+        "Support hands-on demos",
+        "Summarize post-class takeaways",
+        "Support in-class tasks for Software Engineering Case Studio"
+      ],
+      "suggestion": "Apply if you have software engineering or case-studio experience."
     },
     {
-      "courseName": "自然语言处理基础训练营",
+      "courseName": "Natural Language Processing Fundamentals Bootcamp",
       "courseCode": "MO-NLP-645",
-      "moName": "李老师",
+      "moName": "Prof. Li",
       "courseDate": "2026-03-26",
       "courseTime": "13:00-15:00",
-      "courseLocation": "教二楼 B402",
+      "courseLocation": "Teaching Building 2, Room B402",
       "studentCount": 66,
-      "status": "等待招聘 TA",
-      "workload": "案例拆解 + 服务排障",
-      "courseDescription": "课程围绕自然语言处理基础训练营展开，通过真实招聘场景案例、课堂讨论和实践演练，提升应聘相关岗位所需的核心能力。",
-      "keywordTags": ["自然语言处理", "基础训练营", "3月课程", "人才选拔", "课程介绍", "课程报名"],
-      "checklist": ["辅助讲解核心概念", "协助布置实验任务", "跟进课后答疑", "协助支持自然语言处理基础训练营相关课堂任务"],
-      "suggestion": "有课程助教或带教经验优先，可重点突出标签：课程报名"
+      "status": "Recruiting TA",
+      "workload": "Case triage and troubleshooting",
+      "courseDescription": "NLP bootcamp using hiring-style cases, discussion, and drills for core job skills.",
+      "keywordTags": [
+        "NLP",
+        "Bootcamp",
+        "March intake",
+        "Talent screening",
+        "Course overview",
+        "Enrollment"
+      ],
+      "checklist": [
+        "Help explain core concepts",
+        "Help assign lab tasks",
+        "Follow up on after-class Q&A",
+        "Support in-class tasks for NLP Fundamentals Bootcamp"
+      ],
+      "suggestion": "TA or tutoring experience preferred; highlight enrollment-facing strengths."
     },
     {
-      "courseName": "操作系统方法论专题",
+      "courseName": "Operating Systems Methods Studio",
       "courseCode": "MO-OS-279",
-      "moName": "林老师",
+      "moName": "Prof. Lin",
       "courseDate": "2026-03-26",
       "courseTime": "09:00-11:00",
-      "courseLocation": "图书馆报告厅",
+      "courseLocation": "Library Auditorium",
       "studentCount": 48,
-      "status": "等待招聘 TA",
-      "workload": "案例拆解 + 服务排障",
-      "courseDescription": "课程围绕操作系统方法论专题展开，通过真实招聘场景案例、课堂讨论和实践演练，提升应聘相关岗位所需的核心能力。",
-      "keywordTags": ["操作系统", "方法论专题", "3月课程", "岗位匹配", "课程报名", "课程介绍"],
-      "checklist": ["协助完成环境检查", "支持课堂实操演示", "整理课后复盘要点", "协助支持操作系统方法论专题相关课堂任务"],
-      "suggestion": "有课程助教或带教经验优先，具备操作系统或方法论专题相关经历更匹配"
+      "status": "Recruiting TA",
+      "workload": "Case triage and troubleshooting",
+      "courseDescription": "OS methods studio using hiring-style cases, discussion, and drills.",
+      "keywordTags": [
+        "Operating systems",
+        "Methods studio",
+        "March intake",
+        "Role fit",
+        "Enrollment",
+        "Course overview"
+      ],
+      "checklist": [
+        "Help with environment checks",
+        "Support hands-on demos",
+        "Summarize post-class takeaways",
+        "Support in-class tasks for Operating Systems Methods Studio"
+      ],
+      "suggestion": "TA experience preferred; operating systems or methods-studio background helps."
     },
     {
-      "courseName": "自然语言处理基础训练营",
+      "courseName": "Natural Language Processing Fundamentals Bootcamp",
       "courseCode": "MO-NLP-556",
-      "moName": "张老师",
+      "moName": "Prof. Zhang",
       "courseDate": "2026-04-01",
       "courseTime": "10:00-13:00",
-      "courseLocation": "创新中心 201",
+      "courseLocation": "Innovation Center, Room 201",
       "studentCount": 72,
-      "status": "等待招聘 TA",
-      "workload": "课前准备 + 课堂支持 + 课后答疑 + 自然语言处理基础训练营课堂协助",
-      "courseDescription": "该课程强调自然语言处理基础训练营的应用能力培养，内容涵盖概念讲解、工具使用、项目拆解以及结果展示。",
-      "keywordTags": ["自然语言处理", "基础训练营", "4月课程", "教学安排", "学习路径", "技能标签"],
-      "checklist": ["组织小组讨论", "维护课堂互动秩序", "汇总学生问题", "协助支持自然语言处理基础训练营相关课堂任务"],
-      "suggestion": "熟悉对应技术栈并具备答疑能力者优先，可重点突出标签：技能标签"
+      "status": "Recruiting TA",
+      "workload": "Prep, in-class support, after-class Q&A, and NLP bootcamp support",
+      "courseDescription": "Applied NLP bootcamp: concepts, tools, projects, and presenting outcomes.",
+      "keywordTags": [
+        "NLP",
+        "Bootcamp",
+        "April intake",
+        "Teaching schedule",
+        "Learning path",
+        "Skill tags"
+      ],
+      "checklist": [
+        "Facilitate group discussion",
+        "Keep in-class participation on track",
+        "Collect student questions",
+        "Support in-class tasks for NLP Fundamentals Bootcamp"
+      ],
+      "suggestion": "Prefer stack familiarity and Q&A skills; highlight your skill tags."
     },
     {
-      "courseName": "计算机视觉基础训练营",
+      "courseName": "Computer Vision Fundamentals Bootcamp",
       "courseCode": "MO-CV-181",
-      "moName": "张老师",
+      "moName": "Prof. Zhang",
       "courseDate": "2026-04-01",
       "courseTime": "09:30-12:30",
-      "courseLocation": "教二楼 B108",
+      "courseLocation": "Teaching Building 2, Room B108",
       "studentCount": 42,
-      "status": "等待招聘 TA",
-      "workload": "课前准备 + 课堂支持 + 课后答疑",
-      "courseDescription": "课程围绕计算机视觉基础训练营展开，通过真实招聘场景案例、课堂讨论和实践演练，提升应聘相关岗位所需的核心能力。",
-      "keywordTags": ["计算机视觉", "基础训练营", "4月课程", "校招", "MO发布", "招聘课程"],
-      "checklist": ["准备 Demo 或案例素材", "跟进重点同学学习情况", "反馈课堂参与表现", "协助支持计算机视觉基础训练营相关课堂任务"],
-      "suggestion": "有课程助教或带教经验优先，具备计算机视觉或基础训练营相关经历更匹配"
+      "status": "Recruiting TA",
+      "workload": "Prep, in-class support, after-class Q&A",
+      "courseDescription": "Computer vision bootcamp using hiring-style cases, discussion, and drills.",
+      "keywordTags": [
+        "Computer vision",
+        "Bootcamp",
+        "April intake",
+        "Campus hiring",
+        "MO-led",
+        "Recruitment course"
+      ],
+      "checklist": [
+        "Prepare demos or case materials",
+        "Follow up with students who need extra help",
+        "Report participation and engagement",
+        "Support in-class tasks for Computer Vision Bootcamp"
+      ],
+      "suggestion": "TA experience preferred; computer vision or bootcamp background helps."
     },
     {
-      "courseName": "软件工程方法论专题",
+      "courseName": "Software Engineering Methods Studio",
       "courseCode": "MO-SE-394",
-      "moName": "朱老师",
+      "moName": "Prof. Zhu",
       "courseDate": "2026-04-01",
       "courseTime": "13:00-16:00",
-      "courseLocation": "教二楼 B108",
+      "courseLocation": "Teaching Building 2, Room B108",
       "studentCount": 42,
-      "status": "等待招聘 TA",
-      "workload": "实验支持 + 模型讲解",
-      "courseDescription": "课程围绕软件工程方法论专题展开，通过真实招聘场景案例、课堂讨论和实践演练，提升应聘相关岗位所需的核心能力。",
-      "keywordTags": ["软件工程", "方法论专题", "4月课程", "案例分析", "综合提升", "项目实践"],
-      "checklist": ["协助完成环境检查", "支持课堂实操演示", "整理课后复盘要点", "协助支持软件工程方法论专题相关课堂任务"],
-      "suggestion": "擅长原理分析与表达的候选人更适合，可重点突出标签：项目实践"
+      "status": "Recruiting TA",
+      "workload": "Lab support and model walkthroughs",
+      "courseDescription": "Software engineering methods studio using hiring-style cases, discussion, and drills.",
+      "keywordTags": [
+        "Software engineering",
+        "Methods studio",
+        "April intake",
+        "Case analysis",
+        "Skill building",
+        "Project practice"
+      ],
+      "checklist": [
+        "Help with environment checks",
+        "Support hands-on demos",
+        "Summarize post-class takeaways",
+        "Support in-class tasks for Software Engineering Methods Studio"
+      ],
+      "suggestion": "Strong fit for conceptual communication; highlight hands-on project practice."
     },
     {
-      "courseName": "前端工程岗位能力提升",
+      "courseName": "Front-end Engineering Skills Lab",
       "courseCode": "MO-FE-889",
-      "moName": "孙老师",
+      "moName": "Prof. Sun",
       "courseDate": "2026-04-02",
       "courseTime": "15:30-18:30",
-      "courseLocation": "教一楼 A305",
+      "courseLocation": "Teaching Building 1, Room A305",
       "studentCount": 48,
-      "status": "等待招聘 TA",
-      "workload": "课前准备 + 课堂支持 + 课后答疑 + 前端工程岗位能力提升课堂协助",
-      "courseDescription": "课程围绕前端工程岗位能力提升展开，通过真实招聘场景案例、课堂讨论和实践演练，提升应聘相关岗位所需的核心能力。",
-      "keywordTags": ["前端工程", "岗位能力提升", "4月课程", "能力评估", "招聘课程", "校招"],
-      "checklist": ["辅助讲解核心概念", "协助布置实验任务", "跟进课后答疑", "协助支持前端工程岗位能力提升相关课堂任务"],
-      "suggestion": "熟悉对应技术栈并具备答疑能力者优先，具备前端工程或岗位能力提升相关经历更匹配"
+      "status": "Recruiting TA",
+      "workload": "Prep, in-class support, after-class Q&A, and front-end skills lab support",
+      "courseDescription": "Front-end engineering skills lab using hiring-style cases, discussion, and drills.",
+      "keywordTags": [
+        "Front-end engineering",
+        "Skills lab",
+        "April intake",
+        "Skills assessment",
+        "Recruitment course",
+        "Campus hiring"
+      ],
+      "checklist": [
+        "Help explain core concepts",
+        "Help assign lab tasks",
+        "Follow up on after-class Q&A",
+        "Support in-class tasks for Front-end Engineering Skills Lab"
+      ],
+      "suggestion": "Prefer stack familiarity and Q&A skills; front-end or skills-lab experience helps."
     },
     {
-      "courseName": "信息检索基础训练营",
+      "courseName": "Information Retrieval Fundamentals Bootcamp",
       "courseCode": "MO-IR-838",
-      "moName": "周老师",
+      "moName": "Prof. Zhou",
       "courseDate": "2026-03-30",
       "courseTime": "13:30-15:30",
-      "courseLocation": "综合楼 C203",
+      "courseLocation": "Complex Building C, Room 203",
       "studentCount": 30,
-      "status": "等待招聘 TA",
-      "workload": "实验支持 + 模型讲解",
-      "courseDescription": "该课程强调信息检索基础训练营的应用能力培养，内容涵盖概念讲解、工具使用、项目拆解以及结果展示。",
-      "keywordTags": ["信息检索", "基础训练营", "3月课程", "岗位匹配", "课程报名", "课程介绍"],
-      "checklist": ["协助 MO 完成课程准备", "整理课堂演示材料", "记录课堂反馈并同步", "协助支持信息检索基础训练营相关课堂任务"],
-      "suggestion": "有课程助教或带教经验优先，可重点突出标签：课程介绍"
+      "status": "Recruiting TA",
+      "workload": "Lab support and model walkthroughs",
+      "courseDescription": "Applied information retrieval bootcamp: concepts, tools, projects, and outcomes.",
+      "keywordTags": [
+        "Information retrieval",
+        "Bootcamp",
+        "March intake",
+        "Role fit",
+        "Enrollment",
+        "Course overview"
+      ],
+      "checklist": [
+        "Help the MO prepare sessions",
+        "Organize in-class demo materials",
+        "Capture feedback and share with the MO",
+        "Support in-class tasks for Information Retrieval Bootcamp"
+      ],
+      "suggestion": "TA experience preferred; highlight course-overview and communication skills."
     },
     {
-      "courseName": "软件工程应用导论",
+      "courseName": "Software Engineering Introduction",
       "courseCode": "MO-SE-465",
-      "moName": "李老师",
+      "moName": "Prof. Li",
       "courseDate": "2026-04-03",
       "courseTime": "16:30-18:30",
-      "courseLocation": "教二楼 B402",
+      "courseLocation": "Teaching Building 2, Room B402",
       "studentCount": 36,
-      "status": "等待招聘 TA",
-      "workload": "案例拆解 + 服务排障",
-      "courseDescription": "课程结合企业用人需求设计，围绕软件工程应用导论组织学习任务，适合作为招聘前置储备课程进行训练。",
-      "keywordTags": ["软件工程", "应用导论", "4月课程", "综合提升", "面试准备", "案例分析"],
-      "checklist": ["准备 Demo 或案例素材", "跟进重点同学学习情况", "反馈课堂参与表现", "协助支持软件工程应用导论相关课堂任务"],
-      "suggestion": "有项目实战经验的同学申请更有优势，具备软件工程或应用导论相关经历更匹配"
+      "status": "Recruiting TA",
+      "workload": "Case triage and troubleshooting",
+      "courseDescription": "Industry-aligned introduction to software engineering, suitable as pre-placement training.",
+      "keywordTags": [
+        "Software engineering",
+        "Introduction",
+        "April intake",
+        "Skill building",
+        "Interview prep",
+        "Case analysis"
+      ],
+      "checklist": [
+        "Prepare demos or case materials",
+        "Follow up with students who need extra help",
+        "Report participation and engagement",
+        "Support in-class tasks for Software Engineering Introduction"
+      ],
+      "suggestion": "Project experience is a plus; software engineering or intro-level teaching background helps."
     }
   ]
 }

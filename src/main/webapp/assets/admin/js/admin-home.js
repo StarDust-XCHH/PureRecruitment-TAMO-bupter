@@ -20,9 +20,9 @@
     ];
 
     const mockNotices = [
-        { id: 1, title: '系统维护通知', content: '系统将于今晚 22:00-24:00 进行维护升级，请提前保存工作。', priority: 'high', createdAt: '2026-03-21 10:00' },
-        { id: 2, title: '春季学期 TA 招募开始', content: '春季学期 TA 招募已正式开始，请各位 MO 及时发布岗位信息。', priority: 'medium', createdAt: '2026-03-20 14:30' },
-        { id: 3, title: '新功能上线', content: '管理员后台新增数据统计功能，欢迎体验反馈。', priority: 'low', createdAt: '2026-03-19 09:00' },
+        { id: 1, title: 'Maintenance notice', content: 'Maintenance is scheduled tonight 22:00-24:00. Please save your work.', priority: 'high', createdAt: '2026-03-21 10:00' },
+        { id: 2, title: 'Spring TA recruitment open', content: 'Spring TA recruitment is open—MOs should publish postings soon.', priority: 'medium', createdAt: '2026-03-20 14:30' },
+        { id: 3, title: 'New feature', content: 'The admin console now includes basic analytics—feedback welcome.', priority: 'low', createdAt: '2026-03-19 09:00' },
     ];
 
     // Initialize
@@ -57,13 +57,13 @@
 
         // Update page title
         const titles = {
-            'dashboard': '数据看板',
-            'users': '用户管理',
-            'notices': '公告管理',
-            'permissions': '权限管理',
-            'settings': '系统设置'
+            'dashboard': 'Dashboard',
+            'users': 'User management',
+            'notices': 'Notices',
+            'permissions': 'Permissions',
+            'settings': 'System settings'
         };
-        pageTitle.textContent = titles[route] || '控制台';
+        pageTitle.textContent = titles[route] || 'Console';
     }
 
     // Event Listeners
@@ -90,7 +90,7 @@
 
         const tbody = document.getElementById('recentLogins');
         if (recentLogins.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="3">暂无数据</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="3">No data</td></tr>';
         } else {
             tbody.innerHTML = recentLogins.map(user => `
                 <tr>
@@ -135,7 +135,7 @@
 
     function createUserRow(user) {
         const statusClass = user.status === 'active' ? 'active' : user.status === 'pending' ? 'pending' : 'inactive';
-        const statusText = user.status === 'active' ? '正常' : user.status === 'pending' ? '待审核' : '禁用';
+        const statusText = user.status === 'active' ? 'Active' : user.status === 'pending' ? 'Pending review' : 'Suspended';
 
         return `
             <tr>
@@ -146,9 +146,9 @@
                 <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                 <td>
                     <div class="action-buttons">
-                        <button class="btn sm secondary" onclick="editUser('${user.id}')">编辑</button>
+                        <button class="btn sm secondary" onclick="editUser('${user.id}')">Edit</button>
                         <button class="btn sm ${user.status === 'active' ? 'danger' : 'primary'}" onclick="toggleUserStatus('${user.id}')">
-                            ${user.status === 'active' ? '禁用' : '启用'}
+                            ${user.status === 'active' ? 'Suspended' : 'Enable'}
                         </button>
                     </div>
                 </td>
@@ -174,10 +174,10 @@
                 </div>
                 <div class="notice-content">${notice.content}</div>
                 <div class="notice-footer">
-                    <span class="notice-meta">管理员</span>
+                    <span class="notice-meta">Admin</span>
                     <div class="notice-actions">
-                        <button class="btn sm secondary" onclick="editNotice(${notice.id})">编辑</button>
-                        <button class="btn sm danger" onclick="deleteNotice(${notice.id})">删除</button>
+                        <button class="btn sm secondary" onclick="editNotice(${notice.id})">Edit</button>
+                        <button class="btn sm danger" onclick="deleteNotice(${notice.id})">Delete</button>
                     </div>
                 </div>
             </div>
@@ -186,40 +186,40 @@
 
     // Actions
     function handleLogout() {
-        if (confirm('确定要退出登录吗？')) {
+        if (confirm('Sign out?')) {
             window.location.href = '${pageContext.request.contextPath}/index.jsp';
         }
     }
 
     function refreshData() {
-        alert('数据已刷新');
+        alert('Data refreshed');
         loadDashboardData();
         loadUsers();
         loadNotices();
     }
 
     function showCreateNoticeModal() {
-        alert('创建公告功能开发中');
+        alert('Creating notices is not available yet');
     }
 
     // Global functions (for onclick attributes)
     window.editUser = function(id) {
-        alert(`编辑用户 ${id} 功能开发中`);
+        alert(`Edit user ${id} is not available yet`);
     };
 
     window.toggleUserStatus = function(id) {
-        if (confirm('确定要更改用户状态吗？')) {
-            alert(`用户 ${id} 状态已更改`);
+        if (confirm('Change user status?')) {
+            alert(`User ${id} status updated`);
         }
     };
 
     window.editNotice = function(id) {
-        alert(`编辑公告 ${id} 功能开发中`);
+        alert(`Edit notice ${id} is not available yet`);
     };
 
     window.deleteNotice = function(id) {
-        if (confirm('确定要删除这条公告吗？')) {
-            alert(`公告 ${id} 已删除`);
+        if (confirm('Delete this notice?')) {
+            alert(`Notice ${id} deleted`);
         }
     };
 

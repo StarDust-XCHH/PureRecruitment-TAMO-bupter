@@ -1,9 +1,9 @@
 <div class="ta-modal-overlay" id="taModalOverlay" aria-hidden="true">
     <div class="ta-modal-panel wide job-detail-modal" data-modal="course-detail" role="dialog" aria-labelledby="modalCourseDetailTitle">
-        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <button class="modal-close" type="button" aria-label="Close" data-modal-close>&times;</button>
         <div class="modal-head">
-            <h3 id="modalCourseDetailTitle">课程岗位详情</h3>
-            <p class="muted">查看课程安排和招聘重点，快速进入筛选流程。</p>
+            <h3 id="modalCourseDetailTitle">Posting details</h3>
+            <p class="muted">Review schedule and hiring focus, then jump into screening.</p>
         </div>
         <div class="modal-body">
             <div class="job-detail-shell">
@@ -12,32 +12,32 @@
                         <div class="job-detail-title-row">
                             <div>
                                 <div class="job-code" id="jobDetailCode">MO-0000</div>
-                                <h4 id="jobDetailName">课程名称</h4>
+                                <h4 id="jobDetailName">Course title</h4>
                             </div>
                             <span class="pill" id="jobDetailMo">MO</span>
                         </div>
-                        <p class="job-detail-summary" id="jobDetailDescription">课程介绍</p>
+                        <p class="job-detail-summary" id="jobDetailDescription">Course overview</p>
                         <div class="job-detail-meta-grid">
-                            <div class="job-detail-meta"><span>课程日期</span><strong id="jobDetailDate">--</strong></div>
-                            <div class="job-detail-meta"><span>课程时间</span><strong id="jobDetailTime">--</strong></div>
-                            <div class="job-detail-meta"><span>上课地点</span><strong id="jobDetailLocation">--</strong></div>
-                            <div class="job-detail-meta"><span>招聘状态</span><strong id="jobDetailStatus">--</strong></div>
+                            <div class="job-detail-meta"><span>Date</span><strong id="jobDetailDate">--</strong></div>
+                            <div class="job-detail-meta"><span>Time</span><strong id="jobDetailTime">--</strong></div>
+                            <div class="job-detail-meta"><span>Location</span><strong id="jobDetailLocation">--</strong></div>
+                            <div class="job-detail-meta"><span>Hiring status</span><strong id="jobDetailStatus">--</strong></div>
                         </div>
                     </div>
                     <div class="job-detail-section">
-                        <h5>课程标签</h5>
+                        <h5>Tags</h5>
                         <div class="job-detail-tags" id="jobDetailTags"></div>
                     </div>
                     <div class="job-detail-section">
-                        <h5>TA 工作清单</h5>
+                        <h5>TA checklist</h5>
                         <ul class="job-detail-checklist" id="jobDetailChecklist"></ul>
                     </div>
                 </section>
                 <aside class="job-detail-side">
                     <div class="job-detail-side-card">
-                        <h5>下一步</h5>
-                        <p>点击“进入应聘筛选”后将自动切换到应聘筛选路由，并按该课程加载候选人。</p>
-                        <button class="pill-btn" type="button" id="jumpToApplicantsBtn">进入应聘筛选</button>
+                        <h5>Next step</h5>
+                        <p>Opens applicant review for this course and loads its candidates.</p>
+                        <button class="pill-btn" type="button" id="jumpToApplicantsBtn">Open applicant review</button>
                     </div>
                 </aside>
             </div>
@@ -45,31 +45,31 @@
     </div>
 
     <div class="ta-modal-panel" data-modal="summary" role="dialog" aria-labelledby="modalSummaryTitle">
-        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <button class="modal-close" type="button" aria-label="Close" data-modal-close>&times;</button>
         <div class="modal-head">
-            <h3 id="modalSummaryTitle">MO 概览说明</h3>
-            <p class="muted">该页面复用了 TA 的布局和组件规范，保持一致的交互与视觉结构。</p>
+            <h3 id="modalSummaryTitle">MO overview</h3>
+            <p class="muted">Reuses TA layout and components for a consistent experience.</p>
         </div>
         <div class="modal-body">
             <ul class="resume-checklist">
-                <li><div><strong>岗位发布</strong><p class="muted">MO 可创建课程岗位并实时刷新列表。</p></div></li>
-                <li><div><strong>应聘查看</strong><p class="muted">聚合 TA 账号与档案，显示候选池信息。</p></div></li>
-                <li><div><strong>筛选回写</strong><p class="muted">录用/拒绝会同步到 TA 申请状态文件。</p></div></li>
+                <li><div><strong>Publish postings</strong><p class="muted">MOs create course postings and refresh the list live.</p></div></li>
+                <li><div><strong>Applicant review</strong><p class="muted">Pulls TA accounts and profiles into a shared pool.</p></div></li>
+                <li><div><strong>Decision sync</strong><p class="muted">Hire/reject writes back to TA application status.</p></div></li>
             </ul>
         </div>
     </div>
 
     <div class="ta-modal-panel" data-modal="settings" role="dialog" aria-labelledby="modalSettingsTitle">
-        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <button class="modal-close" type="button" aria-label="Close" data-modal-close>&times;</button>
         <div class="modal-head">
-            <h3 id="modalSettingsTitle">MO 设置</h3>
-            <p class="muted">当前原型保留最小设置项：主题切换与会话信息。</p>
+            <h3 id="modalSettingsTitle">MO settings</h3>
+            <p class="muted">Minimal settings: theme plus session details.</p>
         </div>
         <div class="modal-body">
             <div class="status-summary">
-                <div class="status-line"><span>当前账号</span><span class="pill" id="moSettingsUsername">--</span></div>
-                <div class="status-line"><span>角色</span><span class="pill">MO</span></div>
-                <div class="status-line"><span>主题</span><span class="pill" id="moSettingsTheme">--</span></div>
+                <div class="status-line"><span>Signed in as</span><span class="pill" id="moSettingsUsername">--</span></div>
+                <div class="status-line"><span>Role</span><span class="pill">MO</span></div>
+                <div class="status-line"><span>Theme</span><span class="pill" id="moSettingsTheme">--</span></div>
             </div>
         </div>
     </div>

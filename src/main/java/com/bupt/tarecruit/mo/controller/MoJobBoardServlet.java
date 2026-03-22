@@ -24,7 +24,7 @@ public class MoJobBoardServlet extends HttpServlet {
             JsonObject payload = recruitmentDao.getPendingCourses();
             writeJson(resp, 200, payload);
         } catch (Exception ex) {
-            writeJson(resp, 500, gson.toJsonTree(ApiResponse.failure("读取 MO 岗位列表失败: " + ex.getMessage())).getAsJsonObject());
+            writeJson(resp, 500, gson.toJsonTree(ApiResponse.failure("Failed to load MO job list: " + ex.getMessage())).getAsJsonObject());
         }
     }
 
@@ -40,7 +40,7 @@ public class MoJobBoardServlet extends HttpServlet {
         } catch (IllegalArgumentException ex) {
             writeJson(resp, 400, gson.toJsonTree(ApiResponse.failure(ex.getMessage())).getAsJsonObject());
         } catch (Exception ex) {
-            writeJson(resp, 500, gson.toJsonTree(ApiResponse.failure("发布岗位失败: " + ex.getMessage())).getAsJsonObject());
+            writeJson(resp, 500, gson.toJsonTree(ApiResponse.failure("Failed to publish job: " + ex.getMessage())).getAsJsonObject());
         }
     }
 

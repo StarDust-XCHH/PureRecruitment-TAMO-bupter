@@ -60,7 +60,7 @@
                 needMaterialCount: Number(summary.needMaterialCount || 0),
                 offerCount: Number(summary.offerCount || 0),
                 estimatedFeedbackTime: safeText(summary.estimatedFeedbackTime, '--'),
-                latestStatusLabel: safeText(summary.latestStatusLabel, '暂无申请')
+                latestStatusLabel: safeText(summary.latestStatusLabel, 'No applications yet')
             };
         }
 
@@ -68,8 +68,8 @@
             const record = item && typeof item === 'object' ? item : {};
             return {
                 applicationId: safeText(record.applicationId),
-                courseName: safeText(record.courseName, '未命名岗位'),
-                status: safeText(record.status, '处理中'),
+                courseName: safeText(record.courseName, 'Untitled posting'),
+                status: safeText(record.status, 'In progress'),
                 statusTone: safeText(record.statusTone, 'warn'),
                 summary: safeText(record.summary || record.moComment),
                 nextAction: safeText(record.nextAction || record.nextStep),
@@ -93,13 +93,13 @@
             if (!summary) return;
             const data = normalizeSummary(summaryData);
             summary.innerHTML = [
-                ['当前申请数', data.totalCount],
-                ['推进中', data.activeCount],
-                ['面试邀约', data.interviewCount],
-                ['待补充资料', data.needMaterialCount],
-                ['已录用', data.offerCount],
-                ['预计反馈时间', data.estimatedFeedbackTime],
-                ['最新状态', data.latestStatusLabel]
+                ['Applications', data.totalCount],
+                ['In progress', data.activeCount],
+                ['Interview invites', data.interviewCount],
+                ['Pending materials', data.needMaterialCount],
+                ['Hired', data.offerCount],
+                ['Expected feedback', data.estimatedFeedbackTime],
+                ['Latest status', data.latestStatusLabel]
             ].map(([label, value]) => {
                 return '<div class="status-line"><span>' + escapeHtml(label) + '</span><span class="pill">' + escapeHtml(value) + '</span></div>';
             }).join('');
@@ -114,13 +114,13 @@
             });
 
             if (!merged.length) {
-                notifications.innerHTML = '<div class="message-item"><strong>暂无通知</strong><div class="muted">当前没有新的状态提醒。</div></div>';
+                notifications.innerHTML = '<div class="message-item"><strong>No notifications</strong><div class="muted">You are all caught up for now.</div></div>';
                 return;
             }
 
             notifications.innerHTML = merged.map((entry) => {
-                const title = safeText(entry?.title, '状态提醒');
-                const content = safeText(entry?.content, '暂无内容');
+                const title = safeText(entry?.title, 'Update');
+                const content = safeText(entry?.content, 'No details');
                 const meta = safeText(entry?.createdAt || entry?.time || entry?.tone);
                 return ''
                     + '<div class="message-item">'
@@ -141,7 +141,7 @@
             timeline.innerHTML = items.map((item, index) => {
                 const detailsHtml = item.details.length
                     ? '<div class="status-detail-list">' + item.details.map((detail) => {
-                        return '<div class="status-detail-row"><span>' + escapeHtml(safeText(detail?.label, '字段')) + '</span><strong>' + escapeHtml(safeText(detail?.value, '--')) + '</strong></div>';
+                        return '<div class="status-detail-row"><span>' + escapeHtml(safeText(detail?.label, 'Field')) + '</span><strong>' + escapeHtml(safeText(detail?.value, '--')) + '</strong></div>';
                     }).join('') + '</div>'
                     : '';
 
@@ -150,7 +150,7 @@
                         const doneClass = step?.done ? ' is-done' : '';
                         return ''
                             + '<div class="status-step' + doneClass + '">'
-                            + '  <strong>' + escapeHtml(safeText(step?.label, '状态节点')) + '</strong>'
+                            + '  <strong>' + escapeHtml(safeText(step?.label, 'Milestone')) + '</strong>'
                             + '  <div class="muted">' + escapeHtml(safeText(step?.content, '')) + '</div>'
                             + '  <small class="muted">' + escapeHtml(safeText(step?.time, '--')) + '</small>'
                             + '</div>';
@@ -167,8 +167,8 @@
                     + '  <strong>' + escapeHtml(item.courseName) + '</strong>'
                     + '  <div class="timeline-meta">' + escapeHtml(item.status) + ' · ' + escapeHtml(item.updatedAt || '--') + '</div>'
                     + '  <div class="accordion-content">'
-                    + '      <p>' + escapeHtml(item.summary || '暂无状态说明。') + '</p>'
-                    + '      <p>' + escapeHtml(item.nextAction || '暂无下一步提示。') + '</p>'
+                    + '      <p>' + escapeHtml(item.summary || 'No status summary yet.') + '</p>'
+                    + '      <p>' + escapeHtml(item.nextAction || 'No next step provided.') + '</p>'
                     +        tagsHtml
                     +        detailsHtml
                     +        timelineHtml
@@ -210,7 +210,7 @@
             if (!route || state.loading) return;
             state.loading = true;
             state.taId = resolveTaId();
-            setStatusMessage('申请状态加载中...', 'muted');
+            setStatusMessage('Loading application status…', 'muted');
             if (emptyState) emptyState.hidden = true;
 
             try {
@@ -219,7 +219,7 @@
                 });
                 const payload = await response.json();
                 if (!response.ok || !payload?.success) {
-                    throw new Error(payload?.message || '读取申请状态失败');
+                    throw new Error(payload?.message || 'Failed to load application status');
                 }
 
                 const items = normalizeArray(payload.items).map(normalizeItem);
@@ -234,10 +234,10 @@
 
                 if (!items.length) {
                     if (emptyState) emptyState.hidden = false;
-                    setStatusMessage('当前还没有申请记录，可前往职位大厅投递岗位。', 'muted');
+                    setStatusMessage('No applications yet—browse the job board to apply.', 'muted');
                 } else {
                     if (emptyState) emptyState.hidden = true;
-                    setStatusMessage('已同步 ' + items.length + ' 条申请状态。', 'success');
+                    setStatusMessage('Synced ' + items.length + ' application status(es).', 'success');
                 }
             } catch (error) {
                 console.error('[TA-STATUS] load failed', error);
@@ -245,7 +245,7 @@
                 renderSummary({});
                 renderNotifications([], []);
                 if (emptyState) emptyState.hidden = false;
-                setStatusMessage(error.message || '申请状态加载失败', 'error');
+                setStatusMessage(error.message || 'Could not load application status', 'error');
             } finally {
                 state.loading = false;
             }

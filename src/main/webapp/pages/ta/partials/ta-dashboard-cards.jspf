@@ -1,13 +1,13 @@
 <div class="card">
     <div class="overview-top">
         <div>
-            <h1>TA 工作台总览</h1>
-            <p class="muted">保留首页四卡片容器骨架，后续阶段补视觉、动效与数据接入。</p>
+            <h1>TA workspace overview</h1>
+            <p class="muted">Four insight cards on the home view—visuals and live data come later.</p>
         </div>
         <div class="overview-badges">
-            <span class="pill">阶段 1</span>
-            <span class="pill">页面骨架</span>
-            <span class="pill">设置入口已预留</span>
+            <span class="pill">Phase 1</span>
+            <span class="pill">Page shell</span>
+            <span class="pill">Settings entry reserved</span>
         </div>
     </div>
     <div class="stat-grid insight-grid insight-grid-spaced">
@@ -15,23 +15,23 @@
             <div class="insight-card-header">
                 <span class="insight-icon plane-icon" aria-hidden="true"></span>
                 <div>
-                    <p class="insight-label">投递追踪</p>
-                    <p class="insight-subtitle">工作台卡片容器一</p>
+                    <p class="insight-label">Application tracker</p>
+                    <p class="insight-subtitle">Insight card slot 1</p>
                 </div>
             </div>
             <div class="insight-core-number">3</div>
-            <p class="insight-meta">保留后续追踪详情 modal 入口</p>
+            <p class="insight-meta">Opens the tracker modal later</p>
         </div>
         <div class="insight-card radar-card" data-modal-target="recommend">
             <div class="insight-card-header">
                 <span class="insight-icon radar-icon" aria-hidden="true"></span>
                 <div>
-                    <p class="insight-label">岗位雷达</p>
-                    <p class="insight-subtitle">工作台卡片容器二</p>
+                    <p class="insight-label">Job radar</p>
+                    <p class="insight-subtitle">Insight card slot 2</p>
                 </div>
             </div>
             <div class="insight-core-number accent-positive">+5</div>
-            <p class="insight-meta">保留推荐岗位列表骨架</p>
+            <p class="insight-meta">Recommended list shell</p>
         </div>
         <div class="insight-card profile-strength-card" data-modal-target="checklist">
             <div class="profile-strength-content">
@@ -42,12 +42,12 @@
                     <div class="insight-card-header">
                         <span class="insight-icon badge-icon" aria-hidden="true"></span>
                         <div>
-                            <p class="insight-label">资料完善度</p>
-                            <p class="insight-subtitle">工作台卡片容器三</p>
+                            <p class="insight-label">Profile strength</p>
+                            <p class="insight-subtitle">Insight card slot 3</p>
                         </div>
                     </div>
-                    <p class="insight-meta">保留资料检查清单骨架</p>
-                    <p class="insight-subtext">可在设置中心补齐资料后自动刷新完善度。</p>
+                    <p class="insight-meta">Checklist modal shell</p>
+                    <p class="insight-subtext">Completing settings will refresh strength later.</p>
                 </div>
             </div>
         </div>
@@ -55,12 +55,12 @@
             <div class="insight-card-header">
                 <span class="insight-icon calendar-icon" aria-hidden="true"></span>
                 <div>
-                    <p class="insight-label">待办日程</p>
-                    <p class="insight-subtitle">工作台卡片容器四</p>
+                    <p class="insight-label">Upcoming</p>
+                    <p class="insight-subtitle">Insight card slot 4</p>
                 </div>
             </div>
             <div class="insight-core-number accent-warn">2</div>
-            <p class="insight-meta">保留日程规划抽屉骨架</p>
+            <p class="insight-meta">Planner drawer shell</p>
         </div>
     </div>
 </div>

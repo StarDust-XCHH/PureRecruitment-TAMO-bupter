@@ -24,16 +24,7 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * 助教账户数据访问对象。
- *
- * <p>本阶段在既有注册/登录能力基础上，补齐：</p>
- * <ul>
- *     <li>profile settings 读写</li>
- *     <li>头像路径保存</li>
- *     <li>修改密码</li>
- *     <li>application status 读取</li>
- *     <li>settings 保存反馈字段</li>
- * </ul>
+ * Data access for TA accounts, profiles, settings, passwords, and application status.
  */
 public class TaAccountDao {
     private static final String DATA_MOUNT_ENV = "mountDataTAMObupter";
@@ -69,7 +60,7 @@ public class TaAccountDao {
         String rawPassword = password == null ? "" : password;
 
         if (normalizedIdentifier.isEmpty() || rawPassword.isEmpty()) {
-            return TaLoginResult.failure(400, "请输入账号和密码");
+            return TaLoginResult.failure(400, "Enter your account and password");
         }
 
         List<Map<String, Object>> accounts = loadRecords(TA_DATA_PATH, TA_SCHEMA, TA_ENTITY);
@@ -83,7 +74,7 @@ public class TaAccountDao {
         }
 
         if (matchedAccount == null) {
-            return TaLoginResult.failure(404, "账号不存在");
+            return TaLoginResult.failure(404, "Account not found");
         }
 
         @SuppressWarnings("unchecked")
@@ -99,7 +90,7 @@ public class TaAccountDao {
             auth.put("failedAttempts", currentFailures + 1);
             matchedAccount.put("updatedAt", currentTime);
             saveRecords(TA_DATA_PATH, TA_SCHEMA, TA_ENTITY, accounts);
-            return TaLoginResult.failure(401, "账号或密码错误");
+            return TaLoginResult.failure(401, "Incorrect username or password");
         }
 
         auth.put("failedAttempts", 0);
@@ -126,10 +117,10 @@ public class TaAccountDao {
         List<Map<String, Object>> settings = loadRecords(SETTINGS_DATA_PATH, SETTINGS_SCHEMA, SETTINGS_ENTITY);
 
         for (Map<String, Object> account : accounts) {
-            if (asString(account.get("id")).equalsIgnoreCase(taId)) return TaRegisterResult.failure(409, "TA ID 已存在");
-            if (asString(account.get("username")).equalsIgnoreCase(username)) return TaRegisterResult.failure(409, "用户名已被占用");
-            if (asString(account.get("email")).equalsIgnoreCase(email)) return TaRegisterResult.failure(409, "邮箱已被注册");
-            if (asString(account.get("phone")).equals(phone)) return TaRegisterResult.failure(409, "手机号已被注册");
+            if (asString(account.get("id")).equalsIgnoreCase(taId)) return TaRegisterResult.failure(409, "TA ID already exists");
+            if (asString(account.get("username")).equalsIgnoreCase(username)) return TaRegisterResult.failure(409, "Username is already taken");
+            if (asString(account.get("email")).equalsIgnoreCase(email)) return TaRegisterResult.failure(409, "Email is already registered");
+            if (asString(account.get("phone")).equals(phone)) return TaRegisterResult.failure(409, "Phone number is already registered");
         }
 
         String currentTime = AuthUtils.nowIso();
@@ -172,7 +163,7 @@ public class TaAccountDao {
     public synchronized ProfileResult getProfileSettings(String taId) throws IOException {
         String normalizedTaId = trim(taId);
         if (normalizedTaId.isEmpty()) {
-            return ProfileResult.failure(400, "缺少 TA 标识");
+            return ProfileResult.failure(400, "Missing TA identifier");
         }
 
         List<Map<String, Object>> accounts = loadRecords(TA_DATA_PATH, TA_SCHEMA, TA_ENTITY);
@@ -181,7 +172,7 @@ public class TaAccountDao {
 
         Map<String, Object> account = findAccountByTaId(accounts, normalizedTaId);
         if (account == null) {
-            return ProfileResult.failure(404, "未找到对应 TA 账号");
+            return ProfileResult.failure(404, "TA account not found");
         }
 
         String now = AuthUtils.nowIso();
@@ -196,7 +187,7 @@ public class TaAccountDao {
 
     public synchronized ProfileResult saveProfileSettings(ProfileUpdateInput input) throws IOException {
         if (input == null || trim(input.taId()).isEmpty()) {
-            return ProfileResult.failure(400, "缺少 TA 标识");
+            return ProfileResult.failure(400, "Missing TA identifier");
         }
 
         List<Map<String, Object>> accounts = loadRecords(TA_DATA_PATH, TA_SCHEMA, TA_ENTITY);
@@ -205,7 +196,7 @@ public class TaAccountDao {
 
         Map<String, Object> account = findAccountByTaId(accounts, trim(input.taId()));
         if (account == null) {
-            return ProfileResult.failure(404, "未找到对应 TA 账号");
+            return ProfileResult.failure(404, "TA account not found");
         }
 
         String now = AuthUtils.nowIso();
@@ -240,7 +231,7 @@ public class TaAccountDao {
         setting.put("profileSaved", true);
         setting.put("profileSavedAt", now);
         setting.put("lastProfileSyncStatus", "success");
-        setting.put("lastProfileSyncMessage", "资料保存成功");
+        setting.put("lastProfileSyncMessage", "Profile saved successfully");
         setting.put("updatedAt", now);
 
         saveRecords(TA_DATA_PATH, TA_SCHEMA, TA_ENTITY, accounts);
@@ -256,22 +247,22 @@ public class TaAccountDao {
         String normalizedNewPassword = newPassword == null ? "" : newPassword;
 
         if (normalizedTaId.isEmpty()) {
-            return PasswordUpdateResult.failure(400, "缺少 TA 标识");
+            return PasswordUpdateResult.failure(400, "Missing TA identifier");
         }
         if (normalizedCurrentPassword.isBlank() || normalizedNewPassword.isBlank()) {
-            return PasswordUpdateResult.failure(400, "请输入当前密码和新密码");
+            return PasswordUpdateResult.failure(400, "Enter your current password and a new password");
         }
         if (normalizedNewPassword.trim().length() < 6) {
-            return PasswordUpdateResult.failure(400, "新密码至少 6 位");
+            return PasswordUpdateResult.failure(400, "New password must be at least 6 characters");
         }
         if (Objects.equals(normalizedCurrentPassword, normalizedNewPassword)) {
-            return PasswordUpdateResult.failure(400, "新密码不能与当前密码相同");
+            return PasswordUpdateResult.failure(400, "New password must differ from the current password");
         }
 
         List<Map<String, Object>> accounts = loadRecords(TA_DATA_PATH, TA_SCHEMA, TA_ENTITY);
         Map<String, Object> account = findAccountByTaId(accounts, normalizedTaId);
         if (account == null) {
-            return PasswordUpdateResult.failure(404, "未找到对应 TA 账号");
+            return PasswordUpdateResult.failure(404, "TA account not found");
         }
 
         Map<String, Object> auth = ensureAuthMap(account);
@@ -281,7 +272,7 @@ public class TaAccountDao {
             int currentFailures = asInt(auth.get("failedAttempts"));
             auth.put("failedAttempts", currentFailures + 1);
             saveRecords(TA_DATA_PATH, TA_SCHEMA, TA_ENTITY, accounts);
-            return PasswordUpdateResult.failure(401, "当前密码不正确");
+            return PasswordUpdateResult.failure(401, "Current password is incorrect");
         }
 
         String now = AuthUtils.nowIso();
@@ -300,13 +291,13 @@ public class TaAccountDao {
     public synchronized ApplicationStatusResult getApplicationStatus(String taId) throws IOException {
         String normalizedTaId = trim(taId);
         if (normalizedTaId.isEmpty()) {
-            return ApplicationStatusResult.failure(400, "缺少 TA 标识");
+            return ApplicationStatusResult.failure(400, "Missing TA identifier");
         }
 
         List<Map<String, Object>> accounts = loadRecords(TA_DATA_PATH, TA_SCHEMA, TA_ENTITY);
         Map<String, Object> account = findAccountByTaId(accounts, normalizedTaId);
         if (account == null) {
-            return ApplicationStatusResult.failure(404, "未找到对应 TA 账号");
+            return ApplicationStatusResult.failure(404, "TA account not found");
         }
 
         ensureApplicationStatusFile(normalizedTaId);
@@ -320,15 +311,15 @@ public class TaAccountDao {
         summary.addProperty("offerCount", 0);
         summary.addProperty("closedCount", 0);
         summary.addProperty("activeCount", 0);
-        summary.addProperty("estimatedFeedbackTime", "3-5 工作日");
-        summary.addProperty("latestStatusLabel", "暂无申请");
+        summary.addProperty("estimatedFeedbackTime", "3-5 business days");
+        summary.addProperty("latestStatusLabel", "No applications yet");
 
         int interviewCount = 0;
         int needMaterialCount = 0;
         int offerCount = 0;
         int closedCount = 0;
         String latestUpdatedAt = "";
-        String latestStatusLabel = "暂无申请";
+        String latestStatusLabel = "No applications yet";
         for (JsonElement element : items) {
             if (!element.isJsonObject()) {
                 continue;
@@ -340,22 +331,22 @@ public class TaAccountDao {
             JsonObject normalizedItem = normalizeApplicationStatusItem(item);
             userItems.add(normalizedItem);
             String status = getAsString(normalizedItem, "status");
-            if (containsAny(status, "面试", "interview")) {
+            if (containsAny(status, "interview", "Interview")) {
                 interviewCount++;
             }
-            if (containsAny(status, "补充资料", "补资料", "material")) {
+            if (containsAny(status, "material", "Material", "Pending materials")) {
                 needMaterialCount++;
             }
-            if (containsAny(status, "录用", "offer", "accepted")) {
+            if (containsAny(status, "offer", "accepted", "Hired", "hired")) {
                 offerCount++;
             }
-            if (containsAny(status, "关闭", "淘汰", "未通过", "closed", "reject")) {
+            if (containsAny(status, "closed", "reject", "Not selected", "Rejected", "rejected")) {
                 closedCount++;
             }
             String updatedAt = getAsString(normalizedItem, "updatedAt");
             if (latestUpdatedAt.isEmpty() || updatedAt.compareTo(latestUpdatedAt) > 0) {
                 latestUpdatedAt = updatedAt;
-                latestStatusLabel = status.isBlank() ? "处理中" : status;
+                latestStatusLabel = status.isBlank() ? "In progress" : status;
             }
         }
         summary.addProperty("totalCount", userItems.size());
@@ -368,20 +359,20 @@ public class TaAccountDao {
 
         JsonArray messages = new JsonArray();
         JsonObject moNotice = new JsonObject();
-        moNotice.addProperty("title", "MO 提醒");
-        moNotice.addProperty("content", interviewCount > 0 ? "你有申请进入后续推进环节，请留意站内通知。" : "暂无新的 MO 面试邀约，请继续关注岗位更新。");
+        moNotice.addProperty("title", "MO notice");
+        moNotice.addProperty("content", interviewCount > 0 ? "Some applications are moving forward—watch for updates in the app." : "No new interview invites yet; keep an eye on new postings.");
         messages.add(moNotice);
 
         JsonObject systemNotice = new JsonObject();
-        systemNotice.addProperty("title", "系统通知");
-        systemNotice.addProperty("content", needMaterialCount > 0 ? "存在待补充资料的申请，请尽快完善。" : "当前申请状态已同步完成。");
+        systemNotice.addProperty("title", "System notice");
+        systemNotice.addProperty("content", needMaterialCount > 0 ? "You have applications waiting on additional materials—please complete them soon." : "Your application statuses are up to date.");
         messages.add(systemNotice);
 
         JsonObject progressNotice = new JsonObject();
-        progressNotice.addProperty("title", "状态汇总");
+        progressNotice.addProperty("title", "Status summary");
         progressNotice.addProperty("content", userItems.size() > 0
-                ? "当前共有 " + userItems.size() + " 条申请记录，最新进度为“" + latestStatusLabel + "”。"
-                : "当前还没有申请记录，可前往职位大厅投递岗位。");
+                ? "You have " + userItems.size() + " application(s); latest status: \"" + latestStatusLabel + "\"."
+                : "No applications yet—browse the job board to apply.");
         messages.add(progressNotice);
 
         return ApplicationStatusResult.success(userItems, summary, messages);
@@ -417,7 +408,7 @@ public class TaAccountDao {
                 return result == null ? new ArrayList<>() : result;
             }
         } catch (Exception e) {
-            System.err.println("[TA-DATA] JSON 解析失败: " + path);
+            System.err.println("[TA-DATA] JSON parse failed: " + path);
         }
         return new ArrayList<>();
     }
@@ -527,83 +518,83 @@ public class TaAccountDao {
         items.add(createApplicationStatusItem(
                 taId,
                 "APP-" + taId + "-01",
-                "EBU6304 软件工程助教",
-                "审核中",
+                "EBU6304 Software Engineering TA",
+                "Under review",
                 "warn",
-                "已完成简历初筛，正在安排课程理解面试。",
-                "请保持手机和邮箱畅通，等待面试通知。",
+                "Initial resume screening is complete; a course-awareness interview is being scheduled.",
+                "Please keep your phone and email available for interview updates.",
                 "2026-03-16T10:00:00Z",
                 "software-engineering-ta",
-                "教学支持 / 软件工程",
-                "高",
-                arrayOf("已投递", "简历通过", "等待面试"),
+                "Instructional support / Software engineering",
+                "High",
+                arrayOf("Submitted", "Resume approved", "Interview pending"),
                 arrayOf(
-                        createTimelineStep("已投递申请", "系统已记录你的岗位投递信息。", "2026-03-13T09:30:00Z", true),
-                        createTimelineStep("简历初筛通过", "MO 认为课程相关经历匹配度较高。", "2026-03-14T14:00:00Z", true),
-                        createTimelineStep("等待面试安排", "预计 3-5 个工作日内发送面试通知。", "2026-03-16T10:00:00Z", false)
+                        createTimelineStep("Application submitted", "Your application has been recorded.", "2026-03-13T09:30:00Z", true),
+                        createTimelineStep("Resume screening passed", "The MO sees a strong match with the course focus.", "2026-03-14T14:00:00Z", true),
+                        createTimelineStep("Interview scheduling", "Expect an interview invitation within 3-5 business days.", "2026-03-16T10:00:00Z", false)
                 ),
                 arrayOf(
-                        createDetailEntry("岗位编号", "EBU6304"),
-                        createDetailEntry("课程方向", "软件工程"),
-                        createDetailEntry("授课地点", "教一楼 A305")
+                        createDetailEntry("Posting ID", "EBU6304"),
+                        createDetailEntry("Course area", "Software engineering"),
+                        createDetailEntry("Teaching venue", "Teaching Building 1, Room A305")
                 ),
                 arrayOf(
-                        createNotificationEntry("MO 提醒", "请提前准备课程项目截图和可讲解案例。", "info", "2026-03-16T10:05:00Z"),
-                        createNotificationEntry("系统通知", "你的申请已进入后续推进阶段。", "success", "2026-03-16T10:06:00Z")
+                        createNotificationEntry("MO notice", "Prepare project screenshots and a case you can walk through.", "info", "2026-03-16T10:05:00Z"),
+                        createNotificationEntry("System notice", "Your application is moving to the next stage.", "success", "2026-03-16T10:06:00Z")
                 )
         ));
         items.add(createApplicationStatusItem(
                 taId,
                 "APP-" + taId + "-02",
-                "EBU6301 计算机网络助教",
-                "待补充资料",
+                "EBU6301 Computer Networks TA",
+                "Pending materials",
                 "warn",
-                "需要补充一份能够体现网络实验经验的材料。",
-                "请在 24 小时内上传课程实验截图或项目链接。",
+                "Please add materials that demonstrate hands-on networking lab experience.",
+                "Upload lab screenshots or a project link within 24 hours.",
                 "2026-03-15T09:00:00Z",
                 "computer-network-ta",
-                "网络实验 / 教学答疑",
-                "中",
-                arrayOf("已投递", "待补充资料"),
+                "Network labs / Q&A support",
+                "Medium",
+                arrayOf("Submitted", "Pending materials"),
                 arrayOf(
-                        createTimelineStep("已投递申请", "系统已记录你的岗位投递信息。", "2026-03-12T11:00:00Z", true),
-                        createTimelineStep("待补充资料", "MO 请求补充网络实验相关证明材料。", "2026-03-15T09:00:00Z", false)
+                        createTimelineStep("Application submitted", "Your application has been recorded.", "2026-03-12T11:00:00Z", true),
+                        createTimelineStep("Pending materials", "The MO requests proof of networking lab experience.", "2026-03-15T09:00:00Z", false)
                 ),
                 arrayOf(
-                        createDetailEntry("岗位编号", "EBU6301"),
-                        createDetailEntry("课程方向", "计算机网络"),
-                        createDetailEntry("材料要求", "网络实验截图 / 项目仓库链接")
+                        createDetailEntry("Posting ID", "EBU6301"),
+                        createDetailEntry("Course area", "Computer networks"),
+                        createDetailEntry("Materials required", "Network lab screenshots / repository link")
                 ),
                 arrayOf(
-                        createNotificationEntry("材料提醒", "补充材料后将重新进入审核队列。", "warn", "2026-03-15T09:05:00Z")
+                        createNotificationEntry("Materials reminder", "After you submit materials, your file re-enters the review queue.", "warn", "2026-03-15T09:05:00Z")
                 )
         ));
         items.add(createApplicationStatusItem(
                 taId,
                 "APP-" + taId + "-03",
-                "EBU6402 数据库助教",
-                "已录用",
+                "EBU6402 Databases TA",
+                "Hired",
                 "success",
-                "教学经验与数据库项目经历匹配度较高。",
-                "请留意后续签约通知和首次排班安排。",
+                "Strong match between teaching experience and database project work.",
+                "Watch for onboarding paperwork and your first scheduling notice.",
                 "2026-03-14T08:00:00Z",
                 "database-ta",
-                "数据库 / 实验辅导",
-                "高",
-                arrayOf("已投递", "初筛通过", "完成面试", "已录用"),
+                "Databases / Lab tutoring",
+                "High",
+                arrayOf("Submitted", "Screening passed", "Interview completed", "Hired"),
                 arrayOf(
-                        createTimelineStep("已投递申请", "系统已记录你的岗位投递信息。", "2026-03-10T10:00:00Z", true),
-                        createTimelineStep("初筛通过", "岗位匹配度评估结果良好。", "2026-03-11T15:00:00Z", true),
-                        createTimelineStep("完成面试", "你已完成课程理解与答疑模拟面试。", "2026-03-13T16:00:00Z", true),
-                        createTimelineStep("已录用", "请等待签约与排班通知。", "2026-03-14T08:00:00Z", true)
+                        createTimelineStep("Application submitted", "Your application has been recorded.", "2026-03-10T10:00:00Z", true),
+                        createTimelineStep("Screening passed", "Role fit assessment looks positive.", "2026-03-11T15:00:00Z", true),
+                        createTimelineStep("Interview completed", "You completed the course-awareness and Q&A practice interview.", "2026-03-13T16:00:00Z", true),
+                        createTimelineStep("Hired", "Please wait for contract and scheduling details.", "2026-03-14T08:00:00Z", true)
                 ),
                 arrayOf(
-                        createDetailEntry("岗位编号", "EBU6402"),
-                        createDetailEntry("课程方向", "数据库"),
-                        createDetailEntry("预计到岗", "2026-03-21")
+                        createDetailEntry("Posting ID", "EBU6402"),
+                        createDetailEntry("Course area", "Databases"),
+                        createDetailEntry("Expected start", "2026-03-21")
                 ),
                 arrayOf(
-                        createNotificationEntry("录用通知", "恭喜你已通过该岗位全部流程。", "success", "2026-03-14T08:05:00Z")
+                        createNotificationEntry("Offer notice", "Congratulations—you have completed all steps for this posting.", "success", "2026-03-14T08:05:00Z")
                 )
         ));
         root.add("items", items);
@@ -695,13 +686,13 @@ public class TaAccountDao {
         }
         if (!item.has("details") || !item.get("details").isJsonArray()) {
             JsonArray details = new JsonArray();
-            details.add(createDetailEntry("岗位名称", getAsString(item, "courseName")));
-            details.add(createDetailEntry("当前状态", getAsString(item, "status")));
+            details.add(createDetailEntry("Posting title", getAsString(item, "courseName")));
+            details.add(createDetailEntry("Current status", getAsString(item, "status")));
             item.add("details", details);
         }
         if (!item.has("notifications") || !item.get("notifications").isJsonArray()) {
             JsonArray notifications = new JsonArray();
-            notifications.add(createNotificationEntry("状态同步", firstNonBlank(getAsString(item, "nextAction"), getAsString(item, "nextStep")), getAsString(item, "statusTone"), getAsString(item, "updatedAt")));
+            notifications.add(createNotificationEntry("Status update", firstNonBlank(getAsString(item, "nextAction"), getAsString(item, "nextStep")), getAsString(item, "statusTone"), getAsString(item, "updatedAt")));
             item.add("notifications", notifications);
         }
         if (!item.has("tags") || !item.get("tags").isJsonArray()) {
@@ -912,9 +903,9 @@ public class TaAccountDao {
     }
 
     public static String getDataMountStatusMessage() {
-        return "[TA-DATA] 环境变量 " + DATA_MOUNT_ENV + " "
-                + (RESOLVED_DATA_ROOT.fromEnvironment() ? "已挂载" : "未挂载，使用默认目录")
-                + "；数据根目录=" + RESOLVED_DATA_ROOT.rootPath();
+        return "[TA-DATA] env " + DATA_MOUNT_ENV + " "
+                + (RESOLVED_DATA_ROOT.fromEnvironment() ? "mounted" : "not mounted, using default directory")
+                + "; dataRoot=" + RESOLVED_DATA_ROOT.rootPath();
     }
 
     public static Path getResolvedDataRoot() {
@@ -1040,7 +1031,7 @@ public class TaAccountDao {
         private TaLoginResult(boolean success, int status, String message, Map<String, Object> data) {
             this.success = success; this.status = status; this.message = message; this.data = data;
         }
-        public static TaLoginResult success(Map<String, Object> data) { return new TaLoginResult(true, 200, "登录成功", data); }
+        public static TaLoginResult success(Map<String, Object> data) { return new TaLoginResult(true, 200, "Signed in successfully", data); }
         public static TaLoginResult failure(int status, String message) { return new TaLoginResult(false, status, message, null); }
         public boolean isSuccess() { return success; }
         public int getStatus() { return status; }
@@ -1056,7 +1047,7 @@ public class TaAccountDao {
         private TaRegisterResult(boolean success, int status, String message, Map<String, Object> data) {
             this.success = success; this.status = status; this.message = message; this.data = data;
         }
-        public static TaRegisterResult success(Map<String, Object> data) { return new TaRegisterResult(true, 201, "注册成功", data); }
+        public static TaRegisterResult success(Map<String, Object> data) { return new TaRegisterResult(true, 201, "Registered successfully", data); }
         public static TaRegisterResult failure(int status, String message) { return new TaRegisterResult(false, status, message, null); }
         public boolean isSuccess() { return success; }
         public int getStatus() { return status; }
@@ -1076,7 +1067,7 @@ public class TaAccountDao {
         private ProfileResult(boolean success, int status, String message, Map<String, Object> data) {
             this.success = success; this.status = status; this.message = message; this.data = data;
         }
-        public static ProfileResult success(ProfileData data) { return new ProfileResult(true, 200, "操作成功", data.toMap()); }
+        public static ProfileResult success(ProfileData data) { return new ProfileResult(true, 200, "OK", data.toMap()); }
         public static ProfileResult failure(int status, String message) { return new ProfileResult(false, status, message, null); }
         public boolean isSuccess() { return success; }
         public int getStatus() { return status; }
@@ -1091,7 +1082,7 @@ public class TaAccountDao {
         private PasswordUpdateResult(boolean success, int status, String message) {
             this.success = success; this.status = status; this.message = message;
         }
-        public static PasswordUpdateResult success() { return new PasswordUpdateResult(true, 200, "密码更新成功"); }
+        public static PasswordUpdateResult success() { return new PasswordUpdateResult(true, 200, "Password updated"); }
         public static PasswordUpdateResult failure(int status, String message) { return new PasswordUpdateResult(false, status, message); }
         public boolean isSuccess() { return success; }
         public int getStatus() { return status; }
@@ -1116,7 +1107,7 @@ public class TaAccountDao {
         }
 
         public static ApplicationStatusResult success(JsonArray items, JsonObject summary, JsonArray messages) {
-            return new ApplicationStatusResult(true, 200, "获取成功", items, summary, messages);
+            return new ApplicationStatusResult(true, 200, "OK", items, summary, messages);
         }
 
         public static ApplicationStatusResult failure(int status, String message) {

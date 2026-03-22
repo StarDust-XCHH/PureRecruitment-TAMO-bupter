@@ -102,10 +102,10 @@
                     '<h4>' + item.courseName + '</h4>' +
                     '<div class="job-tags">' + toTags(item).map(function (tag) { return '<span class="pill">' + tag + '</span>'; }).join('') + '</div>' +
                     '<div class="course-meta-stack">' +
-                    '<div class="course-meta-item"><span class="course-meta-label">课程时间</span><strong>' + item.courseDate + ' · ' + item.courseTime + '</strong></div>' +
-                    '<div class="course-meta-item"><span class="course-meta-label">招聘状态</span><strong>' + (item.status || '等待招聘 TA') + '</strong></div>' +
+                    '<div class="course-meta-item"><span class="course-meta-label">Schedule</span><strong>' + item.courseDate + ' · ' + item.courseTime + '</strong></div>' +
+                    '<div class="course-meta-item"><span class="course-meta-label">Hiring status</span><strong>' + (item.status || 'Recruiting TA') + '</strong></div>' +
                     '</div>' +
-                    '<div class="course-card-hint"><span>点击查看详情</span><span aria-hidden="true">→</span></div>';
+                    '<div class="course-card-hint"><span>View details</span><span aria-hidden="true">→</span></div>';
                 card.addEventListener('click', function () {
                     renderDetail(item);
                     if (typeof app.openModal === 'function') app.openModal('course-detail');
@@ -132,7 +132,7 @@
                 jobPagination.appendChild(btn);
             }
 
-            openCoursesCount.textContent = '开放课程 ' + state.jobs.length;
+            openCoursesCount.textContent = 'Open courses ' + state.jobs.length;
             if (typeof app.onJobsUpdated === 'function') app.onJobsUpdated(state.jobs);
         }
 
@@ -165,7 +165,7 @@
                 courseDescription: document.getElementById('courseDescInput').value
             };
 
-            publishStatus.textContent = '发布中...';
+            publishStatus.textContent = 'Publishing…';
             try {
                 const res = await fetch('../../api/mo/jobs', {
                     method: 'POST',
@@ -174,13 +174,13 @@
                 });
                 const payload = await res.json();
                 if (!res.ok || payload.success === false) {
-                    throw new Error(payload.message || '发布失败');
+                    throw new Error(payload.message || 'Publish failed');
                 }
-                publishStatus.textContent = '发布成功';
+                publishStatus.textContent = 'Published';
                 publishForm.reset();
                 await loadJobs();
             } catch (err) {
-                publishStatus.textContent = err.message || '发布失败';
+                publishStatus.textContent = err.message || 'Publish failed';
             }
         }
 

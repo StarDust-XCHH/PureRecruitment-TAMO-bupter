@@ -71,7 +71,7 @@ public class MoRecruitmentDao {
         String rawChecklist = trim(getAsString(input, "checklist"));
 
         if (courseName.isEmpty() || courseDate.isEmpty() || courseTime.isEmpty()) {
-            throw new IllegalArgumentException("课程名称、日期和时间不能为空");
+            throw new IllegalArgumentException("Course name, date, and time are required");
         }
 
         JsonObject item = new JsonObject();
@@ -80,14 +80,14 @@ public class MoRecruitmentDao {
         item.addProperty("moName", moName.isBlank() ? "MO" : moName);
         item.addProperty("courseDate", courseDate);
         item.addProperty("courseTime", courseTime);
-        item.addProperty("courseLocation", courseLocation.isBlank() ? "待安排" : courseLocation);
+        item.addProperty("courseLocation", courseLocation.isBlank() ? "TBD" : courseLocation);
         item.addProperty("studentCount", 0);
-        item.addProperty("status", "等待招聘 TA");
-        item.addProperty("workload", "课前准备 + 课堂支持 + 课后答疑");
-        item.addProperty("courseDescription", courseDescription.isBlank() ? "MO 新发布课程，等待 TA 申请。" : courseDescription);
+        item.addProperty("status", "Recruiting TA");
+        item.addProperty("workload", "Prep, in-class support, and after-class Q&A");
+        item.addProperty("courseDescription", courseDescription.isBlank() ? "New course published by the MO; open for TA applications." : courseDescription);
         item.add("keywordTags", parseCsvToArray(rawTags));
         item.add("checklist", parseCsvToArray(rawChecklist));
-        item.addProperty("suggestion", "建议优先关注与课程方向匹配的 TA 申请。");
+        item.addProperty("suggestion", "Prioritize TA applicants whose background matches the course focus.");
         item.addProperty("createdAt", Instant.now().toString());
         item.addProperty("source", "mo-manual");
 
@@ -97,7 +97,7 @@ public class MoRecruitmentDao {
 
         JsonObject result = new JsonObject();
         result.addProperty("success", true);
-        result.addProperty("message", "课程发布成功");
+        result.addProperty("message", "Course published successfully");
         result.add("item", item.deepCopy());
         return result;
     }
@@ -134,7 +134,7 @@ public class MoRecruitmentDao {
 
             JsonObject row = new JsonObject();
             row.addProperty("taId", taId);
-            row.addProperty("name", firstNonBlank(getAsString(account, "name"), "未命名 TA"));
+            row.addProperty("name", firstNonBlank(getAsString(account, "name"), "Unnamed TA"));
             row.addProperty("username", getAsString(account, "username"));
             row.addProperty("email", firstNonBlank(getAsString(profile, "contactEmail"), getAsString(account, "email")));
             row.addProperty("intent", getAsString(profile, "applicationIntent"));
@@ -144,12 +144,12 @@ public class MoRecruitmentDao {
 
             if (latest == null) {
                 row.addProperty("applicationId", "");
-                row.addProperty("status", "可邀请");
+                row.addProperty("status", "Invitable");
                 row.addProperty("updatedAt", "");
-                row.addProperty("comment", "暂无该课程投递记录，可由 MO 主动邀请。");
+                row.addProperty("comment", "No application on file for this course; the MO may invite proactively.");
             } else {
                 row.addProperty("applicationId", getAsString(latest, "applicationId"));
-                row.addProperty("status", firstNonBlank(getAsString(latest, "status"), "审核中"));
+                row.addProperty("status", firstNonBlank(getAsString(latest, "status"), "Under review"));
                 row.addProperty("updatedAt", getAsString(latest, "updatedAt"));
                 row.addProperty("comment", firstNonBlank(getAsString(latest, "summary"), getAsString(latest, "moComment")));
             }
@@ -171,10 +171,10 @@ public class MoRecruitmentDao {
         String normalizedComment = trim(comment);
 
         if (normalizedCourseCode.isBlank() || normalizedTaId.isBlank()) {
-            throw new IllegalArgumentException("courseCode 与 taId 不能为空");
+            throw new IllegalArgumentException("courseCode and taId are required");
         }
         if (!"selected".equals(normalizedDecision) && !"rejected".equals(normalizedDecision)) {
-            throw new IllegalArgumentException("decision 仅支持 selected 或 rejected");
+            throw new IllegalArgumentException("decision must be selected or rejected");
         }
 
         JsonObject appRoot = ensureStructuredFile(TA_APPLICATION_STATUS, "ta", "application-status");
@@ -182,9 +182,9 @@ public class MoRecruitmentDao {
         JsonObject course = findCourseByCode(normalizedCourseCode);
 
         String now = Instant.now().toString();
-        String statusText = "selected".equals(normalizedDecision) ? "已录用" : "未录用";
+        String statusText = "selected".equals(normalizedDecision) ? "Hired" : "Not selected";
         String summaryText = normalizedComment.isBlank()
-                ? ("selected".equals(normalizedDecision) ? "MO 已确认录用该 TA。" : "MO 已结束该候选人的招聘流程。")
+                ? ("selected".equals(normalizedDecision) ? "The MO has confirmed this TA for the role." : "The MO has closed the recruitment process for this candidate.")
                 : normalizedComment;
 
         JsonObject target = findLatestApplicationForCourse(appItems, normalizedTaId, normalizedCourseCode, normalizeSlug(normalizedCourseCode));
@@ -205,18 +205,18 @@ public class MoRecruitmentDao {
         target.addProperty("statusTone", "selected".equals(normalizedDecision) ? "success" : "danger");
         target.addProperty("summary", summaryText);
         target.addProperty("moComment", summaryText);
-        target.addProperty("nextAction", "selected".equals(normalizedDecision) ? "请等待签约与排班通知。" : "可继续申请其他课程岗位。");
+        target.addProperty("nextAction", "selected".equals(normalizedDecision) ? "Please wait for contract and scheduling details." : "You may apply for other course postings.");
         target.addProperty("nextStep", target.get("nextAction").getAsString());
         target.addProperty("updatedAt", now);
-        target.addProperty("category", "MO 招聘流程");
-        target.addProperty("matchLevel", "selected".equals(normalizedDecision) ? "高" : "中");
+        target.addProperty("category", "MO recruitment");
+        target.addProperty("matchLevel", "selected".equals(normalizedDecision) ? "High" : "Medium");
 
         updateMeta(appRoot, "ta", "application-status");
         writeJson(TA_APPLICATION_STATUS, appRoot);
 
         JsonObject payload = new JsonObject();
         payload.addProperty("success", true);
-        payload.addProperty("message", "selected".equals(normalizedDecision) ? "已录用该 TA" : "已拒绝该 TA");
+        payload.addProperty("message", "selected".equals(normalizedDecision) ? "TA marked as hired" : "TA marked as not selected");
         payload.addProperty("taId", normalizedTaId);
         payload.addProperty("courseCode", normalizedCourseCode);
         payload.addProperty("status", statusText);

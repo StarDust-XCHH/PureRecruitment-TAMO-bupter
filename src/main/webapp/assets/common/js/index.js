@@ -162,14 +162,14 @@
             const adminPassword = document.getElementById('adminPassword').value;
 
             if (!adminAccount || !adminPassword) {
-                setInlineMessage(adminError, '请输入管理员账号和密码');
+                setInlineMessage(adminError, 'Enter admin account and password');
                 return;
             }
 
-            setLoading(adminLogin, '登录中...', true, '管理员登录');
+            setLoading(adminLogin, 'Signing in...', true, 'Admin sign-in');
 
             try {
-                // 模拟管理员登录 - 实际应调用后端接口
+                // Mock admin login — replace with a real API when available
                 if (adminAccount === 'admin' && adminPassword === 'admin123') {
                     const adminUser = {
                         username: 'admin',
@@ -179,20 +179,20 @@
                     localStorage.setItem('admin-user', JSON.stringify(adminUser));
                     window.location.replace('pages/admin/admin-home.jsp');
                 } else {
-                    setInlineMessage(adminError, '账号或密码错误（测试账号: admin/admin123）');
+                    setInlineMessage(adminError, 'Invalid credentials (demo: admin / admin123)');
                 }
             } catch (error) {
-                console.error("[JS] 管理员登录异常:", error);
-                setInlineMessage(adminError, '登录失败，请重试');
+                console.error("[JS] Admin login error:", error);
+                setInlineMessage(adminError, 'Sign-in failed. Try again.');
             } finally {
-                setLoading(adminLogin, '登录中...', false, '管理员登录');
+                setLoading(adminLogin, 'Signing in...', false, 'Admin sign-in');
             }
         });
 
         openRegister.addEventListener('click', function (event) {
             event.preventDefault();
             if (roleInput.value !== 'TA') {
-                setInlineMessage(loginError, '目前仅开放 TA 角色注册哦！');
+                setInlineMessage(loginError, 'Registration is only available for the TA role.');
                 return;
             }
             registerTaId.value = generateTaId();
@@ -226,18 +226,17 @@
             clearFieldErrors([loginUsername, loginPassword]);
 
             const username = loginUsername.value.trim();
-            const password = loginPassword.value; // 保持原始密码不 trim
+            const password = loginPassword.value; // do not trim password
             const role = roleInput.value || 'TA';
 
-            // 【前端调试日志】
-            console.group("--- 登录请求调试 ---");
-            console.log("请求 URL:", "api/ta/login");
-            console.log("识别码 (identifier):", username);
-            console.log("密码长度:", password ? password.length : 0);
+            console.group("--- Login debug ---");
+            console.log("URL:", "api/ta/login");
+            console.log("identifier:", username);
+            console.log("password length:", password ? password.length : 0);
             console.groupEnd();
 
             if (!username || !password) {
-                setInlineMessage(loginError, '请输入用户名和密码');
+                setInlineMessage(loginError, 'Enter username and password');
                 return;
             }
 
@@ -251,10 +250,10 @@
                 return;
             }
 
-            setLoading(loginSubmit, '登录中...', true, '进入系统');
+            setLoading(loginSubmit, 'Signing in...', true, 'Continue');
 
             try {
-                // 【核心修改】：去掉开头的 /，改用相对路径以适配 Context Path
+                // Relative URL so it works with any context path
                 const response = await fetch('api/ta/login', {
                     method: 'POST',
                     headers: {
@@ -266,23 +265,23 @@
                     })
                 });
 
-                console.log("[JS] 原始响应状态码:", response.status);
+                console.log("[JS] response status:", response.status);
 
                 if (response.status === 404) {
-                    console.error("[JS] 错误：接口地址不存在 (404)。请检查 Servlet 映射或 Context Path。");
-                    setInlineMessage(loginError, '服务器接口未找到 (404)');
+                    console.error("[JS] Endpoint not found (404). Check servlet mapping / context path.");
+                    setInlineMessage(loginError, 'Server endpoint not found (404)');
                     return;
                 }
 
                 const payload = await response.json();
-                console.log("[JS] 解析后的响应体:", payload);
+                console.log("[JS] response body:", payload);
 
                 if (!response.ok || !payload.success) {
-                    setInlineMessage(loginError, payload.message || '登录失败');
+                    setInlineMessage(loginError, payload.message || 'Sign-in failed');
                     return;
                 }
 
-                // 成功逻辑
+                // success
                 const data = payload.data || {};
                 const user = {
                     taId: data.taId,
@@ -295,10 +294,10 @@
                 window.location.replace('pages/ta/ta-home.jsp');
 
             } catch (error) {
-                console.error("[JS] 网络请求异常:", error);
-                setInlineMessage(loginError, '连接服务器失败，请检查后端是否启动');
+                console.error("[JS] Network error:", error);
+                setInlineMessage(loginError, 'Could not reach the server. Is the backend running?');
             } finally {
-                setLoading(loginSubmit, '登录中...', false, '进入系统');
+                setLoading(loginSubmit, 'Signing in...', false, 'Continue');
             }
         });
 
@@ -338,36 +337,36 @@
                 if (!phone) {
                     markInvalid(registerPhone);
                 }
-                setInlineMessage(registerError, '姓名、用户名、邮箱、手机号不能为空');
+                setInlineMessage(registerError, 'Name, username, email, and phone are required');
                 return;
             }
 
             if (!emailPattern.test(email)) {
                 markInvalid(registerEmail);
-                setInlineMessage(registerError, '邮箱格式不正确');
+                setInlineMessage(registerError, 'Invalid email format');
                 return;
             }
 
             if (!phonePattern.test(phone)) {
                 markInvalid(registerPhone);
-                setInlineMessage(registerError, '手机号格式不正确');
+                setInlineMessage(registerError, 'Invalid phone number');
                 return;
             }
 
             if (password.length < 6) {
                 markInvalid(registerPassword);
-                setInlineMessage(registerError, '密码至少 6 位');
+                setInlineMessage(registerError, 'Password must be at least 6 characters');
                 return;
             }
 
             if (password !== confirmPassword) {
                 markInvalid(registerPassword);
                 markInvalid(registerConfirmPassword);
-                setInlineMessage(registerError, '两次输入的密码不一致');
+                setInlineMessage(registerError, 'Passwords do not match');
                 return;
             }
 
-            setLoading(registerSubmit, '注册中...', true, '完成注册并登录');
+            setLoading(registerSubmit, 'Registering...', true, 'Register and sign in');
 
             try {
                 const response = await fetch('api/ta/register', {
@@ -394,7 +393,7 @@
                 }
 
                 if (!response.ok || !payload.success) {
-                    setInlineMessage(registerError, payload.message || '注册失败，请检查信息后重试');
+                    setInlineMessage(registerError, payload.message || 'Registration failed. Check your details.');
                     return;
                 }
 
@@ -415,9 +414,9 @@
                 saveTaUser(user);
                 window.location.replace('pages/ta/ta-home.jsp');
             } catch (error) {
-                setInlineMessage(registerError, '注册请求失败，请稍后再试');
+                setInlineMessage(registerError, 'Registration request failed. Try again later.');
             } finally {
-                setLoading(registerSubmit, '注册中...', false, '完成注册并登录');
+                setLoading(registerSubmit, 'Registering...', false, 'Register and sign in');
             }
         });
     })();

@@ -2,37 +2,37 @@
     <div class="card jobs-hall-card">
         <div class="overview-top" id="jobsHallHeading">
             <div>
-                <h1>岗位发布与管理</h1>
-                <p class="muted">发布课程岗位后会写入 `mountDataTAMObupter/mo/pending-recruitment-courses.json`。</p>
+                <h1>Postings</h1>
+                <p class="muted">Published postings are saved to <code>mountDataTAMObupter/mo/pending-recruitment-courses.json</code>.</p>
             </div>
             <div class="overview-badges">
-                <span class="pill" id="openCoursesCount">开放课程 0</span>
+                <span class="pill" id="openCoursesCount">Open courses 0</span>
                 <button id="refreshJobsBtn" class="refresh-btn pill" type="button">
                     <span class="refresh-icon">↻</span>
-                    <span class="refresh-text">刷新列表</span>
+                    <span class="refresh-text">Refresh</span>
                 </button>
             </div>
         </div>
 
         <form id="jobPublishForm" class="mo-form-grid" autocomplete="off">
-            <label>课程名称<input id="courseNameInput" required type="text" placeholder="如：软件工程实验班"></label>
-            <label>课程日期<input id="courseDateInput" required type="date"></label>
-            <label>课程时间<input id="courseTimeInput" required type="text" placeholder="如：14:00-16:00"></label>
-            <label>上课地点<input id="courseLocationInput" type="text" placeholder="如：教一楼 A305"></label>
-            <label>标签（逗号分隔）<input id="courseTagsInput" type="text" placeholder="软件工程,实验班,3月课程"></label>
-            <label>工作清单（逗号分隔）<input id="courseChecklistInput" type="text" placeholder="点名,答疑,批改作业"></label>
-            <label class="full">课程描述<textarea id="courseDescInput" rows="3" placeholder="介绍岗位需求与课程目标"></textarea></label>
+            <label>Course title<input id="courseNameInput" required type="text" placeholder="e.g. Software engineering studio"></label>
+            <label>Course date<input id="courseDateInput" required type="date"></label>
+            <label>Course time<input id="courseTimeInput" required type="text" placeholder="e.g. 14:00-16:00"></label>
+            <label>Location<input id="courseLocationInput" type="text" placeholder="e.g. Teaching Building 1, Room A305"></label>
+            <label>Tags (comma-separated)<input id="courseTagsInput" type="text" placeholder="software engineering,studio,March"></label>
+            <label>Checklist (comma-separated)<input id="courseChecklistInput" type="text" placeholder="attendance,Q&A,grading"></label>
+            <label class="full">Description<textarea id="courseDescInput" rows="3" placeholder="Describe the role and course goals"></textarea></label>
             <div class="full">
-                <button class="pill-btn" id="publishJobBtn" type="submit">发布岗位</button>
+                <button class="pill-btn" id="publishJobBtn" type="submit">Publish posting</button>
                 <span id="publishJobStatus" class="muted"></span>
             </div>
         </form>
 
         <label class="job-search-box" for="jobSearchInput">
             <span class="job-search-icon" aria-hidden="true">⌕</span>
-            <input id="jobSearchInput" type="text" placeholder="搜索课程编号 / 名称 / 标签">
+            <input id="jobSearchInput" type="text" placeholder="Search code, title, or tags">
         </label>
         <div class="job-board course-board" id="jobBoard"></div>
-        <div class="job-pagination" aria-label="岗位分页" id="jobPagination"></div>
+        <div class="job-pagination" aria-label="Posting pagination" id="jobPagination"></div>
     </div>
 </div>

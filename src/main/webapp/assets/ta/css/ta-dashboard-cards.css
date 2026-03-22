@@ -1,8 +1,8 @@
 @charset "UTF-8";
 
 /* ==========================================================================
-   1. 上方数据卡片 (Insight Cards)
-   优化目标：做减法，弱化视觉权重，使其不抢夺主卡片焦点
+   1. Insight cards (top row)
+   Keep them visually lighter than the hero card.
    ========================================================================== */
 .insight-card {
     padding: 18px;
@@ -62,7 +62,7 @@
     box-shadow: 0 0 20px rgba(0, 242, 254, 0.08) inset;
 }
 
-/* --- 浅色模式下的上方卡片 --- */
+/* --- Insight cards, light theme --- */
 [data-theme="light"] .insight-card {
     background: #ffffff;
     border: 1px solid rgba(15, 23, 42, 0.06);
@@ -76,7 +76,7 @@
     border-color: rgba(15, 23, 42, 0.12);
 }
 
-/* --- 卡片内部文字通用元素 --- */
+/* --- Shared typography inside cards --- */
 .insight-card-header {
     display: flex;
     gap: 12px;
@@ -151,7 +151,7 @@
     color: rgba(15, 23, 42, 0.45);
 }
 
-/* --- 图标库 --- */
+/* --- Icon slots --- */
 .insight-icon {
     width: 34px;
     height: 34px;
@@ -171,23 +171,23 @@
 .calendar-icon::before { content: "📅"; font-size: 18px; color: #fdba74; }
 
 /* ==========================================================================
-   资料完善度卡片 - 终极物理与视觉双重对齐版
+   Profile strength card (donut + metrics alignment)
    ========================================================================== */
 
 .profile-strength-content {
     display: grid;
-    grid-template-columns: 58px minmax(0, 1fr); /* 稍微收敛圆环尺寸，使其与大数字的视觉体量对等 */
+    grid-template-columns: 58px minmax(0, 1fr); /* ring size vs headline weight */
 
-    /* 🚨 核心：强制三段式网格（顶端自适应、中间弹性、底端自适应） */
+    /* Three-row grid: header, middle flex, footer */
     grid-template-rows: auto 1fr auto;
     grid-template-areas:
         "header header"
         "donut  meta"
         "subtext subtext";
     column-gap: 16px;
-    row-gap: 12px; /* 严格等于外层卡   片的标准间距，不差1px */
+    row-gap: 12px; /* match parent card gap */
     height: 100%;
-    /* 👇 新增这一行：强制该容器跨越外层 .insight-card 的所有 3 行（auto 1fr auto） */
+    /* Span all rows of parent .insight-card (auto 1fr auto) */
     grid-row: 1 / -1;
 }
 
@@ -201,22 +201,22 @@
     align-items: flex-start;
 }
 
-/* 图标还原 */
+/* Icon baseline */
 .profile-strength-content .insight-icon {
     position: relative !important;
     margin: 0;
 }
 
-/* 🚨 中间层：圆环 */
+/* Donut chart */
 .donut-chart {
     grid-area: donut;
     width: 100%;
     aspect-ratio: 1;
     margin: 0;
 
-    /* 👇 关键点 1：必须强行顶对齐（start），不能居中！这样才能与旁边数字的“起跑线”锁死，无视底部文字的影响 */
+    /* Top-align with headline baseline */
     align-self: start;
-    /* 👇 关键点 2：视错觉修正。下推 4px，抵消掉旁边大数字体自带来的“空气顶宽”，达到视觉上的绝对平齐 */
+    /* Optical nudge: +4px vs large numeral cap height */
     margin-top: 4px;
 
     --donut-degree: 0deg;
@@ -245,13 +245,12 @@
     color: #0f172a;
 }
 
-/* 🚨 中间层：评级文字 */
+/* Rating line */
 .profile-strength-content .insight-meta {
     grid-area: meta;
 
-    /* 同样跟随顶部对齐的原则 */
     align-self: start;
-    /* 精确计算：下推 20px，刚好将这行字对齐在 58px 圆环的垂直中心！ */
+    /* Nudge to visually center with 58px ring */
     margin: 0;
     margin-top: 20px;
 
@@ -260,10 +259,10 @@
     color: #1e293b;
 }
 
-/* 🚨 底部层：补充说明 */
+/* Footer note */
 .profile-strength-content .insight-subtext {
     grid-area: subtext;
-    /* 强制沉降到剩余空间的最低端，完美贴合别的卡片的 Footer */
+    /* Pin to bottom of remaining space */
     align-self: end;
     margin: 0;
     font-size: 13px;
@@ -271,7 +270,7 @@
     line-height: 1.6;
 }
 
-/* --- 手机端响应式 --- */
+/* --- Mobile --- */
 @media (max-width: 640px) {
     .profile-strength-content {
         grid-template-columns: 1fr;
@@ -286,7 +285,7 @@
     }
     .profile-strength-content .insight-card-header {
         margin-bottom: 4px;
-        text-align: left; /* 手机端头部仍保持左对齐比较稳 */
+        text-align: left; /* keep header left-aligned on small screens */
         width: 100%;
     }
     .donut-chart {
@@ -296,7 +295,7 @@
 
 
 /* ==========================================================================
-   2. 英雄卡片主视觉 (Hero Panel)
+   2. Hero panel
    ========================================================================== */
 .hero-card {
     margin-top: 22px;
@@ -352,7 +351,7 @@
     mask-image: radial-gradient(circle at 30% 20%, rgba(0, 0, 0, 0.8), transparent 60%);
 }
 
-/* --- 浅色模式下的英雄卡片 --- */
+/* --- Hero panel, light theme --- */
 [data-theme="light"] .hero-panel {
     background: linear-gradient(135deg, #eef2ff 0%, #f0f9ff 50%, #e0f2fe 100%);
     border: 1px solid rgba(186, 230, 253, 0.8);
@@ -365,7 +364,7 @@
     border-color: rgba(125, 211, 252, 0.9);
 }
 
-/* --- 英雄卡片内容区 --- */
+/* --- Hero copy --- */
 .hero-content {
     display: grid;
     gap: 16px;
@@ -415,7 +414,7 @@
     color: rgba(15, 23, 42, 0.75);
 }
 
-/* --- 英雄卡片按钮 --- */
+/* --- Hero actions --- */
 .hero-actions {
     display: flex;
     gap: 14px;
@@ -465,7 +464,7 @@
 
 
 /* ==========================================================================
-   3. 右侧视觉区与动效 (Hero Visual & Animations)
+   3. Hero visual and motion
    ========================================================================== */
 .hero-visual {
     position: relative;
@@ -523,7 +522,7 @@
     text-transform: uppercase;
 }
 
-/* --- 浅色模式下的右侧视觉 --- */
+/* --- Hero visual, light theme --- */
 [data-theme="light"] .hero-orb {
     background: radial-gradient(circle, rgba(56, 189, 248, 0.35), rgba(255, 255, 255, 0));
     box-shadow: 0 0 40px rgba(56, 189, 248, 0.15);
@@ -533,7 +532,7 @@
 [data-theme="light"] .hero-lines { border-color: rgba(56, 189, 248, 0.25); }
 [data-theme="light"] .hero-visual-text { color: #64748b; }
 
-/* 关键帧动画 */
+/* Keyframes */
 @keyframes orbPulse {
     0% { transform: scale(0.95); opacity: 0.8; }
     100% { transform: scale(1.05); opacity: 1; }
@@ -544,7 +543,7 @@
     100% { transform: rotate(372deg); }
 }
 
-/* 响应式调整 */
+/* Responsive */
 @media (max-width: 960px) {
     .hero-panel {
         grid-template-columns: 1fr;

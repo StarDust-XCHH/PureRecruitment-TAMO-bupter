@@ -2,136 +2,136 @@
     <div class="card jobs-hall-card">
         <div class="overview-top" id="jobsHallHeading">
             <div>
-                <h1>职位大厅</h1>
-                <p class="muted">浏览等待招聘的课程卡片，当前阶段保留搜索、详情入口与容器骨架。</p>
+                <h1>Job board</h1>
+                <p class="muted">Browse open course postings—search, open details, and apply when ready.</p>
             </div>
             <div class="overview-badges">
-                <span class="pill" id="openCoursesCount">开放课程 8</span>
+                <span class="pill" id="openCoursesCount">Open courses 8</span>
                 <button id="refreshJobsBtn" class="refresh-btn pill" type="button">
                     <span class="refresh-icon">↻</span>
-                    <span class="refresh-text">刷新列表</span>
+                    <span class="refresh-text">Refresh list</span>
                 </button>
             </div>
         </div>
         <label class="job-search-box" for="jobSearchInput">
             <span class="job-search-icon" aria-hidden="true">⌕</span>
-            <input id="jobSearchInput" type="text" placeholder="搜索课程编号 / 名称 / 标签">
+            <input id="jobSearchInput" type="text" placeholder="Search code, title, or tags">
         </label>
         <div class="job-board course-board" id="jobBoard">
-            <div class="job-card course-job-card" tabindex="0" role="button" aria-label="查看 软件工程基础训练营 详情" data-job-detail-card data-course-code="MO-SE-628">
+            <div class="job-card course-job-card" tabindex="0" role="button" aria-label="View Software Engineering Case Studio details" data-job-detail-card data-course-code="MO-SE-206">
                 <div class="course-card-topline">
-                    <span class="job-code">MO-SE-628</span>
-                    <span class="pill">开课 MO</span>
+                    <span class="job-code">MO-SE-206</span>
+                    <span class="pill">MO-led</span>
                 </div>
-                <h4>软件工程基础训练营</h4>
+                <h4>Software Engineering Case Studio</h4>
                 <div class="job-tags">
-                    <span class="pill">软件工程</span>
-                    <span class="pill">基础训练营</span>
-                    <span class="pill">3月课程</span>
+                    <span class="pill">Software engineering</span>
+                    <span class="pill">Case studio</span>
+                    <span class="pill">March</span>
                 </div>
                 <div class="course-meta-stack">
                     <div class="course-meta-item">
-                        <span class="course-meta-label">课程时间</span>
-                        <strong>03-20 · 17:00-19:00</strong>
+                        <span class="course-meta-label">Schedule</span>
+                        <strong>03-30 · 09:00-12:00</strong>
                     </div>
                     <div class="course-meta-item">
-                        <span class="course-meta-label">招聘状态</span>
-                        <strong>等待招募 TA</strong>
+                        <span class="course-meta-label">Hiring status</span>
+                        <strong>Recruiting TA</strong>
                     </div>
                 </div>
                 <div class="course-card-hint">
-                    <span>点击查看详情</span>
+                    <span>View details</span>
                     <span aria-hidden="true">→</span>
                 </div>
             </div>
-            <div class="job-card course-job-card" tabindex="0" role="button" aria-label="查看 编译原理方法论专题 详情" data-job-detail-card data-course-code="MO-PL-403">
+            <div class="job-card course-job-card" tabindex="0" role="button" aria-label="View NLP Methods Studio details" data-job-detail-card data-course-code="MO-NLP-383">
                 <div class="course-card-topline">
-                    <span class="job-code">MO-PL-403</span>
-                    <span class="pill">开课 MO</span>
+                    <span class="job-code">MO-NLP-383</span>
+                    <span class="pill">MO-led</span>
                 </div>
-                <h4>编译原理方法论专题</h4>
+                <h4>Natural Language Processing Methods Studio</h4>
                 <div class="job-tags">
-                    <span class="pill">编译原理</span>
-                    <span class="pill">方法论专题</span>
-                    <span class="pill">项目实践</span>
+                    <span class="pill">NLP</span>
+                    <span class="pill">Methods studio</span>
+                    <span class="pill">March</span>
                 </div>
                 <div class="course-meta-stack">
                     <div class="course-meta-item">
-                        <span class="course-meta-label">课程时间</span>
-                        <strong>03-16 · 12:30-14:30</strong>
+                        <span class="course-meta-label">Schedule</span>
+                        <strong>03-19 · 15:00-17:00</strong>
                     </div>
                     <div class="course-meta-item">
-                        <span class="course-meta-label">招聘状态</span>
-                        <strong>等待招募 TA</strong>
+                        <span class="course-meta-label">Hiring status</span>
+                        <strong>Recruiting TA</strong>
                     </div>
                 </div>
                 <div class="course-card-hint">
-                    <span>点击查看详情</span>
+                    <span>View details</span>
                     <span aria-hidden="true">→</span>
                 </div>
             </div>
-            <div class="job-card course-job-card" tabindex="0" role="button" aria-label="查看 数据科学综合实验 详情" data-job-detail-card data-course-code="MO-DS-820">
+            <div class="job-card course-job-card" tabindex="0" role="button" aria-label="View Data Science Case Studio details" data-job-detail-card data-course-code="MO-DS-457">
                 <div class="course-card-topline">
-                    <span class="job-code">MO-DS-820</span>
-                    <span class="pill">开课 MO</span>
+                    <span class="job-code">MO-DS-457</span>
+                    <span class="pill">MO-led</span>
                 </div>
-                <h4>数据科学综合实验</h4>
+                <h4>Data Science Case Studio</h4>
                 <div class="job-tags">
-                    <span class="pill">数据科学</span>
-                    <span class="pill">综合实验</span>
-                    <span class="pill">案例分析</span>
+                    <span class="pill">Data science</span>
+                    <span class="pill">Case studio</span>
+                    <span class="pill">March</span>
                 </div>
                 <div class="course-meta-stack">
                     <div class="course-meta-item">
-                        <span class="course-meta-label">课程时间</span>
-                        <strong>03-20 · 16:30-18:30</strong>
+                        <span class="course-meta-label">Schedule</span>
+                        <strong>03-16 · 09:00-12:00</strong>
                     </div>
                     <div class="course-meta-item">
-                        <span class="course-meta-label">招聘状态</span>
-                        <strong>等待招募 TA</strong>
+                        <span class="course-meta-label">Hiring status</span>
+                        <strong>Recruiting TA</strong>
                     </div>
                 </div>
                 <div class="course-card-hint">
-                    <span>点击查看详情</span>
+                    <span>View details</span>
                     <span aria-hidden="true">→</span>
                 </div>
             </div>
-            <div class="job-card course-job-card" tabindex="0" role="button" aria-label="查看 机器学习进阶实战 详情" data-job-detail-card data-course-code="MO-ML-284">
+            <div class="job-card course-job-card" tabindex="0" role="button" aria-label="View Machine Learning Fundamentals Bootcamp details" data-job-detail-card data-course-code="MO-ML-918">
                 <div class="course-card-topline">
-                    <span class="job-code">MO-ML-284</span>
-                    <span class="pill">开课 MO</span>
+                    <span class="job-code">MO-ML-918</span>
+                    <span class="pill">MO-led</span>
                 </div>
-                <h4>机器学习进阶实战</h4>
+                <h4>Machine Learning Fundamentals Bootcamp</h4>
                 <div class="job-tags">
-                    <span class="pill">机器学习</span>
-                    <span class="pill">进阶实战</span>
-                    <span class="pill">岗位训练</span>
+                    <span class="pill">Machine learning</span>
+                    <span class="pill">Bootcamp</span>
+                    <span class="pill">March</span>
                 </div>
                 <div class="course-meta-stack">
                     <div class="course-meta-item">
-                        <span class="course-meta-label">课程时间</span>
-                        <strong>03-23 · 12:30-14:30</strong>
+                        <span class="course-meta-label">Schedule</span>
+                        <strong>03-17 · 17:00-20:00</strong>
                     </div>
                     <div class="course-meta-item">
-                        <span class="course-meta-label">招聘状态</span>
-                        <strong>等待招募 TA</strong>
+                        <span class="course-meta-label">Hiring status</span>
+                        <strong>Recruiting TA</strong>
                     </div>
                 </div>
                 <div class="course-card-hint">
-                    <span>点击查看详情</span>
+                    <span>View details</span>
                     <span aria-hidden="true">→</span>
                 </div>
             </div>
         </div>
-        <div class="job-pagination" aria-label="职位大厅分页" id="jobPagination"></div>
+        <div class="job-pagination" aria-label="Job board pagination" id="jobPagination"></div>
         <div class="job-extra course-job-extra">
             <div class="task-row">
-                <span>系统提示：本周内优先开放 MO 待招聘课程，点击卡片可查看完整课程介绍与申请入口。</span>
-                <span class="pill">本周新增 3 门</span>
+                <span>Tip: MO postings refresh through the week—open a card for the full description and apply link.</span>
+                <span class="pill">3 new this week</span>
             </div>
             <div class="task-row">
-                <span>推荐策略：优先展示与你技能画像和最近投递方向更接近的课程。</span>
-                <span class="pill">推荐匹配度 88%</span>
+                <span>Recommendations favor courses that match your skills and recent applications.</span>
+                <span class="pill">Match score 88%</span>
             </div>
         </div>
     </div>

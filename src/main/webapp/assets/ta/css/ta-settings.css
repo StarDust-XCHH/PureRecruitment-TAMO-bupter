@@ -150,7 +150,7 @@
 }
 
 .settings-avatar::after {
-    content: "点击更换头像";
+    content: "Change avatar";
     position: absolute;
     left: 50%;
     bottom: 12px;

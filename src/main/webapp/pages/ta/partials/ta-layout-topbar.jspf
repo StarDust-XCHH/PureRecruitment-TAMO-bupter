@@ -1,7 +1,7 @@
 <div class="topbar">
     <div class="greeting">
-        <h1 id="welcomeTitle">欢迎回来，<span id="welcomeName">TA</span></h1>
-        <p>在这里管理你的档案、申请与工作台设置入口。</p>
+        <h1 id="welcomeTitle">Welcome back, <span id="welcomeName">TA</span></h1>
+        <p>Manage your profile, applications, and workspace shortcuts here.</p>
     </div>
     <div class="topbar-actions">
         <button class="user-trigger" id="userTrigger" type="button" aria-haspopup="dialog" aria-expanded="false">
@@ -9,7 +9,7 @@
             <span class="user-name" id="userName">Seele</span>
             <span class="user-caret" aria-hidden="true">▾</span>
         </button>
-        <button class="logout-btn" id="logoutBtn" type="button">退出登录</button>
-        <button class="theme-toggle" id="themeToggle" aria-label="切换主题" type="button">🌙</button>
+        <button class="logout-btn" id="logoutBtn" type="button">Sign out</button>
+        <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme" type="button">🌙</button>
     </div>
 </div>

@@ -2,27 +2,27 @@
     <div class="card">
         <div class="overview-top">
             <div>
-                <h1>应聘筛选</h1>
-                <p class="muted">支持查看 TA 资料，并将录用/拒绝结果回写到 TA 申请状态数据。</p>
+                <h1>Applicant review</h1>
+                <p class="muted">Inspect TA profiles; hire/reject updates TA application status.</p>
             </div>
             <div class="overview-badges">
-                <span class="pill">故事 8：查看应聘者</span>
-                <span class="pill">故事 9：选择应聘者</span>
+                <span class="pill">Story 8: View applicants</span>
+                <span class="pill">Story 9: Select applicants</span>
             </div>
         </div>
 
         <div class="mo-applicants-toolbar">
-            <label for="applicantCourseSelect">选择课程岗位</label>
+            <label for="applicantCourseSelect">Select a posting</label>
             <select id="applicantCourseSelect"></select>
-            <button class="pill-btn ghost" id="refreshApplicantsBtn" type="button">刷新候选人</button>
+            <button class="pill-btn ghost" id="refreshApplicantsBtn" type="button">Refresh candidates</button>
             <span class="muted" id="applicantsStatusText"></span>
         </div>
 
         <div class="mo-applicant-list" id="applicantList"></div>
         <div class="empty-state" id="applicantEmptyState" hidden>
             <div class="empty-state__icon">🗂️</div>
-            <h3>暂无候选人</h3>
-            <p>请先选择岗位或发布新岗位，系统将聚合 TA 候选池。</p>
+            <h3>No candidates yet</h3>
+            <p>Pick a posting or publish a new one to load the TA candidate pool.</p>
         </div>
     </div>
 </div>

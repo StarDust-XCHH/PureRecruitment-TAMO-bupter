@@ -2,13 +2,13 @@
     <div class="card">
         <div class="overview-top">
             <div>
-                <h1>我的 TA 工作台</h1>
-                <p class="muted">实时同步档案概览，并为设置中心、投递追踪与详情弹窗预留入口。</p>
+                <h1>My TA workspace</h1>
+                <p class="muted">Profile snapshot with quick entry to settings, application tracking, and detail modals.</p>
             </div>
             <div class="overview-badges">
-                <span class="pill">身份：Teaching Assistant</span>
-                <span class="pill">学期：2026 Spring</span>
-                <span class="pill">状态：申请活跃</span>
+                <span class="pill">Role: Teaching Assistant</span>
+                <span class="pill">Term: 2026 Spring</span>
+                <span class="pill">Status: Actively applying</span>
             </div>
         </div>
         <div class="stat-grid insight-grid insight-grid-spaced">
@@ -16,23 +16,23 @@
                 <div class="insight-card-header">
                     <span class="insight-icon plane-icon" aria-hidden="true"></span>
                     <div>
-                        <p class="insight-label">投递追踪</p>
-                        <p class="insight-subtitle">查看当前申请推进情况</p>
+                        <p class="insight-label">Application tracker</p>
+                        <p class="insight-subtitle">See how each application is moving</p>
                     </div>
                 </div>
                 <div class="insight-core-number">3</div>
-                <p class="insight-meta">2 待处理 ｜ 1 面试中</p>
+                <p class="insight-meta">2 open · 1 in interview</p>
             </div>
             <div class="insight-card radar-card" data-modal-target="recommend">
                 <div class="insight-card-header">
                     <span class="insight-icon radar-icon" aria-hidden="true"></span>
                     <div>
-                        <p class="insight-label">岗位雷达</p>
-                        <p class="insight-subtitle">保留推荐职位详情骨架</p>
+                        <p class="insight-label">Job radar</p>
+                        <p class="insight-subtitle">Recommended roles at a glance</p>
                     </div>
                 </div>
                 <div class="insight-core-number accent-positive">+5</div>
-                <p class="insight-meta">匹配技能：Java / Python / 数据结构</p>
+                <p class="insight-meta">Skills: Java / Python / Data structures</p>
             </div>
             <div class="insight-card profile-strength-card" data-modal-target="checklist">
                 <div class="profile-strength-content">
@@ -43,12 +43,12 @@
                         <div class="insight-card-header">
                             <span class="insight-icon badge-icon" aria-hidden="true"></span>
                             <div>
-                                <p class="insight-label">资料完善度</p>
-                                <p class="insight-subtitle">设置中心后续联动入口</p>
+                                <p class="insight-label">Profile strength</p>
+                                <p class="insight-subtitle">Tied to the settings center</p>
                             </div>
                         </div>
-                        <p class="insight-meta">评级：极佳（S）</p>
-                        <p class="insight-subtext">请继续补充项目细节</p>
+                        <p class="insight-meta">Rating: Excellent (S)</p>
+                        <p class="insight-subtext">Add more project detail to stand out</p>
                     </div>
                 </div>
             </div>
@@ -56,25 +56,25 @@
                 <div class="insight-card-header">
                     <span class="insight-icon calendar-icon" aria-hidden="true"></span>
                     <div>
-                        <p class="insight-label">待办日程</p>
-                        <p class="insight-subtitle">后续接入日程与任务规划</p>
+                        <p class="insight-label">Up next</p>
+                        <p class="insight-subtitle">Schedule and tasks (coming soon)</p>
                     </div>
                 </div>
                 <div class="insight-core-number accent-warn">2</div>
-                <p class="insight-meta">明日：1 场助教面试 ｜ 1 门课程</p>
+                <p class="insight-meta">Tomorrow: 1 TA interview · 1 class</p>
             </div>
         </div>
         <div class="hero-card" id="heroCard" aria-live="polite">
             <div class="hero-panel">
                 <div class="hero-content">
-                    <span class="hero-badge" id="heroBadge">💡 竞争力提升</span>
+                    <span class="hero-badge" id="heroBadge">💡 Stand out</span>
 
-                    <h3 class="hero-title" id="heroTitle">你的硬件开发经历很棒，但还可以更出彩。</h3>
-                    <p class="hero-desc" id="heroDesc">目前简历的整体竞争力为 84%。如果在简历中补充一下你最近在做的那个带有 2D 激光雷达和 IMU 传感器融合的项目细节，击败率有望突破 90%。</p>
+                    <h3 class="hero-title" id="heroTitle">Your hardware background is strong—let’s make it unforgettable.</h3>
+                    <p class="hero-desc" id="heroDesc">Overall profile strength is 84%. Adding detail on your recent 2D LiDAR + IMU fusion project could push you past 90% match on similar roles.</p>
 
                     <div class="hero-actions">
-                        <button class="hero-btn primary" type="button" id="heroPrimary">立即去更新简历</button>
-                        <button class="hero-btn ghost" type="button" id="heroSecondary">稍后处理</button>
+                        <button class="hero-btn primary" type="button" id="heroPrimary">Update profile</button>
+                        <button class="hero-btn ghost" type="button" id="heroSecondary">Maybe later</button>
                     </div>
                 </div>
 

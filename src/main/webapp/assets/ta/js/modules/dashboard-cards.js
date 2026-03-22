@@ -15,30 +15,30 @@
         const heroScenarios = [
             {
                 key: 'urgent',
-                badge: '⏰ 紧急待办',
-                title: 'Seele，明天下午有一场微处理器课程的 TA 面试。',
-                desc: '教授留言提醒你需要准备一段关于 C 语言和底层通信逻辑的试讲。点击下方按钮查看面试指南与注意事项。',
-                primary: '查看面试详情',
-                secondary: '已准备妥当',
+                badge: '⏰ Action needed',
+                title: 'Seele, you have a microprocessors TA interview tomorrow afternoon.',
+                desc: 'Your instructor asked you to prepare a short demo on C and low-level communication. Open the guide for tips and what to bring.',
+                primary: 'Interview details',
+                secondary: 'I am ready',
                 modalTarget: 'planner',
                 routeJump: 'profile'
             },
             {
                 key: 'opportunity',
-                badge: '✨ 极佳匹配',
-                title: '发现一个与你技能点高度重合的新岗位！',
-                desc: '刚刚发布了一个【自主导航与机器人学 TA】的空缺。系统分析了你的历史经历，发现你在 ROS、SLAM 算法以及 STM32 硬件部署方面的实战经验与该岗位 95% 匹配，目前竞争者较少。',
-                primary: '一键投递简历',
-                secondary: '查看岗位详情',
+                badge: '✨ Strong match',
+                title: 'A new role lines up closely with your skills.',
+                desc: 'An Autonomous Navigation & Robotics TA opening just went live. Based on your background in ROS, SLAM, and STM32 deployment, you are about a 95% match and competition looks light so far.',
+                primary: 'Apply now',
+                secondary: 'View posting',
                 routeJump: 'jobs'
             },
             {
                 key: 'growth',
-                badge: '💡 竞争力提升',
-                title: '你的硬件开发经历很棒，但还可以更出彩。',
-                desc: '目前简历的整体竞争力为 84%。如果能在简历中补充一下你最近在做的那个带有 2D 激光雷达和 IMU 传感器融合的项目细节，击败率有望突破 90%。',
-                primary: '立即去更新简历',
-                secondary: '稍后处理',
+                badge: '💡 Stand out more',
+                title: 'Your hardware experience is solid—one more detail could lift your profile.',
+                desc: 'Overall strength is around 84%. Adding specifics on your recent 2D LiDAR + IMU fusion project could push you past 90%.',
+                primary: 'Update profile',
+                secondary: 'Remind me later',
                 modalTarget: 'checklist',
                 routeJump: 'profile'
             }
@@ -108,7 +108,7 @@
                 btn.classList.add('applied');
                 btn.textContent = btn.dataset.applyLabelDone || '✓ Applied';
                 if (btn.id === 'jobDetailApplyBtn' && app.jobDetailStatus) {
-                    app.jobDetailStatus.textContent = '已申请';
+                    app.jobDetailStatus.textContent = 'Applied';
                 }
             });
         });

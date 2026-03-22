@@ -1,8 +1,8 @@
 <div class="welcome-card show">
     <div class="badge">MO</div>
     <div>
-        <h3>MO 工作台原型</h3>
-        <p>基于 TA 架构复用模块，当前为中保真设计：支持岗位发布、应聘者浏览与录用状态回写。</p>
-        <span class="hint">遵循 handout：JSON 存储 + Servlet/JSP</span>
+        <h3>MO workspace prototype</h3>
+        <p>Reuses the TA shell: publish jobs, browse applicants, and write hiring status back to TA data.</p>
+        <span class="hint">Handout stack: JSON files + Servlet/JSP</span>
     </div>
 </div>

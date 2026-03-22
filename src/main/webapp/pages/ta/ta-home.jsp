@@ -1,10 +1,10 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="dark">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TA 工作台</title>
+    <title>TA workspace</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/ta/css/ta-layout.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/ta/css/ta-components.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/ta/css/ta-dashboard-cards.css">
@@ -42,8 +42,8 @@
 <script src="${pageContext.request.contextPath}/assets/ta/js/modules/profile.js"></script>
 <script src="${pageContext.request.contextPath}/assets/ta/js/modules/password.js"></script>
 <script src="${pageContext.request.contextPath}/assets/ta/js/modules/job-board.js"></script>
-<script src="${pageContext.request.contextPath}/assets/ta/js/modules/dashboard-cards.js"></script>
-<script src="${pageContext.request.contextPath}/assets/ta/js/modules/status.js"></script>
+<script src="${pageContext.request.contextPath}/assets/ta/js/modules/dashboard-cards.js?v=20260322-en-hero"></script>
+<script src="${pageContext.request.contextPath}/assets/ta/js/modules/status.js?v=20260322-en-status"></script>
 <script src="${pageContext.request.contextPath}/assets/ta/js/modules/onboarding.js"></script>
 <script src="${pageContext.request.contextPath}/assets/ta/js/ta-home.js"></script>
 </body>

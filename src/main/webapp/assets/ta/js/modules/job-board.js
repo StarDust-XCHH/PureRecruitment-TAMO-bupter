@@ -54,7 +54,7 @@
             if (jobDetailLocation) jobDetailLocation.textContent = course.location;
             if (jobDetailStudentCount) jobDetailStudentCount.textContent = course.studentCountText;
             if (jobDetailStatus) jobDetailStatus.textContent = course.status;
-            if (jobDetailWorkload) jobDetailWorkload.textContent = course.workload || '待确认';
+            if (jobDetailWorkload) jobDetailWorkload.textContent = course.workload || 'TBD';
             if (jobDetailDescription) jobDetailDescription.textContent = course.description;
             if (jobDetailSuggestion) jobDetailSuggestion.textContent = course.suggestion;
 
@@ -187,27 +187,27 @@
                 isJobFetching = true;
                 if (btn) btn.disabled = true;
                 if (btnIcon) btnIcon.classList.add('spinning');
-                if (btnText) btnText.textContent = '更新中...';
+                if (btnText) btnText.textContent = 'Updating…';
 
-                console.log('[JOB-BOARD][fetch] 请求地址=', requestUrl);
+                console.log('[JOB-BOARD][fetch] url=', requestUrl);
 
                 const response = await fetch(requestUrl, {
                     method: 'GET',
                     headers: { Accept: 'application/json' }
                 });
 
-                if (!response.ok) throw new Error('网络请求失败，status=' + response.status);
+                if (!response.ok) throw new Error('Request failed, status=' + response.status);
 
                 const data = await response.json();
 
                 if (data.schema === 'error' || !data.items) {
-                    console.error('后端未返回正确数据');
+                    console.error('Invalid job board payload');
                     return;
                 }
 
                 const countBadge = document.getElementById('openCoursesCount');
                 if (countBadge) {
-                    countBadge.textContent = '开放课程 ' + data.items.length;
+                    countBadge.textContent = 'Open courses ' + data.items.length;
                 }
 
                 courseDetailState = {};
@@ -216,9 +216,9 @@
                 data.items.forEach(function (item) {
                     const keywordTags = Array.isArray(item.keywordTags) ? item.keywordTags : [];
                     const checklist = Array.isArray(item.checklist) ? item.checklist : [];
-                    const courseLocation = item.courseLocation || '待安排';
+                    const courseLocation = item.courseLocation || 'TBD';
                     const studentCount = Number.isFinite(Number(item.studentCount)) ? Number(item.studentCount) : 0;
-                    const studentCountText = studentCount > 0 ? studentCount + ' 人' : '待确认';
+                    const studentCountText = studentCount > 0 ? studentCount + ' students' : 'TBD';
 
                     courseDetailState[item.courseCode] = {
                         code: item.courseCode,
@@ -242,7 +242,7 @@
                     }).join('');
 
                     newCardsHTML.push(
-                        '<div class="job-card course-job-card" tabindex="0" role="button" aria-label="查看 ' + item.courseName + ' 详情" data-job-detail-card data-course-code="' + item.courseCode + '">' +
+                        '<div class="job-card course-job-card" tabindex="0" role="button" aria-label="View ' + item.courseName + ' details" data-job-detail-card data-course-code="' + item.courseCode + '">' +
                         '<div class="course-card-topline">' +
                         '<span class="job-code">' + item.courseCode + '</span>' +
                         '<span class="course-mo-badge">' + item.moName + '</span>' +
@@ -253,24 +253,24 @@
                         '</div>' +
                         '<div class="course-meta-stack">' +
                         '<div class="course-meta-item">' +
-                        '<span class="course-meta-label">课程时间</span>' +
+                        '<span class="course-meta-label">Schedule</span>' +
                         '<strong>' + item.courseDate + ' · ' + item.courseTime + '</strong>' +
                         '</div>' +
                         '<div class="course-meta-item">' +
-                        '<span class="course-meta-label">上课地点</span>' +
+                        '<span class="course-meta-label">Location</span>' +
                         '<strong>' + courseLocation + '</strong>' +
                         '</div>' +
                         '<div class="course-meta-item">' +
-                        '<span class="course-meta-label">学生人数</span>' +
+                        '<span class="course-meta-label">Enrollment</span>' +
                         '<strong>' + studentCountText + '</strong>' +
                         '</div>' +
                         '<div class="course-meta-item">' +
-                        '<span class="course-meta-label">招聘状态</span>' +
+                        '<span class="course-meta-label">Hiring status</span>' +
                         '<strong>' + item.status + '</strong>' +
                         '</div>' +
                         '</div>' +
                         '<div class="course-card-hint">' +
-                        '<span>点击查看详情</span>' +
+                        '<span>View details</span>' +
                         '<span aria-hidden="true">→</span>' +
                         '</div>' +
                         '</div>'
@@ -286,12 +286,12 @@
                 currentJobsPage = '1';
                 renderJobsBoard();
             } catch (error) {
-                console.error('拉取岗位数据异常:', error);
+                console.error('Job board fetch failed:', error);
             } finally {
                 isJobFetching = false;
                 if (btn) btn.disabled = false;
                 if (btnIcon) btnIcon.classList.remove('spinning');
-                if (btnText) btnText.textContent = '刷新列表';
+                if (btnText) btnText.textContent = 'Refresh list';
             }
         }
 

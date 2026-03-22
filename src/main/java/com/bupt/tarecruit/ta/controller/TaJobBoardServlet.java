@@ -43,7 +43,7 @@ public class TaJobBoardServlet extends HttpServlet {
             JsonObject payload = taAccountDao.getPendingJobBoardData();
             if (payload == null || !payload.has("items") || !payload.get("items").isJsonArray()) {
                 response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                writer.write(buildErrorResponse("暂无开放招聘的岗位数据或数据文件不存在"));
+                writer.write(buildErrorResponse("No open job postings found or data file is missing"));
                 logInfo("RESPONSE", "status=" + response.getStatus() + ", durationMs=" + (System.currentTimeMillis() - startTime));
                 return;
             }
@@ -58,7 +58,7 @@ public class TaJobBoardServlet extends HttpServlet {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             try (PrintWriter writer = response.getWriter()) {
-                writer.write(buildErrorResponse("服务器内部错误，读取岗位数据失败"));
+                writer.write(buildErrorResponse("Server error while loading job postings"));
             }
         }
     }

@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "settings",
     "version": "1.0",
-    "updatedAt": "2026-03-21T14:04:52.539897300Z"
+    "updatedAt": "2026-03-22T11:51:28.653241700Z"
   },
   "items": [
     {
@@ -24,7 +24,7 @@
       "profileSaved": true,
       "profileSavedAt": "2026-03-16T19:15:37.101489700Z",
       "lastProfileSyncStatus": "success",
-      "lastProfileSyncMessage": "资料保存成功",
+      "lastProfileSyncMessage": "Profile saved successfully",
       "updatedAt": "2026-03-16T19:15:37.101489700Z",
       "avatar": "image/TA-10258_1773688536990_cbe066f0e82c43b8ab7b5f6623eda88b.png",
       "onboardingCompletedAt": "",

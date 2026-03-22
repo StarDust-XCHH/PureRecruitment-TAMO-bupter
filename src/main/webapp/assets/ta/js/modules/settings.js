@@ -26,7 +26,7 @@
         try {
             userData = userRaw ? JSON.parse(userRaw) : null;
         } catch (error) {
-            console.warn('[TA-ONBOARD] ta-user 解析失败：', error, userRaw);
+            console.warn('[TA-SETTINGS] failed to parse ta-user:', error, userRaw);
         }
 
         app.state.settings = {
@@ -88,7 +88,7 @@
             if (welcomeName) {
                 welcomeName.textContent = displayName;
             } else {
-                welcomeTitle.textContent = '欢迎回来，' + displayName;
+                welcomeTitle.textContent = 'Welcome back, ' + displayName;
             }
             if (userName) userName.textContent = displayName;
             debugThemeLog('welcome-title-updated', { reason, displayName });
@@ -185,7 +185,7 @@
         }
 
         if (!ensureLoggedIn()) {
-            throw new Error('未登录，已重定向到登录页');
+            throw new Error('Not signed in; redirecting to login');
         }
 
         applyWelcomeTitle('init');
@@ -194,7 +194,7 @@
 
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => {
-                if (!window.confirm('确认退出登录吗？')) return;
+                if (!window.confirm('Sign out?')) return;
                 setUserData(null);
                 redirectToLogin();
             });

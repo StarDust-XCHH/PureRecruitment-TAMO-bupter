@@ -1,8 +1,8 @@
-<div class="welcome-card actionable" id="welcomeCard" role="button" tabindex="0" aria-label="首次登录提示，点击打开个人信息设置">
-    <div class="badge">新</div>
+<div class="welcome-card actionable" id="welcomeCard" role="button" tabindex="0" aria-label="First-time hint: open profile settings">
+    <div class="badge">New</div>
     <div>
-        <h3>首次登录提示</h3>
-        <p>欢迎加入 TA 招聘系统！本阶段先完成工作台骨架、设置中心入口与核心弹窗容器铺设。</p>
-        <button class="hint hint-link" id="welcomeProfileHint" type="button">建议从右上角个人信息与设置中心开始</button>
+        <h3>First-time hint</h3>
+        <p>Welcome to the TA recruitment workspace—this build focuses on layout, settings entry, and modal shells.</p>
+        <button class="hint hint-link" id="welcomeProfileHint" type="button">Start from the profile & settings entry on the top right</button>
     </div>
 </div>
