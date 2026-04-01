@@ -111,4 +111,5 @@
 ## 写入与治理说明
 
 - MO 发布会写入业务字段，并对治理/流程类字段做 **默认值占位**；后续由 TA/Admin 流程更新计数与时间戳等，详见 `docs/recruitment-courses-governance-notes.md`。
+- `GET /api/mo/jobs` 仅在响应中做 v2 归一化，**不会**因刷新列表而改写本文件，避免影响其它课程的磁盘数据。
 - 服务端路径由 `DataMountPaths.moRecruitmentCourses()` 解析，默认指向本目录下的 `recruitment-courses.json`。

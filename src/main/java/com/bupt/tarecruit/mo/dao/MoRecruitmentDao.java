@@ -62,15 +62,10 @@ public class MoRecruitmentDao {
         payload.addProperty("count", normalizedItems.size());
         payload.add("items", normalizedItems);
 
-        // Persist normalized v2 items so legacy records are migrated gradually.
-        root.addProperty("schema", JOB_BOARD_SCHEMA);
-        root.addProperty("version", JOB_BOARD_VERSION);
-        root.addProperty("generatedAt", Instant.now().toString());
-        root.addProperty("count", normalizedItems.size());
-        root.add("items", normalizedItems.deepCopy());
-        updateMeta(root, JOB_BOARD_SCHEMA, JOB_BOARD_ENTITY, JOB_BOARD_VERSION);
-        writeJson(MO_PENDING_COURSES, root);
-
+        // Read path does not write the file: avoids rewriting every item (e.g. stripping optional
+        // empty keys on unrelated courses) whenever MO lists jobs. Normalization is for the response
+        // only; persistence happens on createCourse / other explicit writes. Legacy rows on disk may
+        // stay pre-v2-shaped until edited or migrated elsewhere.
         return payload;
     }
 

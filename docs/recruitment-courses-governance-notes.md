@@ -13,6 +13,12 @@
 - **EN:** Not implemented now: TA/Admin-side business logic that updates governance/process placeholders.
 - **中文：** 未实现：由 TA/Admin 侧业务逻辑更新 governance / process 类占位字段。
 
+## Read vs write (MO list API) / 读取与写回（MO 列表接口）
+
+**EN:** `GET /api/mo/jobs` applies v2 normalization when building the JSON **response** only. It does **not** persist that normalization to `recruitment-courses.json`, so unrelated courses are not rewritten when the list is refreshed.
+
+**中文：** `GET /api/mo/jobs` 仅在组装**响应**时对记录做 v2 归一化，**不会**把归一化结果写回 `recruitment-courses.json`，因此刷新岗位列表不会改写磁盘上其它课程的数据。
+
 ## Field Ownership / 字段归属
 
 **EN:** MO publish writes:

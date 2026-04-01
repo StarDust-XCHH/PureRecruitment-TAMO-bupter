@@ -36,6 +36,7 @@ This log tracks MO-side changes that interact with TA-side interfaces or TA data
     - `items`
   - Reads from:
     - `mountDataTAMObupter/common/recruitment-courses.json`
+  - Normalizes each item **in memory** for the response only; **does not** write `recruitment-courses.json`. Listing jobs therefore does not rewrite or “clean up” other courses on disk.
 
 - `POST /api/mo/jobs`
   - Creates one MO job using semester-scale fields (see `docs/mo-job-board-api-v2.md`).
@@ -88,14 +89,14 @@ This log tracks MO-side changes that interact with TA-side interfaces or TA data
   - `docs/mo-job-board-api-v2.md`
 - Current MO backend behavior:
   - accepts v2 fields in `POST /api/mo/jobs`
-  - returns normalized v2 payload in `GET /api/mo/jobs`
+  - returns normalized v2 payload in `GET /api/mo/jobs` (normalization is **not** persisted by that GET)
   - initializes `recruitedCount=0` and other placeholder fields on publish
   - keeps compatibility mirror field `status = recruitmentStatus` for existing readers
   - uses shared path resolver in `common` package for MO/TA JSON mount paths
 
 - Current TA backend behavior for job board:
   - `GET /api/ta/jobs` reads from the same `mountDataTAMObupter/common/recruitment-courses.json` file
-  - returns `items` as pass-through normalized payload (does not implement new field lifecycle updates)
+  - returns `items` largely as stored on disk (pass-through); not the same code path as MO’s in-memory `normalizeJobItem` (TA-side lifecycle updates for new fields are not implemented here)
 
 ## Notes
 
