@@ -69,7 +69,7 @@ public class MoRecruitmentDao {
         return payload;
     }
 
-    public synchronized JsonObject createCourse(String moName, JsonObject input) throws IOException {
+    public synchronized JsonObject createCourse(JsonObject input) throws IOException {
         JsonObject root = ensureStructuredFile(
                 MO_PENDING_COURSES,
                 JOB_BOARD_SCHEMA,
@@ -79,7 +79,6 @@ public class MoRecruitmentDao {
         JsonArray items = root.getAsJsonArray("items");
 
         String now = Instant.now().toString();
-        String finalMoName = moName == null || moName.isBlank() ? "MO" : moName.trim();
         String courseName = trim(getAsString(input, "courseName"));
         if (courseName.isEmpty()) {
             throw new IllegalArgumentException("课程名称不能为空");
@@ -109,7 +108,8 @@ public class MoRecruitmentDao {
         if (courseDescription.isEmpty()) {
             throw new IllegalArgumentException("岗位描述不能为空");
         }
-        String ownerMoName = firstNonBlank(trim(getAsString(input, "ownerMoName")), finalMoName);
+        String ownerMoName = firstNonBlank(trim(getAsString(input, "ownerMoName")),
+                firstNonBlank(trim(getAsString(input, "ownerMoId")), "MO"));
         String ownerMoId = firstNonBlank(trim(getAsString(input, "ownerMoId")), ownerMoName);
         String recruitmentBrief = trim(getAsString(input, "recruitmentBrief"));
         String workload = trim(getAsString(input, "workload"));
@@ -122,7 +122,6 @@ public class MoRecruitmentDao {
         item.addProperty("jobId", jobId);
         item.addProperty("courseCode", courseCode);
         item.addProperty("courseName", courseName);
-        item.addProperty("moName", finalMoName);
         item.addProperty("ownerMoId", ownerMoId);
         item.addProperty("ownerMoName", ownerMoName);
         if (!semester.isBlank()) {
@@ -178,6 +177,7 @@ public class MoRecruitmentDao {
 
         items.add(item);
         updateMeta(root, JOB_BOARD_SCHEMA, JOB_BOARD_ENTITY, JOB_BOARD_VERSION);
+        syncJobBoardFileEnvelope(root, items);
         writeJson(MO_PENDING_COURSES, root);
 
         JsonObject result = new JsonObject();
@@ -407,6 +407,15 @@ public class MoRecruitmentDao {
         meta.addProperty("updatedAt", Instant.now().toString());
     }
 
+    /** Keeps v2 top-level envelope (`count`, `generatedAt`, …) aligned with `items` on each publish. */
+    private void syncJobBoardFileEnvelope(JsonObject root, JsonArray items) {
+        String now = Instant.now().toString();
+        root.addProperty("schema", JOB_BOARD_SCHEMA);
+        root.addProperty("version", JOB_BOARD_VERSION);
+        root.addProperty("generatedAt", now);
+        root.addProperty("count", items.size());
+    }
+
     private void writeJson(Path path, JsonObject root) throws IOException {
         Files.createDirectories(path.getParent());
         try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
@@ -580,11 +589,14 @@ public class MoRecruitmentDao {
 
     private JsonObject normalizeJobItem(JsonObject source) {
         JsonObject item = source.deepCopy();
+        String legacyMoName = trim(getAsString(item, "moName"));
+        item.remove("moName");
         String courseName = firstNonBlank(getAsString(item, "courseName"), "Untitled TA Job");
         item.addProperty("courseName", courseName);
-        item.addProperty("moName", firstNonBlank(getAsString(item, "moName"), "MO"));
-        item.addProperty("ownerMoName", firstNonBlank(getAsString(item, "ownerMoName"), getAsString(item, "moName")));
-        item.addProperty("ownerMoId", firstNonBlank(getAsString(item, "ownerMoId"), getAsString(item, "ownerMoName")));
+        String ownerMoName = firstNonBlank(trim(getAsString(item, "ownerMoName")),
+                firstNonBlank(legacyMoName, "MO"));
+        item.addProperty("ownerMoName", ownerMoName);
+        item.addProperty("ownerMoId", firstNonBlank(trim(getAsString(item, "ownerMoId")), ownerMoName));
         if (trim(getAsString(item, "semester")).isBlank()) item.remove("semester");
         else item.addProperty("semester", trim(getAsString(item, "semester")));
         String recruitmentStatus = firstNonBlank(getAsString(item, "recruitmentStatus"), firstNonBlank(getAsString(item, "status"), "OPEN"));

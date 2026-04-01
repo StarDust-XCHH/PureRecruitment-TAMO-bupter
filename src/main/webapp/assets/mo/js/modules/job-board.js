@@ -130,6 +130,10 @@
             return [];
         }
 
+        function moOwnerLabel(item) {
+            return (item && (item.ownerMoName || item.ownerMoId)) || 'MO';
+        }
+
         function renderDetail(item) {
             const setText = function (id, text) {
                 const el = document.getElementById(id);
@@ -137,7 +141,7 @@
             };
             setText('jobDetailCode', getDisplayCode(item));
             setText('jobDetailName', item.courseName || '未命名岗位');
-            setText('jobDetailMo', item.moName);
+            setText('jobDetailMo', moOwnerLabel(item));
             setText('jobDetailDescription', item.recruitmentBrief || item.courseDescription);
             setText('jobDetailDate', item.teachingWeeks ? ('Week ' + weekText(item.teachingWeeks)) : '--');
             setText('jobDetailTime', '--');
@@ -176,6 +180,8 @@
                 const text = [
                     item.courseCode || item.jobId,
                     item.courseName,
+                    item.ownerMoName || '',
+                    item.ownerMoId || '',
                     item.recruitmentBrief || '',
                     item.courseDescription || '',
                     (item.requiredSkills && item.requiredSkills.fixedTags || []).join(' ')
@@ -195,7 +201,7 @@
                 card.setAttribute('tabindex', '0');
                 card.setAttribute('role', 'button');
                 card.innerHTML =
-                    '<div class="course-card-topline"><span class="job-code">' + getDisplayCode(item) + '</span><span class="pill">' + (item.moName || 'MO') + '</span></div>' +
+                    '<div class="course-card-topline"><span class="job-code">' + getDisplayCode(item) + '</span><span class="pill">' + moOwnerLabel(item) + '</span></div>' +
                     '<h4>' + (item.courseName || '未命名岗位') + '</h4>' +
                     '<div class="job-tags">' + toTags(item).map(function (tag) { return '<span class="pill">' + tag + '</span>'; }).join('') + '</div>' +
                     '<div class="course-meta-stack">' +
@@ -275,7 +281,6 @@
 
             const body = {
                 courseCode: courseCodeInput,
-                moName: moUsername,
                 ownerMoId: ownerMoId,
                 ownerMoName: moUsername,
                 courseName: courseNameInput,

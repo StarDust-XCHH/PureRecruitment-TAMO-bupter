@@ -26,7 +26,7 @@
 **中文：** MO 发布写入：
 
 - `jobId`, `courseCode`, `courseName`
-- `moName`, `ownerMoId`, `ownerMoName`
+- `ownerMoId`, `ownerMoName`
 - `semester`, `recruitmentStatus`, compatibility `status`
 - `courseDescription`, `recruitmentBrief`, `requiredSkills`
 - `teachingWeeks`, `assessmentEvents`

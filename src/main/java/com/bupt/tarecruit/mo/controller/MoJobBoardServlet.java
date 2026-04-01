@@ -33,10 +33,7 @@ public class MoJobBoardServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             JsonObject body = JsonParser.parseReader(req.getReader()).getAsJsonObject();
-            String moName = body.has("moName") && !body.get("moName").isJsonNull()
-                    ? body.get("moName").getAsString()
-                    : "MO";
-            JsonObject payload = recruitmentDao.createCourse(moName, body);
+            JsonObject payload = recruitmentDao.createCourse(body);
             writeJson(resp, 201, payload);
         } catch (IllegalStateException | ClassCastException ex) {
             writeJson(resp, 400, buildV2Error("请求体不是合法 JSON 对象"));

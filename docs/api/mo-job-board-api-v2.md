@@ -63,7 +63,6 @@ Each item MUST follow this structure.
 {
   "courseCode": "SE-TA-2026S",
   "courseName": "Software Engineering TA (Semester)",
-  "moName": "Dr. Zhang",
   "ownerMoId": "MO-10001",
   "ownerMoName": "Dr. Zhang",
   "semester": "2026-Spring",
@@ -136,7 +135,6 @@ Required / 必填:
 - `courseDescription`
 
 Recommended optional / 建议选填:
-- `moName`
 - `ownerMoId`
 - `ownerMoName`
 - `semester`
@@ -167,6 +165,8 @@ Recommended optional / 建议选填:
 Implementation notes / 实现备注:
 - `status` is currently kept as compatibility mirror of `recruitmentStatus`.  
   当前实现中 `status` 作为 `recruitmentStatus` 的兼容镜像字段保留。
+- `moName` is **not** part of the contract; use `ownerMoId` and `ownerMoName` only. Legacy `moName` on disk is not written on new publishes; MO `GET` normalization removes it from the response and, when present, uses it once to backfill `ownerMoName` if missing.  
+  契约中**不再**包含 `moName`，仅使用 `ownerMoId` 与 `ownerMoName`。新发布不再写入 `moName`；若磁盘上仍有历史 `moName`，`GET /api/mo/jobs` 归一化时会从响应中去掉该键，并在缺省 `ownerMoName` 时用其回填一次。
 - `publishStatus` belongs to Admin governance lifecycle (Option A), but MO publish currently initializes it with default placeholder value only.  
   按方案 A，`publishStatus` 归属 Admin 治理生命周期；MO 发布当前仅做默认占位初始化。
 
@@ -269,7 +269,6 @@ Example request (MO publish) / 请求示例（MO 发布）:
 {
   "courseCode": "SE-TA-2026S",
   "courseName": "Software Engineering TA (Semester)",
-  "moName": "Dr. Zhang",
   "ownerMoId": "MO-10001",
   "ownerMoName": "Dr. Zhang",
   "semester": "2026-Spring",
@@ -332,7 +331,8 @@ Success response (`200`) / 成功响应:
       "jobId": "MOJOB-SE-2026S-001",
       "courseCode": "SE-TA-2026S",
       "courseName": "Software Engineering TA (Semester)",
-      "moName": "Dr. Zhang",
+      "ownerMoId": "MO-10001",
+      "ownerMoName": "Dr. Zhang",
       "status": "OPEN",
       "recruitmentStatus": "OPEN",
       "studentCount": -1,
@@ -406,7 +406,7 @@ Current MO publish implementation writes these proposal fields now:
 
 Implementation snapshot by responsibility / 按职责划分的当前实现快照:
 - **MO input-driven fields**: entered by MO form or derived from MO identity/context.  
-  `courseCode`, `courseName`, `recruitmentStatus`(+`status` mirror), `courseDescription`, `requiredSkills`, `teachingWeeks`, `assessmentEvents`, `studentCount`, `taRecruitCount`, `campus`, `semester`, `applicationDeadline`, `recruitmentBrief`, `workload`, `ownerMoId`, `ownerMoName`, `moName`.
+  `courseCode`, `courseName`, `recruitmentStatus`(+`status` mirror), `courseDescription`, `requiredSkills`, `teachingWeeks`, `assessmentEvents`, `studentCount`, `taRecruitCount`, `campus`, `semester`, `applicationDeadline`, `recruitmentBrief`, `workload`, `ownerMoId`, `ownerMoName`.
 - **MO generated fields**: generated at publish time.  
   `jobId`, `createdAt`, `updatedAt`, `source`.
 - **Placeholder-only fields (initialized, logic not implemented here)**: for downstream TA/Admin workflows.  
@@ -469,8 +469,8 @@ This section describes **who should own lifecycle semantics** (long-term target)
 
 ### 9.2 What MO publish does today / 当前 MO 发布实际做了什么
 
-- **MO form + request body**: user-driven fields only (plus `moName` / identity-derived `ownerMoId` / `ownerMoName` where applicable).  
-  **MO 表单与请求体**：仅用户填写与身份派生字段。
+- **MO form + request body**: user-driven fields plus identity-derived `ownerMoId` / `ownerMoName` (no separate `moName` field).  
+  **MO 表单与请求体**：用户填写字段及身份派生的 `ownerMoId` / `ownerMoName`（不再使用单独的 `moName` 字段）。
 - **MO server on `POST /api/mo/jobs`**: generates `jobId`, `createdAt`, `updatedAt`, sets `source`, mirrors `status` from `recruitmentStatus`, and **initializes** governance/process placeholders with defaults so the JSON is a complete “course DB” row for TA/Admin to consume later.  
   **服务端在发布时**：生成 `jobId`、时间戳、`source`，维护 `status` 与 `recruitmentStatus` 一致，并对治理/流程字段做**默认占位初始化**，使单条记录可作为后续 TA/Admin 调用的完整行数据。
 - **Important**: initializing a field does **not** mean MO owns its **lifecycle**; downstream components should still treat governance/process fields per §9.1 when implementing updates.  

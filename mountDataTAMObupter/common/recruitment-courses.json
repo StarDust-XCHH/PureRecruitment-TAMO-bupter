@@ -2,13 +2,12 @@
   "schema": "mo-ta-job-board",
   "version": "2.0",
   "generatedAt": "2026-04-02T12:00:00Z",
-  "count": 0,
+  "count": 2,
   "items": [
     {
       "jobId": "MOJOB-8A577FB7",
       "courseCode": "EBU9900",
       "courseName": "SampleTest",
-      "moName": "MO-0402-T2",
       "ownerMoId": "MO-0402-T2",
       "ownerMoName": "MO-0402-T2",
       "semester": "2026-Spring",
@@ -77,7 +76,6 @@
       "jobId": "MOJOB-5DC8868D",
       "courseCode": "EBU9901",
       "courseName": "Test2",
-      "moName": "MO-0402-T2",
       "ownerMoId": "MO-0402-T2",
       "ownerMoName": "MO-0402-T2",
       "semester": "2026-Spring",

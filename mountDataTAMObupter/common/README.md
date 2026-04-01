@@ -28,9 +28,8 @@
 | `jobId` | string | 岗位唯一 ID（如 `MOJOB-XXXXXXXX`），发布时由服务端生成。 |
 | `courseCode` | string | 课程编号。 |
 | `courseName` | string | 课程/岗位名称。 |
-| `moName` | string | 发布侧展示的 MO 名称。 |
 | `ownerMoId` | string | MO 稳定标识，建议作关联键。 |
-| `ownerMoName` | string | MO 展示名，可与 `ownerMoId` 相同。 |
+| `ownerMoName` | string | MO 展示名；可与 `ownerMoId` 相同，用于列表/详情展示。 |
 | `semester` | string | 学期，如 `2026-Spring`；可空字符串。 |
 
 ### 状态（招聘 / 兼容 / 治理占位）
