@@ -1,8 +1,8 @@
 {
   "schema": "mo-ta-job-board",
   "version": "2.0",
-  "generatedAt": "2026-04-01T19:30:27.576324Z",
-  "count": 4,
+  "generatedAt": "2026-04-01T21:25:40.268278300Z",
+  "count": 5,
   "items": [
     {
       "jobId": "MOJOB-87E1EB5B",
@@ -11,7 +11,6 @@
       "moName": "MO-0402-T1",
       "ownerMoId": "MO-0402-T1",
       "ownerMoName": "MO-0402-T1",
-      "semester": "",
       "status": "OPEN",
       "recruitmentStatus": "OPEN",
       "publishStatus": "PENDING_REVIEW",
@@ -32,7 +31,6 @@
       "lastSelectionAt": "",
       "taRecruitCount": 10,
       "campus": "Main",
-      "applicationDeadline": "",
       "requiredSkills": {
         "fixedTags": [
           "Python",
@@ -55,7 +53,6 @@
       "moName": "MO-0402-T1",
       "ownerMoId": "MO-0402-T1",
       "ownerMoName": "MO-0402-T1",
-      "semester": "",
       "status": "OPEN",
       "recruitmentStatus": "OPEN",
       "publishStatus": "PENDING_REVIEW",
@@ -76,7 +73,6 @@
       "lastSelectionAt": "",
       "taRecruitCount": 15,
       "campus": "Main",
-      "applicationDeadline": "",
       "requiredSkills": {
         "fixedTags": [
           "C/C++",
@@ -103,7 +99,6 @@
       "moName": "MO-0402-T1",
       "ownerMoId": "MO-0402-T1",
       "ownerMoName": "MO-0402-T1",
-      "semester": "",
       "status": "OPEN",
       "recruitmentStatus": "OPEN",
       "publishStatus": "PENDING_REVIEW",
@@ -124,7 +119,6 @@
       "lastSelectionAt": "",
       "taRecruitCount": 25,
       "campus": "Shahe",
-      "applicationDeadline": "",
       "teachingWeeks": {
         "weeks": [
           4,
@@ -190,7 +184,6 @@
       "moName": "MO-0402-T1",
       "ownerMoId": "MO-0402-T1",
       "ownerMoName": "MO-0402-T1",
-      "semester": "",
       "status": "OPEN",
       "recruitmentStatus": "OPEN",
       "publishStatus": "PENDING_REVIEW",
@@ -210,7 +203,6 @@
       "lastApplicationAt": "",
       "lastSelectionAt": "",
       "taRecruitCount": 20,
-      "applicationDeadline": "",
       "requiredSkills": {
         "fixedTags": [
           "Computer Networks",
@@ -224,12 +216,70 @@
       "createdAt": "2026-04-01T19:30:27.567459100Z",
       "updatedAt": "2026-04-01T19:30:27.567459100Z",
       "source": "mo-manual-v2"
+    },
+    {
+      "jobId": "MOJOB-6A4EE10E",
+      "courseCode": "EBU9905",
+      "courseName": "Test Course 5",
+      "moName": "MO-0402-T2",
+      "ownerMoId": "MO-0402-T2",
+      "ownerMoName": "MO-0402-T2",
+      "semester": "2026-Spring",
+      "status": "OPEN",
+      "recruitmentStatus": "OPEN",
+      "publishStatus": "PENDING_REVIEW",
+      "visibility": "INTERNAL",
+      "isArchived": false,
+      "auditStatus": "PENDING",
+      "auditComment": "",
+      "priority": "NORMAL",
+      "dataVersion": 1,
+      "lastSyncedAt": "",
+      "studentCount": 250,
+      "recruitedCount": 0,
+      "applicationsTotal": 0,
+      "applicationsPending": 0,
+      "applicationsAccepted": 0,
+      "applicationsRejected": 0,
+      "lastApplicationAt": "",
+      "lastSelectionAt": "",
+      "taRecruitCount": 20,
+      "campus": "Main",
+      "applicationDeadline": "2026-04-30T22:24:00.000Z",
+      "requiredSkills": {
+        "fixedTags": [
+          "C/C++",
+          "JavaScript",
+          "TypeScript",
+          "SQL",
+          "Linux",
+          "Git",
+          "Data Structures",
+          "Algorithms",
+          "Machine Learning",
+          "Computer Networks",
+          "Operating Systems",
+          "Database",
+          "Software Engineering"
+        ],
+        "customSkills": [
+          {
+            "name": "Sleep",
+            "description": "Good sleep rather than work wearily."
+          }
+        ]
+      },
+      "courseDescription": "This is also a sample.",
+      "recruitmentBrief": "Sample para. 1.\nSample.",
+      "createdAt": "2026-04-01T21:25:40.257430900Z",
+      "updatedAt": "2026-04-01T21:25:40.257430900Z",
+      "source": "mo-manual-v2"
     }
   ],
   "meta": {
     "schema": "mo-ta-job-board",
     "entity": "jobs",
     "version": "2.0",
-    "updatedAt": "2026-04-01T19:30:27.576324Z"
+    "updatedAt": "2026-04-01T21:25:40.268278300Z"
   }
 }
