@@ -61,9 +61,39 @@
 
 ---
 
+## Entry 02 - MO-TA 招聘岗位 API v2 与数据落盘
+
+**At 2026-04-02 06:20 (UTC+8), by Fenghao.**
+
+### 新增/修改内容
+
+1. **Job Board API v2（`/api/mo/jobs`）**
+   - `GET`：返回 `schema: mo-ta-job-board`、`version: 2.0` 的岗位列表；数据源为 `mountDataTAMObupter/common/recruitment-courses.json`；对 `items` 做内存规范化，不写回磁盘。
+   - `POST`：按学期级契约创建岗位，写入同一 JSON；补齐治理占位字段与 `status` / `recruitmentStatus` 兼容镜像。
+2. **DAO 与挂载路径**
+   - 扩展 `MoRecruitmentDao` 以读写 v2 字段；新增 `DataMountPaths` 统一解析 common/TA 挂载路径。
+3. **技能标签接口**
+   - 新增 `MoSkillTagsServlet`：`GET /api/mo/skill-tags` 与别名 `GET /api/common/skill-tags`，供发布表单拉取固定标签列表。
+4. **MO 前端岗位模块**
+   - 更新 `job-board.js`、`mo-route-jobs.jspf` 与 `mo-home.css`，对接 v2 字段与发布/列表流程。
+5. **数据与文档**
+   - 新增 `recruitment-courses.json` 作为岗位主数据；移除旧版待审核示例 JSON；补充 `docs/mo-job-board-api-v2.md`、`recruitment-courses-governance-notes.md` 等说明，并更新 `mo-ta-interaction-log.md`。
+
+### 需要解决的问题
+
+- 服务端校验与错误码体系仍为轻量实现，后续可按契约收紧。
+- 岗位编辑、关闭、归档等管理能力尚未在 MO 端闭环。
+- TA 端对 v2 新字段的生命周期更新与 MO 规范化路径是否完全一致，需联调确认。
+
+### 备注
+
+- 契约细节以 `docs/mo-job-board-api-v2.md` 为准；TA 端 `GET /api/ta/jobs` 已读同一文件，行为以磁盘为准，与 MO `GET` 内存规范化路径不同，集成时注意字段来源。
+
+---
+
 ## 模板
 
-### Entry 02 - [本次开发主题]
+### Entry 03 - [本次开发主题]
 
 **At [YYYY-MM-DD HH:MM (UTC+8)], by [Name].**
 

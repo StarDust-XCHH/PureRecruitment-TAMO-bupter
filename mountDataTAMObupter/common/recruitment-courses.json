@@ -3,5 +3,121 @@
   "version": "2.0",
   "generatedAt": "2026-04-02T12:00:00Z",
   "count": 0,
-  "items": []
+  "items": [
+    {
+      "jobId": "MOJOB-8A577FB7",
+      "courseCode": "EBU9900",
+      "courseName": "SampleTest",
+      "moName": "MO-0402-T2",
+      "ownerMoId": "MO-0402-T2",
+      "ownerMoName": "MO-0402-T2",
+      "semester": "2026-Spring",
+      "status": "OPEN",
+      "recruitmentStatus": "OPEN",
+      "publishStatus": "PENDING_REVIEW",
+      "visibility": "INTERNAL",
+      "isArchived": false,
+      "auditStatus": "PENDING",
+      "auditComment": "",
+      "priority": "NORMAL",
+      "dataVersion": 1,
+      "lastSyncedAt": "",
+      "studentCount": 250,
+      "recruitedCount": 0,
+      "applicationsTotal": 0,
+      "applicationsPending": 0,
+      "applicationsAccepted": 0,
+      "applicationsRejected": 0,
+      "lastApplicationAt": "",
+      "lastSelectionAt": "",
+      "taRecruitCount": 9,
+      "campus": "Main",
+      "applicationDeadline": "2026-04-30T22:15:00.000Z",
+      "teachingWeeks": {
+        "weeks": [
+          3,
+          5,
+          7,
+          9
+        ]
+      },
+      "assessmentEvents": [
+        {
+          "name": "ClassTestl8",
+          "weeks": [],
+          "description": ""
+        },
+        {
+          "name": "CodingDay12,130n-site coding assistance",
+          "weeks": [],
+          "description": ""
+        }
+      ],
+      "requiredSkills": {
+        "fixedTags": [
+          "Python",
+          "TypeScript",
+          "Operating Systems",
+          "Software Engineering"
+        ],
+        "customSkills": [
+          {
+            "name": "Sleep",
+            "description": "I need sleep now."
+          }
+        ]
+      },
+      "courseDescription": "This is a sample discription.",
+      "recruitmentBrief": "This is a sample.\nA sample.",
+      "createdAt": "2026-04-01T22:17:39.505268800Z",
+      "updatedAt": "2026-04-01T22:17:39.505268800Z",
+      "source": "mo-manual-v2"
+    },
+    {
+      "jobId": "MOJOB-5DC8868D",
+      "courseCode": "EBU9901",
+      "courseName": "Test2",
+      "moName": "MO-0402-T2",
+      "ownerMoId": "MO-0402-T2",
+      "ownerMoName": "MO-0402-T2",
+      "semester": "2026-Spring",
+      "status": "OPEN",
+      "recruitmentStatus": "OPEN",
+      "publishStatus": "PENDING_REVIEW",
+      "visibility": "INTERNAL",
+      "isArchived": false,
+      "auditStatus": "PENDING",
+      "auditComment": "",
+      "priority": "NORMAL",
+      "dataVersion": 1,
+      "lastSyncedAt": "",
+      "studentCount": -1,
+      "recruitedCount": 0,
+      "applicationsTotal": 0,
+      "applicationsPending": 0,
+      "applicationsAccepted": 0,
+      "applicationsRejected": 0,
+      "lastApplicationAt": "",
+      "lastSelectionAt": "",
+      "taRecruitCount": 18,
+      "campus": "Shahe",
+      "requiredSkills": {
+        "fixedTags": [
+          "Machine Learning",
+          "Software Engineering"
+        ],
+        "customSkills": []
+      },
+      "courseDescription": "This is a sample of a minimum-data course.",
+      "createdAt": "2026-04-01T22:19:28.081093400Z",
+      "updatedAt": "2026-04-01T22:19:28.081093400Z",
+      "source": "mo-manual-v2"
+    }
+  ],
+  "meta": {
+    "schema": "mo-ta-job-board",
+    "entity": "jobs",
+    "version": "2.0",
+    "updatedAt": "2026-04-01T22:19:28.081093400Z"
+  }
 }
