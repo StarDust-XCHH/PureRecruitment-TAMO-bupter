@@ -1,0 +1,235 @@
+{
+  "schema": "mo-ta-job-board",
+  "version": "2.0",
+  "generatedAt": "2026-04-01T19:30:27.576324Z",
+  "count": 4,
+  "items": [
+    {
+      "jobId": "MOJOB-87E1EB5B",
+      "courseCode": "EBU9901",
+      "courseName": "Soft Test Course Name",
+      "moName": "MO-0402-T1",
+      "ownerMoId": "MO-0402-T1",
+      "ownerMoName": "MO-0402-T1",
+      "semester": "",
+      "status": "OPEN",
+      "recruitmentStatus": "OPEN",
+      "publishStatus": "PENDING_REVIEW",
+      "visibility": "INTERNAL",
+      "isArchived": false,
+      "auditStatus": "PENDING",
+      "auditComment": "",
+      "priority": "NORMAL",
+      "dataVersion": 1,
+      "lastSyncedAt": "",
+      "studentCount": -1,
+      "recruitedCount": 0,
+      "applicationsTotal": 0,
+      "applicationsPending": 0,
+      "applicationsAccepted": 0,
+      "applicationsRejected": 0,
+      "lastApplicationAt": "",
+      "lastSelectionAt": "",
+      "taRecruitCount": 10,
+      "campus": "Main",
+      "applicationDeadline": "",
+      "requiredSkills": {
+        "fixedTags": [
+          "Python",
+          "C/C++",
+          "SQL"
+        ],
+        "customSkills": []
+      },
+      "courseDescription": "This is a test of course publish.",
+      "recruitmentBrief": "This is a test of course publish.",
+      "workload": "Teaching support + Q&A + grading support",
+      "createdAt": "2026-04-01T18:48:32.401424400Z",
+      "updatedAt": "2026-04-01T18:48:32.401424400Z",
+      "source": "mo-manual-v2"
+    },
+    {
+      "jobId": "MOJOB-99926764",
+      "courseCode": "EBU9902",
+      "courseName": "Test Course Name 2",
+      "moName": "MO-0402-T1",
+      "ownerMoId": "MO-0402-T1",
+      "ownerMoName": "MO-0402-T1",
+      "semester": "",
+      "status": "OPEN",
+      "recruitmentStatus": "OPEN",
+      "publishStatus": "PENDING_REVIEW",
+      "visibility": "INTERNAL",
+      "isArchived": false,
+      "auditStatus": "PENDING",
+      "auditComment": "",
+      "priority": "NORMAL",
+      "dataVersion": 1,
+      "lastSyncedAt": "",
+      "studentCount": -1,
+      "recruitedCount": 0,
+      "applicationsTotal": 0,
+      "applicationsPending": 0,
+      "applicationsAccepted": 0,
+      "applicationsRejected": 0,
+      "lastApplicationAt": "",
+      "lastSelectionAt": "",
+      "taRecruitCount": 15,
+      "campus": "Main",
+      "applicationDeadline": "",
+      "requiredSkills": {
+        "fixedTags": [
+          "C/C++",
+          "TypeScript",
+          "SQL"
+        ],
+        "customSkills": [
+          {
+            "name": "Read",
+            "description": "You must be able to read fast."
+          }
+        ]
+      },
+      "courseDescription": "This is a sample description of the job.",
+      "recruitmentBrief": "This is a sample instruction of the recruitment.\nThis is the 2nd paragraph of this instruction.",
+      "createdAt": "2026-04-01T19:00:15.363446200Z",
+      "updatedAt": "2026-04-01T19:00:15.363446200Z",
+      "source": "mo-manual-v2"
+    },
+    {
+      "jobId": "JOB-T-59801",
+      "courseCode": "EBU9903",
+      "courseName": "Test Name 3",
+      "moName": "MO-0402-T1",
+      "ownerMoId": "MO-0402-T1",
+      "ownerMoName": "MO-0402-T1",
+      "semester": "",
+      "status": "OPEN",
+      "recruitmentStatus": "OPEN",
+      "publishStatus": "PENDING_REVIEW",
+      "visibility": "INTERNAL",
+      "isArchived": false,
+      "auditStatus": "PENDING",
+      "auditComment": "",
+      "priority": "NORMAL",
+      "dataVersion": 1,
+      "lastSyncedAt": "",
+      "studentCount": 999,
+      "recruitedCount": 0,
+      "applicationsTotal": 0,
+      "applicationsPending": 0,
+      "applicationsAccepted": 0,
+      "applicationsRejected": 0,
+      "lastApplicationAt": "",
+      "lastSelectionAt": "",
+      "taRecruitCount": 25,
+      "campus": "Shahe",
+      "applicationDeadline": "",
+      "teachingWeeks": {
+        "weeks": [
+          4,
+          7,
+          10,
+          18
+        ]
+      },
+      "assessmentEvents": [
+        {
+          "name": "Lab",
+          "weeks": [
+            8
+          ],
+          "description": "help labs"
+        },
+        {
+          "name": "Coding Day",
+          "weeks": [],
+          "description": "do coding"
+        }
+      ],
+      "requiredSkills": {
+        "fixedTags": [
+          "Python",
+          "Java",
+          "C/C++",
+          "JavaScript",
+          "TypeScript",
+          "SQL",
+          "Linux",
+          "Git",
+          "Data Structures",
+          "Algorithms",
+          "Machine Learning",
+          "Computer Networks",
+          "Operating Systems",
+          "Database",
+          "Software Engineering",
+          "Web Development"
+        ],
+        "customSkills": [
+          {
+            "name": "Writing",
+            "description": "You need to write fast."
+          },
+          {
+            "name": "Eating",
+            "description": "You need to eat fast."
+          }
+        ]
+      },
+      "courseDescription": "This is a sample.",
+      "recruitmentBrief": "This is a sample.\nThis is also a sample.",
+      "createdAt": "2026-04-01T19:08:51.811839200Z",
+      "updatedAt": "2026-04-01T19:08:51.811839200Z",
+      "source": "mo-manual-v2"
+    },
+    {
+      "jobId": "MOJOB-BB433878",
+      "courseCode": "EBU9904",
+      "courseName": "Test Name 4",
+      "moName": "MO-0402-T1",
+      "ownerMoId": "MO-0402-T1",
+      "ownerMoName": "MO-0402-T1",
+      "semester": "",
+      "status": "OPEN",
+      "recruitmentStatus": "OPEN",
+      "publishStatus": "PENDING_REVIEW",
+      "visibility": "INTERNAL",
+      "isArchived": false,
+      "auditStatus": "PENDING",
+      "auditComment": "",
+      "priority": "NORMAL",
+      "dataVersion": 1,
+      "lastSyncedAt": "",
+      "studentCount": -1,
+      "recruitedCount": 0,
+      "applicationsTotal": 0,
+      "applicationsPending": 0,
+      "applicationsAccepted": 0,
+      "applicationsRejected": 0,
+      "lastApplicationAt": "",
+      "lastSelectionAt": "",
+      "taRecruitCount": 20,
+      "applicationDeadline": "",
+      "requiredSkills": {
+        "fixedTags": [
+          "Computer Networks",
+          "Operating Systems",
+          "Database",
+          "Software Engineering"
+        ],
+        "customSkills": []
+      },
+      "courseDescription": "This is a sample.",
+      "createdAt": "2026-04-01T19:30:27.567459100Z",
+      "updatedAt": "2026-04-01T19:30:27.567459100Z",
+      "source": "mo-manual-v2"
+    }
+  ],
+  "meta": {
+    "schema": "mo-ta-job-board",
+    "entity": "jobs",
+    "version": "2.0",
+    "updatedAt": "2026-04-01T19:30:27.576324Z"
+  }
+}

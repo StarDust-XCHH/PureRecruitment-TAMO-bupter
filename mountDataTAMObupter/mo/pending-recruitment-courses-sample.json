@@ -1,547 +1,123 @@
 {
-  "schema": "mo-pending-recruitment-courses",
-  "generatedAt": "2026-03-11T09:51:10.085879500Z",
-  "count": 20,
+  "schema": "mo-ta-job-board",
+  "version": "2.0",
+  "generatedAt": "2026-04-02T14:30:00Z",
+  "count": 2,
   "items": [
     {
-      "courseName": "深度学习项目制工作坊",
-      "courseCode": "MO-DL-345",
-      "moName": "朱老师",
-      "courseDate": "2026-03-12",
-      "courseTime": "17:00-19:00",
-      "status": "等待招聘 TA",
-      "workload": "互动组织 + 课堂记录 + 课后答疑 + 深度学习项目制工作坊课堂协助",
-      "courseDescription": "本课程由MO发布，面向具备基础知识的候选人，聚焦深度学习项目制工作坊，帮助学生建立完整的问题分析与解决思路。",
-      "keywordTags": [
-        "深度学习",
-        "项目制工作坊",
-        "3月课程",
-        "能力评估",
-        "MO发布",
-        "校招"
+      "jobId": "MOJOB-SE-2026S-001",
+      "courseCode": "SE-TA-2026S",
+      "courseName": "Software Engineering TA (Semester)",
+      "moName": "Dr. Zhang",
+      "ownerMoId": "MO-10001",
+      "ownerMoName": "Dr. Zhang",
+      "semester": "2026-Spring",
+      "status": "OPEN",
+      "recruitmentStatus": "OPEN",
+      "publishStatus": "PENDING_REVIEW",
+      "visibility": "INTERNAL",
+      "isArchived": false,
+      "auditStatus": "PENDING",
+      "auditComment": "",
+      "priority": "NORMAL",
+      "dataVersion": 1,
+      "lastSyncedAt": "",
+      "studentCount": 180,
+      "recruitedCount": 0,
+      "applicationsTotal": 0,
+      "applicationsPending": 0,
+      "applicationsAccepted": 0,
+      "applicationsRejected": 0,
+      "lastApplicationAt": "",
+      "lastSelectionAt": "",
+      "taRecruitCount": 6,
+      "campus": "Main",
+      "applicationDeadline": "2026-04-30T23:59:59+08:00",
+      "teachingWeeks": {
+        "weeks": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20]
+      },
+      "assessmentEvents": [
+        {
+          "name": "ClassTest",
+          "weeks": [8, 9],
+          "description": "In-class mid test support and invigilation."
+        },
+        {
+          "name": "CodingDay",
+          "weeks": [12],
+          "description": "Assist coding-day setup, Q&A, and grading collection."
+        }
       ],
-      "checklist": [
-        "协助完成环境检查",
-        "支持课堂实操演示",
-        "整理课后复盘要点",
-        "协助支持深度学习项目制工作坊相关课堂任务"
-      ],
-      "suggestion": "有项目实战经验的同学申请更有优势，具备深度学习或项目制工作坊相关经历更匹配",
-      "courseLocation": "教一楼 A201",
-      "studentCount": 30
+      "requiredSkills": {
+        "fixedTags": ["Java", "Git", "Software Engineering", "Algorithms"],
+        "customSkills": [
+          {
+            "name": "Code Review",
+            "description": "Can review student code and provide structured feedback."
+          }
+        ]
+      },
+      "courseDescription": "Semester-scale TA recruitment for the software engineering module.",
+      "recruitmentBrief": "This is a semester-long TA role.\n\nMain responsibilities include lecture support, weekly lab assistance, assignment Q&A, and project milestone follow-up.",
+      "workload": "Teaching support + Q&A + grading support",
+      "createdAt": "2026-04-02T14:00:00Z",
+      "updatedAt": "2026-04-02T14:00:00Z",
+      "source": "sample-v2"
     },
     {
-      "courseName": "机器学习岗位能力提升",
-      "courseCode": "MO-ML-982",
-      "moName": "朱老师",
-      "courseDate": "2026-03-18",
-      "courseTime": "14:30-16:30",
-      "status": "等待招聘 TA",
-      "workload": "课前准备 + 课堂支持 + 课后答疑",
-      "courseDescription": "本课程由MO发布，面向具备基础知识的候选人，聚焦机器学习岗位能力提升，帮助学生建立完整的问题分析与解决思路。",
-      "keywordTags": [
-        "机器学习",
-        "岗位能力提升",
-        "3月课程",
-        "学习路径",
-        "课程预约",
-        "技能标签"
+      "jobId": "MOJOB-ML-2026S-002",
+      "courseCode": "ML-TA-2026S",
+      "courseName": "Machine Learning Practice TA (Custom Weeks)",
+      "moName": "Dr. Li",
+      "ownerMoId": "MO-10002",
+      "ownerMoName": "Dr. Li",
+      "semester": "2026-Spring",
+      "status": "OPEN",
+      "recruitmentStatus": "OPEN",
+      "publishStatus": "PENDING_REVIEW",
+      "visibility": "INTERNAL",
+      "isArchived": false,
+      "auditStatus": "PENDING",
+      "auditComment": "",
+      "priority": "NORMAL",
+      "dataVersion": 1,
+      "lastSyncedAt": "",
+      "studentCount": -1,
+      "recruitedCount": 0,
+      "applicationsTotal": 0,
+      "applicationsPending": 0,
+      "applicationsAccepted": 0,
+      "applicationsRejected": 0,
+      "lastApplicationAt": "",
+      "lastSelectionAt": "",
+      "taRecruitCount": 3,
+      "campus": "Shahe",
+      "applicationDeadline": "2026-05-05T23:59:59+08:00",
+      "teachingWeeks": {
+        "weeks": [3, 4, 6, 8, 10, 12, 14, 16]
+      },
+      "assessmentEvents": [
+        {
+          "name": "ModelDemoDay",
+          "weeks": [16, 17],
+          "description": "Coordinate model demo logistics and technical troubleshooting."
+        }
       ],
-      "checklist": [
-        "准备 Demo 或案例素材",
-        "跟进重点同学学习情况",
-        "反馈课堂参与表现",
-        "协助支持机器学习岗位能力提升相关课堂任务"
-      ],
-      "suggestion": "近期投递方向与课程主题接近，建议优先关注，可重点突出标签：技能标签",
-      "courseLocation": "教一楼 A305",
-      "studentCount": 36
-    },
-    {
-      "courseName": "机器学习方法论专题",
-      "courseCode": "MO-ML-456",
-      "moName": "高老师",
-      "courseDate": "2026-03-20",
-      "courseTime": "09:00-11:00",
-      "status": "等待招聘 TA",
-      "workload": "实验答疑 + SQL 调优",
-      "courseDescription": "本课程由MO发布，面向具备基础知识的候选人，聚焦机器学习方法论专题，帮助学生建立完整的问题分析与解决思路。",
-      "keywordTags": [
-        "机器学习",
-        "方法论专题",
-        "3月课程",
-        "岗位训练",
-        "案例分析",
-        "项目实践"
-      ],
-      "checklist": [
-        "协助完成环境检查",
-        "支持课堂实操演示",
-        "整理课后复盘要点",
-        "协助支持机器学习方法论专题相关课堂任务"
-      ],
-      "suggestion": "相关经历建议申请，具备机器学习或方法论专题相关经历更匹配",
-      "courseLocation": "教二楼 B108",
-      "studentCount": 42
-    },
-    {
-      "courseName": "编译原理综合实验",
-      "courseCode": "MO-PL-780",
-      "moName": "吴老师",
-      "courseDate": "2026-03-18",
-      "courseTime": "12:30-15:30",
-      "status": "等待招聘 TA",
-      "workload": "案例讲解辅助 + 工具支持 + 编译原理综合实验课堂协助",
-      "courseDescription": "本课程由MO发布，面向具备基础知识的候选人，聚焦编译原理综合实验，帮助学生建立完整的问题分析与解决思路。",
-      "keywordTags": [
-        "编译原理",
-        "综合实验",
-        "3月课程",
-        "项目实践",
-        "面试准备",
-        "岗位训练"
-      ],
-      "checklist": [
-        "辅助讲解核心概念",
-        "协助布置实验任务",
-        "跟进课后答疑",
-        "协助支持编译原理综合实验相关课堂任务"
-      ],
-      "suggestion": "近期投递方向与课程主题接近，建议优先关注，可重点突出标签：岗位训练",
-      "courseLocation": "教二楼 B402",
-      "studentCount": 48
-    },
-    {
-      "courseName": "计算机视觉案例研修",
-      "courseCode": "MO-CV-324",
-      "moName": "胡老师",
-      "courseDate": "2026-03-17",
-      "courseTime": "12:30-14:30",
-      "status": "等待招聘 TA",
-      "workload": "互动组织 + 课堂记录 + 课后答疑",
-      "courseDescription": "课程结合企业用人需求设计，围绕计算机视觉案例研修组织学习任务，适合作为招聘前置储备课程进行训练。",
-      "keywordTags": [
-        "计算机视觉",
-        "案例研修",
-        "3月课程",
-        "学习路径",
-        "技能标签",
-        "教学安排"
-      ],
-      "checklist": [
-        "准备 Demo 或案例素材",
-        "跟进重点同学学习情况",
-        "反馈课堂参与表现",
-        "协助支持计算机视觉案例研修相关课堂任务"
-      ],
-      "suggestion": "熟悉对应技术栈并具备答疑能力者优先，具备计算机视觉或案例研修相关经历更匹配",
-      "courseLocation": "实验楼 301",
-      "studentCount": 54
-    },
-    {
-      "courseName": "软件工程项目制工作坊",
-      "courseCode": "MO-SE-175",
-      "moName": "黄老师",
-      "courseDate": "2026-03-23",
-      "courseTime": "12:00-14:00",
-      "status": "等待招聘 TA",
-      "workload": "实验答疑 + SQL 调优",
-      "courseDescription": "本课程由MO发布，面向具备基础知识的候选人，聚焦软件工程项目制工作坊，帮助学生建立完整的问题分析与解决思路。",
-      "keywordTags": [
-        "软件工程",
-        "项目制工作坊",
-        "3月课程",
-        "面试准备",
-        "案例分析",
-        "综合提升"
-      ],
-      "checklist": [
-        "协助 MO 完成课程准备",
-        "整理课堂演示材料",
-        "记录课堂反馈并同步",
-        "协助支持软件工程项目制工作坊相关课堂任务"
-      ],
-      "suggestion": "熟悉对应技术栈并具备答疑能力者优先，可重点突出标签：综合提升",
-      "courseLocation": "实验楼 405",
-      "studentCount": 60
-    },
-    {
-      "courseName": "数据库项目制工作坊",
-      "courseCode": "MO-DB-1004",
-      "moName": "孙老师",
-      "courseDate": "2026-03-18",
-      "courseTime": "15:30-17:30",
-      "status": "等待招聘 TA",
-      "workload": "课前准备 + 课堂支持 + 课后答疑 + 数据库项目制工作坊课堂协助",
-      "courseDescription": "课程结合企业用人需求设计，围绕数据库项目制工作坊组织学习任务，适合作为招聘前置储备课程进行训练。",
-      "keywordTags": [
-        "数据库",
-        "项目制工作坊",
-        "3月课程",
-        "MO发布",
-        "能力评估",
-        "招聘课程"
-      ],
-      "checklist": [
-        "协助完成环境检查",
-        "支持课堂实操演示",
-        "整理课后复盘要点",
-        "协助支持数据库项目制工作坊相关课堂任务"
-      ],
-      "suggestion": "有课程助教或带教经验优先，具备数据库或项目制工作坊相关经历更匹配",
-      "courseLocation": "创新中心 201",
-      "studentCount": 66
-    },
-    {
-      "courseName": "编译原理项目制工作坊",
-      "courseCode": "MO-PL-777",
-      "moName": "朱老师",
-      "courseDate": "2026-03-27",
-      "courseTime": "13:30-15:30",
-      "status": "等待招聘 TA",
-      "workload": "页面调优辅助 + Demo 演示",
-      "courseDescription": "本课程由MO发布，面向具备基础知识的候选人，聚焦编译原理项目制工作坊，帮助学生建立完整的问题分析与解决思路。",
-      "keywordTags": [
-        "编译原理",
-        "项目制工作坊",
-        "3月课程",
-        "项目实践",
-        "综合提升",
-        "岗位训练"
-      ],
-      "checklist": [
-        "准备 Demo 或案例素材",
-        "跟进重点同学学习情况",
-        "反馈课堂参与表现",
-        "协助支持编译原理项目制工作坊相关课堂任务"
-      ],
-      "suggestion": "熟悉对应技术栈并具备答疑能力者优先，可重点突出标签：岗位训练",
-      "courseLocation": "创新中心 305",
-      "studentCount": 72
-    },
-    {
-      "courseName": "数据科学基础训练营",
-      "courseCode": "MO-DS-219",
-      "moName": "吴老师",
-      "courseDate": "2026-03-23",
-      "courseTime": "11:00-14:00",
-      "status": "等待招聘 TA",
-      "workload": "课堂支持 + 实验辅导",
-      "courseDescription": "该课程强调数据科学基础训练营的应用能力培养，内容涵盖概念讲解、工具使用、项目拆解以及结果展示。",
-      "keywordTags": [
-        "数据科学",
-        "基础训练营",
-        "3月课程",
-        "教学安排",
-        "技能标签",
-        "学习路径"
-      ],
-      "checklist": [
-        "协助 MO 完成课程准备",
-        "整理课堂演示材料",
-        "记录课堂反馈并同步",
-        "协助支持数据科学基础训练营相关课堂任务"
-      ],
-      "suggestion": "擅长原理分析与表达的候选人更适合，具备数据科学或基础训练营相关经历更匹配",
-      "courseLocation": "学生活动中心 204",
-      "studentCount": 30
-    },
-    {
-      "courseName": "编译原理岗位能力提升",
-      "courseCode": "MO-PL-411",
-      "moName": "林老师",
-      "courseDate": "2026-03-30",
-      "courseTime": "10:30-13:30",
-      "status": "等待招聘 TA",
-      "workload": "实验支持 + 模型讲解 + 编译原理岗位能力提升课堂协助",
-      "courseDescription": "该课程强调编译原理岗位能力提升的应用能力培养，内容涵盖概念讲解、工具使用、项目拆解以及结果展示。",
-      "keywordTags": [
-        "编译原理",
-        "岗位能力提升",
-        "3月课程",
-        "教学计划",
-        "课程介绍",
-        "课程报名"
-      ],
-      "checklist": [
-        "组织小组讨论",
-        "维护课堂互动秩序",
-        "汇总学生问题",
-        "协助支持编译原理岗位能力提升相关课堂任务"
-      ],
-      "suggestion": "相关经历建议申请，可重点突出标签：课程报名",
-      "courseLocation": "科研楼 512",
-      "studentCount": 36
-    },
-    {
-      "courseName": "计算机视觉方法论专题",
-      "courseCode": "MO-CV-552",
-      "moName": "张老师",
-      "courseDate": "2026-03-25",
-      "courseTime": "13:00-15:00",
-      "status": "等待招聘 TA",
-      "workload": "案例讲解辅助 + 工具支持",
-      "courseDescription": "课程围绕计算机视觉方法论专题展开，通过真实招聘场景案例、课堂讨论和实践演练，提升应聘相关岗位所需的核心能力。",
-      "keywordTags": [
-        "计算机视觉",
-        "方法论专题",
-        "3月课程",
-        "实训课程",
-        "学习路径",
-        "课程预约"
-      ],
-      "checklist": [
-        "协助 MO 完成课程准备",
-        "整理课堂演示材料",
-        "记录课堂反馈并同步",
-        "协助支持计算机视觉方法论专题相关课堂任务"
-      ],
-      "suggestion": "相关经历建议申请，具备计算机视觉或方法论专题相关经历更匹配",
-      "courseLocation": "教一楼 A201",
-      "studentCount": 42
-    },
-    {
-      "courseName": "分布式系统方法论专题",
-      "courseCode": "MO-DC-559",
-      "moName": "杨老师",
-      "courseDate": "2026-03-25",
-      "courseTime": "14:00-16:00",
-      "status": "等待招聘 TA",
-      "workload": "实验支持 + 模型讲解",
-      "courseDescription": "课程结合企业用人需求设计，围绕分布式系统方法论专题组织学习任务，适合作为招聘前置储备课程进行训练。",
-      "keywordTags": [
-        "分布式系统",
-        "方法论专题",
-        "3月课程",
-        "教学安排",
-        "技能标签",
-        "实训课程"
-      ],
-      "checklist": [
-        "准备 Demo 或案例素材",
-        "跟进重点同学学习情况",
-        "反馈课堂参与表现",
-        "协助支持分布式系统方法论专题相关课堂任务"
-      ],
-      "suggestion": "相关经历建议申请，可重点突出标签：实训课程",
-      "courseLocation": "教一楼 A305",
-      "studentCount": 48
-    },
-    {
-      "courseName": "数据科学综合实验",
-      "courseCode": "MO-DS-840",
-      "moName": "朱老师",
-      "courseDate": "2026-03-31",
-      "courseTime": "17:30-20:30",
-      "status": "等待招聘 TA",
-      "workload": "案例讲解辅助 + 工具支持 + 数据科学综合实验课堂协助",
-      "courseDescription": "本课程由MO发布，面向具备基础知识的候选人，聚焦数据科学综合实验，帮助学生建立完整的问题分析与解决思路。",
-      "keywordTags": [
-        "数据科学",
-        "综合实验",
-        "3月课程",
-        "面试准备",
-        "项目实践",
-        "案例分析"
-      ],
-      "checklist": [
-        "辅助讲解核心概念",
-        "协助布置实验任务",
-        "跟进课后答疑",
-        "协助支持数据科学综合实验相关课堂任务"
-      ],
-      "suggestion": "近期投递方向与课程主题接近，建议优先关注，具备数据科学或综合实验相关经历更匹配",
-      "courseLocation": "教二楼 B108",
-      "studentCount": 54
-    },
-    {
-      "courseName": "数据库方法论专题",
-      "courseCode": "MO-DB-184",
-      "moName": "张老师",
-      "courseDate": "2026-03-30",
-      "courseTime": "12:30-15:30",
-      "status": "等待招聘 TA",
-      "workload": "案例讲解辅助 + 工具支持",
-      "courseDescription": "本课程由MO发布，面向具备基础知识的候选人，聚焦数据库方法论专题，帮助学生建立完整的问题分析与解决思路。",
-      "keywordTags": [
-        "数据库",
-        "方法论专题",
-        "3月课程",
-        "课程报名",
-        "课程介绍",
-        "教学计划"
-      ],
-      "checklist": [
-        "协助完成环境检查",
-        "支持课堂实操演示",
-        "整理课后复盘要点",
-        "协助支持数据库方法论专题相关课堂任务"
-      ],
-      "suggestion": "擅长原理分析与表达的候选人更适合，可重点突出标签：教学计划",
-      "courseLocation": "教二楼 B402",
-      "studentCount": 60
-    },
-    {
-      "courseName": "数据库案例研修",
-      "courseCode": "MO-DB-199",
-      "moName": "刘老师",
-      "courseDate": "2026-04-03",
-      "courseTime": "11:00-14:00",
-      "status": "等待招聘 TA",
-      "workload": "实验支持 + 模型讲解",
-      "courseDescription": "课程围绕数据库案例研修展开，通过真实招聘场景案例、课堂讨论和实践演练，提升应聘相关岗位所需的核心能力。",
-      "keywordTags": [
-        "数据库",
-        "案例研修",
-        "4月课程",
-        "综合提升",
-        "案例分析",
-        "面试准备"
-      ],
-      "checklist": [
-        "组织小组讨论",
-        "维护课堂互动秩序",
-        "汇总学生问题",
-        "协助支持数据库案例研修相关课堂任务"
-      ],
-      "suggestion": "近期投递方向与课程主题接近，建议优先关注，具备数据库或案例研修相关经历更匹配",
-      "courseLocation": "实验楼 301",
-      "studentCount": 66
-    },
-    {
-      "courseName": "前端工程岗位能力提升",
-      "courseCode": "MO-FE-943",
-      "moName": "高老师",
-      "courseDate": "2026-04-06",
-      "courseTime": "17:30-19:30",
-      "status": "等待招聘 TA",
-      "workload": "实验答疑 + SQL 调优 + 前端工程岗位能力提升课堂协助",
-      "courseDescription": "该课程强调前端工程岗位能力提升的应用能力培养，内容涵盖概念讲解、工具使用、项目拆解以及结果展示。",
-      "keywordTags": [
-        "前端工程",
-        "岗位能力提升",
-        "4月课程",
-        "课程介绍",
-        "岗位匹配",
-        "人才选拔"
-      ],
-      "checklist": [
-        "协助完成环境检查",
-        "支持课堂实操演示",
-        "整理课后复盘要点",
-        "协助支持前端工程岗位能力提升相关课堂任务"
-      ],
-      "suggestion": "有项目实战经验的同学申请更有优势，可重点突出标签：人才选拔",
-      "courseLocation": "实验楼 405",
-      "studentCount": 72
-    },
-    {
-      "courseName": "网络安全项目制工作坊",
-      "courseCode": "MO-NS-216",
-      "moName": "陈老师",
-      "courseDate": "2026-04-06",
-      "courseTime": "12:30-14:30",
-      "status": "等待招聘 TA",
-      "workload": "实验支持 + 模型讲解",
-      "courseDescription": "该课程强调网络安全项目制工作坊的应用能力培养，内容涵盖概念讲解、工具使用、项目拆解以及结果展示。",
-      "keywordTags": [
-        "网络安全",
-        "项目制工作坊",
-        "4月课程",
-        "岗位训练",
-        "面试准备",
-        "案例分析"
-      ],
-      "checklist": [
-        "辅助讲解核心概念",
-        "协助布置实验任务",
-        "跟进课后答疑",
-        "协助支持网络安全项目制工作坊相关课堂任务"
-      ],
-      "suggestion": "擅长原理分析与表达的候选人更适合，具备网络安全或项目制工作坊相关经历更匹配",
-      "courseLocation": "创新中心 201",
-      "studentCount": 30
-    },
-    {
-      "courseName": "数据科学综合实验",
-      "courseCode": "MO-DS-860",
-      "moName": "张老师",
-      "courseDate": "2026-04-03",
-      "courseTime": "10:00-12:00",
-      "status": "等待招聘 TA",
-      "workload": "实验答疑 + SQL 调优",
-      "courseDescription": "本课程由MO发布，面向具备基础知识的候选人，聚焦数据科学综合实验，帮助学生建立完整的问题分析与解决思路。",
-      "keywordTags": [
-        "数据科学",
-        "综合实验",
-        "4月课程",
-        "能力评估",
-        "MO发布",
-        "候选人培养"
-      ],
-      "checklist": [
-        "组织小组讨论",
-        "维护课堂互动秩序",
-        "汇总学生问题",
-        "协助支持数据科学综合实验相关课堂任务"
-      ],
-      "suggestion": "相关经历建议申请，可重点突出标签：候选人培养",
-      "courseLocation": "创新中心 305",
-      "studentCount": 36
-    },
-    {
-      "courseName": "操作系统应用导论",
-      "courseCode": "MO-OS-285",
-      "moName": "吴老师",
-      "courseDate": "2026-04-06",
-      "courseTime": "16:30-19:30",
-      "status": "等待招聘 TA",
-      "workload": "课前准备 + 课堂支持 + 课后答疑 + 操作系统应用导论课堂协助",
-      "courseDescription": "本课程由MO发布，面向具备基础知识的候选人，聚焦操作系统应用导论，帮助学生建立完整的问题分析与解决思路。",
-      "keywordTags": [
-        "操作系统",
-        "应用导论",
-        "4月课程",
-        "课程介绍",
-        "人才选拔",
-        "教学计划"
-      ],
-      "checklist": [
-        "协助完成环境检查",
-        "支持课堂实操演示",
-        "整理课后复盘要点",
-        "协助支持操作系统应用导论相关课堂任务"
-      ],
-      "suggestion": "有课程助教或带教经验优先，具备操作系统或应用导论相关经历更匹配",
-      "courseLocation": "学生活动中心 204",
-      "studentCount": 42
-    },
-    {
-      "courseName": "人工智能综合实验",
-      "courseCode": "MO-AI-158",
-      "moName": "刘老师",
-      "courseDate": "2026-04-09",
-      "courseTime": "11:00-14:00",
-      "status": "等待招聘 TA",
-      "workload": "实验支持 + 模型讲解",
-      "courseDescription": "课程围绕人工智能综合实验展开，通过真实招聘场景案例、课堂讨论和实践演练，提升应聘相关岗位所需的核心能力。",
-      "keywordTags": [
-        "人工智能",
-        "综合实验",
-        "4月课程",
-        "人才选拔",
-        "教学计划",
-        "岗位匹配"
-      ],
-      "checklist": [
-        "组织小组讨论",
-        "维护课堂互动秩序",
-        "汇总学生问题",
-        "协助支持人工智能综合实验相关课堂任务"
-      ],
-      "suggestion": "近期投递方向与课程主题接近，建议优先关注，可重点突出标签：岗位匹配",
-      "courseLocation": "科研楼 512",
-      "studentCount": 48
+      "requiredSkills": {
+        "fixedTags": ["Python", "Machine Learning", "Data Structures"],
+        "customSkills": [
+          {
+            "name": "Notebook Debugging",
+            "description": "Can quickly locate and fix common notebook runtime issues."
+          }
+        ]
+      },
+      "courseDescription": "Applied machine-learning TA role with focused custom-week activities.",
+      "recruitmentBrief": "This role supports practical coding sessions and model debugging.\n\nPlease include prior ML coursework/projects and your available weekly times in the application.",
+      "workload": "In-class support + milestone assistance",
+      "createdAt": "2026-04-02T14:10:00Z",
+      "updatedAt": "2026-04-02T14:10:00Z",
+      "source": "sample-v2"
     }
   ]
 }
