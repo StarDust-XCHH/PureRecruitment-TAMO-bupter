@@ -63,31 +63,35 @@
 
 ## Entry 02 - MO-TA 招聘岗位 API v2 与数据落盘
 
-**At 2026-04-02 06:20 (UTC+8), by Fenghao.**
+**At 2026-04-02 07:00 (UTC+8), by Fenghao.**
 
 ### 新增/修改内容
 
 1. **Job Board API v2（`/api/mo/jobs`）**
    - `GET`：返回 `schema: mo-ta-job-board`、`version: 2.0` 的岗位列表；数据源为 `mountDataTAMObupter/common/recruitment-courses.json`；对 `items` 做内存规范化，不写回磁盘。
-   - `POST`：按学期级契约创建岗位，写入同一 JSON；补齐治理占位字段与 `status` / `recruitmentStatus` 兼容镜像。
+   - `POST`：`MoJobBoardServlet` 将请求体整体交给 `MoRecruitmentDao.createCourse(body)` 落盘；补齐治理占位字段与 `status` / `recruitmentStatus` 兼容镜像。
 2. **DAO 与挂载路径**
-   - 扩展 `MoRecruitmentDao` 以读写 v2 字段；新增 `DataMountPaths` 统一解析 common/TA 挂载路径。
+   - 扩展 `MoRecruitmentDao` 以读写 v2 字段；新增 `DataMountPaths` 统一解析 common/TA 挂载路径；增加 `syncJobBoardFileEnvelope`，在写入后同步顶层 `count`、`generatedAt` 等信封字段。
 3. **技能标签接口**
    - 新增 `MoSkillTagsServlet`：`GET /api/mo/skill-tags` 与别名 `GET /api/common/skill-tags`，供发布表单拉取固定标签列表。
 4. **MO 前端岗位模块**
-   - 更新 `job-board.js`、`mo-route-jobs.jspf` 与 `mo-home.css`，对接 v2 字段与发布/列表流程。
-5. **数据与文档**
-   - 新增 `recruitment-courses.json` 作为岗位主数据；移除旧版待审核示例 JSON；补充 `docs/mo-job-board-api-v2.md`、`recruitment-courses-governance-notes.md` 等说明，并更新 `mo-ta-interaction-log.md`。
+   - 更新 `job-board.js`、`mo-route-jobs.jspf` 与 `mo-home.css`，对接 v2 字段与发布/列表流程；MO 所有者展示统一经 `moOwnerLabel`（优先 `ownerMoName` / `ownerMoId`），搜索索引不再依赖已废弃的 `moName`。
+5. **契约与数据字段（`moName` 弃用）**
+   - 新发布不再写入 `moName`；契约与治理文档仅以 `ownerMoId`、`ownerMoName` 表示 MO 身份。`GET` 归一化会从响应中去掉历史 `moName` 键，并在缺省 `ownerMoName` 时可用磁盘上的遗留 `moName` 回填一次。
+6. **数据与文档**
+   - 以 `recruitment-courses.json` 为岗位主数据；移除旧版待审核示例 JSON；样例数据中补充完整学期级字段（教学周、评估事件、技能等）便于联调。
+   - 文档目录整理：契约 `docs/api/mo-job-board-api-v2.md`，后端交互 `docs/backend/mo-ta-interaction-log.md`，数据治理 `docs/database/recruitment-courses-governance-notes.md`；本日志位于 `docs/log/`（原 `projectFile/MO-module-development-log.md` 已迁出并删除）。
 
 ### 需要解决的问题
 
 - 服务端校验与错误码体系仍为轻量实现，后续可按契约收紧。
 - 岗位编辑、关闭、归档等管理能力尚未在 MO 端闭环。
 - TA 端对 v2 新字段的生命周期更新与 MO 规范化路径是否完全一致，需联调确认。
+- 其他 Entry 1 中提出的问题。
 
 ### 备注
 
-- 契约细节以 `docs/mo-job-board-api-v2.md` 为准；TA 端 `GET /api/ta/jobs` 已读同一文件，行为以磁盘为准，与 MO `GET` 内存规范化路径不同，集成时注意字段来源。
+- 契约细节以 `docs/api/mo-job-board-api-v2.md` 为准；TA 端 `GET /api/ta/jobs` 已读同一文件，行为以磁盘为准，与 MO `GET` 内存规范化路径不同，集成时注意字段来源。
 
 ---
 
