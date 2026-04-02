@@ -34,6 +34,22 @@
     grid-column: 1 / -1;
 }
 
+.mo-form-grid select[multiple] {
+    min-height: 130px;
+}
+
+.mo-publish-note {
+    font-size: 12px;
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px dashed var(--card-border);
+    background: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .mo-publish-note {
+    background: rgba(255, 255, 255, 0.6);
+}
+
 .mo-applicants-toolbar {
     margin: 14px 0;
     display: flex;

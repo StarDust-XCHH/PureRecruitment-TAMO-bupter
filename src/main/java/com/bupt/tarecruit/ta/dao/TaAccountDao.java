@@ -1,5 +1,6 @@
 package com.bupt.tarecruit.ta.dao;
 
+import com.bupt.tarecruit.common.config.DataMountPaths;
 import com.bupt.tarecruit.common.util.AuthUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -36,9 +37,6 @@ import java.util.Objects;
  * </ul>
  */
 public class TaAccountDao {
-    private static final String DATA_MOUNT_ENV = "mountDataTAMObupter";
-    private static final Path DEFAULT_DATA_ROOT = Path.of("mountDataTAMObupter");
-
     private static final String TA_SCHEMA = "ta";
     private static final String TA_ENTITY = "tas";
     private static final String PROFILE_SCHEMA = "ta";
@@ -47,17 +45,15 @@ public class TaAccountDao {
     private static final String SETTINGS_ENTITY = "settings";
     private static final String APPLICATION_SCHEMA = "ta";
     private static final String APPLICATION_ENTITY = "application-status";
-    private static final String JOB_BOARD_SCHEMA = "mo-pending-recruitment-courses";
-    private static final String JOB_BOARD_ENTITY = "pending-recruitment-courses";
+    private static final String JOB_BOARD_SCHEMA = "mo-ta-job-board";
+    private static final String JOB_BOARD_ENTITY = "jobs";
 
-    private static final ResolvedDataRoot RESOLVED_DATA_ROOT = resolveDataRoot();
-    private static final Path TA_DIR_PATH = RESOLVED_DATA_ROOT.rootPath().resolve("ta");
+    private static final Path TA_DIR_PATH = DataMountPaths.taDir();
     private static final Path TA_DATA_PATH = TA_DIR_PATH.resolve("tas.json");
     private static final Path PROFILE_DATA_PATH = TA_DIR_PATH.resolve("profiles.json");
     private static final Path SETTINGS_DATA_PATH = TA_DIR_PATH.resolve("settings.json");
     private static final Path APPLICATION_STATUS_PATH = TA_DIR_PATH.resolve("application-status.json");
-    private static final Path MO_DIR_PATH = RESOLVED_DATA_ROOT.rootPath().resolve("mo");
-    private static final Path JOB_BOARD_DATA_PATH = MO_DIR_PATH.resolve("pending-recruitment-courses.json");
+    private static final Path JOB_BOARD_DATA_PATH = DataMountPaths.moRecruitmentCourses();
 
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
@@ -903,22 +899,14 @@ public class TaAccountDao {
                 || storedPhone.equals(identifier);
     }
 
-    private static ResolvedDataRoot resolveDataRoot() {
-        String envValue = System.getenv(DATA_MOUNT_ENV);
-        if (envValue == null || envValue.trim().isEmpty()) {
-            return new ResolvedDataRoot(false, DEFAULT_DATA_ROOT.toAbsolutePath().normalize());
-        }
-        return new ResolvedDataRoot(true, Path.of(envValue.trim()).toAbsolutePath().normalize());
-    }
-
     public static String getDataMountStatusMessage() {
-        return "[TA-DATA] 环境变量 " + DATA_MOUNT_ENV + " "
-                + (RESOLVED_DATA_ROOT.fromEnvironment() ? "已挂载" : "未挂载，使用默认目录")
-                + "；数据根目录=" + RESOLVED_DATA_ROOT.rootPath();
+        return "[TA-DATA] 环境变量 " + DataMountPaths.DATA_MOUNT_ENV + " "
+                + (DataMountPaths.fromEnvironment() ? "已挂载" : "未挂载，使用默认目录")
+                + "；数据根目录=" + DataMountPaths.root();
     }
 
     public static Path getResolvedDataRoot() {
-        return RESOLVED_DATA_ROOT.rootPath();
+        return DataMountPaths.root();
     }
 
     public static Path getResolvedTaDataDir() {
@@ -1017,8 +1005,6 @@ public class TaAccountDao {
         String first = trim(primary);
         return first.isEmpty() ? trimToEmpty(fallback) : first;
     }
-
-    private record ResolvedDataRoot(boolean fromEnvironment, Path rootPath) {}
 
     public static class ProfileData {
         private final Map<String, Object> data;

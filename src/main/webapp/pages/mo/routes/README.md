@@ -1,0 +1,11 @@
+# MO route sections (`routes`)
+
+JSPF fragments: each defines one **route panel** (`data-route` + `id="route-<name>"`) toggled by `assets/mo/js/modules/route-nav.js`.
+
+| File | Route | Content |
+| --- | --- | --- |
+| `mo-route-dashboard.jspf` | `dashboard` | Overview stats and insight cards tied to dashboard JS. |
+| `mo-route-jobs.jspf` | `jobs` | Job list, search/pagination, and publish form for `/api/mo/jobs`. |
+| `mo-route-applicants.jspf` | `applicants` | Per-course applicant list and MO selection actions. |
+
+Only one route panel should be `.active` at a time; the nav module sets initial route to `dashboard`.

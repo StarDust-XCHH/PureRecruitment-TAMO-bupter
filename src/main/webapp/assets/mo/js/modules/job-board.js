@@ -19,15 +19,119 @@
         const refreshJobsBtn = document.getElementById('refreshJobsBtn');
         const publishForm = document.getElementById('jobPublishForm');
         const publishStatus = document.getElementById('publishJobStatus');
+        const fixedSkillsInput = document.getElementById('fixedSkillsInput');
 
-        function toTags(item) {
-            if (!Array.isArray(item.keywordTags)) return [];
-            return item.keywordTags.slice(0, 4);
+        function parseCsv(text) {
+            return String(text || '')
+                .split(',')
+                .map(function (s) { return s.trim(); })
+                .filter(Boolean);
         }
 
-        function toChecklist(item) {
-            if (!Array.isArray(item.checklist)) return [];
-            return item.checklist;
+        function readSelectedValues(selectId) {
+            const el = document.getElementById(selectId);
+            if (!el) return [];
+            return Array.from(el.selectedOptions || []).map(function (opt) { return opt.value; }).filter(Boolean);
+        }
+
+        async function loadSkillTags() {
+            if (!fixedSkillsInput) return;
+            try {
+                const res = await fetch('../../api/mo/skill-tags', { headers: { Accept: 'application/json' } });
+                if (!res.ok) return;
+                const payload = await res.json();
+                const items = Array.isArray(payload.items) ? payload.items : [];
+                if (!items.length) return;
+                const selected = new Set(Array.from(fixedSkillsInput.selectedOptions || []).map(function (opt) { return opt.value; }));
+                fixedSkillsInput.innerHTML = '';
+                items.forEach(function (tag) {
+                    const text = String(tag || '').trim();
+                    if (!text) return;
+                    const option = document.createElement('option');
+                    option.value = text;
+                    option.textContent = text;
+                    if (selected.has(text)) option.selected = true;
+                    fixedSkillsInput.appendChild(option);
+                });
+            } catch (err) {
+                console.warn('[MO-JOBS] load skill tags failed', err);
+            }
+        }
+
+        function parseAssessmentEvents(multiline) {
+            const lines = String(multiline || '')
+                .split(/\r?\n/)
+                .map(function (line) { return line.trim(); })
+                .filter(Boolean);
+            return lines.map(function (line) {
+                const parts = line.split('|');
+                const weeks = parseCsv((parts[1] || '').trim())
+                    .map(function (v) { return Number(v); })
+                    .filter(function (n) { return Number.isFinite(n) && n >= 1 && n <= 20; });
+                const uniqWeeks = Array.from(new Set(weeks)).sort(function (a, b) { return a - b; });
+                return {
+                    name: (parts[0] || '').trim(),
+                    weeks: uniqWeeks,
+                    description: (parts[2] || '').trim()
+                };
+            }).filter(function (entry) { return entry.name; });
+        }
+
+        function parseCustomSkills(multiline) {
+            const lines = String(multiline || '')
+                .split(/\r?\n/)
+                .map(function (line) { return line.trim(); })
+                .filter(Boolean);
+            return lines.map(function (line) {
+                const parts = line.split('|');
+                return {
+                    name: (parts[0] || '').trim(),
+                    description: (parts[1] || '').trim()
+                };
+            }).filter(function (entry) { return entry.name; });
+        }
+
+        function parseTeachingWeeks() {
+            const customWeeks = parseCsv(document.getElementById('teachingWeeksCustomInput').value)
+                .map(function (v) { return Number(v); })
+                .filter(function (n) { return Number.isFinite(n) && n >= 1 && n <= 20; });
+            const uniqWeeks = Array.from(new Set(customWeeks)).sort(function (a, b) { return a - b; });
+            return {
+                weeks: uniqWeeks
+            };
+        }
+
+        function weekText(teachingWeeks) {
+            const weeks = teachingWeeks && Array.isArray(teachingWeeks.weeks) ? teachingWeeks.weeks : [];
+            if (!weeks.length) return '--';
+            return weeks.join(',');
+        }
+
+        function getDisplayCode(item) {
+            return item.courseCode || item.jobId || '--';
+        }
+
+        function getDisplayTime(item) {
+            const weeksText = weekText(item.teachingWeeks);
+            if (weeksText !== '--') {
+                return 'Week ' + weeksText;
+            }
+            return '--';
+        }
+
+        function getDisplayLocation(item) {
+            return item && item.campus ? item.campus : '--';
+        }
+
+        function toTags(item) {
+            if (item.requiredSkills && Array.isArray(item.requiredSkills.fixedTags)) {
+                return item.requiredSkills.fixedTags.slice(0, 4);
+            }
+            return [];
+        }
+
+        function moOwnerLabel(item) {
+            return (item && (item.ownerMoName || item.ownerMoId)) || 'MO';
         }
 
         function renderDetail(item) {
@@ -35,14 +139,14 @@
                 const el = document.getElementById(id);
                 if (el) el.textContent = text || '--';
             };
-            setText('jobDetailCode', item.courseCode);
-            setText('jobDetailName', item.courseName);
-            setText('jobDetailMo', item.moName);
-            setText('jobDetailDescription', item.courseDescription);
-            setText('jobDetailDate', item.courseDate);
-            setText('jobDetailTime', item.courseTime);
-            setText('jobDetailLocation', item.courseLocation);
-            setText('jobDetailStatus', item.status);
+            setText('jobDetailCode', getDisplayCode(item));
+            setText('jobDetailName', item.courseName || '未命名岗位');
+            setText('jobDetailMo', moOwnerLabel(item));
+            setText('jobDetailDescription', item.recruitmentBrief || item.courseDescription);
+            setText('jobDetailDate', item.teachingWeeks ? ('Week ' + weekText(item.teachingWeeks)) : '--');
+            setText('jobDetailTime', '--');
+            setText('jobDetailLocation', getDisplayLocation(item));
+            setText('jobDetailStatus', item.recruitmentStatus || item.status || 'OPEN');
 
             const tags = document.getElementById('jobDetailTags');
             if (tags) {
@@ -58,11 +162,6 @@
             const checklist = document.getElementById('jobDetailChecklist');
             if (checklist) {
                 checklist.innerHTML = '';
-                toChecklist(item).forEach(function (entry) {
-                    const li = document.createElement('li');
-                    li.textContent = entry;
-                    checklist.appendChild(li);
-                });
             }
 
             const jumpBtn = document.getElementById('jumpToApplicantsBtn');
@@ -70,7 +169,7 @@
                 jumpBtn.onclick = function () {
                     if (typeof app.closeAllModals === 'function') app.closeAllModals();
                     if (typeof app.activateRoute === 'function') app.activateRoute('applicants');
-                    if (typeof app.setApplicantCourse === 'function') app.setApplicantCourse(item.courseCode);
+                    if (typeof app.setApplicantCourse === 'function') app.setApplicantCourse(item.courseCode || item.jobId);
                 };
             }
         }
@@ -79,9 +178,13 @@
             const keyword = (jobSearchInput.value || '').trim().toLowerCase();
             state.filteredJobs = state.jobs.filter(function (item) {
                 const text = [
-                    item.courseCode,
+                    item.courseCode || item.jobId,
                     item.courseName,
-                    (item.keywordTags || []).join(' ')
+                    item.ownerMoName || '',
+                    item.ownerMoId || '',
+                    item.recruitmentBrief || '',
+                    item.courseDescription || '',
+                    (item.requiredSkills && item.requiredSkills.fixedTags || []).join(' ')
                 ].join(' ').toLowerCase();
                 return !keyword || text.includes(keyword);
             });
@@ -98,12 +201,12 @@
                 card.setAttribute('tabindex', '0');
                 card.setAttribute('role', 'button');
                 card.innerHTML =
-                    '<div class="course-card-topline"><span class="job-code">' + item.courseCode + '</span><span class="pill">' + (item.moName || 'MO') + '</span></div>' +
-                    '<h4>' + item.courseName + '</h4>' +
+                    '<div class="course-card-topline"><span class="job-code">' + getDisplayCode(item) + '</span><span class="pill">' + moOwnerLabel(item) + '</span></div>' +
+                    '<h4>' + (item.courseName || '未命名岗位') + '</h4>' +
                     '<div class="job-tags">' + toTags(item).map(function (tag) { return '<span class="pill">' + tag + '</span>'; }).join('') + '</div>' +
                     '<div class="course-meta-stack">' +
-                    '<div class="course-meta-item"><span class="course-meta-label">课程时间</span><strong>' + item.courseDate + ' · ' + item.courseTime + '</strong></div>' +
-                    '<div class="course-meta-item"><span class="course-meta-label">招聘状态</span><strong>' + (item.status || '等待招聘 TA') + '</strong></div>' +
+                    '<div class="course-meta-item"><span class="course-meta-label">课程/学期安排</span><strong>' + getDisplayTime(item) + '</strong></div>' +
+                    '<div class="course-meta-item"><span class="course-meta-label">招聘状态</span><strong>' + (item.recruitmentStatus || item.status || 'OPEN') + '</strong></div>' +
                     '</div>' +
                     '<div class="course-card-hint"><span>点击查看详情</span><span aria-hidden="true">→</span></div>';
                 card.addEventListener('click', function () {
@@ -154,16 +257,50 @@
         async function publishJob(event) {
             event.preventDefault();
             const moUser = typeof app.getMoUser === 'function' ? app.getMoUser() : null;
+            const teachingWeeks = parseTeachingWeeks();
+            const fixedSkills = readSelectedValues('fixedSkillsInput');
+            const courseCodeInput = document.getElementById('courseCodeInput').value.trim();
+            const courseNameInput = document.getElementById('courseNameInput').value.trim();
+            const semesterInput = document.getElementById('semesterInput').value.trim();
+            const recruitmentStatusInput = document.getElementById('recruitmentStatusInput').value.trim();
+            const courseDescInput = document.getElementById('courseDescInput').value.trim();
+            const studentCountRaw = document.getElementById('studentCountInput').value.trim();
+            const taRecruitCountRaw = document.getElementById('taRecruitCountInput').value.trim();
+            const campusRaw = document.getElementById('campusInput').value.trim();
+            const applicationDeadlineRaw = document.getElementById('applicationDeadlineInput').value.trim();
+            const recruitmentBriefRaw = document.getElementById('recruitmentBriefInput').value.trim();
+            const moUsername = (moUser && moUser.username) ? moUser.username : 'MO';
+            const ownerMoId = (moUser && (moUser.id || moUser.moId || moUser.userId))
+                ? String(moUser.id || moUser.moId || moUser.userId).trim()
+                : moUsername;
+
+            if (!courseNameInput || !courseCodeInput || !recruitmentStatusInput || !courseDescInput || fixedSkills.length === 0) {
+                publishStatus.textContent = '请填写必填项：课程名、课程编号、招聘状态、至少一个技能标签、岗位描述';
+                return;
+            }
+
             const body = {
-                moName: (moUser && moUser.username) ? moUser.username : 'MO',
-                courseName: document.getElementById('courseNameInput').value,
-                courseDate: document.getElementById('courseDateInput').value,
-                courseTime: document.getElementById('courseTimeInput').value,
-                courseLocation: document.getElementById('courseLocationInput').value,
-                keywordTags: document.getElementById('courseTagsInput').value,
-                checklist: document.getElementById('courseChecklistInput').value,
-                courseDescription: document.getElementById('courseDescInput').value
+                courseCode: courseCodeInput,
+                ownerMoId: ownerMoId,
+                ownerMoName: moUsername,
+                courseName: courseNameInput,
+                recruitmentStatus: recruitmentStatusInput,
+                status: recruitmentStatusInput,
+                assessmentEvents: parseAssessmentEvents(document.getElementById('assessmentEventsInput').value),
+                requiredSkills: {
+                    fixedTags: fixedSkills,
+                    customSkills: parseCustomSkills(document.getElementById('customSkillsInput').value)
+                },
+                courseDescription: courseDescInput,
+                source: 'mo-manual-v2'
             };
+            if (semesterInput) body.semester = semesterInput;
+            if (teachingWeeks.weeks.length) body.teachingWeeks = teachingWeeks;
+            body.studentCount = studentCountRaw === '' ? -1 : (Number(studentCountRaw) || 0);
+            if (taRecruitCountRaw !== '') body.taRecruitCount = Number(taRecruitCountRaw) || 0;
+            if (campusRaw) body.campus = campusRaw;
+            if (applicationDeadlineRaw) body.applicationDeadline = new Date(applicationDeadlineRaw).toISOString();
+            if (recruitmentBriefRaw) body.recruitmentBrief = recruitmentBriefRaw;
 
             publishStatus.textContent = '发布中...';
             try {
@@ -174,13 +311,14 @@
                 });
                 const payload = await res.json();
                 if (!res.ok || payload.success === false) {
-                    throw new Error(payload.message || '发布失败');
+                    publishStatus.textContent = payload.message || '发布失败';
+                    return;
                 }
                 publishStatus.textContent = '发布成功';
                 publishForm.reset();
                 await loadJobs();
             } catch (err) {
-                publishStatus.textContent = err.message || '发布失败';
+                publishStatus.textContent = (err && err.message) ? err.message : '发布失败';
             }
         }
 
@@ -194,6 +332,7 @@
         });
         refreshJobsBtn.addEventListener('click', loadJobs);
 
+        loadSkillTags();
         loadJobs();
     };
 })();
