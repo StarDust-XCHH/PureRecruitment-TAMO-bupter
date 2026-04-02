@@ -2,8 +2,19 @@ package com.bupt.tarecruit.common.config;
 
 import java.nio.file.Path;
 
+/**
+ * 解析 MO/TA 挂载数据根目录。类加载时读取环境变量 {@link #DATA_MOUNT_ENV}；未设置或为空时，
+ * 使用 {@link #DEFAULT_DATA_ROOT} 并转为绝对路径（与进程工作目录有关）。
+ * <p>
+ * 应用启动时 {@link com.bupt.tarecruit.common.listener.DataMountStartupListener} 会将
+ * {@link #root()}、{@link #fromEnvironment()} 打到标准输出（{@code [data-mount]} 行），与 TA 侧
+ * {@link com.bupt.tarecruit.ta.dao.TaAccountDao#getDataMountStatusMessage()} 对照使用。
+ * 包级说明见 {@code com/bupt/tarecruit/common/README.md}。
+ */
 public final class DataMountPaths {
+    /** 环境变量名：指向数据根目录；未设置则回退 {@link #DEFAULT_DATA_ROOT}。 */
     public static final String DATA_MOUNT_ENV = "mountDataTAMObupter";
+    /** 未设置环境变量时使用的相对路径名（会经 {@link Path#toAbsolutePath()} 解析）。 */
     public static final Path DEFAULT_DATA_ROOT = Path.of("mountDataTAMObupter");
 
     private static final ResolvedDataRoot RESOLVED = resolveDataRoot();
@@ -11,10 +22,12 @@ public final class DataMountPaths {
     private DataMountPaths() {
     }
 
+    /** 当前解析后的数据根目录（绝对路径、已规范化）。 */
     public static Path root() {
         return RESOLVED.rootPath();
     }
 
+    /** {@code true} 表示根路径来自环境变量 {@link #DATA_MOUNT_ENV}；{@code false} 表示使用默认相对目录。 */
     public static boolean fromEnvironment() {
         return RESOLVED.fromEnvironment();
     }

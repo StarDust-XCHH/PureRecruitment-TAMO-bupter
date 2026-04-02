@@ -1,11 +1,12 @@
 # `MoRecruitmentDao`
 
-File-backed DAO for MO recruitment flows. It reads and writes:
+File-backed DAO for MO recruitment flows.
 
-- **`DataMountPaths.moRecruitmentCourses()`** — shared `recruitment-courses.json` (v2 `mo-ta-job-board` schema): list/normalize jobs, create published jobs with normalized fields and placeholders, and keep legacy rows migrated on read.
-- **`DataMountPaths.taApplicationStatus()`** — TA application records for applicant lists and selection decisions.
-- **`DataMountPaths.taProfiles()`** / **`taAccounts()`** — joined when resolving applicant display data.
+**Job board file (`recruitment-courses.json`)** is handled by **`com.bupt.tarecruit.common.dao.RecruitmentCoursesDao`**: `getPendingCourses` delegates to **`readJobBoard()`** (same standardized read as TA); `createCourse` delegates append/persist after building the new row. MO does not add other course-DB features beyond publish here.
 
-Main operations include loading the job list (`getPendingCourses`), creating a course/job (`createCourse`), fetching applicants by `courseCode`, and persisting MO decisions (`decideApplication`). Uses Gson with pretty printing; synchronized methods for safe concurrent access to the same files.
+This class still reads/writes TA-side JSON directly for:
 
-`getPendingCourses` returns a v2-normalized JSON payload in memory but **does not rewrite** `recruitment-courses.json`, so listing jobs does not mutate other courses’ stored fields. The file is updated on `createCourse` and other write paths. On publish, `syncJobBoardFileEnvelope` updates top-level `count` / `generatedAt` (and `schema` / `version`) to match `items`.
+- **`DataMountPaths.taApplicationStatus()`** — applicant lists and MO selection decisions.
+- **`DataMountPaths.taProfiles()`** / **`taAccounts()`** — joined for applicant display.
+
+`synchronized` remains on methods that touch TA files. Listing jobs does not rewrite `recruitment-courses.json`; publish updates that file via `RecruitmentCoursesDao`.

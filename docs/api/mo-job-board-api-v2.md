@@ -417,8 +417,8 @@ Request/response boundary note / 请求与响应边界说明:
   `POST /api/mo/jobs` 以 MO 输入字段为主；占位/治理字段如未提供由服务端初始化。
 - `GET /api/mo/jobs` returns each item **normalized in memory** (v2 shape, defaults for missing governance/process fields). It **does not** write `recruitment-courses.json`, so refreshing the MO job list does not change on-disk rows for other courses.  
   `GET /api/mo/jobs` 在**内存中**对每条 `item` 做 v2 归一化（缺失的治理/流程字段在响应中补默认）；**不会**写回 `recruitment-courses.json`，避免拉列表时连带改写磁盘上其它课程。
-- `GET /api/ta/jobs` reads the file and returns `items` as stored (TA backend pass-through). Legacy or partially shaped rows on disk may differ from the MO GET response until a write (e.g. `POST /api/mo/jobs`) updates that row.  
-  `GET /api/ta/jobs` 按磁盘存储返回 `items`（TA 侧偏透传）。历史或未完整落盘的行可能与 MO `GET` 的归一化视图不一致，直至对该行有一次写操作（例如 MO 发布）更新文件。
+- `GET /api/ta/jobs` uses the same backend path as MO list: `RecruitmentCoursesDao.readJobBoard()` applies in-memory v2 normalization per item; no extra write.  
+  `GET /api/ta/jobs` 与 MO 列表共用 **`readJobBoard()`**，对每条 `item` 做与 MO `GET` 一致的内存 v2 归一化，**不写盘**。
 
 ---
 

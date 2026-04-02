@@ -1,12 +1,12 @@
 package com.bupt.tarecruit.ta.dao;
 
 import com.bupt.tarecruit.common.config.DataMountPaths;
+import com.bupt.tarecruit.common.dao.RecruitmentCoursesDao;
 import com.bupt.tarecruit.common.util.AuthUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
@@ -23,6 +23,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+
+import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.getAsString;
+import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.trim;
 
 /**
  * 助教账户数据访问对象。
@@ -45,15 +48,12 @@ public class TaAccountDao {
     private static final String SETTINGS_ENTITY = "settings";
     private static final String APPLICATION_SCHEMA = "ta";
     private static final String APPLICATION_ENTITY = "application-status";
-    private static final String JOB_BOARD_SCHEMA = "mo-ta-job-board";
-    private static final String JOB_BOARD_ENTITY = "jobs";
 
     private static final Path TA_DIR_PATH = DataMountPaths.taDir();
     private static final Path TA_DATA_PATH = TA_DIR_PATH.resolve("tas.json");
     private static final Path PROFILE_DATA_PATH = TA_DIR_PATH.resolve("profiles.json");
     private static final Path SETTINGS_DATA_PATH = TA_DIR_PATH.resolve("settings.json");
     private static final Path APPLICATION_STATUS_PATH = TA_DIR_PATH.resolve("application-status.json");
-    private static final Path JOB_BOARD_DATA_PATH = DataMountPaths.moRecruitmentCourses();
 
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
@@ -383,21 +383,8 @@ public class TaAccountDao {
         return ApplicationStatusResult.success(userItems, summary, messages);
     }
 
-    public synchronized JsonObject getPendingJobBoardData() throws IOException {
-        ensureJobBoardDataFile();
-        JsonObject root = loadStructuredJson(JOB_BOARD_DATA_PATH, JOB_BOARD_SCHEMA, JOB_BOARD_ENTITY);
-        JsonObject normalized = new JsonObject();
-        if (root.has("meta") && root.get("meta").isJsonObject()) {
-            normalized.add("meta", root.getAsJsonObject("meta").deepCopy());
-        }
-        normalized.addProperty("schema", JOB_BOARD_SCHEMA);
-        normalized.addProperty("generatedAt", getMetaString(root, "updatedAt"));
-        JsonArray items = root.has("items") && root.get("items").isJsonArray()
-                ? root.getAsJsonArray("items").deepCopy()
-                : new JsonArray();
-        normalized.addProperty("count", items.size());
-        normalized.add("items", items);
-        return normalized;
+    public JsonObject getPendingJobBoardData() throws IOException {
+        return RecruitmentCoursesDao.readJobBoard();
     }
 
     private List<Map<String, Object>> loadRecords(Path path, String schema, String entity) throws IOException {
@@ -715,32 +702,6 @@ public class TaAccountDao {
         return item;
     }
 
-    private void ensureJobBoardDataFile() throws IOException {
-        if (Files.exists(JOB_BOARD_DATA_PATH)) {
-            return;
-        }
-        JsonObject root = new JsonObject();
-        JsonObject meta = new JsonObject();
-        meta.addProperty("schema", JOB_BOARD_SCHEMA);
-        meta.addProperty("entity", JOB_BOARD_ENTITY);
-        meta.addProperty("version", "1.0");
-        meta.addProperty("updatedAt", Instant.now().toString());
-        root.add("meta", meta);
-        root.add("items", new JsonArray());
-        ensureStructuredJsonFile(JOB_BOARD_DATA_PATH, JOB_BOARD_SCHEMA, JOB_BOARD_ENTITY, root);
-    }
-
-    private String getMetaString(JsonObject root, String key) {
-        if (root == null || !root.has("meta") || !root.get("meta").isJsonObject()) {
-            return "";
-        }
-        JsonObject meta = root.getAsJsonObject("meta");
-        if (!meta.has(key) || meta.get(key).isJsonNull()) {
-            return "";
-        }
-        return meta.get(key).getAsString();
-    }
-
     private Map<String, Object> ensureProfileRecord(List<Map<String, Object>> profiles, Map<String, Object> account, String now) {
         String taId = asString(account.get("id"));
         for (Map<String, Object> profile : profiles) {
@@ -945,15 +906,7 @@ public class TaAccountDao {
         return false;
     }
 
-    private String getAsString(JsonObject object, String key) {
-        if (object == null || !object.has(key) || object.get(key).isJsonNull()) {
-            return "";
-        }
-        return object.get(key).getAsString();
-    }
-
-    private String trim(String value) { return value == null ? "" : value.trim(); }
-    private String trimToEmpty(String value) { return value == null ? "" : value.trim(); }
+    private String trimToEmpty(String value) { return trim(value); }
     private String trimToNull(String value) {
         String trimmed = trim(value);
         return trimmed.isEmpty() ? null : trimmed;
@@ -1003,7 +956,7 @@ public class TaAccountDao {
 
     private String firstNonBlank(String primary, String fallback) {
         String first = trim(primary);
-        return first.isEmpty() ? trimToEmpty(fallback) : first;
+        return first.isEmpty() ? trim(fallback) : first;
     }
 
     public static class ProfileData {
