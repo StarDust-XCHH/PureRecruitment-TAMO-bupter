@@ -97,22 +97,36 @@
 
 ## Entry 03 - 岗位库共用 DAO（`RecruitmentCoursesDao`）
 
-**At 2026-04-02 03:00 (UTC+8), by Fenghao.**
+**At 2026-04-03 04:00 (UTC+8), by Fenghao.**
 
 ### 新增/修改内容
 
-1. **共用 DAO**：新增 `com.bupt.tarecruit.common.dao.RecruitmentCoursesDao`，集中 `recruitment-courses.json` 的路径、文件锁、**标准化读** `readJobBoard()`（MO/TA 共用）、发布追加落盘及 `findNormalizedJobByCourseCode`。
-2. **MO**：`MoRecruitmentDao` 中岗位列表/发布/选人查课程名改为委托上述类；与 TA 申请数据相关的读写仍留在本 DAO。
-3. **TA**：`TaAccountDao.getPendingJobBoardData` 与 MO 列表一致，委托 **`readJobBoard()`**，不再使用单独的磁盘透传读路径。
-4. **文档**：`common/dao/README` 说明公用接口；`mountDataTAMObupter/common/recruitment-courses-dao-notes.md` 标注 Admin/TA 对岗位库专有写操作尚未实现。
+1. **共用 `RecruitmentCoursesDao`（`recruitment-courses.json`）**
+   - 统一岗位主数据文件的路径解析、并发锁与契约常量（`mo-ta-job-board` / `jobs` / `2.0`）。
+   - **`readJobBoard()`**：对磁盘 `items` 做内存归一化并组装响应（含 `schema`、`version`、`generatedAt`、`count`），供 MO 与 TA **同源读取**岗位大厅列表；读路径不写回磁盘。
+   - **`appendPublishedJob`**：MO 发布岗位时在文件末尾追加一条，并同步 `meta` 与顶层信封字段后落盘。
+   - 提供发布与展示所需的领域归一化与校验（教学周、考核事件、技能标签、校区、`normalizeJobItem` 等），保证列表与详情字段形状一致。
+   - **`findNormalizedJobByCourseCode`**：按课程编码查询单条归一化岗位，供 MO 在录用/拒绝决策时展示课程名称等信息。
+   - 提供按 `jobId`、治理字段、`ownerMoId` 等筛选/查询的静态方法，便于后续管理端或列表能力直接复用。
+
+2. **`MoRecruitmentDao`**
+   - 岗位待办列表、发布落盘、选人决策中的课程信息查询均通过 **`RecruitmentCoursesDao`** 完成，与 TA 侧读取同一套规范化结果。
+   - TA 账户、档案、申请状态等 JSON 仍由本类负责；结构化文件的创建与 **`meta`** 维护通过 **`ensureStructuredFile(Path, entity)`**（`ta` schema、`1.0` 版本）统一处理。
+
+3. **TA 岗位数据入口**
+   - **`TaAccountDao.getPendingJobBoardData`** 使用 **`readJobBoard()`**，与 MO 岗位列表数据来源与展示形状一致。
+
+4. **文档与挂载说明**
+   - 更新 **`common/dao/README`**、**`mo/dao/README`** 等包内说明；**`mountDataTAMObupter/common/recruitment-courses-dao-notes.md`** 记录 Admin/TA 对岗位库的专有写操作尚未在本包实现等事项。
 
 ### 需要解决的问题
 
-- 与 Entry 02 中「校验、岗位编辑、TA 字段生命周期」等条目相同；本重构不新增业务功能。
+- 与 Entry 02 中「服务端校验、岗位编辑、TA 字段生命周期」等待办项相同；本阶段以 **共用 DAO 与委托调用** 为主，**不扩展新的业务规则**。
+- 预留的按 `jobId`/治理/`ownerMoId` 查询能力尚未在 HTTP 层暴露，需产品化时再接线。
 
 ### 备注
 
-- 契约与行为仍以 `docs/api/mo-job-board-api-v2.md` 为准。
+- 契约与行为仍以 **`docs/api/mo-job-board-api-v2.md`** 为准。
 
 ---
 
