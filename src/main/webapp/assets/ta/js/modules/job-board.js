@@ -5,31 +5,18 @@
     const modules = taApp.modules = taApp.modules || {};
 
     modules.jobBoard = function initJobBoardModule(app) {
-        let courseJobCards = document.querySelectorAll('[data-job-detail-card]');
+        // 仅保留最外层常驻容器的缓存（如果它们也会动态重建，建议也放进方法内实时查询）
         const jobSearchInput = document.getElementById('jobSearchInput');
         const jobPagination = document.getElementById('jobPagination');
         const jobsRoute = document.getElementById('route-jobs');
         const jobsHallHeading = document.getElementById('jobsHallHeading');
         const jobBoard = document.getElementById('jobBoard');
+
         const JOBS_PER_PAGE = 6;
         const JOBS_SCROLL_OFFSET = 24;
 
+        let courseJobCards = []; // 改为用数组/NodeList维护当前挂载的卡片
         let courseDetailState = {};
-
-        const jobDetailCode = document.getElementById('jobDetailCode');
-        const jobDetailName = document.getElementById('jobDetailName');
-        const jobDetailMo = document.getElementById('jobDetailMo');
-        const jobDetailDate = document.getElementById('jobDetailDate');
-        const jobDetailTime = document.getElementById('jobDetailTime');
-        const jobDetailLocation = document.getElementById('jobDetailLocation');
-        const jobDetailStudentCount = document.getElementById('jobDetailStudentCount');
-        const jobDetailStatus = document.getElementById('jobDetailStatus');
-        const jobDetailWorkload = document.getElementById('jobDetailWorkload');
-        const jobDetailDescription = document.getElementById('jobDetailDescription');
-        const jobDetailTags = document.getElementById('jobDetailTags');
-        const jobDetailChecklist = document.getElementById('jobDetailChecklist');
-        const jobDetailSuggestion = document.getElementById('jobDetailSuggestion');
-        const jobDetailApplyBtn = document.getElementById('jobDetailApplyBtn');
         let activeCourseCode = null;
         let currentJobsPage = '1';
         let isJobFetching = false;
@@ -46,12 +33,23 @@
             const course = courseDetailState[courseCode];
             if (!course) return;
             activeCourseCode = courseCode;
+
+            // 【修复关键】：将弹窗DOM的获取放在渲染函数内部，确保拿到的是最新挂载的活动节点
+            const jobDetailCode = document.getElementById('jobDetailCode');
+            const jobDetailName = document.getElementById('jobDetailName');
+            const jobDetailMo = document.getElementById('jobDetailMo');
+            const jobDetailStudentCount = document.getElementById('jobDetailStudentCount');
+            const jobDetailStatus = document.getElementById('jobDetailStatus');
+            const jobDetailWorkload = document.getElementById('jobDetailWorkload');
+            const jobDetailDescription = document.getElementById('jobDetailDescription');
+            const jobDetailTags = document.getElementById('jobDetailTags');
+            const jobDetailChecklist = document.getElementById('jobDetailChecklist');
+            const jobDetailSuggestion = document.getElementById('jobDetailSuggestion');
+            const jobDetailApplyBtn = document.getElementById('jobDetailApplyBtn');
+
             if (jobDetailCode) jobDetailCode.textContent = course.code;
             if (jobDetailName) jobDetailName.textContent = course.name;
             if (jobDetailMo) jobDetailMo.textContent = course.mo;
-            if (jobDetailDate) jobDetailDate.textContent = course.date;
-            if (jobDetailTime) jobDetailTime.textContent = course.time;
-            if (jobDetailLocation) jobDetailLocation.textContent = course.location;
             if (jobDetailStudentCount) jobDetailStudentCount.textContent = course.studentCountText;
             if (jobDetailStatus) jobDetailStatus.textContent = course.status;
             if (jobDetailWorkload) jobDetailWorkload.textContent = course.workload || '待确认';
@@ -85,10 +83,16 @@
         }
 
         function bindCardEvents() {
-            courseJobCards = document.querySelectorAll('[data-job-detail-card]');
+            // 【修复关键】：将作用域限制在 jobBoard 内部，防止误杀弹窗内的同类结构卡片
+            const currentJobBoard = document.getElementById('jobBoard');
+            if (!currentJobBoard) return;
+
+            courseJobCards = currentJobBoard.querySelectorAll('[data-job-detail-card]');
 
             courseJobCards.forEach((card) => {
-                const openCardDetail = () => {
+                const openCardDetail = (event) => {
+                    event?.preventDefault();
+                    event?.stopPropagation();
                     const courseCode = card.dataset.courseCode;
                     renderCourseDetail(courseCode);
                     if (typeof app.openModal === 'function') app.openModal('course-detail');
@@ -97,8 +101,7 @@
                 card.addEventListener('click', openCardDetail);
                 card.addEventListener('keydown', (event) => {
                     if (event.key === 'Enter' || event.key === ' ') {
-                        event.preventDefault();
-                        openCardDetail();
+                        openCardDetail(event);
                     }
                 });
             });
@@ -216,17 +219,15 @@
                 data.items.forEach(function (item) {
                     const keywordTags = Array.isArray(item.keywordTags) ? item.keywordTags : [];
                     const checklist = Array.isArray(item.checklist) ? item.checklist : [];
-                    const courseLocation = item.courseLocation || '待安排';
                     const studentCount = Number.isFinite(Number(item.studentCount)) ? Number(item.studentCount) : 0;
                     const studentCountText = studentCount > 0 ? studentCount + ' 人' : '待确认';
+
+                    const courseMoName = item.ownerMoName || item.moName || '待分配';
 
                     courseDetailState[item.courseCode] = {
                         code: item.courseCode,
                         name: item.courseName,
-                        mo: item.moName,
-                        date: item.courseDate,
-                        time: item.courseTime,
-                        location: courseLocation,
+                        mo: courseMoName,
                         studentCount: studentCount,
                         studentCountText: studentCountText,
                         status: item.status,
@@ -245,7 +246,7 @@
                         '<div class="job-card course-job-card" tabindex="0" role="button" aria-label="查看 ' + item.courseName + ' 详情" data-job-detail-card data-course-code="' + item.courseCode + '">' +
                         '<div class="course-card-topline">' +
                         '<span class="job-code">' + item.courseCode + '</span>' +
-                        '<span class="course-mo-badge">' + item.moName + '</span>' +
+                        '<span class="course-mo-badge">' + courseMoName + '</span>' +
                         '</div>' +
                         '<h4>' + item.courseName + '</h4>' +
                         '<div class="job-tags">' +
@@ -253,12 +254,8 @@
                         '</div>' +
                         '<div class="course-meta-stack">' +
                         '<div class="course-meta-item">' +
-                        '<span class="course-meta-label">课程时间</span>' +
-                        '<strong>' + item.courseDate + ' · ' + item.courseTime + '</strong>' +
-                        '</div>' +
-                        '<div class="course-meta-item">' +
-                        '<span class="course-meta-label">上课地点</span>' +
-                        '<strong>' + courseLocation + '</strong>' +
+                        '<span class="course-meta-label">开课MO</span>' +
+                        '<strong>' + courseMoName + '</strong>' +
                         '</div>' +
                         '<div class="course-meta-item">' +
                         '<span class="course-meta-label">学生人数</span>' +
@@ -309,8 +306,13 @@
         renderJobsBoard();
         fetchAndRefreshJobs();
 
+        // 【修复关键】：不再暴露过期的静态DOM引用，改为用 getter 实时抓取给主应用使用
         app.activeCourseCode = () => activeCourseCode;
-        app.jobDetailStatus = jobDetailStatus;
-        app.jobDetailApplyBtn = jobDetailApplyBtn;
+        Object.defineProperty(app, 'jobDetailStatus', {
+            get: () => document.getElementById('jobDetailStatus')
+        });
+        Object.defineProperty(app, 'jobDetailApplyBtn', {
+            get: () => document.getElementById('jobDetailApplyBtn')
+        });
     };
 })();
