@@ -68,19 +68,19 @@
 ### 新增/修改内容
 
 1. **Job Board API v2（`/api/mo/jobs`）**
-   - `GET`：返回 `schema: mo-ta-job-board`、`version: 2.0` 的岗位列表；数据源为 `mountDataTAMObupter/common/recruitment-courses.json`；对 `items` 做内存规范化，不写回磁盘。
-   - `POST`：`MoJobBoardServlet` 将请求体整体交给 `MoRecruitmentDao.createCourse(body)` 落盘；补齐治理占位字段与 `status` / `recruitmentStatus` 兼容镜像。
+  - `GET`：返回 `schema: mo-ta-job-board`、`version: 2.0` 的岗位列表；数据源为 `mountDataTAMObupter/common/recruitment-courses.json`；对 `items` 做内存规范化，不写回磁盘。
+  - `POST`：`MoJobBoardServlet` 将请求体整体交给 `MoRecruitmentDao.createCourse(body)` 落盘；补齐治理占位字段与 `status` / `recruitmentStatus` 兼容镜像。
 2. **DAO 与挂载路径**
-   - 扩展 `MoRecruitmentDao` 以读写 v2 字段；新增 `DataMountPaths` 统一解析 common/TA 挂载路径；增加 `syncJobBoardFileEnvelope`，在写入后同步顶层 `count`、`generatedAt` 等信封字段。
+  - 扩展 `MoRecruitmentDao` 以读写 v2 字段；新增 `DataMountPaths` 统一解析 common/TA 挂载路径；增加 `syncJobBoardFileEnvelope`，在写入后同步顶层 `count`、`generatedAt` 等信封字段。
 3. **技能标签接口**
-   - 新增 `MoSkillTagsServlet`：`GET /api/mo/skill-tags` 与别名 `GET /api/common/skill-tags`，供发布表单拉取固定标签列表。
+  - 新增 `MoSkillTagsServlet`：`GET /api/mo/skill-tags` 与别名 `GET /api/common/skill-tags`，供发布表单拉取固定标签列表。
 4. **MO 前端岗位模块**
-   - 更新 `job-board.js`、`mo-route-jobs.jspf` 与 `mo-home.css`，对接 v2 字段与发布/列表流程；MO 所有者展示统一经 `moOwnerLabel`（优先 `ownerMoName` / `ownerMoId`），搜索索引不再依赖已废弃的 `moName`。
+  - 更新 `job-board.js`、`mo-route-jobs.jspf` 与 `mo-home.css`，对接 v2 字段与发布/列表流程；MO 所有者展示统一经 `moOwnerLabel`（优先 `ownerMoName` / `ownerMoId`），搜索索引不再依赖已废弃的 `moName`。
 5. **契约与数据字段（`moName` 弃用）**
-   - 新发布不再写入 `moName`；契约与治理文档仅以 `ownerMoId`、`ownerMoName` 表示 MO 身份。`GET` 归一化会从响应中去掉历史 `moName` 键，并在缺省 `ownerMoName` 时可用磁盘上的遗留 `moName` 回填一次。
+  - 新发布不再写入 `moName`；契约与治理文档仅以 `ownerMoId`、`ownerMoName` 表示 MO 身份。`GET` 归一化会从响应中去掉历史 `moName` 键，并在缺省 `ownerMoName` 时可用磁盘上的遗留 `moName` 回填一次。
 6. **数据与文档**
-   - 以 `recruitment-courses.json` 为岗位主数据；移除旧版待审核示例 JSON；样例数据中补充完整学期级字段（教学周、评估事件、技能等）便于联调。
-   - 文档目录整理：契约 `docs/api/mo-job-board-api-v2.md`，后端交互 `docs/backend/mo-ta-interaction-log.md`，数据治理 `docs/database/recruitment-courses-governance-notes.md`；本日志位于 `docs/log/`（原 `projectFile/MO-module-development-log.md` 已迁出并删除）。
+  - 以 `recruitment-courses.json` 为岗位主数据；移除旧版待审核示例 JSON；样例数据中补充完整学期级字段（教学周、评估事件、技能等）便于联调。
+  - 文档目录整理：契约 `docs/api/mo-job-board-api-v2.md`，后端交互 `docs/backend/mo-ta-interaction-log.md`，数据治理 `docs/database/recruitment-courses-governance-notes.md`；本日志位于 `docs/log/`（原 `projectFile/MO-module-development-log.md` 已迁出并删除）。
 
 ### 需要解决的问题
 
@@ -95,9 +95,44 @@
 
 ---
 
+## Entry 03 - 岗位库共用 DAO（`RecruitmentCoursesDao`）
+
+**At 2026-04-03 04:00 (UTC+8), by Fenghao.**
+
+### 新增/修改内容
+
+1. **共用 `RecruitmentCoursesDao`（`recruitment-courses.json`）**
+   - 统一岗位主数据文件的路径解析、并发锁与契约常量（`mo-ta-job-board` / `jobs` / `2.0`）。
+   - **`readJobBoard()`**：对磁盘 `items` 做内存归一化并组装响应（含 `schema`、`version`、`generatedAt`、`count`），供 MO 与 TA **同源读取**岗位大厅列表；读路径不写回磁盘。
+   - **`appendPublishedJob`**：MO 发布岗位时在文件末尾追加一条，并同步 `meta` 与顶层信封字段后落盘。
+   - 提供发布与展示所需的领域归一化与校验（教学周、考核事件、技能标签、校区、`normalizeJobItem` 等），保证列表与详情字段形状一致。
+   - **`findNormalizedJobByCourseCode`**：按课程编码查询单条归一化岗位，供 MO 在录用/拒绝决策时展示课程名称等信息。
+   - 提供按 `jobId`、治理字段、`ownerMoId` 等筛选/查询的静态方法，便于后续管理端或列表能力直接复用。
+
+2. **`MoRecruitmentDao`**
+   - 岗位待办列表、发布落盘、选人决策中的课程信息查询均通过 **`RecruitmentCoursesDao`** 完成，与 TA 侧读取同一套规范化结果。
+   - TA 账户、档案、申请状态等 JSON 仍由本类负责；结构化文件的创建与 **`meta`** 维护通过 **`ensureStructuredFile(Path, entity)`**（`ta` schema、`1.0` 版本）统一处理。
+
+3. **TA 岗位数据入口**
+   - **`TaAccountDao.getPendingJobBoardData`** 使用 **`readJobBoard()`**，与 MO 岗位列表数据来源与展示形状一致。
+
+4. **文档与挂载说明**
+   - 更新 **`common/dao/README`**、**`mo/dao/README`** 等包内说明；**`mountDataTAMObupter/common/recruitment-courses-dao-notes.md`** 记录 Admin/TA 对岗位库的专有写操作尚未在本包实现等事项。
+
+### 需要解决的问题
+
+- 与 Entry 02 中「服务端校验、岗位编辑、TA 字段生命周期」等待办项相同；本阶段以 **共用 DAO 与委托调用** 为主，**不扩展新的业务规则**。
+- 预留的按 `jobId`/治理/`ownerMoId` 查询能力尚未在 HTTP 层暴露，需产品化时再接线。
+
+### 备注
+
+- 契约与行为仍以 **`docs/api/mo-job-board-api-v2.md`** 为准。
+
+---
+
 ## 模板
 
-### Entry 03 - [本次开发主题]
+### Entry 04 - [本次开发主题]
 
 **At [YYYY-MM-DD HH:MM (UTC+8)], by [Name].**
 

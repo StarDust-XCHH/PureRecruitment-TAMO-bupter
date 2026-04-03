@@ -1,6 +1,7 @@
 package com.bupt.tarecruit.mo.dao;
 
 import com.bupt.tarecruit.common.config.DataMountPaths;
+import com.bupt.tarecruit.common.dao.RecruitmentCoursesDao;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -21,14 +22,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.firstNonBlank;
+import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.getAsString;
+import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.getOptionalInt;
+import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.trim;
+
 public class MoRecruitmentDao {
-    private static final Path MO_PENDING_COURSES = DataMountPaths.moRecruitmentCourses();
     private static final Path TA_APPLICATION_STATUS = DataMountPaths.taApplicationStatus();
     private static final Path TA_PROFILES = DataMountPaths.taProfiles();
     private static final Path TA_ACCOUNTS = DataMountPaths.taAccounts();
-    private static final String JOB_BOARD_SCHEMA = "mo-ta-job-board";
-    private static final String JOB_BOARD_ENTITY = "jobs";
-    private static final String JOB_BOARD_VERSION = "2.0";
     private static final String TA_SCHEMA = "ta";
     private static final String TA_ENTITY_TAS = "tas";
     private static final String TA_ENTITY_PROFILES = "profiles";
@@ -39,45 +41,11 @@ public class MoRecruitmentDao {
             .disableHtmlEscaping()
             .create();
 
-    public synchronized JsonObject getPendingCourses() throws IOException {
-        JsonObject root = ensureStructuredFile(
-                MO_PENDING_COURSES,
-                JOB_BOARD_SCHEMA,
-                JOB_BOARD_ENTITY,
-                JOB_BOARD_VERSION
-        );
-
-        JsonArray items = root.getAsJsonArray("items");
-        JsonArray normalizedItems = new JsonArray();
-        for (JsonElement element : items) {
-            if (element != null && element.isJsonObject()) {
-                normalizedItems.add(normalizeJobItem(element.getAsJsonObject()));
-            }
-        }
-
-        JsonObject payload = new JsonObject();
-        payload.addProperty("schema", JOB_BOARD_SCHEMA);
-        payload.addProperty("version", JOB_BOARD_VERSION);
-        payload.addProperty("generatedAt", getMetaUpdatedAt(root));
-        payload.addProperty("count", normalizedItems.size());
-        payload.add("items", normalizedItems);
-
-        // Read path does not write the file: avoids rewriting every item (e.g. stripping optional
-        // empty keys on unrelated courses) whenever MO lists jobs. Normalization is for the response
-        // only; persistence happens on createCourse / other explicit writes. Legacy rows on disk may
-        // stay pre-v2-shaped until edited or migrated elsewhere.
-        return payload;
+    public JsonObject getPendingCourses() throws IOException {
+        return RecruitmentCoursesDao.readJobBoard();
     }
 
-    public synchronized JsonObject createCourse(JsonObject input) throws IOException {
-        JsonObject root = ensureStructuredFile(
-                MO_PENDING_COURSES,
-                JOB_BOARD_SCHEMA,
-                JOB_BOARD_ENTITY,
-                JOB_BOARD_VERSION
-        );
-        JsonArray items = root.getAsJsonArray("items");
-
+    public JsonObject createCourse(JsonObject input) throws IOException {
         String now = Instant.now().toString();
         String courseName = trim(getAsString(input, "courseName"));
         if (courseName.isEmpty()) {
@@ -88,19 +56,24 @@ public class MoRecruitmentDao {
         if (courseCode.isEmpty()) {
             throw new IllegalArgumentException("课程编号不能为空");
         }
-        String recruitmentStatus = firstNonBlank(trim(getAsString(input, "recruitmentStatus")), trim(getAsString(input, "status")));
+        String recruitmentStatus = firstNonBlank(
+                trim(getAsString(input, "recruitmentStatus")),
+                trim(getAsString(input, "status")));
         if (recruitmentStatus.isEmpty()) {
             throw new IllegalArgumentException("招聘状态不能为空");
         }
         String semester = trim(getAsString(input, "semester"));
         String applicationDeadline = trim(getAsString(input, "applicationDeadline"));
 
-        JsonObject teachingWeeks = normalizeTeachingWeeks(input.has("teachingWeeks") && input.get("teachingWeeks").isJsonObject()
-                ? input.getAsJsonObject("teachingWeeks")
-                : null);
-        JsonArray assessmentEvents = normalizeAssessmentEvents(input.has("assessmentEvents") ? input.get("assessmentEvents") : null);
-        JsonObject requiredSkills = normalizeRequiredSkills(input.has("requiredSkills") ? input.get("requiredSkills") : null);
-        if (!hasRequiredSkills(requiredSkills)) {
+        JsonObject teachingWeeks = RecruitmentCoursesDao.normalizeTeachingWeeks(
+                input.has("teachingWeeks") && input.get("teachingWeeks").isJsonObject()
+                        ? input.getAsJsonObject("teachingWeeks")
+                        : null);
+        JsonArray assessmentEvents = RecruitmentCoursesDao.normalizeAssessmentEvents(
+                input.has("assessmentEvents") ? input.get("assessmentEvents") : null);
+        JsonObject requiredSkills = RecruitmentCoursesDao.normalizeRequiredSkills(
+                input.has("requiredSkills") ? input.get("requiredSkills") : null);
+        if (!RecruitmentCoursesDao.hasRequiredSkills(requiredSkills)) {
             throw new IllegalArgumentException("技能标签不能为空");
         }
 
@@ -108,12 +81,15 @@ public class MoRecruitmentDao {
         if (courseDescription.isEmpty()) {
             throw new IllegalArgumentException("岗位描述不能为空");
         }
-        String ownerMoName = firstNonBlank(trim(getAsString(input, "ownerMoName")),
-                firstNonBlank(trim(getAsString(input, "ownerMoId")), "MO"));
-        String ownerMoId = firstNonBlank(trim(getAsString(input, "ownerMoId")), ownerMoName);
+        String ownerMoName = firstNonBlank(
+                trim(getAsString(input, "ownerMoName")),
+                firstNonBlank(
+                        trim(getAsString(input, "ownerMoId")), "MO"));
+        String ownerMoId = firstNonBlank(
+                trim(getAsString(input, "ownerMoId")), ownerMoName);
         String recruitmentBrief = trim(getAsString(input, "recruitmentBrief"));
         String workload = trim(getAsString(input, "workload"));
-        String campus = normalizeCampus(getAsString(input, "campus"));
+        String campus = RecruitmentCoursesDao.normalizeCampus(getAsString(input, "campus"));
         Integer taRecruitCount = getOptionalInt(input, "taRecruitCount");
         Integer studentCount = getOptionalInt(input, "studentCount");
         int normalizedStudentCount = studentCount == null ? -1 : studentCount;
@@ -127,7 +103,7 @@ public class MoRecruitmentDao {
         if (!semester.isBlank()) {
             item.addProperty("semester", semester);
         }
-        item.addProperty("status", recruitmentStatus); // compatibility field for existing readers
+        item.addProperty("status", recruitmentStatus);
         item.addProperty("recruitmentStatus", recruitmentStatus);
         item.addProperty("publishStatus", "PENDING_REVIEW");
         item.addProperty("visibility", "INTERNAL");
@@ -175,10 +151,7 @@ public class MoRecruitmentDao {
             item.addProperty("source", source);
         }
 
-        items.add(item);
-        updateMeta(root, JOB_BOARD_SCHEMA, JOB_BOARD_ENTITY, JOB_BOARD_VERSION);
-        syncJobBoardFileEnvelope(root, items);
-        writeJson(MO_PENDING_COURSES, root);
+        RecruitmentCoursesDao.appendPublishedJob(item);
 
         JsonObject result = new JsonObject();
         result.addProperty("success", true);
@@ -193,9 +166,9 @@ public class MoRecruitmentDao {
             return new JsonArray();
         }
 
-        JsonObject accountRoot = ensureTaStructuredFile(TA_ACCOUNTS, TA_ENTITY_TAS);
-        JsonObject profileRoot = ensureTaStructuredFile(TA_PROFILES, TA_ENTITY_PROFILES);
-        JsonObject appRoot = ensureTaStructuredFile(TA_APPLICATION_STATUS, TA_ENTITY_APPLICATION_STATUS);
+        JsonObject accountRoot = ensureStructuredFile(TA_ACCOUNTS, TA_ENTITY_TAS);
+        JsonObject profileRoot = ensureStructuredFile(TA_PROFILES, TA_ENTITY_PROFILES);
+        JsonObject appRoot = ensureStructuredFile(TA_APPLICATION_STATUS, TA_ENTITY_APPLICATION_STATUS);
 
         JsonArray accountItems = accountRoot.getAsJsonArray("items");
         JsonArray profileItems = profileRoot.getAsJsonArray("items");
@@ -262,9 +235,9 @@ public class MoRecruitmentDao {
             throw new IllegalArgumentException("decision 仅支持 selected 或 rejected");
         }
 
-        JsonObject appRoot = ensureTaStructuredFile(TA_APPLICATION_STATUS, TA_ENTITY_APPLICATION_STATUS);
+        JsonObject appRoot = ensureStructuredFile(TA_APPLICATION_STATUS, TA_ENTITY_APPLICATION_STATUS);
         JsonArray appItems = appRoot.getAsJsonArray("items");
-        JsonObject course = findCourseByCode(normalizedCourseCode);
+        JsonObject course = RecruitmentCoursesDao.findNormalizedJobByCourseCode(normalizedCourseCode);
 
         String now = Instant.now().toString();
         String statusText = "selected".equals(normalizedDecision) ? "已录用" : "未录用";
@@ -309,20 +282,6 @@ public class MoRecruitmentDao {
         return payload;
     }
 
-    private JsonObject findCourseByCode(String courseCode) throws IOException {
-        JsonObject courses = ensureStructuredFile(MO_PENDING_COURSES, JOB_BOARD_SCHEMA, JOB_BOARD_ENTITY, JOB_BOARD_VERSION);
-        for (JsonElement item : courses.getAsJsonArray("items")) {
-            if (!item.isJsonObject()) {
-                continue;
-            }
-            JsonObject obj = normalizeJobItem(item.getAsJsonObject());
-            if (courseCode.equalsIgnoreCase(getAsString(obj, "courseCode"))) {
-                return obj;
-            }
-        }
-        return null;
-    }
-
     private JsonObject findProfile(JsonArray profiles, String taId) {
         for (JsonElement element : profiles) {
             if (!element.isJsonObject()) {
@@ -360,18 +319,14 @@ public class MoRecruitmentDao {
         return latest;
     }
 
-    private JsonObject ensureTaStructuredFile(Path path, String entity) throws IOException {
-        return ensureStructuredFile(path, TA_SCHEMA, entity, "1.0");
-    }
-
-    private JsonObject ensureStructuredFile(Path path, String schema, String entity, String version) throws IOException {
+    private JsonObject ensureStructuredFile(Path path, String entity) throws IOException {
         Files.createDirectories(path.getParent());
         if (!Files.exists(path)) {
             JsonObject root = new JsonObject();
             JsonObject meta = new JsonObject();
-            meta.addProperty("schema", schema);
+            meta.addProperty("schema", TA_SCHEMA);
             meta.addProperty("entity", entity);
-            meta.addProperty("version", version);
+            meta.addProperty("version", "1.0");
             meta.addProperty("updatedAt", Instant.now().toString());
             root.add("meta", meta);
             root.add("items", new JsonArray());
@@ -388,14 +343,14 @@ public class MoRecruitmentDao {
                 if (!root.has("items") || !root.get("items").isJsonArray()) {
                     root.add("items", new JsonArray());
                 }
-                updateMeta(root, schema, entity, version);
+                updateMeta(root, TA_SCHEMA, entity, "1.0");
                 return root;
             }
         }
         JsonObject fallback = new JsonObject();
         fallback.add("meta", new JsonObject());
         fallback.add("items", new JsonArray());
-        updateMeta(fallback, schema, entity, version);
+        updateMeta(fallback, TA_SCHEMA, entity, "1.0");
         return fallback;
     }
 
@@ -407,267 +362,11 @@ public class MoRecruitmentDao {
         meta.addProperty("updatedAt", Instant.now().toString());
     }
 
-    /** Keeps v2 top-level envelope (`count`, `generatedAt`, …) aligned with `items` on each publish. */
-    private void syncJobBoardFileEnvelope(JsonObject root, JsonArray items) {
-        String now = Instant.now().toString();
-        root.addProperty("schema", JOB_BOARD_SCHEMA);
-        root.addProperty("version", JOB_BOARD_VERSION);
-        root.addProperty("generatedAt", now);
-        root.addProperty("count", items.size());
-    }
-
     private void writeJson(Path path, JsonObject root) throws IOException {
         Files.createDirectories(path.getParent());
         try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
             GSON.toJson(root, writer);
         }
-    }
-
-    private String getMetaUpdatedAt(JsonObject root) {
-        if (!root.has("meta") || !root.get("meta").isJsonObject()) {
-            return "";
-        }
-        JsonObject meta = root.getAsJsonObject("meta");
-        return getAsString(meta, "updatedAt");
-    }
-
-    private JsonArray parseCsvToArray(String csv) {
-        JsonArray array = new JsonArray();
-        if (csv == null || csv.isBlank()) {
-            return array;
-        }
-        String[] parts = csv.split(",");
-        for (String part : parts) {
-            String value = trim(part);
-            if (!value.isBlank()) {
-                array.add(value);
-            }
-        }
-        return array;
-    }
-
-    private JsonArray parseStringList(JsonElement element) {
-        JsonArray result = new JsonArray();
-        if (element == null || element.isJsonNull()) {
-            return result;
-        }
-        if (element.isJsonArray()) {
-            for (JsonElement item : element.getAsJsonArray()) {
-                if (item != null && !item.isJsonNull()) {
-                    String text = trim(item.getAsString());
-                    if (!text.isBlank()) {
-                        result.add(text);
-                    }
-                }
-            }
-            return result;
-        }
-        if (element.isJsonPrimitive()) {
-            return parseCsvToArray(element.getAsString());
-        }
-        return result;
-    }
-
-    private JsonObject normalizeTeachingWeeks(JsonObject source) {
-        JsonObject out = new JsonObject();
-        JsonArray weeks = new JsonArray();
-        if (source != null && source.has("weeks") && source.get("weeks").isJsonArray()) {
-            List<Integer> values = new ArrayList<>();
-            for (JsonElement week : source.getAsJsonArray("weeks")) {
-                if (week == null || week.isJsonNull()) continue;
-                try {
-                    int w = week.getAsInt();
-                    if (w >= 1 && w <= 20 && !values.contains(w)) {
-                        values.add(w);
-                    }
-                } catch (Exception ignore) {
-                    // keep parsing remaining values
-                }
-            }
-            values.sort(Integer::compareTo);
-            for (Integer i : values) {
-                weeks.add(i);
-            }
-        }
-        out.add("weeks", weeks);
-        return out;
-    }
-
-    private JsonArray normalizeAssessmentEvents(JsonElement source) {
-        JsonArray out = new JsonArray();
-        if (source == null || source.isJsonNull() || !source.isJsonArray()) {
-            return out;
-        }
-        for (JsonElement element : source.getAsJsonArray()) {
-            if (!element.isJsonObject()) continue;
-            JsonObject in = element.getAsJsonObject();
-            String name = trim(getAsString(in, "name"));
-            if (name.isBlank()) continue;
-            JsonObject row = new JsonObject();
-            row.addProperty("name", name);
-            JsonArray weeks = new JsonArray();
-            List<Integer> weekValues = new ArrayList<>();
-            if (in.has("weeks") && in.get("weeks").isJsonArray()) {
-                for (JsonElement week : in.getAsJsonArray("weeks")) {
-                    if (week == null || week.isJsonNull()) continue;
-                    try {
-                        int w = week.getAsInt();
-                        if (w >= 1 && w <= 20 && !weekValues.contains(w)) {
-                            weekValues.add(w);
-                        }
-                    } catch (Exception ignore) {
-                        // keep parsing remaining values
-                    }
-                }
-            } else if (in.has("week")) {
-                int legacyWeek = getAsInt(in, "week", 0);
-                if (legacyWeek >= 1 && legacyWeek <= 20) {
-                    weekValues.add(legacyWeek);
-                }
-            }
-            weekValues.sort(Integer::compareTo);
-            for (Integer w : weekValues) {
-                weeks.add(w);
-            }
-            row.add("weeks", weeks);
-            row.addProperty("description", getAsString(in, "description"));
-            out.add(row);
-        }
-        return out;
-    }
-
-    private JsonObject normalizeRequiredSkills(JsonElement source) {
-        JsonObject out = new JsonObject();
-        JsonArray fixedTags = new JsonArray();
-        JsonArray customSkills = new JsonArray();
-        if (source != null && source.isJsonObject()) {
-            JsonObject in = source.getAsJsonObject();
-            if (in.has("fixedTags")) {
-                fixedTags = parseStringList(in.get("fixedTags"));
-            }
-            if (in.has("customSkills") && in.get("customSkills").isJsonArray()) {
-                for (JsonElement e : in.getAsJsonArray("customSkills")) {
-                    if (!e.isJsonObject()) continue;
-                    JsonObject obj = e.getAsJsonObject();
-                    String name = trim(getAsString(obj, "name"));
-                    if (name.isBlank()) continue;
-                    JsonObject row = new JsonObject();
-                    row.addProperty("name", name);
-                    row.addProperty("description", getAsString(obj, "description"));
-                    customSkills.add(row);
-                }
-            }
-        }
-        out.add("fixedTags", fixedTags);
-        out.add("customSkills", customSkills);
-        return out;
-    }
-
-    private boolean hasRequiredSkills(JsonObject skills) {
-        if (skills == null) {
-            return false;
-        }
-        JsonArray fixed = skills.has("fixedTags") && skills.get("fixedTags").isJsonArray()
-                ? skills.getAsJsonArray("fixedTags")
-                : new JsonArray();
-        JsonArray custom = skills.has("customSkills") && skills.get("customSkills").isJsonArray()
-                ? skills.getAsJsonArray("customSkills")
-                : new JsonArray();
-        return !fixed.isEmpty() || !custom.isEmpty();
-    }
-
-    private String normalizeCampus(String value) {
-        String campus = trim(value);
-        if ("Main".equalsIgnoreCase(campus)) {
-            return "Main";
-        }
-        if ("Shahe".equalsIgnoreCase(campus)) {
-            return "Shahe";
-        }
-        return "";
-    }
-
-    private JsonObject normalizeJobItem(JsonObject source) {
-        JsonObject item = source.deepCopy();
-        String legacyMoName = trim(getAsString(item, "moName"));
-        item.remove("moName");
-        String courseName = firstNonBlank(getAsString(item, "courseName"), "Untitled TA Job");
-        item.addProperty("courseName", courseName);
-        String ownerMoName = firstNonBlank(trim(getAsString(item, "ownerMoName")),
-                firstNonBlank(legacyMoName, "MO"));
-        item.addProperty("ownerMoName", ownerMoName);
-        item.addProperty("ownerMoId", firstNonBlank(trim(getAsString(item, "ownerMoId")), ownerMoName));
-        if (trim(getAsString(item, "semester")).isBlank()) item.remove("semester");
-        else item.addProperty("semester", trim(getAsString(item, "semester")));
-        String recruitmentStatus = firstNonBlank(getAsString(item, "recruitmentStatus"), firstNonBlank(getAsString(item, "status"), "OPEN"));
-        item.addProperty("recruitmentStatus", recruitmentStatus);
-        item.addProperty("status", recruitmentStatus);
-        item.addProperty("publishStatus", firstNonBlank(getAsString(item, "publishStatus"), "PENDING_REVIEW"));
-        item.addProperty("visibility", firstNonBlank(getAsString(item, "visibility"), "INTERNAL"));
-        item.addProperty("isArchived", item.has("isArchived") && !item.get("isArchived").isJsonNull() && item.get("isArchived").getAsBoolean());
-        item.addProperty("auditStatus", firstNonBlank(getAsString(item, "auditStatus"), "PENDING"));
-        item.addProperty("auditComment", firstNonBlank(getAsString(item, "auditComment"), ""));
-        item.addProperty("priority", firstNonBlank(getAsString(item, "priority"), "NORMAL"));
-        item.addProperty("dataVersion", Math.max(1, getAsInt(item, "dataVersion", 1)));
-        item.addProperty("lastSyncedAt", firstNonBlank(getAsString(item, "lastSyncedAt"), ""));
-        item.addProperty("jobId", firstNonBlank(getAsString(item, "jobId"), "MOJOB-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase(Locale.ROOT)));
-        item.addProperty("courseCode", firstNonBlank(getAsString(item, "courseCode"), buildCourseCode(courseName)));
-        item.addProperty("studentCount", getAsInt(item, "studentCount", -1));
-        item.addProperty("recruitedCount", Math.max(0, getAsInt(item, "recruitedCount", 0)));
-        item.addProperty("applicationsTotal", Math.max(0, getAsInt(item, "applicationsTotal", 0)));
-        item.addProperty("applicationsPending", Math.max(0, getAsInt(item, "applicationsPending", 0)));
-        item.addProperty("applicationsAccepted", Math.max(0, getAsInt(item, "applicationsAccepted", 0)));
-        item.addProperty("applicationsRejected", Math.max(0, getAsInt(item, "applicationsRejected", 0)));
-        item.addProperty("lastApplicationAt", firstNonBlank(getAsString(item, "lastApplicationAt"), ""));
-        item.addProperty("lastSelectionAt", firstNonBlank(getAsString(item, "lastSelectionAt"), ""));
-        if (item.has("taRecruitCount")) {
-            item.addProperty("taRecruitCount", getAsInt(item, "taRecruitCount", 0));
-        }
-        if (item.has("campus")) {
-            String campus = normalizeCampus(getAsString(item, "campus"));
-            if (campus.isBlank()) {
-                item.remove("campus");
-            } else {
-                item.addProperty("campus", campus);
-            }
-        }
-        if (item.has("teachingWeeks") && item.get("teachingWeeks").isJsonObject()) {
-            JsonObject teachingWeeks = normalizeTeachingWeeks(item.getAsJsonObject("teachingWeeks"));
-            if (teachingWeeks.getAsJsonArray("weeks").isEmpty()) {
-                item.remove("teachingWeeks");
-            } else {
-                item.add("teachingWeeks", teachingWeeks);
-            }
-        } else {
-            item.remove("teachingWeeks");
-        }
-        JsonArray assessmentEvents = normalizeAssessmentEvents(item.get("assessmentEvents"));
-        if (!assessmentEvents.isEmpty()) {
-            item.add("assessmentEvents", assessmentEvents);
-        } else {
-            item.remove("assessmentEvents");
-        }
-        item.remove("customLabels");
-        if (trim(getAsString(item, "applicationDeadline")).isBlank()) item.remove("applicationDeadline");
-        else item.addProperty("applicationDeadline", trim(getAsString(item, "applicationDeadline")));
-        item.add("requiredSkills", normalizeRequiredSkills(item.get("requiredSkills")));
-        item.addProperty("courseDescription", getAsString(item, "courseDescription"));
-        String recruitmentBrief = trim(getAsString(item, "recruitmentBrief"));
-        if (recruitmentBrief.isBlank()) item.remove("recruitmentBrief");
-        else item.addProperty("recruitmentBrief", recruitmentBrief);
-        String workload = trim(getAsString(item, "workload"));
-        if (workload.isBlank()) item.remove("workload");
-        else item.addProperty("workload", workload);
-        item.remove("suggestion");
-        item.remove("checklist");
-
-        String now = Instant.now().toString();
-        item.addProperty("createdAt", firstNonBlank(getAsString(item, "createdAt"), now));
-        item.addProperty("updatedAt", firstNonBlank(getAsString(item, "updatedAt"), now));
-        String sourceText = trim(getAsString(item, "source"));
-        if (sourceText.isBlank()) item.remove("source");
-        else item.addProperty("source", sourceText);
-        return item;
     }
 
     private String joinArrayAsText(JsonElement element) {
@@ -686,12 +385,6 @@ public class MoRecruitmentDao {
         return String.join(", ", values);
     }
 
-    private String buildCourseCode(String courseName) {
-        String base = "MO-" + courseName.replaceAll("[^A-Za-z0-9\\u4e00-\\u9fa5]", "");
-        String suffix = UUID.randomUUID().toString().substring(0, 4).toUpperCase(Locale.ROOT);
-        return (base.length() > 12 ? base.substring(0, 12) : base) + "-" + suffix;
-    }
-
     private String normalizeSlug(String text) {
         return sanitizeCode(text).toLowerCase(Locale.ROOT);
     }
@@ -701,44 +394,6 @@ public class MoRecruitmentDao {
             return "";
         }
         return text.trim().replaceAll("[^A-Za-z0-9]+", "-").replaceAll("(^-|-$)", "");
-    }
-
-    private String firstNonBlank(String primary, String fallback) {
-        String first = trim(primary);
-        return first.isBlank() ? trim(fallback) : first;
-    }
-
-    private String getAsString(JsonObject object, String key) {
-        if (object == null || key == null || !object.has(key) || object.get(key).isJsonNull()) {
-            return "";
-        }
-        return object.get(key).getAsString();
-    }
-
-    private int getAsInt(JsonObject object, String key, int fallback) {
-        if (object == null || key == null || !object.has(key) || object.get(key).isJsonNull()) {
-            return fallback;
-        }
-        try {
-            return object.get(key).getAsInt();
-        } catch (Exception ex) {
-            return fallback;
-        }
-    }
-
-    private Integer getOptionalInt(JsonObject object, String key) {
-        if (object == null || key == null || !object.has(key) || object.get(key).isJsonNull()) {
-            return null;
-        }
-        try {
-            return object.get(key).getAsInt();
-        } catch (Exception ex) {
-            return null;
-        }
-    }
-
-    private String trim(String value) {
-        return value == null ? "" : value.trim();
     }
 
 }

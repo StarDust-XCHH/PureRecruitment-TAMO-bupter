@@ -93,10 +93,10 @@ This log tracks MO-side changes that interact with TA-side interfaces or TA data
   - initializes `recruitedCount=0` and other placeholder fields on publish
   - keeps compatibility mirror field `status = recruitmentStatus` for existing readers
   - uses shared path resolver in `common` package for MO/TA JSON mount paths
+  - job-board file access is implemented in `com.bupt.tarecruit.common.dao.RecruitmentCoursesDao` (`readJobBoard` for MO + TA lists, `appendPublishedJob` for publish, lookups for MO selection)
 
 - Current TA backend behavior for job board:
-  - `GET /api/ta/jobs` reads from the same `mountDataTAMObupter/common/recruitment-courses.json` file
-  - returns `items` largely as stored on disk (pass-through); not the same code path as MO’s in-memory `normalizeJobItem` (TA-side lifecycle updates for new fields are not implemented here)
+  - `GET /api/ta/jobs` reads from the same `mountDataTAMObupter/common/recruitment-courses.json` file via **`RecruitmentCoursesDao.readJobBoard()`** (same v2 normalization as MO `GET /api/mo/jobs`); TA-side lifecycle field updates on job rows are not implemented here
 
 ## Notes
 

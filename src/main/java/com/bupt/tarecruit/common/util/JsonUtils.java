@@ -6,6 +6,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * 将 {@link ApiResponse} 及常见 Java 值（Map、List、String 等）**手写**为 JSON 字符串，供 Servlet 直接写出。
+ * <p>
+ * 与 {@link GsonJsonObjectUtils} 无重叠：本类<strong>不</strong>使用 Gson {@code JsonObject}；若需解析/读取请求体或文件中的 Gson 结构，请用 {@code GsonJsonObjectUtils}。
+ */
 public final class JsonUtils {
     private JsonUtils() {
     }
