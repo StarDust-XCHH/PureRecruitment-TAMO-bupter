@@ -29,6 +29,50 @@
             window.scrollTo({ top: targetTop, behavior: 'smooth' });
         }
 
+        function formatFileSize(bytes) {
+            const size = Number(bytes);
+            if (!Number.isFinite(size) || size <= 0) return '--';
+            if (size >= 1024 * 1024) return (size / (1024 * 1024)).toFixed(2) + ' MB';
+            if (size >= 1024) return Math.round(size / 1024) + ' KB';
+            return size + ' B';
+        }
+
+        function syncApplyModal(course) {
+            if (!course) return;
+
+            const applyCourseCode = document.getElementById('jobApplyCourseCode');
+            const applyCourseName = document.getElementById('jobApplyCourseName');
+            const applyCourseMo = document.getElementById('jobApplyCourseMo');
+            const applyCourseSummary = document.getElementById('jobApplyCourseSummary');
+            const resumeInput = document.getElementById('jobResumeFileInput');
+            const resumeMeta = document.getElementById('jobResumeFileMeta');
+            const resumeFileName = document.getElementById('jobResumeFileName');
+            const resumeFileSize = document.getElementById('jobResumeFileSize');
+            const submitBtn = document.getElementById('jobResumeSubmitBtn');
+            const resumeTrigger = document.querySelector('.resume-upload-trigger');
+
+            if (applyCourseCode) applyCourseCode.textContent = course.code;
+            if (applyCourseName) applyCourseName.textContent = course.name;
+            if (applyCourseMo) applyCourseMo.textContent = course.mo;
+            if (applyCourseSummary) {
+                applyCourseSummary.textContent = '请上传用于申请“' + course.name + '”的最新简历，建议突出与课程标签、答疑支持和课堂管理相关的经历。';
+            }
+
+            if (resumeInput) {
+                resumeInput.value = '';
+                resumeInput.dataset.courseCode = course.code;
+            }
+            if (resumeMeta) resumeMeta.hidden = true;
+            if (resumeFileName) resumeFileName.textContent = '未选择';
+            if (resumeFileSize) resumeFileSize.textContent = '--';
+            if (resumeTrigger) resumeTrigger.textContent = '选择简历文件';
+            if (submitBtn) {
+                submitBtn.textContent = 'Submit Application';
+                submitBtn.dataset.courseCode = course.code;
+                submitBtn.disabled = false;
+            }
+        }
+
         function renderCourseDetail(courseCode) {
             const course = courseDetailState[courseCode];
             if (!course) return;
@@ -75,6 +119,8 @@
                 jobDetailApplyBtn.textContent = jobDetailApplyBtn.dataset.applyLabelDefault || 'Apply';
                 jobDetailApplyBtn.dataset.courseCode = course.code;
             }
+
+            syncApplyModal(course);
         }
 
         function bindCardEvents() {
@@ -296,6 +342,61 @@
         if (refreshJobsBtn) {
             refreshJobsBtn.addEventListener('click', fetchAndRefreshJobs);
         }
+
+        const jobDetailApplyBtn = document.getElementById('jobDetailApplyBtn');
+        jobDetailApplyBtn?.addEventListener('click', (event) => {
+            event.preventDefault();
+            const courseCode = jobDetailApplyBtn.dataset.courseCode || activeCourseCode;
+            const course = courseDetailState[courseCode];
+            if (!course) return;
+            syncApplyModal(course);
+            if (typeof app.openModal === 'function') app.openModal('course-apply');
+        });
+
+        const jobResumeFileInput = document.getElementById('jobResumeFileInput');
+        jobResumeFileInput?.addEventListener('change', () => {
+            const file = jobResumeFileInput.files && jobResumeFileInput.files[0];
+            const resumeMeta = document.getElementById('jobResumeFileMeta');
+            const resumeFileName = document.getElementById('jobResumeFileName');
+            const resumeFileSize = document.getElementById('jobResumeFileSize');
+            const submitBtn = document.getElementById('jobResumeSubmitBtn');
+            const resumeTrigger = document.querySelector('.resume-upload-trigger');
+
+            if (!file) {
+                if (resumeMeta) resumeMeta.hidden = true;
+                if (resumeFileName) resumeFileName.textContent = '未选择';
+                if (resumeFileSize) resumeFileSize.textContent = '--';
+                if (resumeTrigger) resumeTrigger.textContent = '选择简历文件';
+                if (submitBtn) submitBtn.textContent = 'Submit Application';
+                return;
+            }
+
+            if (resumeMeta) resumeMeta.hidden = false;
+            if (resumeFileName) resumeFileName.textContent = file.name;
+            if (resumeFileSize) resumeFileSize.textContent = formatFileSize(file.size);
+            if (resumeTrigger) resumeTrigger.textContent = '重新选择';
+            if (submitBtn) submitBtn.textContent = 'Submit Application · Ready';
+        });
+
+
+        const jobResumeSubmitBtn = document.getElementById('jobResumeSubmitBtn');
+        jobResumeSubmitBtn?.addEventListener('click', (event) => {
+            event.preventDefault();
+            const resumeInput = document.getElementById('jobResumeFileInput');
+            const selectedFile = resumeInput?.files && resumeInput.files[0];
+            if (!selectedFile) {
+                resumeInput?.click();
+                return;
+            }
+
+            jobResumeSubmitBtn.disabled = true;
+            jobResumeSubmitBtn.textContent = 'Application Submitted';
+
+            if (jobDetailApplyBtn) {
+                jobDetailApplyBtn.classList.add('applied');
+                jobDetailApplyBtn.textContent = 'Resume Uploaded';
+            }
+        });
 
         bindCardEvents();
         renderJobsBoard();
