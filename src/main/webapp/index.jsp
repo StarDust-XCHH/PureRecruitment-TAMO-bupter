@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TA Recruitment System</title>
-        <link rel="stylesheet" href="assets/common/css/index.css">
+    <title>Recruitment System</title>
+    <link rel="stylesheet" href="assets/common/css/index.css">
 </head>
 <body>
 <div class="glow"></div>
@@ -21,10 +21,10 @@
             </button>
 
             <div class="brand" id="brandTrigger">
-                <div class="logo">TA</div>
+                <div class="logo" id="loginLogo">TA</div>
                 <div>
-                    <h1>TA Recruitment System</h1>
-                    <div class="sub">请选择登录身份</div>
+                    <h1 id="loginTitle">TA Recruitment System</h1>
+                    <div class="sub" id="loginSub">请选择登录身份</div>
                 </div>
             </div>
 
@@ -37,7 +37,7 @@
                 <input id="roleInput" name="role" type="hidden" value="TA">
 
                 <div class="field">
-                    <label for="username">用户名 / 邮箱 / 手机号</label>
+                    <label for="username" id="loginIdentifierLabel">用户名 / 邮箱 / 手机号</label>
                     <input id="username" name="username" type="text" placeholder="请输入用户名、邮箱或手机号" autocomplete="username">
                 </div>
 
@@ -48,7 +48,7 @@
 
                 <div class="actions">
                     <button class="btn" id="loginSubmit" type="submit">进入系统</button>
-                    <a class="link" id="openRegister" href="jsp/register.jsp">注册账号</a>
+                    <a class="link" id="openRegister" href="javascript:void(0)">注册账号</a>
                 </div>
 
                 <div class="error" id="loginError" aria-live="polite"></div>
@@ -77,18 +77,20 @@
             </button>
 
             <div class="brand">
-                <div class="logo">TA</div>
+                <div class="logo" id="registerLogo">TA</div>
                 <div>
-                    <h1>TA Registration</h1>
-                    <div class="sub">成为助教 Teaching Assistant</div>
+                    <h1 id="registerTitle">TA Registration</h1>
+                    <div class="sub" id="registerSub">成为助教 Teaching Assistant</div>
                 </div>
             </div>
 
             <form id="registerForm">
+                <input id="registerRoleInput" name="role" type="hidden" value="TA">
+
                 <div class="field-row">
                     <div class="field">
-                        <label for="registerTaId">TA ID 自动生成</label>
-                        <input id="registerTaId" name="taId" type="text" readonly>
+                        <label for="registerId" id="registerIdLabel">TA ID 自动生成</label>
+                        <input id="registerId" name="id" type="text" readonly>
                     </div>
                     <div class="field">
                         <label for="registerName">姓名</label>
@@ -137,4 +139,3 @@
 <script src="assets/common/js/index.js"></script>
 </body>
 </html>
-
