@@ -302,6 +302,44 @@
             return '../../api/ta/jobs';
         }
 
+        function resolveJobApplicationApiUrl() {
+            return '../../api/ta/applications';
+        }
+
+        function getCurrentTaId() {
+            const userData = typeof app.getUserData === 'function' ? app.getUserData() : null;
+            return String(userData?.taId || userData?.id || '').trim();
+        }
+
+        function isAllowedResumeFile(file) {
+            if (!file) return false;
+            const name = String(file.name || '').toLowerCase();
+            return name.endsWith('.pdf') || name.endsWith('.doc') || name.endsWith('.docx');
+        }
+
+        async function submitCourseApplication(courseCode, selectedFile) {
+            const taId = getCurrentTaId();
+            if (!taId) throw new Error('当前未获取到 TA 身份，请重新登录后再试。');
+            if (!courseCode) throw new Error('缺少课程编号，无法提交申请。');
+            if (!selectedFile) throw new Error('请先选择简历文件。');
+            if (!isAllowedResumeFile(selectedFile)) throw new Error('仅支持上传 PDF / DOC / DOCX 简历文件。');
+            if (selectedFile.size > 10 * 1024 * 1024) throw new Error('简历文件大小不能超过 10MB。');
+
+            const formData = new FormData();
+            formData.append('taId', taId);
+            formData.append('courseCode', courseCode);
+            formData.append('resumeFile', selectedFile, selectedFile.name);
+
+            const response = await fetch(resolveJobApplicationApiUrl(), {
+                method: 'POST',
+                body: formData
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload?.success) {
+                throw new Error(payload?.message || ('申请提交失败，status=' + response.status));
+            }
+            return payload.data || {};
+        }
         async function fetchAndRefreshJobs() {
             if (isJobFetching) return;
 
@@ -481,22 +519,40 @@
         });
 
 
-        const jobResumeSubmitBtn = document.getElementById('jobResumeSubmitBtn');
-        jobResumeSubmitBtn?.addEventListener('click', (event) => {
+        jobResumeSubmitBtn?.addEventListener('click', async (event) => {
             event.preventDefault();
             const resumeInput = document.getElementById('jobResumeFileInput');
             const selectedFile = resumeInput?.files && resumeInput.files[0];
+            const courseCode = (jobResumeSubmitBtn.dataset.courseCode || resumeInput?.dataset.courseCode || activeCourseCode || '').trim();
             if (!selectedFile) {
                 resumeInput?.click();
                 return;
             }
 
+            const defaultText = '提交课程申请';
             jobResumeSubmitBtn.disabled = true;
-            jobResumeSubmitBtn.textContent = 'Application Submitted';
+            jobResumeSubmitBtn.textContent = '提交中...';
 
-            if (jobDetailApplyBtn) {
-                jobDetailApplyBtn.classList.add('applied');
-                jobDetailApplyBtn.textContent = 'Resume Uploaded';
+            try {
+                const result = await submitCourseApplication(courseCode, selectedFile);
+                jobResumeSubmitBtn.textContent = '已提交';
+
+                if (jobDetailApplyBtn) {
+                    jobDetailApplyBtn.classList.add('applied');
+                    jobDetailApplyBtn.textContent = '已申请';
+                }
+
+                const resumeTrigger = document.querySelector('.resume-upload-trigger');
+                if (resumeTrigger) resumeTrigger.textContent = '已上传';
+                if (typeof app.loadStatusData === 'function') {
+                    app.loadStatusData();
+                }
+                console.log('[TA-APPLICATION] submit success', result);
+            } catch (error) {
+                console.error('[TA-APPLICATION] submit failed', error);
+                jobResumeSubmitBtn.disabled = false;
+                jobResumeSubmitBtn.textContent = defaultText;
+                window.alert(error.message || '申请提交失败，请稍后重试。');
             }
         });
 
