@@ -73,6 +73,34 @@ public final class DataMountPaths {
         return taDir().resolve("application-status.json");
     }
 
+    public static Path taApplications() {
+        return taDir().resolve("applications.json");
+    }
+
+    public static Path taApplicationEvents() {
+        return taDir().resolve("application-events.json");
+    }
+
+    public static Path taResumeRoot() {
+        return taDir().resolve("resume");
+    }
+
+    public static Path taResumeDir(String taId) {
+        return taResumeRoot().resolve(safePathSegment(taId));
+    }
+
+    public static Path taResumeCourseDir(String taId, String courseCode) {
+        return taResumeDir(taId).resolve(safePathSegment(courseCode));
+    }
+
+    private static String safePathSegment(String value) {
+        String normalized = value == null ? "unknown" : value.trim();
+        if (normalized.isEmpty()) {
+            normalized = "unknown";
+        }
+        return normalized.replaceAll("[^a-zA-Z0-9._-]", "_");
+    }
+
     private static ResolvedDataRoot resolveDataRoot() {
         String envValue = System.getenv(DATA_MOUNT_ENV);
         if (envValue == null || envValue.trim().isEmpty()) {
