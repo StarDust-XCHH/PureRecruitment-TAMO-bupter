@@ -15,6 +15,7 @@ This document records bugs and improvement suggestions found during testing of t
 **Description:**  
 When spaces are inserted within numeric usernames, the system treats them as different accounts.
 
+
 **Examples:**  
 - `2023213143`
 - `2 023213143`
@@ -29,6 +30,9 @@ The system should normalize the username and identify both as the same account.
 
 **Actual Result:**  
 The system treats them as different usernames and allows duplicate registration.
+
+**Impact:**  
+This may allow duplicate TA accounts and cause inconsistent user data.
 
 **Severity:** High
 
