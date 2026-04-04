@@ -4,9 +4,10 @@
 This document records bugs and improvement suggestions found during testing of the TA module.
 
 ## Passed Functions
-- Registration basic flow
-- Login
-- Profile editing
+- Registration basic flow works correctly
+- Duplicate username with leading spaces is handled
+- Login works correctly
+- Profile editing works correctly
 
 ## Bug 1: Registration allows spaced numeric username as new account
 **Module:** Registration
