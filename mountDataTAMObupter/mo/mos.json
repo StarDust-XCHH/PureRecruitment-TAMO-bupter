@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "schema": "mo",
+    "entity": "mos",
+    "version": "1.0",
+    "updatedAt": "2026-04-04T13:43:25.104869300Z"
+  },
+  "items": [
+    {
+      "id": "MO-47567S",
+      "name": "TestMO91",
+      "username": "test001",
+      "email": "123@a.com",
+      "phone": "12345678900",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-04-04T13:42:04.269304700Z",
+      "updatedAt": "2026-04-04T13:43:25.104869300Z",
+      "auth": {
+        "passwordHash": "fe16a1dd6e6009d686c76b4be513515a8351b6d568879511630a94f7231758bc",
+        "passwordSalt": "a4dd340a-d8bb-4a20-8779-a268e3a00c76",
+        "lastLoginAt": "2026-04-04T13:43:25.104869300Z",
+        "failedAttempts": 0
+      }
+    }
+  ]
+}
