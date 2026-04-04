@@ -189,15 +189,21 @@
             }
         });
 
-        openRegister.addEventListener('click', function (event) {
-            event.preventDefault();
-            if (roleInput.value !== 'TA') {
-                setInlineMessage(loginError, '目前仅开放 TA 角色注册哦！');
-                return;
-            }
+    openRegister.addEventListener('click', function (event) {
+        event.preventDefault();
+        const selectedRole = roleInput.value;
+        if (selectedRole !== 'TA' && selectedRole !== 'MO') {
+            setInlineMessage(loginError, '目前仅开放 TA 和 MO 角色注册哦！');
+            return;
+        }
+        if (selectedRole === 'TA') {
             registerTaId.value = generateTaId();
-            showCard(registerCard, loginCard);
-        });
+        } else if (selectedRole === 'MO') {
+            // MO 不需要预生成 ID，由用户手动输入或后端自动生成
+            registerTaId.value = '';
+        }
+        showCard(registerCard, loginCard);
+    });
 
         backToLogin.addEventListener('click', function (event) {
             event.preventDefault();
@@ -369,14 +375,18 @@
 
             setLoading(registerSubmit, '注册中...', true, '完成注册并登录');
 
+            const selectedRole = roleInput.value;
+            const registerUrl = selectedRole === 'MO' ? 'api/mo/register' : 'api/ta/register';
+            const registerParamId = selectedRole === 'MO' ? 'moId' : 'taId';
+
             try {
-                const response = await fetch('api/ta/register', {
+                const response = await fetch(registerUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
                     },
                     body: new URLSearchParams({
-                        taId: taId,
+                        [registerParamId]: taId,
                         name: name,
                         username: username,
                         email: email,
@@ -399,25 +409,32 @@
                 }
 
                 const registered = payload.data || {};
+                const userId = selectedRole === 'MO' ? registered.moId : registered.taId;
                 const user = {
-                    taId: registered.taId || taId,
+                    [selectedRole === 'MO' ? 'moId' : 'taId']: userId || taId,
                     name: registered.name || name,
                     username: registered.username || username,
                     email: registered.email || email,
                     phone: registered.phone || phone,
-                    role: 'TA',
+                    role: selectedRole,
                     account: registered.username || username,
                     loginAt: new Date().toISOString(),
                     isFirstLogin: true,
                     createdAt: registered.createdAt || null
                 };
 
-                saveTaUser(user);
-                window.location.replace('pages/ta/ta-home.jsp');
+                if (selectedRole === 'MO') {
+                    saveMoUser(user);
+                    window.location.replace('pages/mo/mo-home.jsp');
+                } else {
+                    saveTaUser(user);
+                    window.location.replace('pages/ta/ta-home.jsp');
+                }
             } catch (error) {
                 setInlineMessage(registerError, '注册请求失败，请稍后再试');
             } finally {
                 setLoading(registerSubmit, '注册中...', false, '完成注册并登录');
             }
+
         });
     })();

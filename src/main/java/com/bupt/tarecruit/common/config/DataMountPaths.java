@@ -37,6 +37,21 @@ public final class DataMountPaths {
     public static Path moDir() {
         return root().resolve("mo");
     }
+    /** Returns path to MO accounts file ({@code mos.json}). */
+    public static Path moAccounts() {
+        return moDir().resolve("mos.json");
+    }
+
+    /** Returns path to MO profiles file ({@code profiles.json}). */
+    public static Path moProfiles() {
+        return moDir().resolve("profiles.json");
+    }
+
+    /** Returns path to MO settings file ({@code settings.json}). */
+    @SuppressWarnings("unused")
+    public static Path moSettings() {
+        return moDir().resolve("settings.json");
+    }
 
     public static Path taDir() {
         return root().resolve("ta");

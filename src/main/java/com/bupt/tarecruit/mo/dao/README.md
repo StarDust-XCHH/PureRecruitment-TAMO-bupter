@@ -1,12 +1,27 @@
-# `MoRecruitmentDao`
 
-File-backed DAO for MO recruitment flows.
+# MO Data Access Objects (`com.bupt.tarecruit.mo.dao`)
 
-**Job board file (`recruitment-courses.json`)** is handled by **`com.bupt.tarecruit.common.dao.RecruitmentCoursesDao`**: `getPendingCourses` delegates to **`readJobBoard()`** (same standardized read as TA); `createCourse` delegates append/persist after building the new row. MO does not add other course-DB features beyond publish here.
+File-backed DAO classes for MO module, handling both recruitment flows and user authentication.
 
-This class still reads/writes TA-side JSON directly for:
+## Classes
 
-- **`DataMountPaths.taApplicationStatus()`** — applicant lists and MO selection decisions.
-- **`DataMountPaths.taProfiles()`** / **`taAccounts()`** — joined for applicant display.
+### `MoRecruitmentDao`
+Manages MO recruitment operations:
+- **Job board file** (`recruitment-courses.json`) via `RecruitmentCoursesDao`
+- **TA applicant data** from `taApplicationStatus()`, `taProfiles()`, `taAccounts()`
+- Methods: `getPendingCourses()`, `createCourse()`, `getApplicantsForCourse()`, `decideApplication()`
 
-`synchronized` remains on methods that touch TA files. Listing jobs does not rewrite `recruitment-courses.json`; publish updates that file via `RecruitmentCoursesDao`.
+### `MoAccountDao`
+Manages MO user authentication and profile operations:
+- **Account file** (`mos.json`) - MO main accounts with credentials
+- **Profile file** (`profiles.json`) - User personal information
+- **Settings file** (`settings.json`) - System preferences
+- Methods: `login()`, `register()`, and internal helpers
+
+## Thread Safety
+
+All write methods in `MoAccountDao` use `synchronized` keyword to prevent concurrent modification issues.
+
+## Data Location
+
+MO data files are stored under `mountDataTAMObupter/mo/` directory, configured via `DataMountPaths.moDir()`.
