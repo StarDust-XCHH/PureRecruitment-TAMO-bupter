@@ -184,18 +184,6 @@
                         <p class="job-detail-summary" id="jobDetailDescription">课程结合企业用人需求设计，围绕软件工程基础训练营组织学习任务，适合作为招聘前置储备课程进行训练。</p>
                         <div class="job-detail-meta-grid">
                             <div class="job-detail-meta">
-                                <span>课程日期</span>
-                                <strong id="jobDetailDate">2026-03-20</strong>
-                            </div>
-                            <div class="job-detail-meta">
-                                <span>课程时间</span>
-                                <strong id="jobDetailTime">17:00-19:00</strong>
-                            </div>
-                            <div class="job-detail-meta">
-                                <span>上课地点</span>
-                                <strong id="jobDetailLocation">教一楼 A201</strong>
-                            </div>
-                            <div class="job-detail-meta">
                                 <span>学生人数</span>
                                 <strong id="jobDetailStudentCount">36 人</strong>
                             </div>
@@ -263,115 +251,75 @@
                                 <button class="pill-btn" type="button" id="saveProfileBtn">保存</button>
                             </div>
                         </div>
-                        <div class="settings-avatar" role="button" tabindex="0" id="profileAvatarBox" aria-label="更换头像">S</div>
-                        <label class="settings-field full settings-avatar-upload-field" for="avatarFile">
-                            <span>头像上传</span>
-                            <input id="avatarFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
-                            <small class="muted" id="avatarUploadHint">支持 PNG / JPG / WEBP / GIF，大小限制 10MB。点击头像即可更换。</small>
-                        </label>
-                        <div class="settings-grid">
+                        <div class="settings-grid two-column">
                             <label class="settings-field">
                                 <span>真实姓名</span>
                                 <input id="fullName" type="text" placeholder="请输入真实姓名">
                             </label>
                             <label class="settings-field">
-                                <span>申请意向</span>
-                                <input id="applicationIntent" type="text" placeholder="如：数据库 / 操作系统 / 计算机网络">
+                                <span>申请方向</span>
+                                <input id="applicationIntent" type="text" placeholder="如：软件工程、数据分析 TA">
                             </label>
                             <label class="settings-field">
                                 <span>学号</span>
-                                <input id="studentId" type="text" placeholder="系统自动分配" readonly disabled>
+                                <input id="studentId" type="text" placeholder="系统自动带出或手动补充">
                             </label>
                             <label class="settings-field">
                                 <span>联系邮箱</span>
-                                <input id="contactEmail" type="email" placeholder="name@bupt.edu.cn">
+                                <input id="contactEmail" type="email" placeholder="请输入常用邮箱">
                             </label>
                         </div>
-                        <label class="settings-field full">
-                            <span>自我介绍</span>
-                            <textarea id="bio" rows="4" placeholder="简单介绍你的研究方向、授课经验或教学风格"></textarea>
+                        <label class="settings-field">
+                            <span>个人简介</span>
+                            <textarea id="bio" rows="5" placeholder="简要介绍你的课程经历、助教经历或擅长方向"></textarea>
                         </label>
-                        <div class="settings-field full">
+                        <label class="settings-field">
                             <span>技能标签</span>
-                            <div class="skills-input" id="skillsInput" data-readonly="false">
-                                <input id="skillEntry" type="text" placeholder="输入技能后回车">
-                            </div>
-                            <small class="muted">回车可新增标签，点击标签右侧 × 可删除。</small>
-                        </div>
+                            <input id="skillsInput" type="text" placeholder="多个标签请用逗号分隔，如：Java, Python, 课堂管理">
+                        </label>
                     </div>
                 </div>
-                <div class="settings-panel" data-settings-panel="security" role="tabpanel">
+                <div class="settings-panel" data-settings-panel="security" role="tabpanel" hidden>
                     <div class="settings-section">
-                        <div class="settings-subtitle">修改密码</div>
-                        <div class="settings-grid stack">
+                        <h4>修改密码</h4>
+                        <div class="settings-grid">
                             <label class="settings-field">
                                 <span>当前密码</span>
-                                <input id="currentPassword" type="password" placeholder="请输入当前密码">
+                                <input id="currentPassword" type="password" autocomplete="current-password">
                             </label>
                             <label class="settings-field">
                                 <span>新密码</span>
-                                <input id="newPassword" type="password" placeholder="至少 6 位">
+                                <input id="newPassword" type="password" autocomplete="new-password">
                             </label>
                             <label class="settings-field">
                                 <span>确认新密码</span>
-                                <input id="confirmPassword" type="password" placeholder="再次输入新密码">
+                                <input id="confirmPassword" type="password" autocomplete="new-password">
                             </label>
                         </div>
-                        <div class="settings-action-row">
-                            <span class="muted" id="passwordSaveStatus">尚未保存</span>
-                            <button class="pill-btn" type="button" id="savePasswordBtn">保存</button>
+                        <div class="settings-action-group">
+                            <button class="pill-btn" type="button" id="updatePasswordBtn">更新密码</button>
                         </div>
+                        <p class="muted" id="passwordFeedback">为确保账号安全，建议定期更新密码。</p>
                     </div>
                 </div>
-                <div class="settings-panel" data-settings-panel="preferences" role="tabpanel">
+                <div class="settings-panel" data-settings-panel="preferences" role="tabpanel" hidden>
                     <div class="settings-section">
-                        <label class="settings-field full">
-                            <span>界面主题</span>
-                            <select id="themeSelect">
-                                <option value="system">跟随系统</option>
-                                <option value="light">浅色模式</option>
-                                <option value="dark">深色模式</option>
-                            </select>
+                        <h4>通知与偏好</h4>
+                        <label class="settings-toggle">
+                            <input id="notifyApplication" type="checkbox" checked>
+                            <span>接收投递状态更新提醒</span>
+                        </label>
+                        <label class="settings-toggle">
+                            <input id="notifyRecommendation" type="checkbox" checked>
+                            <span>接收推荐岗位提醒</span>
+                        </label>
+                        <label class="settings-toggle">
+                            <input id="notifyInterview" type="checkbox" checked>
+                            <span>接收面试与沟通日程提醒</span>
                         </label>
                     </div>
                 </div>
             </section>
-        </div>
-    </div>
-
-    <div class="ta-modal-panel wide ta-avatar-crop-modal" data-modal="avatar-crop" role="dialog" aria-labelledby="avatarCropTitle" aria-modal="true">
-        <button class="modal-close" type="button" aria-label="关闭头像裁切窗口" data-avatar-crop-close>&times;</button>
-        <div class="modal-head">
-            <h3 id="avatarCropTitle">裁切头像</h3>
-            <p class="muted">请先将头像裁切为 1:1 正方形，确认后系统才会继续上传。</p>
-        </div>
-        <div class="modal-body avatar-crop-body">
-            <div class="avatar-crop-layout">
-                <div class="avatar-crop-stage-wrap">
-                    <div class="avatar-crop-stage" id="avatarCropStage" aria-label="头像裁切区域">
-                        <img id="avatarCropImage" class="avatar-crop-image" alt="头像裁切预览" hidden>
-                        <div class="avatar-crop-mask" aria-hidden="true"></div>
-                        <div class="avatar-crop-frame" aria-hidden="true"></div>
-                    </div>
-                </div>
-                <aside class="avatar-crop-side">
-                    <div class="avatar-crop-preview-card">
-                        <span class="avatar-crop-side-title">裁切结果预览</span>
-                        <div class="avatar-crop-preview-box">
-                            <canvas id="avatarCropPreviewCanvas" width="160" height="160" aria-label="裁切结果预览"></canvas>
-                        </div>
-                    </div>
-                    <label class="settings-field full avatar-crop-zoom-field" for="avatarCropZoomRange">
-                        <span>缩放</span>
-                        <input id="avatarCropZoomRange" type="range" min="1" max="3" step="0.01" value="1">
-                    </label>
-                    <small class="muted" id="avatarCropHint">拖动图片调整取景，滑动缩放条可放大或缩小。</small>
-                    <div class="avatar-crop-actions">
-                        <button class="pill-btn ghost" type="button" id="avatarCropCancelBtn">取消</button>
-                        <button class="pill-btn" type="button" id="avatarCropConfirmBtn">确认裁切</button>
-                    </div>
-                </aside>
-            </div>
         </div>
     </div>
 </div>

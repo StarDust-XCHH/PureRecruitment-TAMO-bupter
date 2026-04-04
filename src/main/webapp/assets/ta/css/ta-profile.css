@@ -202,6 +202,24 @@
     font-size: 14px;
 }
 
+.settings-field select {
+    color-scheme: dark;
+}
+
+.settings-field select option {
+    background-color: #0f172a;
+    color: #f8fafc;
+}
+
+[data-theme="light"] .settings-field select {
+    color-scheme: light;
+}
+
+[data-theme="light"] .settings-field select option {
+    background-color: #ffffff;
+    color: #0f172a;
+}
+
 .settings-field.full {
     grid-column: 1 / -1;
 }
