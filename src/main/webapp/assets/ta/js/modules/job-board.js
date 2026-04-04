@@ -34,7 +34,6 @@
             if (!course) return;
             activeCourseCode = courseCode;
 
-            // 【修复关键】：将弹窗DOM的获取放在渲染函数内部，确保拿到的是最新挂载的活动节点
             const jobDetailCode = document.getElementById('jobDetailCode');
             const jobDetailName = document.getElementById('jobDetailName');
             const jobDetailMo = document.getElementById('jobDetailMo');
@@ -51,7 +50,7 @@
             if (jobDetailName) jobDetailName.textContent = course.name;
             if (jobDetailMo) jobDetailMo.textContent = course.mo;
             if (jobDetailStudentCount) jobDetailStudentCount.textContent = course.studentCountText;
-            if (jobDetailStatus) jobDetailStatus.textContent = course.status;
+            if (jobDetailStatus) jobDetailStatus.textContent = course.statusText;
             if (jobDetailWorkload) jobDetailWorkload.textContent = course.workload || '待确认';
             if (jobDetailDescription) jobDetailDescription.textContent = course.description;
             if (jobDetailSuggestion) jobDetailSuggestion.textContent = course.suggestion;
@@ -83,7 +82,6 @@
         }
 
         function bindCardEvents() {
-            // 【修复关键】：将作用域限制在 jobBoard 内部，防止误杀弹窗内的同类结构卡片
             const currentJobBoard = document.getElementById('jobBoard');
             if (!currentJobBoard) return;
 
@@ -178,6 +176,10 @@
             return '../../api/ta/jobs';
         }
 
+        function buildStatusText(item) {
+            return item.recruitmentStatus || item.status || '待确认';
+        }
+
         async function fetchAndRefreshJobs() {
             if (isJobFetching) return;
 
@@ -221,8 +223,9 @@
                     const checklist = Array.isArray(item.checklist) ? item.checklist : [];
                     const studentCount = Number.isFinite(Number(item.studentCount)) ? Number(item.studentCount) : 0;
                     const studentCountText = studentCount > 0 ? studentCount + ' 人' : '待确认';
-
                     const courseMoName = item.ownerMoName || item.moName || '待分配';
+                    const statusText = buildStatusText(item);
+                    const primaryTagText = keywordTags.length > 0 ? keywordTags[0] : '暂无标签';
 
                     courseDetailState[item.courseCode] = {
                         code: item.courseCode,
@@ -231,6 +234,7 @@
                         studentCount: studentCount,
                         studentCountText: studentCountText,
                         status: item.status,
+                        statusText: statusText,
                         workload: item.workload,
                         description: item.courseDescription,
                         tags: keywordTags,
@@ -258,12 +262,12 @@
                         '<strong>' + courseMoName + '</strong>' +
                         '</div>' +
                         '<div class="course-meta-item">' +
-                        '<span class="course-meta-label">学生人数</span>' +
-                        '<strong>' + studentCountText + '</strong>' +
+                        '<span class="course-meta-label">课程标签</span>' +
+                        '<strong>' + primaryTagText + '</strong>' +
                         '</div>' +
                         '<div class="course-meta-item">' +
-                        '<span class="course-meta-label">招聘状态</span>' +
-                        '<strong>' + item.status + '</strong>' +
+                        '<span class="course-meta-label">开放状态</span>' +
+                        '<strong>' + statusText + '</strong>' +
                         '</div>' +
                         '</div>' +
                         '<div class="course-card-hint">' +
@@ -306,7 +310,6 @@
         renderJobsBoard();
         fetchAndRefreshJobs();
 
-        // 【修复关键】：不再暴露过期的静态DOM引用，改为用 getter 实时抓取给主应用使用
         app.activeCourseCode = () => activeCourseCode;
         Object.defineProperty(app, 'jobDetailStatus', {
             get: () => document.getElementById('jobDetailStatus')

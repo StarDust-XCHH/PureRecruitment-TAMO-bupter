@@ -15,13 +15,13 @@
         </div>
         <label class="job-search-box" for="jobSearchInput">
             <span class="job-search-icon" aria-hidden="true">⌕</span>
-            <input id="jobSearchInput" type="text" placeholder="搜索课程编号 / 名称 / 标签">
+            <input id="jobSearchInput" type="text" placeholder="搜索课程编号 / 名称 / 标签 / MO">
         </label>
         <div class="job-board course-board" id="jobBoard">
             <div class="job-card course-job-card" tabindex="0" role="button" aria-label="查看 软件工程基础训练营 详情" data-job-detail-card data-course-code="MO-SE-628">
                 <div class="course-card-topline">
                     <span class="job-code">MO-SE-628</span>
-                    <span class="pill">开课 MO</span>
+                    <span class="course-mo-badge">王老师</span>
                 </div>
                 <h4>软件工程基础训练营</h4>
                 <div class="job-tags">
@@ -31,12 +31,16 @@
                 </div>
                 <div class="course-meta-stack">
                     <div class="course-meta-item">
-                        <span class="course-meta-label">课程时间</span>
-                        <strong>03-20 · 17:00-19:00</strong>
+                        <span class="course-meta-label">开课MO</span>
+                        <strong>王老师</strong>
                     </div>
                     <div class="course-meta-item">
-                        <span class="course-meta-label">招聘状态</span>
-                        <strong>等待招募 TA</strong>
+                        <span class="course-meta-label">课程标签</span>
+                        <strong>软件工程</strong>
+                    </div>
+                    <div class="course-meta-item">
+                        <span class="course-meta-label">开放状态</span>
+                        <strong>OPEN</strong>
                     </div>
                 </div>
                 <div class="course-card-hint">
@@ -47,7 +51,7 @@
             <div class="job-card course-job-card" tabindex="0" role="button" aria-label="查看 编译原理方法论专题 详情" data-job-detail-card data-course-code="MO-PL-403">
                 <div class="course-card-topline">
                     <span class="job-code">MO-PL-403</span>
-                    <span class="pill">开课 MO</span>
+                    <span class="course-mo-badge">李老师</span>
                 </div>
                 <h4>编译原理方法论专题</h4>
                 <div class="job-tags">
@@ -57,12 +61,16 @@
                 </div>
                 <div class="course-meta-stack">
                     <div class="course-meta-item">
-                        <span class="course-meta-label">课程时间</span>
-                        <strong>03-16 · 12:30-14:30</strong>
+                        <span class="course-meta-label">开课MO</span>
+                        <strong>李老师</strong>
                     </div>
                     <div class="course-meta-item">
-                        <span class="course-meta-label">招聘状态</span>
-                        <strong>等待招募 TA</strong>
+                        <span class="course-meta-label">课程标签</span>
+                        <strong>编译原理</strong>
+                    </div>
+                    <div class="course-meta-item">
+                        <span class="course-meta-label">开放状态</span>
+                        <strong>OPEN</strong>
                     </div>
                 </div>
                 <div class="course-card-hint">
@@ -73,7 +81,7 @@
             <div class="job-card course-job-card" tabindex="0" role="button" aria-label="查看 数据科学综合实验 详情" data-job-detail-card data-course-code="MO-DS-820">
                 <div class="course-card-topline">
                     <span class="job-code">MO-DS-820</span>
-                    <span class="pill">开课 MO</span>
+                    <span class="course-mo-badge">张老师</span>
                 </div>
                 <h4>数据科学综合实验</h4>
                 <div class="job-tags">
@@ -83,12 +91,16 @@
                 </div>
                 <div class="course-meta-stack">
                     <div class="course-meta-item">
-                        <span class="course-meta-label">课程时间</span>
-                        <strong>03-20 · 16:30-18:30</strong>
+                        <span class="course-meta-label">开课MO</span>
+                        <strong>张老师</strong>
                     </div>
                     <div class="course-meta-item">
-                        <span class="course-meta-label">招聘状态</span>
-                        <strong>等待招募 TA</strong>
+                        <span class="course-meta-label">课程标签</span>
+                        <strong>数据科学</strong>
+                    </div>
+                    <div class="course-meta-item">
+                        <span class="course-meta-label">开放状态</span>
+                        <strong>OPEN</strong>
                     </div>
                 </div>
                 <div class="course-card-hint">
@@ -99,7 +111,7 @@
             <div class="job-card course-job-card" tabindex="0" role="button" aria-label="查看 机器学习进阶实战 详情" data-job-detail-card data-course-code="MO-ML-284">
                 <div class="course-card-topline">
                     <span class="job-code">MO-ML-284</span>
-                    <span class="pill">开课 MO</span>
+                    <span class="course-mo-badge">赵老师</span>
                 </div>
                 <h4>机器学习进阶实战</h4>
                 <div class="job-tags">
@@ -109,12 +121,16 @@
                 </div>
                 <div class="course-meta-stack">
                     <div class="course-meta-item">
-                        <span class="course-meta-label">课程时间</span>
-                        <strong>03-23 · 12:30-14:30</strong>
+                        <span class="course-meta-label">开课MO</span>
+                        <strong>赵老师</strong>
                     </div>
                     <div class="course-meta-item">
-                        <span class="course-meta-label">招聘状态</span>
-                        <strong>等待招募 TA</strong>
+                        <span class="course-meta-label">课程标签</span>
+                        <strong>机器学习</strong>
+                    </div>
+                    <div class="course-meta-item">
+                        <span class="course-meta-label">开放状态</span>
+                        <strong>OPEN</strong>
                     </div>
                 </div>
                 <div class="course-card-hint">

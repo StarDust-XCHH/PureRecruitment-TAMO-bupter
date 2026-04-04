@@ -184,20 +184,16 @@
                         <p class="job-detail-summary" id="jobDetailDescription">课程结合企业用人需求设计，围绕软件工程基础训练营组织学习任务，适合作为招聘前置储备课程进行训练。</p>
                         <div class="job-detail-meta-grid">
                             <div class="job-detail-meta">
-                                <span>课程日期</span>
-                                <strong id="jobDetailDate">2026-03-20</strong>
-                            </div>
-                            <div class="job-detail-meta">
-                                <span>课程时间</span>
-                                <strong id="jobDetailTime">17:00-19:00</strong>
-                            </div>
-                            <div class="job-detail-meta">
-                                <span>上课地点</span>
-                                <strong id="jobDetailLocation">教一楼 A201</strong>
-                            </div>
-                            <div class="job-detail-meta">
                                 <span>学生人数</span>
                                 <strong id="jobDetailStudentCount">36 人</strong>
+                            </div>
+                            <div class="job-detail-meta">
+                                <span>开放状态</span>
+                                <strong id="jobDetailStatus">OPEN</strong>
+                            </div>
+                            <div class="job-detail-meta">
+                                <span>工作量</span>
+                                <strong id="jobDetailWorkload">待确认</strong>
                             </div>
                         </div>
                     </div>
