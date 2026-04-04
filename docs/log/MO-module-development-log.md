@@ -102,22 +102,19 @@
 ### 新增/修改内容
 
 1. **共用 `RecruitmentCoursesDao`（`recruitment-courses.json`）**
-   - 统一岗位主数据文件的路径解析、并发锁与契约常量（`mo-ta-job-board` / `jobs` / `2.0`）。
-   - **`readJobBoard()`**：对磁盘 `items` 做内存归一化并组装响应（含 `schema`、`version`、`generatedAt`、`count`），供 MO 与 TA **同源读取**岗位大厅列表；读路径不写回磁盘。
-   - **`appendPublishedJob`**：MO 发布岗位时在文件末尾追加一条，并同步 `meta` 与顶层信封字段后落盘。
-   - 提供发布与展示所需的领域归一化与校验（教学周、考核事件、技能标签、校区、`normalizeJobItem` 等），保证列表与详情字段形状一致。
-   - **`findNormalizedJobByCourseCode`**：按课程编码查询单条归一化岗位，供 MO 在录用/拒绝决策时展示课程名称等信息。
-   - 提供按 `jobId`、治理字段、`ownerMoId` 等筛选/查询的静态方法，便于后续管理端或列表能力直接复用。
-
-2. **`MoRecruitmentDao`**
-   - 岗位待办列表、发布落盘、选人决策中的课程信息查询均通过 **`RecruitmentCoursesDao`** 完成，与 TA 侧读取同一套规范化结果。
-   - TA 账户、档案、申请状态等 JSON 仍由本类负责；结构化文件的创建与 **`meta`** 维护通过 **`ensureStructuredFile(Path, entity)`**（`ta` schema、`1.0` 版本）统一处理。
-
+  - 统一岗位主数据文件的路径解析、并发锁与契约常量（`mo-ta-job-board` / `jobs` / `2.0`）。
+  - `**readJobBoard()`**：对磁盘 `items` 做内存归一化并组装响应（含 `schema`、`version`、`generatedAt`、`count`），供 MO 与 TA **同源读取**岗位大厅列表；读路径不写回磁盘。
+  - `**appendPublishedJob`**：MO 发布岗位时在文件末尾追加一条，并同步 `meta` 与顶层信封字段后落盘。
+  - 提供发布与展示所需的领域归一化与校验（教学周、考核事件、技能标签、校区、`normalizeJobItem` 等），保证列表与详情字段形状一致。
+  - `**findNormalizedJobByCourseCode**`：按课程编码查询单条归一化岗位，供 MO 在录用/拒绝决策时展示课程名称等信息。
+  - 提供按 `jobId`、治理字段、`ownerMoId` 等筛选/查询的静态方法，便于后续管理端或列表能力直接复用。
+2. `**MoRecruitmentDao**`
+  - 岗位待办列表、发布落盘、选人决策中的课程信息查询均通过 `**RecruitmentCoursesDao**` 完成，与 TA 侧读取同一套规范化结果。
+  - TA 账户、档案、申请状态等 JSON 仍由本类负责；结构化文件的创建与 `**meta**` 维护通过 `**ensureStructuredFile(Path, entity)**`（`ta` schema、`1.0` 版本）统一处理。
 3. **TA 岗位数据入口**
-   - **`TaAccountDao.getPendingJobBoardData`** 使用 **`readJobBoard()`**，与 MO 岗位列表数据来源与展示形状一致。
-
+  - `**TaAccountDao.getPendingJobBoardData`** 使用 `**readJobBoard()**`，与 MO 岗位列表数据来源与展示形状一致。
 4. **文档与挂载说明**
-   - 更新 **`common/dao/README`**、**`mo/dao/README`** 等包内说明；**`mountDataTAMObupter/common/recruitment-courses-dao-notes.md`** 记录 Admin/TA 对岗位库的专有写操作尚未在本包实现等事项。
+  - 更新 `**common/dao/README`**、`**mo/dao/README**` 等包内说明；`**mountDataTAMObupter/common/recruitment-courses-dao-notes.md**` 记录 Admin/TA 对岗位库的专有写操作尚未在本包实现等事项。
 
 ### 需要解决的问题
 
@@ -126,9 +123,10 @@
 
 ### 备注
 
-- 契约与行为仍以 **`docs/api/mo-job-board-api-v2.md`** 为准。
+- 契约与行为仍以 `**docs/api/mo-job-board-api-v2.md`** 为准。
 
 ---
+
 ## Entry 04 - MO 个人资料管理功能实现
 
 **At 2026-04-04 15:20 (UTC+8), by Bowen.**
@@ -136,54 +134,81 @@
 ### 新增/修改内容
 
 1. **MoAccountDao 扩展（资料管理核心）**
-    - 新增 `getProfileSettings(String moId)`：读取 MO 的个人资料、账户信息和系统设置，自动补全缺失的 profile/setting 记录。
+  - 新增 `getProfileSettings(String moId)`：读取 MO 的个人资料、账户信息和系统设置，自动补全缺失的 profile/setting 记录。
     - 新增 `saveProfileSettings(ProfileUpdateInput input)`：保存 MO 的个人资料（真实姓名、联系邮箱、个人简介、技能标签、头像路径），同步更新账户和设置文件。
     - 新增 `updatePassword(String moId, String currentPassword, String newPassword)`：验证旧密码后更新新密码，使用 SHA-256 + 随机盐加密存储。
     - 新增辅助方法：`findAccountByMoId()`、`ensureProfileRecord()`、`ensureSettingsRecord()`、`mapProfileData()`、`trimToNull()`、`trimToEmpty()`、`normalizeSkills()`。
     - 新增三个内部静态类：`ProfileResult`（查询结果）、`ProfileUpdateInput`（更新输入）、`PasswordUpdateResult`（密码更新结果）。
     - 新增静态方法 `getResolvedMoDataDir()`：供 Servlet 获取 MO 数据目录路径。
     - 导入 `java.util.Objects` 用于密码比较。
-
 2. **MoProfileSettingsServlet（新建）**
-    - URL 映射：`/api/mo/profile-settings`（资料管理 API）和 `/mo-assets/*`（静态资源服务）。
+  - URL 映射：`/api/mo/profile-settings`（资料管理 API）和 `/mo-assets/*`（静态资源服务）。
     - `GET /api/mo/profile-settings?moId=xxx`：返回 MO 的完整个人资料（账户 + 资料 + 设置）。
     - `POST /api/mo/profile-settings`：支持两种操作：
-        - 默认操作：更新个人资料（含头像上传）
-        - `action=password`：修改密码
+      - 默认操作：更新个人资料（含头像上传）
+      - `action=password`：修改密码
     - 头像处理功能：
-        - 支持 PNG/JPG/WEBP/GIF 格式，最大 10MB
-        - 自动裁剪为正方形并缩放到 256x256 像素
-        - 文件名格式：`{moId}_{timestamp}_{uuid}.{ext}`
-        - 存储路径：`mountDataTAMObupter/mo/image/`
-        - 上传成功后删除旧头像文件
+      - 支持 PNG/JPG/WEBP/GIF 格式，最大 10MB
+      - 自动裁剪为正方形并缩放到 256x256 像素
+      - 文件名格式：`{moId}_{timestamp}_{uuid}.{ext}`
+      - 存储路径：`mountDataTAMObupter/mo/image/`
+      - 上传成功后删除旧头像文件
     - 静态资源服务：通过 `/mo-assets/image/xxx.png` 访问头像文件，设置缓存头 `Cache-Control: public, max-age=86400`。
     - 完整的错误处理和用户反馈机制。
-
 3. **前端页面与交互**
-    - 新增 `mo-route-profile.jspf`：个人资料管理页面，包含：
-        - 头像上传与预览区域
-        - 基本信息编辑表单（真实姓名、联系邮箱、个人简介、技能标签）
-        - 密码修改表单（当前密码、新密码、确认密码）
-        - 实时保存状态提示
+  - 新增 `mo-route-profile.jspf`：个人资料管理页面，包含：
+  - 头像上传与预览区域
+  - 基本信息编辑表单（真实姓名、联系邮箱、个人简介、技能标签）
+  - 密码修改表单（当前密码、新密码、确认密码）
+  - 实时保存状态提示
     - 新增 `profile.js` 模块：前端交互逻辑，包括：
-        - 从 localStorage 自动加载当前 MO ID
-        - 异步加载个人资料并填充表单
-        - 头像选择与实时预览（FileReader API）
-        - 资料提交（FormData + Fetch API）
-        - 密码修改验证与提交
-        - 友好的用户反馈（成功/失败提示）
+      - 从 localStorage 自动加载当前 MO ID
+      - 异步加载个人资料并填充表单
+      - 头像选择与实时预览（FileReader API）
+      - 资料提交（FormData + Fetch API）
+      - 密码修改验证与提交
+      - 友好的用户反馈（成功/失败提示）
     - 更新 `mo-home.jsp`：引入 `mo-route-profile.jspf` 路由和 `profile.js` 脚本。
     - 更新 `mo-layout-sidebar.jspf`：添加"个人资料"导航菜单项（⚙️ 图标）。
-
 4. **数据存储结构**
-    - 复用现有的三个 JSON 文件：
-        - `mos.json`：主账户信息（name、email 等会同步更新）
-        - `profiles.json`：个人资料（realName、contactEmail、bio、skills、avatar、lastUpdatedAt）
-        - `settings.json`：系统设置（avatar、theme、profileSaved、profileSavedAt、lastProfileSyncStatus 等）
+  - 复用现有的三个 JSON 文件：
+  - `mos.json`：主账户信息（name、email 等会同步更新）
+  - `profiles.json`：个人资料（realName、contactEmail、bio、skills、avatar、lastUpdatedAt）
+  - `settings.json`：系统设置（avatar、theme、profileSaved、profileSavedAt、lastProfileSyncStatus 等）
     - 头像文件存储在 `mountDataTAMObupter/mo/image/` 目录。
+
+---
+
+## Entry 05 - MO 个人资料/改密前端健壮性与文档同步
+
+**At 2026-04-04 22:20 (UTC+8), by Fenghao.**
+
+### 新增/修改内容
+
+1. `**assets/mo/js/modules/profile.js`**
+  - **接口与静态资源路径**：`PROFILE_API`、`ASSETS_BASE` 改为相对 `pages/mo/mo-home.jsp` 的 `../../api/mo/profile-settings` 与 `../../mo-assets`，与 `job-board.js`、`applicants.js` 一致，避免非根 context 部署时请求落到站点根路径导致 404。
+  - **改密安全与体验**：移除遍历 `FormData` 及敏感调试输出，避免在浏览器控制台泄露当前密码/新密码明文；新密码与确认密码以 **trim 后** 校验长度（≥6）与一致性，提交 `newPassword` 为 trim 后内容，与后端 `MoAccountDao.updatePassword` 中对 `trim().length()` 的规则一致；当前密码仍原样提交以匹配登录哈希。
+  - **登录态读取**：`loadMoIdFromStorage` 与 `settings.js` 对齐，优先 `sessionStorage` 的 `mo-user`，其次 `localStorage` 的 `mo-user`，再兜底 `localStorage` 的 `moUser`，减少仅一侧存储有数据时资料/改密不可用的问题。
+2. **文档**
+  - `assets/mo/js/modules/README.md`：补充 `profile.js` 职责说明，并明确 `settings.js` 的存储读取顺序。
+  - `assets/mo/js/README.md`：`mo-home.js` 启动顺序中补上 `profile`。
+  - `pages/mo/routes/README.md`：路由表增加 `mo-route-profile.jspf`。
+  - `pages/mo/README.md`：路由数量与模块加载顺序与当前 `mo-home.jsp` / `mo-home.js` 一致（含 profile）。
+
+### 需要解决的问题
+
+- 与 Entry 04 相同的后端/产品项仍适用：例如资料与改密接口的会话绑定策略、服务端对新密码统一 trim 落盘等若需更强一致性，可在 DAO 层再收紧（当前以前端 trim 提交为主）。
+- Entry 01～03 中已列的 MO 能力缺口（岗位编辑、校验体系等）不受影响，仍按原 backlog 推进。
+
+### 备注
+
+- 后端 `MoProfileSettingsServlet` / `MoAccountDao` 本次未改；行为变更集中在 MO 端 `profile.js` 与配套 README。
+
+---
+
 ## 模板
 
-### Entry 05 - [本次开发主题]
+### Entry 06 - [本次开发主题]
 
 **At [YYYY-MM-DD HH:MM (UTC+8)], by [Name].**
 
