@@ -357,9 +357,6 @@ public final class RecruitmentCoursesDao {
         } else {
             item.addProperty("semester", trim(getAsString(item, "semester")));
         }
-        String recruitmentStatus = firstNonBlank(getAsString(item, "recruitmentStatus"), firstNonBlank(getAsString(item, "status"), "OPEN"));
-        item.addProperty("recruitmentStatus", recruitmentStatus);
-        item.addProperty("status", recruitmentStatus);
         item.addProperty("publishStatus", firstNonBlank(getAsString(item, "publishStatus"), "PENDING_REVIEW"));
         item.addProperty("visibility", firstNonBlank(getAsString(item, "visibility"), "INTERNAL"));
         item.addProperty("isArchived", item.has("isArchived") && !item.get("isArchived").isJsonNull() && item.get("isArchived").getAsBoolean());
@@ -419,12 +416,7 @@ public final class RecruitmentCoursesDao {
         } else {
             item.addProperty("recruitmentBrief", recruitmentBrief);
         }
-        String workload = trim(getAsString(item, "workload"));
-        if (workload.isBlank()) {
-            item.remove("workload");
-        } else {
-            item.addProperty("workload", workload);
-        }
+        item.remove("workload");
         item.remove("suggestion");
         item.remove("checklist");
 

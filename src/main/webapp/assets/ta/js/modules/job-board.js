@@ -38,8 +38,6 @@
             const jobDetailName = document.getElementById('jobDetailName');
             const jobDetailMo = document.getElementById('jobDetailMo');
             const jobDetailStudentCount = document.getElementById('jobDetailStudentCount');
-            const jobDetailStatus = document.getElementById('jobDetailStatus');
-            const jobDetailWorkload = document.getElementById('jobDetailWorkload');
             const jobDetailDescription = document.getElementById('jobDetailDescription');
             const jobDetailTags = document.getElementById('jobDetailTags');
             const jobDetailChecklist = document.getElementById('jobDetailChecklist');
@@ -50,8 +48,6 @@
             if (jobDetailName) jobDetailName.textContent = course.name;
             if (jobDetailMo) jobDetailMo.textContent = course.mo;
             if (jobDetailStudentCount) jobDetailStudentCount.textContent = course.studentCountText;
-            if (jobDetailStatus) jobDetailStatus.textContent = course.statusText;
-            if (jobDetailWorkload) jobDetailWorkload.textContent = course.workload || '待确认';
             if (jobDetailDescription) jobDetailDescription.textContent = course.description;
             if (jobDetailSuggestion) jobDetailSuggestion.textContent = course.suggestion;
 
@@ -176,10 +172,6 @@
             return '../../api/ta/jobs';
         }
 
-        function buildStatusText(item) {
-            return item.recruitmentStatus || item.status || '待确认';
-        }
-
         async function fetchAndRefreshJobs() {
             if (isJobFetching) return;
 
@@ -224,7 +216,6 @@
                     const studentCount = Number.isFinite(Number(item.studentCount)) ? Number(item.studentCount) : 0;
                     const studentCountText = studentCount > 0 ? studentCount + ' 人' : '待确认';
                     const courseMoName = item.ownerMoName || item.moName || '待分配';
-                    const statusText = buildStatusText(item);
                     const primaryTagText = keywordTags.length > 0 ? keywordTags[0] : '暂无标签';
 
                     courseDetailState[item.courseCode] = {
@@ -233,9 +224,6 @@
                         mo: courseMoName,
                         studentCount: studentCount,
                         studentCountText: studentCountText,
-                        status: item.status,
-                        statusText: statusText,
-                        workload: item.workload,
                         description: item.courseDescription,
                         tags: keywordTags,
                         checklist: checklist,
@@ -264,10 +252,6 @@
                         '<div class="course-meta-item">' +
                         '<span class="course-meta-label">课程标签</span>' +
                         '<strong>' + primaryTagText + '</strong>' +
-                        '</div>' +
-                        '<div class="course-meta-item">' +
-                        '<span class="course-meta-label">开放状态</span>' +
-                        '<strong>' + statusText + '</strong>' +
                         '</div>' +
                         '</div>' +
                         '<div class="course-card-hint">' +
@@ -311,9 +295,6 @@
         fetchAndRefreshJobs();
 
         app.activeCourseCode = () => activeCourseCode;
-        Object.defineProperty(app, 'jobDetailStatus', {
-            get: () => document.getElementById('jobDetailStatus')
-        });
         Object.defineProperty(app, 'jobDetailApplyBtn', {
             get: () => document.getElementById('jobDetailApplyBtn')
         });

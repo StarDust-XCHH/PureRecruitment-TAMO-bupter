@@ -107,9 +107,6 @@
 
                 btn.classList.add('applied');
                 btn.textContent = btn.dataset.applyLabelDone || '✓ Applied';
-                if (btn.id === 'jobDetailApplyBtn' && app.jobDetailStatus) {
-                    app.jobDetailStatus.textContent = '已申请';
-                }
             });
         });
 

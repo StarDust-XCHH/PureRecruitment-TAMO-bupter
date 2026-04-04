@@ -38,10 +38,6 @@
                         <span class="course-meta-label">课程标签</span>
                         <strong>软件工程</strong>
                     </div>
-                    <div class="course-meta-item">
-                        <span class="course-meta-label">开放状态</span>
-                        <strong>OPEN</strong>
-                    </div>
                 </div>
                 <div class="course-card-hint">
                     <span>点击查看详情</span>
@@ -67,10 +63,6 @@
                     <div class="course-meta-item">
                         <span class="course-meta-label">课程标签</span>
                         <strong>编译原理</strong>
-                    </div>
-                    <div class="course-meta-item">
-                        <span class="course-meta-label">开放状态</span>
-                        <strong>OPEN</strong>
                     </div>
                 </div>
                 <div class="course-card-hint">
@@ -98,10 +90,6 @@
                         <span class="course-meta-label">课程标签</span>
                         <strong>数据科学</strong>
                     </div>
-                    <div class="course-meta-item">
-                        <span class="course-meta-label">开放状态</span>
-                        <strong>OPEN</strong>
-                    </div>
                 </div>
                 <div class="course-card-hint">
                     <span>点击查看详情</span>
@@ -127,10 +115,6 @@
                     <div class="course-meta-item">
                         <span class="course-meta-label">课程标签</span>
                         <strong>机器学习</strong>
-                    </div>
-                    <div class="course-meta-item">
-                        <span class="course-meta-label">开放状态</span>
-                        <strong>OPEN</strong>
                     </div>
                 </div>
                 <div class="course-card-hint">
