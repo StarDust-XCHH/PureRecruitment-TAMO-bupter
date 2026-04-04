@@ -53,6 +53,41 @@
     min-width: 0;
 }
 
+.job-board-state {
+    grid-column: 1 / -1;
+    min-height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    border-radius: 18px;
+    border: 1px dashed rgba(148, 163, 184, 0.32);
+    background: rgba(255, 255, 255, 0.03);
+    color: var(--muted);
+    text-align: center;
+    line-height: 1.7;
+}
+
+.job-board-state-loading {
+    color: var(--text);
+}
+
+.job-board-state-error {
+    border-color: rgba(248, 113, 113, 0.38);
+    color: #fecaca;
+}
+
+[data-theme="light"] .job-board-state {
+    background: rgba(248, 250, 252, 0.92);
+    border-color: rgba(100, 116, 139, 0.24);
+    color: #475569;
+}
+
+[data-theme="light"] .job-board-state-error {
+    border-color: rgba(220, 38, 38, 0.22);
+    color: #b91c1c;
+}
+
 .job-card {
     padding: 18px;
     border-radius: 16px;
