@@ -61,7 +61,11 @@ COURSE_NAME_PARTS = (
 
 SEMESTERS = ["2026-Spring", "2026-Fall", "2025-Fall"]
 CAMPUSES = ["Main", "Shahe"]
-RECRUITMENT_STATUSES = ["OPEN"]
+
+
+def pick_recruitment_status() -> str:
+    """MO 发布表单仅支持 OPEN / CLOSED；加权随机以便批量生成中含足够 CLOSED 样本。"""
+    return random.choices(["OPEN", "CLOSED"], weights=[6, 4], k=1)[0]
 
 
 def _trim(s: str | None) -> str:
@@ -250,7 +254,7 @@ def build_mo_input(existing_codes: set[str]) -> tuple[dict, dict]:
     """
     course_name = random_course_name()
     course_code = unique_course_code(existing_codes)
-    recruitment_status = random.choice(RECRUITMENT_STATUSES)
+    recruitment_status = pick_recruitment_status()
     semester = random.choice(SEMESTERS)
     application_deadline = random_iso_deadline()
 
