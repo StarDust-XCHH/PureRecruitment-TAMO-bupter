@@ -14,12 +14,15 @@
 
         const JOBS_PER_PAGE = 6;
         const JOBS_SCROLL_OFFSET = 24;
+        const TA_WORK_CONTENT_FALLBACK = '待确定';
+        const RECRUITMENT_STATUS_FALLBACK = '待确定';
 
-        let courseJobCards = []; // 改为用数组/NodeList维护当前挂载的卡片
+        let courseJobCards = [];
         let courseDetailState = {};
         let activeCourseCode = null;
         let currentJobsPage = '1';
         let isJobFetching = false;
+        let hasLoadedJobs = false;
 
         function scrollJobsBoardIntoView() {
             const target = jobsHallHeading || jobBoard || jobsRoute;
@@ -35,6 +38,14 @@
             if (size >= 1024 * 1024) return (size / (1024 * 1024)).toFixed(2) + ' MB';
             if (size >= 1024) return Math.round(size / 1024) + ' KB';
             return size + ' B';
+        }
+
+        function normalizeTaWorkContents(contents) {
+            if (!Array.isArray(contents)) return [TA_WORK_CONTENT_FALLBACK];
+            const normalizedContents = contents
+                .map((content) => typeof content === 'string' ? content.trim() : '')
+                .filter((content) => content);
+            return normalizedContents.length > 0 ? normalizedContents : [TA_WORK_CONTENT_FALLBACK];
         }
 
         function syncApplyModal(course) {
@@ -107,7 +118,7 @@
 
             if (jobDetailChecklist) {
                 jobDetailChecklist.innerHTML = '';
-                (course.checklist || []).forEach((item) => {
+                normalizeTaWorkContents(course.taWorkContents).forEach((item) => {
                     const li = document.createElement('li');
                     li.textContent = item;
                     jobDetailChecklist.appendChild(li);
@@ -123,13 +134,25 @@
             syncApplyModal(course);
         }
 
-        function bindCardEvents() {
+        function syncCourseJobCards() {
             const currentJobBoard = document.getElementById('jobBoard');
-            if (!currentJobBoard) return;
+            courseJobCards = currentJobBoard
+                ? Array.from(currentJobBoard.querySelectorAll('[data-job-detail-card]'))
+                : [];
+            return courseJobCards;
+        }
 
-            courseJobCards = currentJobBoard.querySelectorAll('[data-job-detail-card]');
+        function renderJobsBoardState(message, stateClassName) {
+            if (!jobBoard) return;
+            jobBoard.innerHTML = '<div class="job-board-state ' + stateClassName + '">' + message + '</div>';
+            courseJobCards = [];
+        }
 
-            courseJobCards.forEach((card) => {
+        function bindCardEvents() {
+            const cards = syncCourseJobCards();
+            if (!cards.length) return;
+
+            cards.forEach((card) => {
                 const openCardDetail = (event) => {
                     event?.preventDefault();
                     event?.stopPropagation();
@@ -152,8 +175,37 @@
             return card.textContent.toLowerCase().includes(keyword);
         }
 
+        function getSortedJobItems(items) {
+            const normalizedItems = Array.isArray(items) ? items.slice() : [];
+            return normalizedItems.sort((leftItem, rightItem) => {
+                const leftStatus = typeof leftItem?.recruitmentStatus === 'string'
+                    ? leftItem.recruitmentStatus.trim().toUpperCase()
+                    : '';
+                const rightStatus = typeof rightItem?.recruitmentStatus === 'string'
+                    ? rightItem.recruitmentStatus.trim().toUpperCase()
+                    : '';
+                const leftPriority = (leftStatus === 'CLOSE' || leftStatus === 'CLOSED') ? 1 : 0;
+                const rightPriority = (rightStatus === 'CLOSE' || rightStatus === 'CLOSED') ? 1 : 0;
+                if (leftPriority !== rightPriority) {
+                    return leftPriority - rightPriority;
+                }
+                return 0;
+            });
+        }
+
         function getMatchedCards(keyword) {
-            return Array.from(courseJobCards).filter((card) => getCardMatchesKeyword(card, keyword));
+            const matchedCards = Array.from(courseJobCards).filter((card) => getCardMatchesKeyword(card, keyword));
+            return matchedCards.sort((leftCard, rightCard) => {
+                const leftPriority = Number(leftCard.dataset.statusPriority || '1');
+                const rightPriority = Number(rightCard.dataset.statusPriority || '1');
+                if (leftPriority !== rightPriority) {
+                    return leftPriority - rightPriority;
+                }
+
+                const leftOriginalOrder = Number(leftCard.dataset.originalOrder || '0');
+                const rightOriginalOrder = Number(rightCard.dataset.originalOrder || '0');
+                return leftOriginalOrder - rightOriginalOrder;
+            });
         }
 
         function getTotalJobPages(matchedCards) {
@@ -196,10 +248,37 @@
 
         function renderJobsBoard(options) {
             const shouldFocusBoard = !!options?.shouldFocusBoard;
+            const staleState = jobBoard?.querySelector('.job-board-state');
+            if (staleState) staleState.remove();
+
+            syncCourseJobCards();
+
             const keyword = jobSearchInput?.value.trim().toLowerCase() || '';
             const matchedCards = getMatchedCards(keyword);
-            const totalPages = getTotalJobPages(matchedCards);
 
+            if (!courseJobCards.length) {
+                renderJobPagination(0);
+                if (hasLoadedJobs) {
+                    renderJobsBoardState('当前没有可展示的课程卡片。', 'job-board-state-empty');
+                }
+                return;
+            }
+
+            if (!matchedCards.length) {
+                courseJobCards.forEach((card) => {
+                    card.hidden = true;
+                });
+                renderJobPagination(0);
+                if (jobBoard) {
+                    const emptyState = document.createElement('div');
+                    emptyState.className = 'job-board-state job-board-state-empty';
+                    emptyState.textContent = '没有匹配的课程，请尝试其他关键词。';
+                    jobBoard.appendChild(emptyState);
+                }
+                return;
+            }
+
+            const totalPages = getTotalJobPages(matchedCards);
             if (Number(currentJobsPage) > totalPages) currentJobsPage = '1';
 
             const currentPageIndex = Number(currentJobsPage) - 1;
@@ -207,9 +286,14 @@
             const endIndex = startIndex + JOBS_PER_PAGE;
             const visibleCards = new Set(matchedCards.slice(startIndex, endIndex));
 
+            if (jobBoard) {
+                matchedCards.forEach((card) => jobBoard.appendChild(card));
+            }
+
             courseJobCards.forEach((card) => {
                 card.hidden = !visibleCards.has(card);
             });
+
             renderJobPagination(totalPages);
             if (shouldFocusBoard) scrollJobsBoardIntoView();
         }
@@ -228,6 +312,9 @@
 
             try {
                 isJobFetching = true;
+                if (!hasLoadedJobs) {
+                    renderJobsBoardState('课程列表加载中...', 'job-board-state-loading');
+                }
                 if (btn) btn.disabled = true;
                 if (btnIcon) btnIcon.classList.add('spinning');
                 if (btnText) btnText.textContent = '更新中...';
@@ -256,15 +343,22 @@
                 courseDetailState = {};
                 const newCardsHTML = [];
 
-                data.items.forEach(function (item) {
+                const sortedItems = getSortedJobItems(data.items);
+
+                sortedItems.forEach(function (item) {
                     const keywordTags = Array.isArray(item.keywordTags) ? item.keywordTags : [];
                     const checklist = Array.isArray(item.checklist) ? item.checklist : [];
+                    const taWorkContents = normalizeTaWorkContents(item.taWorkContents);
                     const studentCount = Number.isFinite(Number(item.studentCount)) ? Number(item.studentCount) : 0;
                     const studentCountText = studentCount > 0 ? studentCount + ' 人' : '待确认';
                     const courseMoName = item.ownerMoName || item.moName || '待分配';
                     const primaryTagText = keywordTags.length > 0 ? keywordTags[0] : '暂无标签';
                     const descriptionText = item.recruitmentBrief || item.courseDescription || '暂无课程简介';
                     const suggestionText = item.suggestion || '建议结合自身技能标签和课程方向进行投递。';
+                    const recruitmentStatus = typeof item.recruitmentStatus === 'string' && item.recruitmentStatus.trim()
+                        ? item.recruitmentStatus.trim().toUpperCase()
+                        : RECRUITMENT_STATUS_FALLBACK;
+                    const statusPriority = (recruitmentStatus === 'CLOSE' || recruitmentStatus === 'CLOSED') ? 1 : 0;
 
                     courseDetailState[item.courseCode] = {
                         code: item.courseCode,
@@ -275,7 +369,9 @@
                         description: descriptionText,
                         tags: keywordTags,
                         checklist: checklist,
-                        suggestion: suggestionText
+                        taWorkContents: taWorkContents,
+                        suggestion: suggestionText,
+                        recruitmentStatus: recruitmentStatus
                     };
 
                     const tagHTML = keywordTags.slice(0, 3).map(function (tag) {
@@ -283,10 +379,10 @@
                     }).join('');
 
                     newCardsHTML.push(
-                        '<div class="job-card course-job-card" tabindex="0" role="button" aria-label="查看 ' + item.courseName + ' 详情" data-job-detail-card data-course-code="' + item.courseCode + '">' +
+                        '<div class="job-card course-job-card" tabindex="0" role="button" aria-label="查看 ' + item.courseName + ' 详情" data-job-detail-card data-course-code="' + item.courseCode + '" data-status-priority="' + statusPriority + '" data-original-order="' + newCardsHTML.length + '">' +
                         '<div class="course-card-topline">' +
                         '<span class="job-code">' + item.courseCode + '</span>' +
-                        '<span class="course-mo-badge">' + courseMoName + '</span>' +
+                        '<span class="course-status-badge course-status-badge-' + recruitmentStatus.toLowerCase() + '">' + recruitmentStatus + '</span>' +
                         '</div>' +
                         '<h4>' + item.courseName + '</h4>' +
                         '<p class="course-card-summary">' + (item.courseDescription || '暂无课程简介') + '</p>' +
@@ -320,10 +416,15 @@
                     currentJobBoard.innerHTML = newCardsHTML.join('');
                 }
 
+                activeCourseCode = null;
+                hasLoadedJobs = true;
                 bindCardEvents();
                 currentJobsPage = '1';
                 renderJobsBoard();
             } catch (error) {
+                hasLoadedJobs = true;
+                renderJobsBoardState('课程列表加载失败，请点击“刷新列表”重试。', 'job-board-state-error');
+                renderJobPagination(0);
                 console.error('拉取岗位数据异常:', error);
             } finally {
                 isJobFetching = false;
@@ -334,6 +435,7 @@
         }
 
         jobSearchInput?.addEventListener('input', () => {
+            if (!hasLoadedJobs) return;
             currentJobsPage = '1';
             renderJobsBoard();
         });
@@ -398,8 +500,8 @@
             }
         });
 
-        bindCardEvents();
-        renderJobsBoard();
+        renderJobsBoardState('课程列表加载中...', 'job-board-state-loading');
+        renderJobPagination(0);
         fetchAndRefreshJobs();
 
         app.activeCourseCode = () => activeCourseCode;
