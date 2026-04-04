@@ -242,14 +242,20 @@
                     </div>
                     <div class="job-detail-section resume-upload-card">
                         <h5>上传简历文件</h5>
-                        <p>支持 PDF、Word 等常见简历格式，单次选择 1 个文件。</p>
-                        <label class="resume-upload-dropzone" for="jobResumeFileInput">
-                            <input id="jobResumeFileInput" type="file" accept=".pdf,.doc,.docx,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/rtf,application/vnd.oasis.opendocument.text">
-                            <span class="resume-upload-icon" aria-hidden="true">⇪</span>
-                            <strong>点击上传简历</strong>
-                            <span class="resume-upload-hint">或拖拽文件到此处</span>
-                            <span class="resume-upload-accept">支持 .pdf / .doc / .docx / .rtf / .odt</span>
-                        </label>
+                        <p>建议上传最新版本简历，优先突出项目经历、助教支持经验与沟通协作能力。</p>
+                        <div class="resume-upload-dropzone">
+                            <input id="jobResumeFileInput" class="resume-upload-input" type="file" accept=".pdf,.doc,.docx,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/rtf,application/vnd.oasis.opendocument.text">
+                            <div class="resume-upload-icon" aria-hidden="true">⇪</div>
+                            <div class="resume-upload-copy">
+                                <strong class="resume-upload-title">将简历拖拽到这里，或点击按钮选择文件</strong>
+                                <span class="resume-upload-hint">单次仅支持上传 1 个文件，上传前请确认内容为当前课程申请准备的版本。</span>
+                                <span class="resume-upload-subhint">推荐格式：PDF 优先，也支持 Word、RTF、ODT 等常见简历文件。</span>
+                            </div>
+                            <div class="resume-upload-actions">
+                                <label class="resume-upload-trigger" for="jobResumeFileInput">选择简历文件</label>
+                                <span class="resume-upload-accept">支持 .pdf / .doc / .docx / .rtf / .odt</span>
+                            </div>
+                        </div>
                         <div class="resume-file-meta" id="jobResumeFileMeta" hidden>
                             <div>
                                 <span class="resume-file-label">已选择文件</span>
@@ -263,7 +269,7 @@
                     <div class="job-detail-side-card">
                         <h5>申请课程</h5>
                         <p>确认简历无误后提交，系统将把该课程加入你的投递记录。</p>
-                        <button class="pill-btn" type="button" id="jobResumeSubmitBtn">Submit Application</button>
+                        <button class="pill-btn" type="button" id="jobResumeSubmitBtn">提交课程申请</button>
                     </div>
                     <div class="job-detail-side-card">
                         <h5>投递说明</h5>

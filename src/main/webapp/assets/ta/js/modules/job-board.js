@@ -49,6 +49,7 @@
             const resumeFileName = document.getElementById('jobResumeFileName');
             const resumeFileSize = document.getElementById('jobResumeFileSize');
             const submitBtn = document.getElementById('jobResumeSubmitBtn');
+            const resumeTrigger = document.querySelector('.resume-upload-trigger');
 
             if (applyCourseCode) applyCourseCode.textContent = course.code;
             if (applyCourseName) applyCourseName.textContent = course.name;
@@ -64,6 +65,7 @@
             if (resumeMeta) resumeMeta.hidden = true;
             if (resumeFileName) resumeFileName.textContent = '未选择';
             if (resumeFileSize) resumeFileSize.textContent = '--';
+            if (resumeTrigger) resumeTrigger.textContent = '选择简历文件';
             if (submitBtn) {
                 submitBtn.textContent = 'Submit Application';
                 submitBtn.dataset.courseCode = course.code;
@@ -358,11 +360,13 @@
             const resumeFileName = document.getElementById('jobResumeFileName');
             const resumeFileSize = document.getElementById('jobResumeFileSize');
             const submitBtn = document.getElementById('jobResumeSubmitBtn');
+            const resumeTrigger = document.querySelector('.resume-upload-trigger');
 
             if (!file) {
                 if (resumeMeta) resumeMeta.hidden = true;
                 if (resumeFileName) resumeFileName.textContent = '未选择';
                 if (resumeFileSize) resumeFileSize.textContent = '--';
+                if (resumeTrigger) resumeTrigger.textContent = '选择简历文件';
                 if (submitBtn) submitBtn.textContent = 'Submit Application';
                 return;
             }
@@ -370,8 +374,10 @@
             if (resumeMeta) resumeMeta.hidden = false;
             if (resumeFileName) resumeFileName.textContent = file.name;
             if (resumeFileSize) resumeFileSize.textContent = formatFileSize(file.size);
+            if (resumeTrigger) resumeTrigger.textContent = '重新选择';
             if (submitBtn) submitBtn.textContent = 'Submit Application · Ready';
         });
+
 
         const jobResumeSubmitBtn = document.getElementById('jobResumeSubmitBtn');
         jobResumeSubmitBtn?.addEventListener('click', (event) => {
