@@ -17,11 +17,14 @@ import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 @WebServlet(name = "taJobBoardServlet", value = "/api/ta/jobs")
 public class TaJobBoardServlet extends HttpServlet {
     private static final String JOB_BOARD_TAG = "[TA-JOB-BOARD]";
     private static final DateTimeFormatter LOG_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    private static final String TA_WORK_CONTENT_FALLBACK = "待确定";
+    private static final String RECRUITMENT_STATUS_FALLBACK = "待确定";
 
     private final Gson gson = new Gson();
     private final TaAccountDao taAccountDao = new TaAccountDao();
@@ -100,8 +103,10 @@ public class TaJobBoardServlet extends HttpServlet {
         String campus = readString(item, "campus", "");
         int studentCount = readInt(item, "studentCount", -1);
         int taRecruitCount = Math.max(0, readInt(item, "taRecruitCount", 0));
+        String recruitmentStatus = resolveRecruitmentStatus(item);
 
         JsonArray keywordTags = extractKeywordTags(item);
+        JsonArray taWorkContents = extractTaWorkContents(item);
         JsonArray checklist = buildChecklist(item, ownerMoName, taRecruitCount, campus);
 
         taItem.addProperty("courseCode", courseCode);
@@ -109,8 +114,10 @@ public class TaJobBoardServlet extends HttpServlet {
         taItem.addProperty("ownerMoName", ownerMoName);
         taItem.addProperty("studentCount", studentCount);
         taItem.addProperty("courseDescription", courseDescription);
+        taItem.addProperty("recruitmentStatus", recruitmentStatus);
         taItem.add("keywordTags", keywordTags);
         taItem.add("checklist", checklist);
+        taItem.add("taWorkContents", taWorkContents);
         taItem.addProperty("suggestion", buildSuggestion(courseName, recruitmentBrief, keywordTags, campus));
 
         if (!recruitmentBrief.isBlank()) {
@@ -163,6 +170,31 @@ public class TaJobBoardServlet extends HttpServlet {
         return tags;
     }
 
+    private JsonArray extractTaWorkContents(JsonObject item) {
+        JsonArray taWorkContents = new JsonArray();
+        JsonArray assessmentEvents = item.has("assessmentEvents") && item.get("assessmentEvents").isJsonArray()
+                ? item.getAsJsonArray("assessmentEvents") : null;
+        if (assessmentEvents != null) {
+            for (JsonElement eventElement : assessmentEvents) {
+                if (eventElement == null || !eventElement.isJsonObject()) {
+                    continue;
+                }
+                JsonObject event = eventElement.getAsJsonObject();
+                String content = firstNonBlank(
+                        readString(event, "description", ""),
+                        readString(event, "name", "")
+                );
+                if (!content.isBlank()) {
+                    taWorkContents.add(content);
+                }
+            }
+        }
+        if (taWorkContents.isEmpty()) {
+            taWorkContents.add(TA_WORK_CONTENT_FALLBACK);
+        }
+        return taWorkContents;
+    }
+
     private JsonArray buildChecklist(JsonObject item, String ownerMoName, int taRecruitCount, String campus) {
         JsonArray checklist = new JsonArray();
         checklist.add("协助 " + ownerMoName + " 完成课程答疑与课堂支持");
@@ -212,6 +244,30 @@ public class TaJobBoardServlet extends HttpServlet {
         }
         suggestion.append("。");
         return suggestion.toString();
+    }
+
+    private String resolveRecruitmentStatus(JsonObject item) {
+        String rawStatus = firstNonBlank(
+                readString(item, "recruitmentStatus", ""),
+                readString(item, "status", "")
+        );
+        if (rawStatus.isBlank()) {
+            return RECRUITMENT_STATUS_FALLBACK;
+        }
+
+        return rawStatus.trim().toUpperCase(Locale.ROOT);
+    }
+
+    private String firstNonBlank(String... candidates) {
+        if (candidates == null) {
+            return "";
+        }
+        for (String candidate : candidates) {
+            if (candidate != null && !candidate.isBlank()) {
+                return candidate.trim();
+            }
+        }
+        return "";
     }
 
     private String readString(JsonObject source, String key, String defaultValue) {

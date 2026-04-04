@@ -257,6 +257,38 @@
     color: var(--muted);
 }
 
+.course-status-badge {
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: rgba(255, 255, 255, 0.08);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    text-transform: uppercase;
+}
+
+.course-status-badge-open {
+    color: #34d399;
+    border-color: rgba(52, 211, 153, 0.4);
+    background: rgba(52, 211, 153, 0.14);
+}
+
+.course-status-badge-close {
+    color: #f87171;
+    border-color: rgba(248, 113, 113, 0.42);
+    background: rgba(248, 113, 113, 0.14);
+}
+
+.course-status-badge-待确定 {
+    color: #fbbf24;
+    border-color: rgba(251, 191, 36, 0.42);
+    background: rgba(251, 191, 36, 0.14);
+    letter-spacing: 0;
+    text-transform: none;
+}
+
 .course-job-card h4 {
     position: relative;
     z-index: 1;
