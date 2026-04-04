@@ -221,6 +221,59 @@
         </div>
     </div>
 
+    <div class="ta-modal-panel wide job-apply-modal" data-modal="course-apply" role="dialog" aria-labelledby="modalCourseApplyTitle">
+        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <div class="modal-head">
+            <h3 id="modalCourseApplyTitle">提交课程申请</h3>
+            <p class="muted">上传你的简历文件后即可完成该课程的申请准备，主体样式与课程详情卡片保持一致。</p>
+        </div>
+        <div class="modal-body">
+            <div class="job-detail-shell job-apply-shell">
+                <section class="job-detail-main">
+                    <div class="job-detail-hero">
+                        <div class="job-detail-title-row">
+                            <div>
+                                <div class="job-code" id="jobApplyCourseCode">MO-SE-628</div>
+                                <h4 id="jobApplyCourseName">软件工程基础训练营</h4>
+                            </div>
+                            <span class="pill" id="jobApplyCourseMo">开课 MO</span>
+                        </div>
+                        <p class="job-detail-summary" id="jobApplyCourseSummary">请上传用于申请该课程的最新简历，建议突出课程相关项目经历、答疑经验与课堂支持能力。</p>
+                    </div>
+                    <div class="job-detail-section resume-upload-card">
+                        <h5>上传简历文件</h5>
+                        <p>支持 PDF、Word 等常见简历格式，单次选择 1 个文件。</p>
+                        <label class="resume-upload-dropzone" for="jobResumeFileInput">
+                            <input id="jobResumeFileInput" type="file" accept=".pdf,.doc,.docx,.rtf,.odt,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/rtf,application/vnd.oasis.opendocument.text">
+                            <span class="resume-upload-icon" aria-hidden="true">⇪</span>
+                            <strong>点击上传简历</strong>
+                            <span class="resume-upload-hint">或拖拽文件到此处</span>
+                            <span class="resume-upload-accept">支持 .pdf / .doc / .docx / .rtf / .odt</span>
+                        </label>
+                        <div class="resume-file-meta" id="jobResumeFileMeta" hidden>
+                            <div>
+                                <span class="resume-file-label">已选择文件</span>
+                                <strong id="jobResumeFileName">未选择</strong>
+                            </div>
+                            <span class="pill" id="jobResumeFileSize">--</span>
+                        </div>
+                    </div>
+                </section>
+                <aside class="job-detail-side">
+                    <div class="job-detail-side-card">
+                        <h5>申请课程</h5>
+                        <p>确认简历无误后提交，系统将把该课程加入你的投递记录。</p>
+                        <button class="pill-btn" type="button" id="jobResumeSubmitBtn">Submit Application</button>
+                    </div>
+                    <div class="job-detail-side-card">
+                        <h5>投递说明</h5>
+                        <p>建议优先上传包含项目经历、授课辅助经历与沟通协作能力的简历版本，以提升岗位匹配展示效果。</p>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+
     <div class="ta-modal-panel ta-settings-modal" data-modal="settings" role="dialog" aria-labelledby="modalSettingsTitle">
         <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head">

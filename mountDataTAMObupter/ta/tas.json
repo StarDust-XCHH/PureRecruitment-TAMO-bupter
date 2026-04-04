@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "tas",
     "version": "1.0",
-    "updatedAt": "2026-04-04T11:38:37.337471600Z"
+    "updatedAt": "2026-04-04T12:07:01.503684200Z"
   },
   "items": [
     {
@@ -32,11 +32,11 @@
       "department": "",
       "status": "active",
       "createdAt": "2026-03-16T13:28:45.257077Z",
-      "updatedAt": "2026-04-04T11:38:37.334473200Z",
+      "updatedAt": "2026-04-04T12:07:01.501671700Z",
       "auth": {
         "passwordHash": "8b5361414eb8fa038ca9279a55be8b3b44791939d89475d1618d50230c01d65f",
         "passwordSalt": "cebb50b5-9797-4732-a22a-df78ae1c88da",
-        "lastLoginAt": "2026-04-04T11:38:37.334473200Z",
+        "lastLoginAt": "2026-04-04T12:07:01.501671700Z",
         "failedAttempts": 0
       }
     },
