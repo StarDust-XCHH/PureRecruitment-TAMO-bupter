@@ -89,7 +89,7 @@ The user still lands on the initial page without guidance.
 
 ---
 
-## Improvement Suggestions
+## Improvement Suggestions (Validation & UX Enhancements)
 
 ### 1. Duplicate email and phone check
 The registration page should also prevent duplicate email addresses and phone numbers.
