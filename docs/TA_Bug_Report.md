@@ -50,6 +50,9 @@ All option text should remain visible in dark mode.
 **Actual Result:**  
 Users cannot clearly see option text without hovering.
 
+**Impact:**  
+This reduces usability and may confuse users when navigating settings.
+
 **Severity:** Medium
 
 ---
