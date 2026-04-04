@@ -129,10 +129,61 @@
 - 契约与行为仍以 **`docs/api/mo-job-board-api-v2.md`** 为准。
 
 ---
+## Entry 04 - MO 个人资料管理功能实现
 
+**At 2026-04-04 15:20 (UTC+8), by Bowen.**
+
+### 新增/修改内容
+
+1. **MoAccountDao 扩展（资料管理核心）**
+    - 新增 `getProfileSettings(String moId)`：读取 MO 的个人资料、账户信息和系统设置，自动补全缺失的 profile/setting 记录。
+    - 新增 `saveProfileSettings(ProfileUpdateInput input)`：保存 MO 的个人资料（真实姓名、联系邮箱、个人简介、技能标签、头像路径），同步更新账户和设置文件。
+    - 新增 `updatePassword(String moId, String currentPassword, String newPassword)`：验证旧密码后更新新密码，使用 SHA-256 + 随机盐加密存储。
+    - 新增辅助方法：`findAccountByMoId()`、`ensureProfileRecord()`、`ensureSettingsRecord()`、`mapProfileData()`、`trimToNull()`、`trimToEmpty()`、`normalizeSkills()`。
+    - 新增三个内部静态类：`ProfileResult`（查询结果）、`ProfileUpdateInput`（更新输入）、`PasswordUpdateResult`（密码更新结果）。
+    - 新增静态方法 `getResolvedMoDataDir()`：供 Servlet 获取 MO 数据目录路径。
+    - 导入 `java.util.Objects` 用于密码比较。
+
+2. **MoProfileSettingsServlet（新建）**
+    - URL 映射：`/api/mo/profile-settings`（资料管理 API）和 `/mo-assets/*`（静态资源服务）。
+    - `GET /api/mo/profile-settings?moId=xxx`：返回 MO 的完整个人资料（账户 + 资料 + 设置）。
+    - `POST /api/mo/profile-settings`：支持两种操作：
+        - 默认操作：更新个人资料（含头像上传）
+        - `action=password`：修改密码
+    - 头像处理功能：
+        - 支持 PNG/JPG/WEBP/GIF 格式，最大 10MB
+        - 自动裁剪为正方形并缩放到 256x256 像素
+        - 文件名格式：`{moId}_{timestamp}_{uuid}.{ext}`
+        - 存储路径：`mountDataTAMObupter/mo/image/`
+        - 上传成功后删除旧头像文件
+    - 静态资源服务：通过 `/mo-assets/image/xxx.png` 访问头像文件，设置缓存头 `Cache-Control: public, max-age=86400`。
+    - 完整的错误处理和用户反馈机制。
+
+3. **前端页面与交互**
+    - 新增 `mo-route-profile.jspf`：个人资料管理页面，包含：
+        - 头像上传与预览区域
+        - 基本信息编辑表单（真实姓名、联系邮箱、个人简介、技能标签）
+        - 密码修改表单（当前密码、新密码、确认密码）
+        - 实时保存状态提示
+    - 新增 `profile.js` 模块：前端交互逻辑，包括：
+        - 从 localStorage 自动加载当前 MO ID
+        - 异步加载个人资料并填充表单
+        - 头像选择与实时预览（FileReader API）
+        - 资料提交（FormData + Fetch API）
+        - 密码修改验证与提交
+        - 友好的用户反馈（成功/失败提示）
+    - 更新 `mo-home.jsp`：引入 `mo-route-profile.jspf` 路由和 `profile.js` 脚本。
+    - 更新 `mo-layout-sidebar.jspf`：添加"个人资料"导航菜单项（⚙️ 图标）。
+
+4. **数据存储结构**
+    - 复用现有的三个 JSON 文件：
+        - `mos.json`：主账户信息（name、email 等会同步更新）
+        - `profiles.json`：个人资料（realName、contactEmail、bio、skills、avatar、lastUpdatedAt）
+        - `settings.json`：系统设置（avatar、theme、profileSaved、profileSavedAt、lastProfileSyncStatus 等）
+    - 头像文件存储在 `mountDataTAMObupter/mo/image/` 目录。
 ## 模板
 
-### Entry 04 - [本次开发主题]
+### Entry 05 - [本次开发主题]
 
 **At [YYYY-MM-DD HH:MM (UTC+8)], by [Name].**
 

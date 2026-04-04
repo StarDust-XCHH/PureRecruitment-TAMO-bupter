@@ -18,4 +18,8 @@
         <span>🧑‍🎓</span>
         <span>应聘筛选</span>
     </button>
+    <button class="nav-item" type="button" data-route="profile" aria-current="false">
+        <span>⚙️</span>
+        <span>个人资料</span>
+    </button>
 </nav>

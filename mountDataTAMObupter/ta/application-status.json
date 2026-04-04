@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "application-status",
     "version": "1.0",
-    "updatedAt": "2026-03-21T13:34:37.138437300Z"
+    "updatedAt": "2026-04-04T11:28:16.420881400Z"
   },
   "items": [
     {
@@ -1406,6 +1406,25 @@
       "updatedAt": "2026-03-21T13:34:37.138437300Z",
       "category": "MO 招聘流程",
       "matchLevel": "高"
+    },
+    {
+      "applicationId": "APP-TA-70803-EBU9900",
+      "taId": "TA-70803",
+      "courseName": "SampleTest",
+      "jobSlug": "ebu9900",
+      "tags": [],
+      "timeline": [],
+      "details": [],
+      "notifications": [],
+      "status": "未录用",
+      "statusTone": "danger",
+      "summary": "MO 已结束该候选人的招聘流程。",
+      "moComment": "MO 已结束该候选人的招聘流程。",
+      "nextAction": "可继续申请其他课程岗位。",
+      "nextStep": "可继续申请其他课程岗位。",
+      "updatedAt": "2026-04-04T11:28:16.420881400Z",
+      "category": "MO 招聘流程",
+      "matchLevel": "中"
     }
   ]
 }

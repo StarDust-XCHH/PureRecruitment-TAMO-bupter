@@ -20,6 +20,7 @@
         'modal',
         'jobBoard',
         'applicants',
-        'dashboard'
+        'dashboard',
+        'profile'
     ].forEach(runModule);
 })();

@@ -1,0 +1,59 @@
+<div class="route" id="route-profile" data-route="profile">
+    <div class="card">
+        <div class="overview-top">
+            <div>
+                <h1>个人资料管理</h1>
+                <p class="muted">完善您的个人信息，便于 TA 了解课程背景与教学风格。</p>
+            </div>
+            <div class="overview-badges">
+                <span class="pill">角色：Module Organizer</span>
+                <span class="pill" id="profileSaveStatus">未保存</span>
+            </div>
+        </div>
+
+        <form id="moProfileForm" class="mo-form-grid" autocomplete="off" enctype="multipart/form-data">
+            <input type="hidden" id="moIdField" name="moId" value="">
+
+            <div class="full avatar-upload-section">
+                <label>个人头像</label>
+                <div class="avatar-preview-container">
+                    <img id="avatarPreview" src="" alt="头像预览" class="avatar-preview" style="display: none;">
+                    <div id="avatarPlaceholder" class="avatar-placeholder">👤</div>
+                </div>
+                <input type="file" id="avatarFileInput" name="avatarFile" accept="image/png,image/jpeg,image/webp,image/gif" style="display: none;">
+                <button type="button" id="uploadAvatarBtn" class="pill-btn secondary">选择头像</button>
+                <p class="muted small">支持 PNG/JPG/WEBP/GIF，最大 10MB，自动裁剪为正方形</p>
+            </div>
+
+            <label>真实姓名<input id="realNameInput" name="realName" type="text" placeholder="如：张教授"></label>
+            <label>联系邮箱<input id="contactEmailInput" name="contactEmail" type="email" placeholder="如：professor@example.com"></label>
+
+            <label class="full">个人简介<textarea id="bioInput" name="bio" rows="4" placeholder="简要介绍您的教学背景、研究方向等信息..."></textarea></label>
+
+            <label class="full">专业技能（每行一个或逗号分隔）<textarea id="skillsInput" name="skills" rows="3" placeholder="如：软件工程&#10;数据结构&#10;机器学习"></textarea></label>
+
+            <div class="full">
+                <button type="submit" id="saveProfileBtn" class="pill-btn">保存资料</button>
+                <span id="saveProfileStatus" class="muted"></span>
+            </div>
+        </form>
+
+        <hr class="divider">
+
+        <div class="password-section">
+            <h3>修改密码</h3>
+            <form id="moPasswordForm" class="mo-form-grid" autocomplete="off">
+                <input type="hidden" id="moIdPasswordField" name="moId" value="">
+
+                <label>当前密码<input id="currentPasswordInput" name="currentPassword" type="password" placeholder="请输入当前密码"></label>
+                <label>新密码<input id="newPasswordInput" name="newPassword" type="password" placeholder="至少 6 位字符"></label>
+                <label>确认新密码<input id="confirmPasswordInput" type="password" placeholder="再次输入新密码"></label>
+
+                <div class="full">
+                    <button type="submit" id="changePasswordBtn" class="pill-btn secondary">更新密码</button>
+                    <span id="changePasswordStatus" class="muted"></span>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

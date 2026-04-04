@@ -24,6 +24,7 @@
             <%@ include file="routes/mo-route-dashboard.jspf" %>
             <%@ include file="routes/mo-route-jobs.jspf" %>
             <%@ include file="routes/mo-route-applicants.jspf" %>
+            <%@ include file="routes/mo-route-profile.jspf" %>
         </section>
     </main>
 </div>
@@ -36,6 +37,7 @@
 <script src="${pageContext.request.contextPath}/assets/mo/js/modules/job-board.js"></script>
 <script src="${pageContext.request.contextPath}/assets/mo/js/modules/applicants.js"></script>
 <script src="${pageContext.request.contextPath}/assets/mo/js/modules/dashboard.js"></script>
+<script src="${pageContext.request.contextPath}/assets/mo/js/modules/profile.js"></script>
 <script src="${pageContext.request.contextPath}/assets/mo/js/mo-home.js"></script>
 </body>
 </html>
