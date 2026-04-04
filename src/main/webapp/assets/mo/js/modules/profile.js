@@ -18,14 +18,20 @@
     let currentMoId = null;
     let selectedAvatarFile = null;
 
+    console.log('[MO-PROFILE] 模块加载完成，API地址:', PROFILE_API);
+
     /**
      * 初始化个人资料模块
      */
-    function init() {
+    function init(moApp) {
+        console.log('[MO-PROFILE] init() 被调用');
         bindEvents();
         loadMoIdFromStorage();
         if (currentMoId) {
+            console.log('[MO-PROFILE] 找到 MO ID:', currentMoId);
             loadProfile();
+        } else {
+            console.warn('[MO-PROFILE] 未找到 MO ID，无法加载资料');
         }
     }
 
@@ -39,11 +45,17 @@
         const avatarFileInput = document.getElementById('avatarFileInput');
 
         if (profileForm) {
+            console.log('[MO-PROFILE] 找到 moProfileForm，绑定 submit 事件');
             profileForm.addEventListener('submit', handleProfileSubmit);
+        } else {
+            console.warn('[MO-PROFILE] 未找到 moProfileForm');
         }
 
         if (passwordForm) {
+            console.log('[MO-PROFILE] 找到 moPasswordForm，绑定 submit 事件');
             passwordForm.addEventListener('submit', handlePasswordSubmit);
+        } else {
+            console.warn('[MO-PROFILE] 未找到 moPasswordForm - 这会导致密码修改功能失效！');
         }
 
         if (uploadAvatarBtn && avatarFileInput) {
@@ -57,15 +69,26 @@
      */
     function loadMoIdFromStorage() {
         try {
-            const userData = localStorage.getItem('moUser');
-            if (userData) {
-                const user = JSON.parse(userData);
+            console.log('[MO-PROFILE] 尝试从 localStorage 读取用户信息...');
+            const userData = localStorage.getItem('mo-user');
+            if (!userData) {
+                console.warn('[MO-PROFILE] localStorage 中没有 mo-user，尝试读取 moUser...');
+            }
+            const finalData = userData || localStorage.getItem('moUser');
+
+            if (finalData) {
+                const user = JSON.parse(finalData);
+                console.log('[MO-PROFILE] 解析用户数据:', user);
                 currentMoId = user.moId || user.id;
+                console.log('[MO-PROFILE] 提取的 MO ID:', currentMoId);
 
                 const moIdField = document.getElementById('moIdField');
                 const moIdPasswordField = document.getElementById('moIdPasswordField');
                 if (moIdField) moIdField.value = currentMoId;
                 if (moIdPasswordField) moIdPasswordField.value = currentMoId;
+            } else {
+                console.error('[MO-PROFILE] localStorage 中没有任何 MO 用户数据！');
+                console.log('[MO-PROFILE] 可用的 localStorage 键:', Object.keys(localStorage));
             }
         } catch (e) {
             console.error('[MO-PROFILE] 加载用户信息失败:', e);
@@ -76,11 +99,20 @@
      * 加载个人资料
      */
     async function loadProfile() {
-        if (!currentMoId) return;
+        if (!currentMoId) {
+            console.warn('[MO-PROFILE] currentMoId 为空，跳过加载');
+            return;
+        }
 
         try {
-            const response = await fetch(`${PROFILE_API}?moId=${encodeURIComponent(currentMoId)}`);
+            const url = `${PROFILE_API}?moId=${encodeURIComponent(currentMoId)}`;
+            console.log('[MO-PROFILE] 请求资料:', url);
+
+            const response = await fetch(url);
+            console.log('[MO-PROFILE] 响应状态:', response.status);
+
             const result = await response.json();
+            console.log('[MO-PROFILE] 响应数据:', result);
 
             if (result.success && result.data) {
                 populateProfileForm(result.data);
@@ -96,6 +128,8 @@
      * 填充表单数据
      */
     function populateProfileForm(data) {
+        console.log('[MO-PROFILE] 填充表单数据:', data);
+
         const fields = {
             realNameInput: data.realName || data.name || '',
             contactEmailInput: data.contactEmail || data.email || '',
@@ -105,7 +139,10 @@
 
         Object.entries(fields).forEach(([id, value]) => {
             const element = document.getElementById(id);
-            if (element) element.value = value;
+            if (element) {
+                element.value = value;
+                console.log(`[MO-PROFILE] 设置 ${id} = ${value}`);
+            }
         });
 
         if (data.avatar) {
@@ -209,9 +246,11 @@
      * 处理密码修改提交
      */
     async function handlePasswordSubmit(event) {
+        console.log('[MO-PROFILE] ========== 密码修改表单提交 ==========');
         event.preventDefault();
 
         if (!currentMoId) {
+            console.error('[MO-PROFILE] 密码修改失败：currentMoId 为空');
             alert('请先登录');
             return;
         }
@@ -219,6 +258,10 @@
         const currentPassword = document.getElementById('currentPasswordInput').value;
         const newPassword = document.getElementById('newPasswordInput').value;
         const confirmPassword = document.getElementById('confirmPasswordInput').value;
+
+        console.log('[MO-PROFILE] 当前 MO ID:', currentMoId);
+        console.log('[MO-PROFILE] 当前密码长度:', currentPassword ? currentPassword.length : 0);
+        console.log('[MO-PROFILE] 新密码长度:', newPassword ? newPassword.length : 0);
 
         if (!currentPassword || !newPassword || !confirmPassword) {
             alert('请填写所有密码字段');
@@ -244,12 +287,21 @@
         formData.append('currentPassword', currentPassword);
         formData.append('newPassword', newPassword);
 
+        console.log('[MO-PROFILE] 准备发送密码修改请求到:', PROFILE_API);
+        console.log('[MO-PROFILE] FormData 内容:');
+        for (let pair of formData.entries()) {
+            console.log(`  ${pair[0]}: ${pair[1]}`);
+        }
+
         try {
             const response = await fetch(PROFILE_API, {
                 method: 'POST',
                 body: formData
             });
+
+            console.log('[MO-PROFILE] 响应状态码:', response.status);
             const result = await response.json();
+            console.log('[MO-PROFILE] 响应数据:', result);
 
             if (result.success) {
                 if (statusEl) statusEl.textContent = '✓ 密码已更新';
@@ -278,6 +330,13 @@
         }
     }
 
+    // 注册到 moApp.modules 供 mo-home.js 初始化
+    if (window.MOApp && window.MOApp.modules) {
+        console.log('[MO-PROFILE] 注册到 MOApp.modules.profile');
+        window.MOApp.modules.profile = init;
+    }
+
+    // 同时暴露到全局供直接调用
     window.MoProfileModule = {
         init,
         reload: loadProfile
