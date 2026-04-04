@@ -391,7 +391,9 @@
 [data-theme="light"] .job-detail-hero,
 [data-theme="light"] .job-detail-section,
 [data-theme="light"] .job-detail-side-card {
-    background: rgba(15, 23, 42, 0.04);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(241, 245, 249, 0.94));
+    border-color: rgba(15, 23, 42, 0.12);
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.92);
 }
 
 .job-detail-hero {
@@ -438,7 +440,8 @@
 }
 
 [data-theme="light"] .job-detail-meta {
-    background: rgba(15, 23, 42, 0.04);
+    background: rgba(226, 232, 240, 0.7);
+    border-color: rgba(100, 116, 139, 0.2);
 }
 
 .job-detail-meta span {
@@ -490,7 +493,7 @@
     font-weight: 700;
     letter-spacing: 0.01em;
     box-shadow: 0 14px 28px rgba(3, 6, 20, 0.22), 0 0 0 1px rgba(255, 255, 255, 0.04) inset, 0 10px 22px rgba(0, 242, 254, 0.12);
-    transition: transform 0.2s ease, box-shadow 0.25s ease, filter 0.25s ease;
+    transition: transform 0.2s ease, box-shadow 0.25s ease, filter 0.25s ease, border-color 0.25s ease;
     z-index: 0;
 }
 
@@ -521,6 +524,22 @@
     pointer-events: none;
 }
 
+[data-theme="light"] .job-detail-side-card .apply-btn,
+[data-theme="light"] .job-detail-side-card #jobDetailApplyBtn,
+[data-theme="light"] .job-detail-side-card .pill-btn {
+    border-color: rgba(29, 78, 216, 0.2);
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 46%, #93c5fd 100%);
+    color: #0f172a;
+    box-shadow: 0 14px 28px rgba(59, 130, 246, 0.16), 0 0 0 1px rgba(255, 255, 255, 0.72) inset;
+}
+
+[data-theme="light"] .job-detail-side-card .apply-btn::before,
+[data-theme="light"] .job-detail-side-card #jobDetailApplyBtn::before,
+[data-theme="light"] .job-detail-side-card .pill-btn::before {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(255, 255, 255, 0.32) 42%, rgba(255, 255, 255, 0.06));
+    opacity: 0.96;
+}
+
 .job-detail-side-card .apply-btn:hover,
 .job-detail-side-card .apply-btn:focus-visible,
 .job-detail-side-card #jobDetailApplyBtn:hover,
@@ -530,6 +549,19 @@
     transform: translateY(-2px);
     filter: brightness(1.03);
     box-shadow: 0 18px 34px rgba(3, 6, 20, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.08) inset, 0 0 24px rgba(0, 242, 254, 0.2);
+    outline: none;
+}
+
+[data-theme="light"] .job-detail-side-card .apply-btn:hover,
+[data-theme="light"] .job-detail-side-card .apply-btn:focus-visible,
+[data-theme="light"] .job-detail-side-card #jobDetailApplyBtn:hover,
+[data-theme="light"] .job-detail-side-card #jobDetailApplyBtn:focus-visible,
+[data-theme="light"] .job-detail-side-card .pill-btn:hover,
+[data-theme="light"] .job-detail-side-card .pill-btn:focus-visible {
+    transform: translateY(-2px);
+    border-color: rgba(29, 78, 216, 0.32);
+    box-shadow: 0 18px 32px rgba(59, 130, 246, 0.2), 0 0 0 3px rgba(191, 219, 254, 0.72);
+    filter: brightness(1.01);
     outline: none;
 }
 
