@@ -217,6 +217,8 @@
                     const studentCountText = studentCount > 0 ? studentCount + ' 人' : '待确认';
                     const courseMoName = item.ownerMoName || item.moName || '待分配';
                     const primaryTagText = keywordTags.length > 0 ? keywordTags[0] : '暂无标签';
+                    const descriptionText = item.recruitmentBrief || item.courseDescription || '暂无课程简介';
+                    const suggestionText = item.suggestion || '建议结合自身技能标签和课程方向进行投递。';
 
                     courseDetailState[item.courseCode] = {
                         code: item.courseCode,
@@ -224,10 +226,10 @@
                         mo: courseMoName,
                         studentCount: studentCount,
                         studentCountText: studentCountText,
-                        description: item.courseDescription,
+                        description: descriptionText,
                         tags: keywordTags,
                         checklist: checklist,
-                        suggestion: item.suggestion
+                        suggestion: suggestionText
                     };
 
                     const tagHTML = keywordTags.slice(0, 3).map(function (tag) {
@@ -241,6 +243,7 @@
                         '<span class="course-mo-badge">' + courseMoName + '</span>' +
                         '</div>' +
                         '<h4>' + item.courseName + '</h4>' +
+                        '<p class="course-card-summary">' + (item.courseDescription || '暂无课程简介') + '</p>' +
                         '<div class="job-tags">' +
                         tagHTML +
                         '</div>' +
@@ -252,6 +255,10 @@
                         '<div class="course-meta-item">' +
                         '<span class="course-meta-label">课程标签</span>' +
                         '<strong>' + primaryTagText + '</strong>' +
+                        '</div>' +
+                        '<div class="course-meta-item">' +
+                        '<span class="course-meta-label">学生人数</span>' +
+                        '<strong>' + studentCountText + '</strong>' +
                         '</div>' +
                         '</div>' +
                         '<div class="course-card-hint">' +
