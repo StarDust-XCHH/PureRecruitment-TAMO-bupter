@@ -185,7 +185,7 @@
 
 ### 新增/修改内容
 
-1. `**assets/mo/js/modules/profile.js`**
+1. **`assets/mo/js/modules/profile.js`**
   - **接口与静态资源路径**：`PROFILE_API`、`ASSETS_BASE` 改为相对 `pages/mo/mo-home.jsp` 的 `../../api/mo/profile-settings` 与 `../../mo-assets`，与 `job-board.js`、`applicants.js` 一致，避免非根 context 部署时请求落到站点根路径导致 404。
   - **改密安全与体验**：移除遍历 `FormData` 及敏感调试输出，避免在浏览器控制台泄露当前密码/新密码明文；新密码与确认密码以 **trim 后** 校验长度（≥6）与一致性，提交 `newPassword` 为 trim 后内容，与后端 `MoAccountDao.updatePassword` 中对 `trim().length()` 的规则一致；当前密码仍原样提交以匹配登录哈希。
   - **登录态读取**：`loadMoIdFromStorage` 与 `settings.js` 对齐，优先 `sessionStorage` 的 `mo-user`，其次 `localStorage` 的 `mo-user`，再兜底 `localStorage` 的 `moUser`，减少仅一侧存储有数据时资料/改密不可用的问题。
