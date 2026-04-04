@@ -14,6 +14,8 @@
 
         const JOBS_PER_PAGE = 6;
         const JOBS_SCROLL_OFFSET = 24;
+        const TA_WORK_CONTENT_FALLBACK = '待确定';
+        const RECRUITMENT_STATUS_FALLBACK = '待确定';
 
         let courseJobCards = []; // 改为用数组/NodeList维护当前挂载的卡片
         let courseDetailState = {};
@@ -35,6 +37,14 @@
             if (size >= 1024 * 1024) return (size / (1024 * 1024)).toFixed(2) + ' MB';
             if (size >= 1024) return Math.round(size / 1024) + ' KB';
             return size + ' B';
+        }
+
+        function normalizeTaWorkContents(contents) {
+            if (!Array.isArray(contents)) return [TA_WORK_CONTENT_FALLBACK];
+            const normalizedContents = contents
+                .map((content) => typeof content === 'string' ? content.trim() : '')
+                .filter((content) => content);
+            return normalizedContents.length > 0 ? normalizedContents : [TA_WORK_CONTENT_FALLBACK];
         }
 
         function syncApplyModal(course) {
@@ -107,7 +117,7 @@
 
             if (jobDetailChecklist) {
                 jobDetailChecklist.innerHTML = '';
-                (course.checklist || []).forEach((item) => {
+                normalizeTaWorkContents(course.taWorkContents).forEach((item) => {
                     const li = document.createElement('li');
                     li.textContent = item;
                     jobDetailChecklist.appendChild(li);
@@ -152,8 +162,37 @@
             return card.textContent.toLowerCase().includes(keyword);
         }
 
+        function getSortedJobItems(items) {
+            const normalizedItems = Array.isArray(items) ? items.slice() : [];
+            return normalizedItems.sort((leftItem, rightItem) => {
+                const leftStatus = typeof leftItem?.recruitmentStatus === 'string'
+                    ? leftItem.recruitmentStatus.trim().toUpperCase()
+                    : '';
+                const rightStatus = typeof rightItem?.recruitmentStatus === 'string'
+                    ? rightItem.recruitmentStatus.trim().toUpperCase()
+                    : '';
+                const leftPriority = (leftStatus === 'CLOSE' || leftStatus === 'CLOSED') ? 1 : 0;
+                const rightPriority = (rightStatus === 'CLOSE' || rightStatus === 'CLOSED') ? 1 : 0;
+                if (leftPriority !== rightPriority) {
+                    return leftPriority - rightPriority;
+                }
+                return 0;
+            });
+        }
+
         function getMatchedCards(keyword) {
-            return Array.from(courseJobCards).filter((card) => getCardMatchesKeyword(card, keyword));
+            const matchedCards = Array.from(courseJobCards).filter((card) => getCardMatchesKeyword(card, keyword));
+            return matchedCards.sort((leftCard, rightCard) => {
+                const leftPriority = Number(leftCard.dataset.statusPriority || '1');
+                const rightPriority = Number(rightCard.dataset.statusPriority || '1');
+                if (leftPriority !== rightPriority) {
+                    return leftPriority - rightPriority;
+                }
+
+                const leftOriginalOrder = Number(leftCard.dataset.originalOrder || '0');
+                const rightOriginalOrder = Number(rightCard.dataset.originalOrder || '0');
+                return leftOriginalOrder - rightOriginalOrder;
+            });
         }
 
         function getTotalJobPages(matchedCards) {
@@ -207,9 +246,17 @@
             const endIndex = startIndex + JOBS_PER_PAGE;
             const visibleCards = new Set(matchedCards.slice(startIndex, endIndex));
 
+            const currentJobBoard = document.getElementById('jobBoard');
+            if (currentJobBoard) {
+                // 【关键修复】：将排序后的卡片按正确顺序重新追加到 DOM 容器中
+                // 这样就保证了视觉排布与数组排序完全一致
+                matchedCards.forEach((card) => currentJobBoard.appendChild(card));
+            }
+
             courseJobCards.forEach((card) => {
                 card.hidden = !visibleCards.has(card);
             });
+
             renderJobPagination(totalPages);
             if (shouldFocusBoard) scrollJobsBoardIntoView();
         }
@@ -256,15 +303,22 @@
                 courseDetailState = {};
                 const newCardsHTML = [];
 
-                data.items.forEach(function (item) {
+                const sortedItems = getSortedJobItems(data.items);
+
+                sortedItems.forEach(function (item) {
                     const keywordTags = Array.isArray(item.keywordTags) ? item.keywordTags : [];
                     const checklist = Array.isArray(item.checklist) ? item.checklist : [];
+                    const taWorkContents = normalizeTaWorkContents(item.taWorkContents);
                     const studentCount = Number.isFinite(Number(item.studentCount)) ? Number(item.studentCount) : 0;
                     const studentCountText = studentCount > 0 ? studentCount + ' 人' : '待确认';
                     const courseMoName = item.ownerMoName || item.moName || '待分配';
                     const primaryTagText = keywordTags.length > 0 ? keywordTags[0] : '暂无标签';
                     const descriptionText = item.recruitmentBrief || item.courseDescription || '暂无课程简介';
                     const suggestionText = item.suggestion || '建议结合自身技能标签和课程方向进行投递。';
+                    const recruitmentStatus = typeof item.recruitmentStatus === 'string' && item.recruitmentStatus.trim()
+                        ? item.recruitmentStatus.trim().toUpperCase()
+                        : RECRUITMENT_STATUS_FALLBACK;
+                    const statusPriority = (recruitmentStatus === 'CLOSE' || recruitmentStatus === 'CLOSED') ? 1 : 0;
 
                     courseDetailState[item.courseCode] = {
                         code: item.courseCode,
@@ -275,7 +329,9 @@
                         description: descriptionText,
                         tags: keywordTags,
                         checklist: checklist,
-                        suggestion: suggestionText
+                        taWorkContents: taWorkContents,
+                        suggestion: suggestionText,
+                        recruitmentStatus: recruitmentStatus
                     };
 
                     const tagHTML = keywordTags.slice(0, 3).map(function (tag) {
@@ -283,10 +339,10 @@
                     }).join('');
 
                     newCardsHTML.push(
-                        '<div class="job-card course-job-card" tabindex="0" role="button" aria-label="查看 ' + item.courseName + ' 详情" data-job-detail-card data-course-code="' + item.courseCode + '">' +
+                        '<div class="job-card course-job-card" tabindex="0" role="button" aria-label="查看 ' + item.courseName + ' 详情" data-job-detail-card data-course-code="' + item.courseCode + '" data-status-priority="' + statusPriority + '" data-original-order="' + newCardsHTML.length + '">' +
                         '<div class="course-card-topline">' +
                         '<span class="job-code">' + item.courseCode + '</span>' +
-                        '<span class="course-mo-badge">' + courseMoName + '</span>' +
+                        '<span class="course-status-badge course-status-badge-' + recruitmentStatus.toLowerCase() + '">' + recruitmentStatus + '</span>' +
                         '</div>' +
                         '<h4>' + item.courseName + '</h4>' +
                         '<p class="course-card-summary">' + (item.courseDescription || '暂无课程简介') + '</p>' +
