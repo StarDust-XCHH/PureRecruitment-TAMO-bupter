@@ -10,6 +10,10 @@
   - [`profiles.json`](mountDataTAMObupter/ta/profiles.json) 使用根对象 `{ meta, items }`，其中 `meta.schema = "profile"`、`meta.entity = "profiles"`，`items` 中每条记录包含 `id`、`taId`、`avatar`、`realName`、`applicationIntent`、`studentId`、`contactEmail`、`bio`、`skills`、`availabilityHoursPerWeek`、`semester`、`title`、`lastUpdatedAt`
   - [`settings.json`](mountDataTAMObupter/ta/settings.json) 使用根对象 `{ meta, items }`，其中 `meta.schema = "setting"`、`meta.entity = "settings"`，`items` 中每条记录包含 `id`、`taId`、`theme`、`onboardingStep`、`guideCompleted`、`createdAt`
 
+## 跨模块写入说明（MO）
+
+- TA 投递主数据 [`applications.json`](applications.json) 通常由 TA 侧 [`TaAccountDao`](../../src/main/java/com/bupt/tarecruit/ta/dao/TaAccountDao.java) 创建；MO 在申请人「已查看」流程中可能通过 `com.bupt.tarecruit.mo.dao.MoTaApplicationsMutationDao` 更新同一条记录的 `status`（如 `UNDER_REVIEW`）等字段，以便 TA 状态接口读到一致进度。MO 录用/拒绝结果写在 [`application-status.json`](application-status.json)。详见仓库 [`docs/backend/mo-ta-interaction-log.md`](../../docs/backend/mo-ta-interaction-log.md)。
+
 ## 待开发与当前限制
 
 - 由于头像上传流程尚未成功实现，当前注册阶段仅在 [`TaAccountDao.register()`](src/main/java/com/bupt/tarecruit/ta/dao/TaAccountDao.java:84) 中为 `avatar` 写入空字符串，后续需要补充文件上传接口、存储路径校验、文件类型与大小限制，以及上传成功后的路径回填逻辑

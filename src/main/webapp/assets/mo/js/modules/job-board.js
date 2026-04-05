@@ -5,6 +5,14 @@
     const modules = moApp.modules = moApp.modules || {};
 
     modules.jobBoard = function initJobBoard(app) {
+        function apiUrl(path) {
+            var p = path.charAt(0) === '/' ? path : '/' + path;
+            if (typeof window.moApiPath === 'function') {
+                return window.moApiPath(p);
+            }
+            return '../../' + p.replace(/^\//, '');
+        }
+
         const state = {
             jobs: [],
             page: 1,
@@ -20,6 +28,26 @@
         const publishForm = document.getElementById('jobPublishForm');
         const publishStatus = document.getElementById('publishJobStatus');
         const fixedSkillsInput = document.getElementById('fixedSkillsInput');
+
+        function readMoUserFromStorage() {
+            const raw = sessionStorage.getItem('mo-user') || localStorage.getItem('mo-user');
+            if (!raw) return null;
+            try {
+                return JSON.parse(raw);
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function getMoIdForApi() {
+            const u = typeof app.getMoUser === 'function' ? app.getMoUser() : null;
+            let id = u && (u.moId || u.id) ? String(u.moId || u.id).trim() : '';
+            if (!id) {
+                const fb = readMoUserFromStorage();
+                id = fb && (fb.moId || fb.id) ? String(fb.moId || fb.id).trim() : '';
+            }
+            return id;
+        }
 
         function parseCsv(text) {
             return String(text || '')
@@ -37,7 +65,7 @@
         async function loadSkillTags() {
             if (!fixedSkillsInput) return;
             try {
-                const res = await fetch('../../api/mo/skill-tags', { headers: { Accept: 'application/json' } });
+                const res = await fetch(apiUrl('/api/mo/skill-tags'), { headers: { Accept: 'application/json' } });
                 if (!res.ok) return;
                 const payload = await res.json();
                 const items = Array.isArray(payload.items) ? payload.items : [];
@@ -242,7 +270,18 @@
         async function loadJobs() {
             refreshJobsBtn.disabled = true;
             try {
-                const res = await fetch('../../api/mo/jobs', { headers: { Accept: 'application/json' } });
+                const moId = getMoIdForApi();
+                if (!moId) {
+                    console.warn('[MO-JOBS] 缺少 moId，无法加载岗位列表');
+                    state.jobs = [];
+                    state.page = 1;
+                    renderBoard();
+                    return;
+                }
+                const res = await fetch(
+                    apiUrl('/api/mo/jobs') + '?moId=' + encodeURIComponent(moId),
+                    { headers: { Accept: 'application/json' } }
+                );
                 const payload = await res.json();
                 state.jobs = Array.isArray(payload.items) ? payload.items : [];
                 state.page = 1;
@@ -256,7 +295,6 @@
 
         async function publishJob(event) {
             event.preventDefault();
-            const moUser = typeof app.getMoUser === 'function' ? app.getMoUser() : null;
             const teachingWeeks = parseTeachingWeeks();
             const fixedSkills = readSelectedValues('fixedSkillsInput');
             const courseCodeInput = document.getElementById('courseCodeInput').value.trim();
@@ -269,10 +307,11 @@
             const campusRaw = document.getElementById('campusInput').value.trim();
             const applicationDeadlineRaw = document.getElementById('applicationDeadlineInput').value.trim();
             const recruitmentBriefRaw = document.getElementById('recruitmentBriefInput').value.trim();
-            const moUsername = (moUser && moUser.username) ? moUser.username : 'MO';
-            const ownerMoId = (moUser && (moUser.id || moUser.moId || moUser.userId))
-                ? String(moUser.id || moUser.moId || moUser.userId).trim()
-                : moUsername;
+            const sessionMoId = getMoIdForApi();
+            if (!sessionMoId) {
+                publishStatus.textContent = '未登录或缺少 moId，无法发布';
+                return;
+            }
 
             if (!courseNameInput || !courseCodeInput || !recruitmentStatusInput || !courseDescInput || fixedSkills.length === 0) {
                 publishStatus.textContent = '请填写必填项：课程名、课程编号、招聘状态、至少一个技能标签、岗位描述';
@@ -280,9 +319,8 @@
             }
 
             const body = {
+                moId: sessionMoId,
                 courseCode: courseCodeInput,
-                ownerMoId: ownerMoId,
-                ownerMoName: moUsername,
                 courseName: courseNameInput,
                 recruitmentStatus: recruitmentStatusInput,
                 status: recruitmentStatusInput,
@@ -304,11 +342,14 @@
 
             publishStatus.textContent = '发布中...';
             try {
-                const res = await fetch('../../api/mo/jobs', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-                    body: JSON.stringify(body)
-                });
+                const res = await fetch(
+                    apiUrl('/api/mo/jobs') + '?moId=' + encodeURIComponent(sessionMoId),
+                    {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+                        body: JSON.stringify(body)
+                    }
+                );
                 const payload = await res.json();
                 if (!res.ok || payload.success === false) {
                     publishStatus.textContent = payload.message || '发布失败';

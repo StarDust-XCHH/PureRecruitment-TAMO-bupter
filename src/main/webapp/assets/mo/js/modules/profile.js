@@ -11,8 +11,12 @@
 (function () {
     'use strict';
 
-    const PROFILE_API = '../../api/mo/profile-settings';
-    const ASSETS_BASE = '../../mo-assets';
+    const PROFILE_API = (typeof window.moApiPath === 'function')
+        ? window.moApiPath('/api/mo/profile-settings')
+        : '../../api/mo/profile-settings';
+    const ASSETS_BASE = (typeof window.moApiPath === 'function')
+        ? window.moApiPath('/mo-assets')
+        : '../../mo-assets';
 
     let currentMoId = null;
     let selectedAvatarFile = null;
@@ -128,7 +132,7 @@
         console.log('[MO-PROFILE] 填充表单数据:', data);
 
         const fields = {
-            realNameInput: data.realName || data.name || '',
+            moNameInput: data.name || '',
             contactEmailInput: data.contactEmail || data.email || '',
             bioInput: data.bio || '',
             skillsInput: Array.isArray(data.skills) ? data.skills.join('\n') : ''
@@ -197,7 +201,7 @@
 
         const formData = new FormData();
         formData.append('moId', currentMoId);
-        formData.append('realName', document.getElementById('realNameInput').value);
+        formData.append('name', document.getElementById('moNameInput').value);
         formData.append('contactEmail', document.getElementById('contactEmailInput').value);
         formData.append('bio', document.getElementById('bioInput').value);
 

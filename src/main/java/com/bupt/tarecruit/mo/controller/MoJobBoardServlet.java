@@ -22,8 +22,15 @@ public class MoJobBoardServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
-            JsonObject payload = recruitmentDao.getPendingCourses();
+            String moId = readMoIdParam(req);
+            if (moId.isEmpty()) {
+                writeJson(resp, 400, buildV2Error("缺少 moId 参数"));
+                return;
+            }
+            JsonObject payload = recruitmentDao.getJobBoardForMo(moId);
             writeJson(resp, 200, payload);
+        } catch (IllegalArgumentException ex) {
+            writeJson(resp, 400, buildV2Error(ex.getMessage()));
         } catch (Exception ex) {
             writeJson(resp, 500, buildV2Error("读取 MO 岗位列表失败: " + ex.getMessage()));
         }
@@ -33,7 +40,12 @@ public class MoJobBoardServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         try {
             JsonObject body = JsonParser.parseReader(req.getReader()).getAsJsonObject();
-            JsonObject payload = recruitmentDao.createCourse(body);
+            String moId = readMoIdForPost(req, body);
+            if (moId.isEmpty()) {
+                writeJson(resp, 400, buildV2Error("缺少 moId（请使用查询参数 moId 或 JSON 字段 moId）"));
+                return;
+            }
+            JsonObject payload = recruitmentDao.createCourse(body, moId);
             writeJson(resp, 201, payload);
         } catch (IllegalStateException | ClassCastException ex) {
             writeJson(resp, 400, buildV2Error("请求体不是合法 JSON 对象"));
@@ -42,6 +54,26 @@ public class MoJobBoardServlet extends HttpServlet {
         } catch (Exception ex) {
             writeJson(resp, 500, buildV2Error("发布岗位失败: " + ex.getMessage()));
         }
+    }
+
+    private static String readMoIdParam(HttpServletRequest req) {
+        String q = req.getParameter("moId");
+        return q == null ? "" : q.trim();
+    }
+
+    /**
+     * 查询参数 {@code moId} 优先，否则读请求体中的 {@code moId}（登录账号 id）；持久化岗位的 {@code ownerMoId} 由服务端据此写入，与请求体中的 {@code ownerMoId} 字段无关。
+     */
+    private static String readMoIdForPost(HttpServletRequest req, JsonObject body) {
+        String fromQuery = readMoIdParam(req);
+        if (!fromQuery.isEmpty()) {
+            return fromQuery;
+        }
+        if (body != null && body.has("moId") && !body.get("moId").isJsonNull()) {
+            String b = body.get("moId").getAsString();
+            return b == null ? "" : b.trim();
+        }
+        return "";
     }
 
     private void writeJson(HttpServletResponse resp, int status, JsonObject payload) throws IOException {

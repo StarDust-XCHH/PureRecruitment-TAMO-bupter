@@ -57,7 +57,9 @@ public final class RecruitmentCoursesDao {
         synchronized (FILE_LOCK) {
             JsonObject root = ensureJobBoardRoot();
 
-            JsonArray items = root.getAsJsonArray("items");
+            JsonArray items = root.has("items") && root.get("items").isJsonArray()
+                    ? root.getAsJsonArray("items")
+                    : new JsonArray();
             JsonArray normalizedItems = new JsonArray();
             for (JsonElement element : items) {
                 if (element != null && element.isJsonObject()) {
@@ -351,7 +353,7 @@ public final class RecruitmentCoursesDao {
         String ownerMoName = firstNonBlank(trim(getAsString(item, "ownerMoName")),
                 firstNonBlank(legacyMoName, "MO"));
         item.addProperty("ownerMoName", ownerMoName);
-        item.addProperty("ownerMoId", firstNonBlank(trim(getAsString(item, "ownerMoId")), ownerMoName));
+        item.addProperty("ownerMoId", trim(getAsString(item, "ownerMoId")));
         if (trim(getAsString(item, "semester")).isBlank()) {
             item.remove("semester");
         } else {

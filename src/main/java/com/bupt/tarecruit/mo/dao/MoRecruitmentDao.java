@@ -17,10 +17,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
+
+import com.bupt.tarecruit.mo.service.MoTaApplicationReadService;
 
 import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.firstNonBlank;
 import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.getAsString;
@@ -29,11 +32,7 @@ import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.trim;
 
 public class MoRecruitmentDao {
     private static final Path TA_APPLICATION_STATUS = DataMountPaths.taApplicationStatus();
-    private static final Path TA_PROFILES = DataMountPaths.taProfiles();
-    private static final Path TA_ACCOUNTS = DataMountPaths.taAccounts();
     private static final String TA_SCHEMA = "ta";
-    private static final String TA_ENTITY_TAS = "tas";
-    private static final String TA_ENTITY_PROFILES = "profiles";
     private static final String TA_ENTITY_APPLICATION_STATUS = "application-status";
 
     private static final Gson GSON = new GsonBuilder()
@@ -41,11 +40,69 @@ public class MoRecruitmentDao {
             .disableHtmlEscaping()
             .create();
 
-    public JsonObject getPendingCourses() throws IOException {
-        return RecruitmentCoursesDao.readJobBoard();
+    /**
+     * 岗位上的展示名：取自 {@code mos.json} 账号字段 {@code name}（与 profile 无关；不使用 {@code username}）。
+     * 仅当查不到账号时，才回退请求体中的 {@code ownerMoName}，最后回退 {@code ownerMoId}。
+     */
+    private static String resolveOwnerMoName(String ownerMoId, JsonObject input) throws IOException {
+        MoAccountDao.ProfileResult pr = new MoAccountDao().getProfileSettings(ownerMoId);
+        if (pr.isSuccess() && pr.getData() != null) {
+            Object n = pr.getData().get("name");
+            if (n != null) {
+                String accountName = String.valueOf(n).trim();
+                if (!accountName.isBlank()) {
+                    return accountName;
+                }
+            }
+        }
+        String fromInput = trim(getAsString(input, "ownerMoName"));
+        if (!fromInput.isBlank()) {
+            return fromInput;
+        }
+        return trim(ownerMoId);
     }
 
-    public JsonObject createCourse(JsonObject input) throws IOException {
+    private static boolean jobOwnerMoIdMatchesMo(String moId, String ownerMoIdOnJob) {
+        String m = trim(moId);
+        String o = trim(ownerMoIdOnJob);
+        return !m.isBlank() && !o.isBlank() && o.equalsIgnoreCase(m);
+    }
+
+    /**
+     * 当前 MO 可见的岗位：仅当 {@code item.ownerMoId} 与登录 {@code moId} 相同（忽略大小写）。
+     */
+    public JsonObject getJobBoardForMo(String moId) throws IOException {
+        String m = new MoAccountDao().resolveCanonicalMoId(moId);
+        if (m.isBlank()) {
+            throw new IllegalArgumentException("缺少 moId");
+        }
+        JsonObject full = RecruitmentCoursesDao.readJobBoard();
+        JsonArray items = full.getAsJsonArray("items");
+        JsonArray owned = new JsonArray();
+        for (JsonElement e : items) {
+            if (e == null || !e.isJsonObject()) {
+                continue;
+            }
+            JsonObject j = e.getAsJsonObject();
+            if (jobOwnerMoIdMatchesMo(m, getAsString(j, "ownerMoId"))) {
+                owned.add(j.deepCopy());
+            }
+        }
+        JsonObject payload = new JsonObject();
+        payload.addProperty("schema", getAsString(full, "schema"));
+        payload.addProperty("version", getAsString(full, "version"));
+        if (full.has("generatedAt") && !full.get("generatedAt").isJsonNull()) {
+            payload.add("generatedAt", full.get("generatedAt").deepCopy());
+        }
+        payload.addProperty("count", owned.size());
+        payload.add("items", owned);
+        return payload;
+    }
+
+    /**
+     * 发布课程：{@code ownerMoId} 必须为 {@code actingMoId}，不可由客户端伪造。
+     */
+    public JsonObject createCourse(JsonObject input, String actingMoId) throws IOException {
         String now = Instant.now().toString();
         String courseName = trim(getAsString(input, "courseName"));
         if (courseName.isEmpty()) {
@@ -81,12 +138,11 @@ public class MoRecruitmentDao {
         if (courseDescription.isEmpty()) {
             throw new IllegalArgumentException("岗位描述不能为空");
         }
-        String ownerMoName = firstNonBlank(
-                trim(getAsString(input, "ownerMoName")),
-                firstNonBlank(
-                        trim(getAsString(input, "ownerMoId")), "MO"));
-        String ownerMoId = firstNonBlank(
-                trim(getAsString(input, "ownerMoId")), ownerMoName);
+        String ownerMoId = new MoAccountDao().resolveCanonicalMoId(actingMoId);
+        if (ownerMoId.isBlank()) {
+            throw new IllegalArgumentException("缺少 moId");
+        }
+        String ownerMoName = resolveOwnerMoName(ownerMoId, input);
         String recruitmentBrief = trim(getAsString(input, "recruitmentBrief"));
         String workload = trim(getAsString(input, "workload"));
         String campus = RecruitmentCoursesDao.normalizeCampus(getAsString(input, "campus"));
@@ -160,80 +216,311 @@ public class MoRecruitmentDao {
         return result;
     }
 
-    public synchronized JsonArray getApplicantsForCourse(String courseCode) throws IOException {
+    /**
+     * 返回指定课程下**真实投递**的申请人列表（来自 TA {@code applications.json}），
+     * 合并 {@code application-status.json} 中的录用/拒绝与备注，并计算 MO 未读数。
+     *
+     * @param moId 当前登录 MO，用于岗位归属校验与已读状态
+     */
+    public synchronized JsonObject getApplicantsForCourse(String courseCode, String moId) throws IOException {
         String normalizedCourseCode = trim(courseCode);
+        String normalizedMoId = new MoAccountDao().resolveCanonicalMoId(moId);
         if (normalizedCourseCode.isBlank()) {
-            return new JsonArray();
+            throw new IllegalArgumentException("缺少 courseCode");
         }
+        if (normalizedMoId.isBlank()) {
+            throw new IllegalArgumentException("缺少 moId");
+        }
+        assertMoOwnsCourseResolved(normalizedMoId, normalizedCourseCode);
 
-        JsonObject accountRoot = ensureStructuredFile(TA_ACCOUNTS, TA_ENTITY_TAS);
-        JsonObject profileRoot = ensureStructuredFile(TA_PROFILES, TA_ENTITY_PROFILES);
-        JsonObject appRoot = ensureStructuredFile(TA_APPLICATION_STATUS, TA_ENTITY_APPLICATION_STATUS);
+        MoTaApplicationReadService readService = new MoTaApplicationReadService();
+        JsonObject appStatusRoot = ensureStructuredFile(TA_APPLICATION_STATUS, TA_ENTITY_APPLICATION_STATUS);
+        JsonArray moStatusItems = appStatusRoot.getAsJsonArray("items");
+        MoApplicationReadStateDao readStateDao = new MoApplicationReadStateDao();
 
-        JsonArray accountItems = accountRoot.getAsJsonArray("items");
-        JsonArray profileItems = profileRoot.getAsJsonArray("items");
-        JsonArray appItems = appRoot.getAsJsonArray("items");
-
-        List<JsonObject> rows = new ArrayList<>();
         String targetSlug = normalizeSlug(normalizedCourseCode);
+        List<MoTaApplicationReadService.TaApplicationRecord> applications =
+                readService.getApplicationsByCourseCode(normalizedCourseCode);
 
-        for (JsonElement accountElement : accountItems) {
-            if (!accountElement.isJsonObject()) {
+        JsonArray rows = new JsonArray();
+        int unreadCount = 0;
+        for (MoTaApplicationReadService.TaApplicationRecord rec : applications) {
+            if (!rec.active()) {
                 continue;
             }
-            JsonObject account = accountElement.getAsJsonObject();
-            String taId = getAsString(account, "id");
-            if (taId.isBlank()) {
-                continue;
+            JsonObject moRow = findLatestApplicationForCourse(moStatusItems, rec.taId(), normalizedCourseCode, targetSlug);
+            String displayStatus = resolveApplicantDisplayStatus(rec, moRow);
+            String commentPreview = firstNonBlank(
+                    firstNonBlank(
+                            moRow != null ? getAsString(moRow, "moComment") : "",
+                            moRow != null ? getAsString(moRow, "summary") : ""),
+                    firstNonBlank(rec.summary(), rec.statusLabel())
+            );
+            boolean unread = readStateDao.isUnread(normalizedMoId, rec.applicationId(), rec.updatedAt());
+            if (unread) {
+                unreadCount++;
             }
-
-            JsonObject profile = findProfile(profileItems, taId);
-            JsonObject latest = findLatestApplicationForCourse(appItems, taId, normalizedCourseCode, targetSlug);
 
             JsonObject row = new JsonObject();
-            row.addProperty("taId", taId);
-            row.addProperty("name", firstNonBlank(getAsString(account, "name"), "未命名 TA"));
-            row.addProperty("username", getAsString(account, "username"));
-            row.addProperty("email", firstNonBlank(getAsString(profile, "contactEmail"), getAsString(account, "email")));
-            row.addProperty("intent", getAsString(profile, "applicationIntent"));
-            row.addProperty("skills", joinArrayAsText(profile == null ? null : profile.get("skills")));
-            row.addProperty("bio", getAsString(profile, "bio"));
-            row.addProperty("avatar", getAsString(profile, "avatar"));
-
-            if (latest == null) {
-                row.addProperty("applicationId", "");
-                row.addProperty("status", "可邀请");
-                row.addProperty("updatedAt", "");
-                row.addProperty("comment", "暂无该课程投递记录，可由 MO 主动邀请。");
-            } else {
-                row.addProperty("applicationId", getAsString(latest, "applicationId"));
-                row.addProperty("status", firstNonBlank(getAsString(latest, "status"), "审核中"));
-                row.addProperty("updatedAt", getAsString(latest, "updatedAt"));
-                row.addProperty("comment", firstNonBlank(getAsString(latest, "summary"), getAsString(latest, "moComment")));
-            }
+            row.addProperty("applicationId", rec.applicationId());
+            row.addProperty("taId", rec.taId());
+            row.addProperty("uniqueKey", rec.uniqueKey());
+            row.addProperty("name", firstNonBlank(rec.taName(), rec.taId()));
+            row.addProperty("email", rec.taEmail());
+            row.addProperty("phone", rec.taPhone());
+            row.addProperty("studentId", rec.taStudentId());
+            row.addProperty("intent", getAsString(rec.taSnapshot(), "applicationIntent"));
+            row.addProperty("skills", joinSnapshotSkills(rec.taSnapshot()));
+            row.addProperty("bio", getAsString(rec.taSnapshot(), "bio"));
+            row.addProperty("avatar", getAsString(rec.taSnapshot(), "avatar"));
+            row.addProperty("courseCode", rec.courseCode());
+            row.addProperty("courseName", rec.courseName());
+            row.addProperty("status", displayStatus);
+            row.addProperty("submittedAt", rec.submittedAt());
+            row.addProperty("updatedAt", rec.updatedAt());
+            row.addProperty("comment", commentPreview);
+            row.addProperty("unread", unread);
+            row.addProperty("resumeFileName", firstNonBlank(rec.resumeMeta().originalFileName(), rec.resumeMeta().storedFileName()));
             rows.add(row);
         }
 
-        rows.sort(Comparator.comparing(o -> getAsString(o, "name"), String.CASE_INSENSITIVE_ORDER));
-        JsonArray result = new JsonArray();
-        for (JsonObject row : rows) {
-            result.add(row);
-        }
-        return result;
+        JsonObject payload = new JsonObject();
+        payload.addProperty("success", true);
+        payload.addProperty("courseCode", normalizedCourseCode);
+        payload.addProperty("count", rows.size());
+        payload.addProperty("unreadCount", unreadCount);
+        payload.add("items", rows);
+        return payload;
     }
 
+    private void assertMoOwnsCourseResolved(String resolvedMoId, String courseCode) throws IOException {
+        JsonObject job = RecruitmentCoursesDao.findNormalizedJobByCourseCode(trim(courseCode));
+        if (job == null) {
+            throw new IllegalArgumentException("课程不存在或未发布");
+        }
+        if (!jobOwnerMoIdMatchesMo(resolvedMoId, getAsString(job, "ownerMoId"))) {
+            throw new IllegalArgumentException("当前 MO 无权管理该课程的申请人");
+        }
+    }
+
+    public void assertMoOwnsCourse(String moId, String courseCode) throws IOException {
+        String m = new MoAccountDao().resolveCanonicalMoId(moId);
+        if (m.isBlank()) {
+            throw new IllegalArgumentException("缺少 moId");
+        }
+        assertMoOwnsCourseResolved(m, courseCode);
+    }
+
+    public synchronized JsonObject markApplicationReadByMo(String moId, String applicationId) throws IOException {
+        MoTaApplicationsMutationDao mutationDao = new MoTaApplicationsMutationDao();
+        JsonObject app = mutationDao.findApplicationItem(trim(applicationId));
+        if (app == null) {
+            throw new IllegalArgumentException("申请不存在");
+        }
+        String courseCode = firstNonBlank(getAsString(app, "courseCode"), "");
+        String m = new MoAccountDao().resolveCanonicalMoId(moId);
+        if (m.isBlank()) {
+            throw new IllegalArgumentException("缺少 moId");
+        }
+        assertMoOwnsCourseResolved(m, courseCode);
+        mutationDao.markUnderReview(trim(applicationId));
+        new MoApplicationReadStateDao().markRead(m, trim(applicationId));
+        JsonObject ok = new JsonObject();
+        ok.addProperty("success", true);
+        ok.addProperty("message", "已标记已读，TA 侧申请已更新为审核中");
+        ok.addProperty("applicationId", trim(applicationId));
+        ok.addProperty("taStatus", "UNDER_REVIEW");
+        return ok;
+    }
+
+    public synchronized JsonObject getApplicantDetail(String moId, String applicationId) throws IOException {
+        MoTaApplicationReadService readService = new MoTaApplicationReadService();
+        MoTaApplicationReadService.TaApplicationRecord rec = readService.getApplicationById(applicationId);
+        if (rec == null) {
+            throw new IllegalArgumentException("申请不存在");
+        }
+        String m = new MoAccountDao().resolveCanonicalMoId(moId);
+        if (m.isBlank()) {
+            throw new IllegalArgumentException("缺少 moId");
+        }
+        assertMoOwnsCourseResolved(m, rec.courseCode());
+
+        JsonObject appStatusRoot = ensureStructuredFile(TA_APPLICATION_STATUS, TA_ENTITY_APPLICATION_STATUS);
+        String targetSlug = normalizeSlug(rec.courseCode());
+        JsonObject moRow = findLatestApplicationForCourse(appStatusRoot.getAsJsonArray("items"), rec.taId(), rec.courseCode(), targetSlug);
+
+        MoApplicationCommentsDao commentsDao = new MoApplicationCommentsDao();
+        JsonArray comments = commentsDao.listComments(applicationId);
+
+        JsonObject detail = new JsonObject();
+        detail.addProperty("success", true);
+        detail.addProperty("applicationId", rec.applicationId());
+        detail.addProperty("taId", rec.taId());
+        detail.addProperty("courseCode", rec.courseCode());
+        detail.addProperty("courseName", rec.courseName());
+        detail.add("taSnapshot", rec.taSnapshot().deepCopy());
+        detail.add("courseSnapshot", rec.courseSnapshot().deepCopy());
+        JsonObject resume = new JsonObject();
+        resume.addProperty("originalFileName", rec.resumeMeta().originalFileName());
+        resume.addProperty("storedFileName", rec.resumeMeta().storedFileName());
+        resume.addProperty("relativePath", rec.resumeMeta().relativePath());
+        resume.addProperty("mimeType", rec.resumeMeta().mimeType());
+        resume.addProperty("size", rec.resumeMeta().size());
+        detail.add("resume", resume);
+        detail.add("events", GSON.toJsonTree(readService.getApplicationEvents(applicationId)));
+        detail.add("comments", comments);
+        if (moRow != null) {
+            detail.add("moDecision", moRow.deepCopy());
+        } else {
+            detail.add("moDecision", new JsonObject());
+        }
+        detail.addProperty("submittedAt", rec.submittedAt());
+        detail.addProperty("updatedAt", rec.updatedAt());
+        detail.addProperty("summary", rec.summary());
+        detail.addProperty("nextAction", rec.nextAction());
+        return detail;
+    }
+
+    public synchronized JsonObject addApplicationComment(String moId, String applicationId, String text) throws IOException {
+        MoTaApplicationReadService readService = new MoTaApplicationReadService();
+        MoTaApplicationReadService.TaApplicationRecord rec = readService.getApplicationById(applicationId);
+        if (rec == null) {
+            throw new IllegalArgumentException("申请不存在");
+        }
+        String m = new MoAccountDao().resolveCanonicalMoId(moId);
+        if (m.isBlank()) {
+            throw new IllegalArgumentException("缺少 moId");
+        }
+        assertMoOwnsCourseResolved(m, rec.courseCode());
+        JsonObject comment = new MoApplicationCommentsDao().addComment(applicationId, m, text);
+        JsonObject payload = new JsonObject();
+        payload.addProperty("success", true);
+        payload.add("comment", comment);
+        return payload;
+    }
+
+    public synchronized int countUnreadApplicantsForMo(String moId) throws IOException {
+        String m = new MoAccountDao().resolveCanonicalMoId(moId);
+        if (m.isBlank()) {
+            return 0;
+        }
+        JsonObject board = RecruitmentCoursesDao.readJobBoard();
+        JsonArray jobs = board.getAsJsonArray("items");
+        Set<String> owned = new HashSet<>();
+        for (JsonElement e : jobs) {
+            if (!e.isJsonObject()) {
+                continue;
+            }
+            JsonObject j = e.getAsJsonObject();
+            if (jobOwnerMoIdMatchesMo(m, getAsString(j, "ownerMoId"))) {
+                String cc = trim(getAsString(j, "courseCode")).toUpperCase(Locale.ROOT);
+                if (!cc.isBlank()) {
+                    owned.add(cc);
+                }
+            }
+        }
+        if (owned.isEmpty()) {
+            return 0;
+        }
+        MoTaApplicationReadService readService = new MoTaApplicationReadService();
+        MoApplicationReadStateDao readStateDao = new MoApplicationReadStateDao();
+        int n = 0;
+        for (MoTaApplicationReadService.TaApplicationRecord rec : readService.getActiveApplications()) {
+            if (!rec.active()) {
+                continue;
+            }
+            if (!owned.contains(rec.courseCode().toUpperCase(Locale.ROOT))) {
+                continue;
+            }
+            if (readStateDao.isUnread(m, rec.applicationId(), rec.updatedAt())) {
+                n++;
+            }
+        }
+        return n;
+    }
+
+    private String resolveApplicantDisplayStatus(MoTaApplicationReadService.TaApplicationRecord rec, JsonObject moRow) {
+        if (moRow != null) {
+            String st = getAsString(moRow, "status");
+            if (isAcceptedDecisionText(st)) {
+                return "已录用";
+            }
+            if (isRejectedDecisionText(st)) {
+                return "未录用";
+            }
+            if (!st.isBlank()) {
+                return st;
+            }
+        }
+        return firstNonBlank(rec.statusLabel(), mapTaStatusCodeToShortLabel(getAsString(rec.rawRecord(), "status")));
+    }
+
+    private static boolean isAcceptedDecisionText(String status) {
+        if (status == null || status.isBlank()) {
+            return false;
+        }
+        return status.contains("录用") && !status.contains("未录") && !status.contains("未录用");
+    }
+
+    private static boolean isRejectedDecisionText(String status) {
+        if (status == null || status.isBlank()) {
+            return false;
+        }
+        return status.contains("未录用") || status.contains("未通过") || status.contains("拒绝");
+    }
+
+    private static String mapTaStatusCodeToShortLabel(String code) {
+        String c = trim(code).toUpperCase(Locale.ROOT);
+        return switch (c) {
+            case "UNDER_REVIEW" -> "审核中";
+            case "SUBMITTED" -> "已投递";
+            default -> c.isEmpty() ? "已投递" : code;
+        };
+    }
+
+    private String joinSnapshotSkills(JsonObject taSnapshot) {
+        if (taSnapshot == null || !taSnapshot.has("skills") || !taSnapshot.get("skills").isJsonArray()) {
+            return "";
+        }
+        return joinArrayAsText(taSnapshot.get("skills"));
+    }
+
+    /**
+     * 兼容旧调用方：从岗位 {@code ownerMoId} 推导 {@code moId}（仅适用于本地脚本等场景；HTTP 接口应显式传 moId）。
+     */
     public synchronized JsonObject decideApplication(String courseCode, String taId, String decision, String comment) throws IOException {
+        JsonObject job = RecruitmentCoursesDao.findNormalizedJobByCourseCode(trim(courseCode));
+        String moId = firstNonBlank(getAsString(job, "ownerMoId"), "");
+        if (moId.isBlank()) {
+            throw new IllegalArgumentException("无法从岗位解析 ownerMoId，请使用五参数 decideApplication 并传入 moId");
+        }
+        return decideApplication(courseCode, taId, moId, decision, comment);
+    }
+
+    /**
+     * 录用/拒绝（与 {@code TaMoSubmissionDecisionSimulator} 调用的 DAO 语义一致，但不依赖该工具类）。
+     * 会写入 {@code application-status.json}，并与 TA {@code applications.json} 中的真实 {@code applicationId} 对齐。
+     */
+    public synchronized JsonObject decideApplication(String courseCode, String taId, String moId, String decision, String comment) throws IOException {
         String normalizedCourseCode = trim(courseCode);
         String normalizedTaId = trim(taId);
+        String normalizedMoId = new MoAccountDao().resolveCanonicalMoId(moId);
         String normalizedDecision = trim(decision).toLowerCase(Locale.ROOT);
         String normalizedComment = trim(comment);
 
         if (normalizedCourseCode.isBlank() || normalizedTaId.isBlank()) {
             throw new IllegalArgumentException("courseCode 与 taId 不能为空");
         }
+        if (normalizedMoId.isBlank()) {
+            throw new IllegalArgumentException("缺少 moId");
+        }
+        assertMoOwnsCourseResolved(normalizedMoId, normalizedCourseCode);
         if (!"selected".equals(normalizedDecision) && !"rejected".equals(normalizedDecision)) {
             throw new IllegalArgumentException("decision 仅支持 selected 或 rejected");
         }
+
+        MoTaApplicationsMutationDao mutationDao = new MoTaApplicationsMutationDao();
+        JsonObject taApplication = mutationDao.findApplicationByTaAndCourse(normalizedTaId, normalizedCourseCode);
 
         JsonObject appRoot = ensureStructuredFile(TA_APPLICATION_STATUS, TA_ENTITY_APPLICATION_STATUS);
         JsonArray appItems = appRoot.getAsJsonArray("items");
@@ -246,19 +533,37 @@ public class MoRecruitmentDao {
                 : normalizedComment;
 
         JsonObject target = findLatestApplicationForCourse(appItems, normalizedTaId, normalizedCourseCode, normalizeSlug(normalizedCourseCode));
+        JsonArray preservedComments = new JsonArray();
+        if (target != null && target.has("comments") && target.get("comments").isJsonArray()) {
+            preservedComments = target.getAsJsonArray("comments").deepCopy();
+        }
+
         if (target == null) {
             target = new JsonObject();
-            target.addProperty("applicationId", "APP-" + normalizedTaId + "-" + sanitizeCode(normalizedCourseCode));
+            String syntheticId = "APP-" + normalizedTaId + "-" + sanitizeCode(normalizedCourseCode);
+            String resolvedApplicationId = taApplication != null ? getAsString(taApplication, "applicationId") : syntheticId;
+            target.addProperty("applicationId", resolvedApplicationId);
             target.addProperty("taId", normalizedTaId);
+            target.addProperty("courseCode", normalizedCourseCode);
             target.addProperty("courseName", course == null ? normalizedCourseCode : getAsString(course, "courseName"));
             target.addProperty("jobSlug", normalizeSlug(normalizedCourseCode));
+            target.addProperty("ownerMoId", normalizedMoId);
             target.add("tags", new JsonArray());
             target.add("timeline", new JsonArray());
             target.add("details", new JsonArray());
             target.add("notifications", new JsonArray());
+            target.add("comments", preservedComments);
             appItems.add(target);
+        } else {
+            target.add("comments", preservedComments);
         }
 
+        if (taApplication != null) {
+            target.addProperty("applicationId", getAsString(taApplication, "applicationId"));
+        }
+        target.addProperty("courseCode", normalizedCourseCode);
+        target.addProperty("taId", normalizedTaId);
+        target.addProperty("ownerMoId", normalizedMoId);
         target.addProperty("status", statusText);
         target.addProperty("statusTone", "selected".equals(normalizedDecision) ? "success" : "danger");
         target.addProperty("summary", summaryText);
@@ -268,6 +573,9 @@ public class MoRecruitmentDao {
         target.addProperty("updatedAt", now);
         target.addProperty("category", "MO 招聘流程");
         target.addProperty("matchLevel", "selected".equals(normalizedDecision) ? "高" : "中");
+        if (course != null && getAsString(target, "courseName").isBlank()) {
+            target.addProperty("courseName", getAsString(course, "courseName"));
+        }
 
         updateMeta(appRoot, TA_SCHEMA, TA_ENTITY_APPLICATION_STATUS, "1.0");
         writeJson(TA_APPLICATION_STATUS, appRoot);
@@ -277,22 +585,10 @@ public class MoRecruitmentDao {
         payload.addProperty("message", "selected".equals(normalizedDecision) ? "已录用该 TA" : "已拒绝该 TA");
         payload.addProperty("taId", normalizedTaId);
         payload.addProperty("courseCode", normalizedCourseCode);
+        payload.addProperty("applicationId", getAsString(target, "applicationId"));
         payload.addProperty("status", statusText);
         payload.addProperty("updatedAt", now);
         return payload;
-    }
-
-    private JsonObject findProfile(JsonArray profiles, String taId) {
-        for (JsonElement element : profiles) {
-            if (!element.isJsonObject()) {
-                continue;
-            }
-            JsonObject profile = element.getAsJsonObject();
-            if (taId.equalsIgnoreCase(getAsString(profile, "taId"))) {
-                return profile;
-            }
-        }
-        return null;
     }
 
     private JsonObject findLatestApplicationForCourse(JsonArray apps, String taId, String courseCode, String courseSlug) {
@@ -307,8 +603,11 @@ public class MoRecruitmentDao {
             }
             String appSlug = normalizeSlug(getAsString(app, "jobSlug"));
             String appCourseName = getAsString(app, "courseName");
+            String appCourseCode = trim(getAsString(app, "courseCode")).toUpperCase(Locale.ROOT);
+            String codeUpper = trim(courseCode).toUpperCase(Locale.ROOT);
             boolean matched = appSlug.equals(courseSlug)
-                    || appCourseName.toLowerCase(Locale.ROOT).contains(courseCode.toLowerCase(Locale.ROOT));
+                    || (!appCourseCode.isBlank() && appCourseCode.equals(codeUpper))
+                    || (!appCourseName.isBlank() && appCourseName.toLowerCase(Locale.ROOT).contains(courseCode.toLowerCase(Locale.ROOT)));
             if (!matched) {
                 continue;
             }
