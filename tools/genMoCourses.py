@@ -1,15 +1,25 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-MO 端课程批量生成器：向 mountDataTAMObupter/common/recruitment-courses.json 追加随机课程，
-并在 docs/log/ 下导出本次生成课程的 Excel（仅含 MO 表单侧字段，不含治理/流程初始化占位字段）。
-生成的课程字段内容均为英文。
+MO 端课程工具：在 **单一 Excel 工作簿**（默认 docs/log/mo_courses.xlsx）中维护课程行，
+与 mountDataTAMObupter/common/recruitment-courses.json 双向同步。
+
+子命令（可省略，省略时在终端交互选择）：
+  export   — JSON → Excel（导出当前全部岗位到表内，便于编辑）
+  import   — Excel → JSON（**以表中行为准**：新增行=新课程，删行=从 JSON 删除，改行=更新）
+  generate — 按 mos/profiles 随机生成 EBT#### 课程写入 JSON，并 **重写同一 Excel** 为当前全量
+
+招聘状态随机（仅 generate）：**70% OPEN**、**30% CLOSED**。
+
+路径均可使用相对于仓库根目录的相对路径。
 
 依赖：pip install pandas openpyxl
 """
 
 from __future__ import annotations
 
+import argparse
+import copy
 import json
 import random
 import re
@@ -26,12 +36,43 @@ except ImportError:
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_ROOT = SCRIPT_DIR.parent
-COURSES_JSON = REPO_ROOT / "mountDataTAMObupter" / "common" / "recruitment-courses.json"
+
+DEFAULT_COURSES_JSON = "mountDataTAMObupter/common/recruitment-courses.json"
+DEFAULT_MOS_JSON = "mountDataTAMObupter/mo/mos.json"
+DEFAULT_PROFILES_JSON = "mountDataTAMObupter/mo/profiles.json"
+DEFAULT_EXCEL_REL = "docs/log/mo_courses.xlsx"
 LOG_DIR = REPO_ROOT / "docs" / "log"
+DEFAULT_EXCEL = LOG_DIR / "mo_courses.xlsx"
 
 JOB_BOARD_SCHEMA = "mo-ta-job-board"
 JOB_BOARD_VERSION = "2.0"
 JOB_BOARD_ENTITY = "jobs"
+
+EBT_CODE_PATTERN = re.compile(r"^EBT(\d{4})$", re.IGNORECASE)
+
+EXCEL_COLUMNS = [
+    "jobId",
+    "courseCode",
+    "courseName",
+    "recruitmentStatus",
+    "semester",
+    "applicationDeadline",
+    "campus",
+    "studentCount",
+    "taRecruitCount",
+    "teachingWeeks",
+    "assessmentEvents",
+    "fixedTags",
+    "customTags",
+    "courseDescription",
+    "recruitmentBrief",
+    "workload",
+    "ownerMoId",
+    "ownerMoName",
+    "source",
+]
+
+SHEET_NAME = "mo_courses"
 
 FIXED_SKILL_POOL = [
     "Python",
@@ -63,13 +104,32 @@ SEMESTERS = ["2026-Spring", "2026-Fall", "2025-Fall"]
 CAMPUSES = ["Main", "Shahe"]
 
 
-def pick_recruitment_status() -> str:
-    """MO 发布表单仅支持 OPEN / CLOSED；加权随机以便批量生成中含足够 CLOSED 样本。"""
-    return random.choices(["OPEN", "CLOSED"], weights=[6, 4], k=1)[0]
-
-
 def _trim(s: str | None) -> str:
     return (s or "").strip()
+
+
+def resolve_repo_path(relative: str) -> Path:
+    p = Path(relative.strip())
+    if p.is_absolute():
+        return p
+    return (REPO_ROOT / p).resolve()
+
+
+def resolve_excel_path(arg: str | None) -> Path:
+    if not arg or not _trim(arg):
+        return DEFAULT_EXCEL
+    return resolve_repo_path(arg)
+
+
+def pick_recruitment_status() -> str:
+    return random.choices(["OPEN", "CLOSED"], weights=[7, 3], k=1)[0]
+
+
+def slugify_course_code(code: str) -> str:
+    """与 Java MoRecruitmentDao.sanitizeCode + normalizeSlug 类似：仅字母数字，连字符连接，小写。"""
+    s = re.sub(r"[^A-Za-z0-9]+", "-", _trim(code))
+    s = re.sub(r"(^-|-$)", "", s)
+    return s.lower()
 
 
 def normalize_teaching_weeks(weeks: list[int] | None) -> dict:
@@ -238,22 +298,303 @@ def format_custom_tags_plain(required_skills: dict) -> str:
     return "; ".join(out)
 
 
-def unique_course_code(existing: set[str]) -> str:
-    for _ in range(200):
-        code = f"AUTO-{uuid.uuid4().hex[:6].upper()}"
-        if code not in existing:
-            existing.add(code)
-            return code
-    raise RuntimeError("Failed to generate a unique course code")
+def _cell_str(v) -> str:
+    if v is None:
+        return ""
+    if isinstance(v, float) and pd.isna(v):
+        return ""
+    return _trim(str(v))
 
 
-def build_mo_input(existing_codes: set[str]) -> tuple[dict, dict]:
-    """
-    返回 (full_item 写入 JSON, mo_only 用于 Excel)。
-    full_item 对齐 MoRecruitmentDao.createCourse 写入磁盘的结构。
-    """
+def parse_int_cell(v, default: int = -1) -> int:
+    s = _cell_str(v)
+    if not s:
+        return default
+    try:
+        return int(float(s))
+    except ValueError:
+        return default
+
+
+def parse_teaching_weeks_plain(s: str) -> dict:
+    s = _trim(s)
+    if not s:
+        return {"weeks": []}
+    weeks: list[int] = []
+    for part in s.split(","):
+        part = _trim(part)
+        if not part:
+            continue
+        try:
+            w = int(float(part))
+            if 1 <= w <= 20:
+                weeks.append(w)
+        except ValueError:
+            continue
+    return normalize_teaching_weeks(weeks)
+
+
+def parse_assessment_events_plain(s: str) -> list[dict]:
+    s = _trim(s)
+    if not s:
+        return []
+    raw: list[dict] = []
+    for line in s.splitlines():
+        line = _trim(line)
+        if not line:
+            continue
+        parts = [p.strip() for p in line.split(" | ", 2)]
+        name = parts[0] if parts else ""
+        ws_str = parts[1] if len(parts) > 1 else ""
+        desc = parts[2] if len(parts) > 2 else ""
+        week_list: list[int] = []
+        for p in ws_str.split(","):
+            p = _trim(p)
+            if not p:
+                continue
+            try:
+                wi = int(float(p))
+                if 1 <= wi <= 20 and wi not in week_list:
+                    week_list.append(wi)
+            except ValueError:
+                continue
+        week_list.sort()
+        if name:
+            raw.append({"name": name, "weeks": week_list, "description": desc})
+    return normalize_assessment_events(raw)
+
+
+def parse_fixed_tags_plain(s: str) -> list[str]:
+    out: list[str] = []
+    for part in _trim(s).split(","):
+        t = _trim(part)
+        if t:
+            out.append(t)
+    return out
+
+
+def parse_custom_tags_plain(s: str) -> list[dict]:
+    out: list[dict] = []
+    for piece in _trim(s).split(";"):
+        piece = _trim(piece)
+        if not piece:
+            continue
+        if " - " in piece:
+            nm, _, rest = piece.partition(" - ")
+            nm, rest = _trim(nm), _trim(rest)
+            out.append({"name": nm, "description": rest})
+        else:
+            out.append({"name": piece, "description": ""})
+    return out
+
+
+def new_job_item_shell(now: str) -> dict:
+    return {
+        "publishStatus": "PENDING_REVIEW",
+        "visibility": "INTERNAL",
+        "isArchived": False,
+        "auditStatus": "PENDING",
+        "auditComment": "",
+        "priority": "NORMAL",
+        "dataVersion": 1,
+        "lastSyncedAt": "",
+        "recruitedCount": 0,
+        "applicationsTotal": 0,
+        "applicationsPending": 0,
+        "applicationsAccepted": 0,
+        "applicationsRejected": 0,
+        "lastApplicationAt": "",
+        "lastSelectionAt": "",
+        "createdAt": now,
+        "updatedAt": now,
+        "source": "tools-genMoCourses-excel",
+    }
+
+
+def json_item_to_excel_row(it: dict) -> dict:
+    tw = it.get("teachingWeeks") if isinstance(it.get("teachingWeeks"), dict) else {}
+    ae = it.get("assessmentEvents") if isinstance(it.get("assessmentEvents"), list) else []
+    rs = it.get("requiredSkills") if isinstance(it.get("requiredSkills"), dict) else {}
+    st = _trim(str(it.get("recruitmentStatus", it.get("status", "OPEN"))))
+    return {
+        "jobId": _trim(str(it.get("jobId", ""))),
+        "courseCode": _trim(str(it.get("courseCode", ""))),
+        "courseName": _trim(str(it.get("courseName", ""))),
+        "recruitmentStatus": st or "OPEN",
+        "semester": _trim(str(it.get("semester", ""))),
+        "applicationDeadline": _trim(str(it.get("applicationDeadline", ""))),
+        "campus": _trim(str(it.get("campus", ""))),
+        "studentCount": it.get("studentCount", -1),
+        "taRecruitCount": it.get("taRecruitCount", 0),
+        "teachingWeeks": format_teaching_weeks_plain(tw),
+        "assessmentEvents": format_assessment_events_plain(ae),
+        "fixedTags": format_fixed_tags_plain(rs),
+        "customTags": format_custom_tags_plain(rs),
+        "courseDescription": _trim(str(it.get("courseDescription", ""))),
+        "recruitmentBrief": _trim(str(it.get("recruitmentBrief", ""))),
+        "workload": _trim(str(it.get("workload", ""))),
+        "ownerMoId": _trim(str(it.get("ownerMoId", ""))),
+        "ownerMoName": _trim(str(it.get("ownerMoName", ""))),
+        "source": _trim(str(it.get("source", "excel-import"))),
+    }
+
+
+def excel_row_to_item(row: dict, existing: dict | None) -> dict:
+    """由 Excel 行构造/更新 JSON item；existing 为同 courseCode 的旧记录（可保留计数等）。"""
+    cc = _cell_str(row.get("courseCode"))
+    if not cc:
+        raise ValueError("courseCode 不能为空")
+    cname = _cell_str(row.get("courseName"))
+    if not cname:
+        raise ValueError(f"课程 {cc}: courseName 不能为空")
+
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
+    status = _cell_str(row.get("recruitmentStatus", "OPEN")).upper()
+    if status not in ("OPEN", "CLOSED"):
+        status = "OPEN"
+
+    campus = normalize_campus(_cell_str(row.get("campus")))
+    if not campus:
+        campus = "Main"
+
+    teaching_weeks = parse_teaching_weeks_plain(_cell_str(row.get("teachingWeeks")))
+    assessment_events = parse_assessment_events_plain(_cell_str(row.get("assessmentEvents")))
+    fixed = parse_fixed_tags_plain(_cell_str(row.get("fixedTags")))
+    custom = parse_custom_tags_plain(_cell_str(row.get("customTags")))
+    required_skills = normalize_required_skills({"fixedTags": fixed, "customSkills": custom})
+    if not has_required_skills(required_skills):
+        required_skills["fixedTags"] = [random.choice(FIXED_SKILL_POOL)]
+
+    owner_mo_id = _cell_str(row.get("ownerMoId"))
+    owner_mo_name = _cell_str(row.get("ownerMoName"))
+    if not owner_mo_id:
+        raise ValueError(f"课程 {cc}: ownerMoId 不能为空")
+    if not owner_mo_name:
+        owner_mo_name = owner_mo_id
+
+    job_id = _cell_str(row.get("jobId"))
+    if existing:
+        base = copy.deepcopy(existing)
+        if not job_id:
+            job_id = _trim(str(base.get("jobId", "")))
+        if not job_id:
+            job_id = "MOJOB-" + uuid.uuid4().hex[:8].upper()
+        created = base.get("createdAt") or now
+    else:
+        base = new_job_item_shell(now)
+        if not job_id:
+            job_id = "MOJOB-" + uuid.uuid4().hex[:8].upper()
+        created = now
+
+    sc = parse_int_cell(row.get("studentCount"), -1)
+    trc = parse_int_cell(row.get("taRecruitCount"), 2)
+    if trc < 0:
+        trc = 2
+
+    item: dict = {
+        **base,
+        "jobId": job_id,
+        "courseCode": cc,
+        "courseName": cname,
+        "ownerMoId": owner_mo_id,
+        "ownerMoName": owner_mo_name,
+        "semester": _cell_str(row.get("semester")) or "2026-Spring",
+        "status": status,
+        "recruitmentStatus": status,
+        "studentCount": sc,
+        "taRecruitCount": trc,
+        "campus": campus,
+        "applicationDeadline": _cell_str(row.get("applicationDeadline")) or random_iso_deadline(),
+        "requiredSkills": required_skills,
+        "courseDescription": _cell_str(row.get("courseDescription")) or f"{cname} TA recruitment.",
+        "recruitmentBrief": _cell_str(row.get("recruitmentBrief")),
+        "workload": _cell_str(row.get("workload")),
+        "createdAt": created,
+        "updatedAt": now,
+        "source": _cell_str(row.get("source")) or "excel-import",
+    }
+
+    if teaching_weeks["weeks"]:
+        item["teachingWeeks"] = teaching_weeks
+    else:
+        item.pop("teachingWeeks", None)
+
+    if assessment_events:
+        item["assessmentEvents"] = assessment_events
+    else:
+        item.pop("assessmentEvents", None)
+
+    if not item.get("recruitmentBrief"):
+        item.pop("recruitmentBrief", None)
+    if not item.get("workload"):
+        item.pop("workload", None)
+
+    item["jobSlug"] = slugify_course_code(cc)
+    return item
+
+
+def load_mo_accounts(mos_path: Path, profiles_path: Path) -> list[tuple[str, str]]:
+    if not mos_path.is_file():
+        raise FileNotFoundError(f"找不到 MO 账号文件: {mos_path}")
+    if not profiles_path.is_file():
+        raise FileNotFoundError(f"找不到 MO 资料文件: {profiles_path}")
+
+    with mos_path.open(encoding="utf-8") as f:
+        mos_root = json.load(f)
+    with profiles_path.open(encoding="utf-8") as f:
+        prof_root = json.load(f)
+
+    mos_items = mos_root.get("items")
+    prof_items = prof_root.get("items")
+    if not isinstance(mos_items, list):
+        raise ValueError("mos.json 缺少 items 数组")
+    if not isinstance(prof_items, list):
+        prof_items = []
+
+    by_mo_id: dict[str, dict] = {}
+    for row in prof_items:
+        if isinstance(row, dict):
+            mid = _trim(row.get("moId"))
+            if mid:
+                by_mo_id[mid.lower()] = row
+
+    out: list[tuple[str, str]] = []
+    for acc in mos_items:
+        if not isinstance(acc, dict):
+            continue
+        mo_id = _trim(acc.get("id"))
+        if not mo_id:
+            continue
+        prof = by_mo_id.get(mo_id.lower())
+        real = _trim(prof.get("realName")) if prof else ""
+        name = _trim(acc.get("name"))
+        display = real or name or mo_id
+        out.append((mo_id, display))
+
+    if not out:
+        raise ValueError("mos.json 中未找到任何带 id 的 MO 账号")
+    return out
+
+
+def max_ebt_numeric_suffix(items: list) -> int:
+    m = 0
+    for it in items:
+        if not isinstance(it, dict):
+            continue
+        cc = _trim(str(it.get("courseCode", "")))
+        match = EBT_CODE_PATTERN.fullmatch(cc)
+        if match:
+            m = max(m, int(match.group(1)))
+    return m
+
+
+def build_mo_input(
+    ebt_index: int,
+    owner_mo_id: str,
+    owner_mo_name: str,
+) -> tuple[dict, dict]:
     course_name = random_course_name()
-    course_code = unique_course_code(existing_codes)
+    course_code = f"EBT{ebt_index:04d}"
     recruitment_status = pick_recruitment_status()
     semester = random.choice(SEMESTERS)
     application_deadline = random_iso_deadline()
@@ -312,7 +653,6 @@ def build_mo_input(existing_codes: set[str]) -> tuple[dict, dict]:
             ]
         )
 
-    mo_id = f"MO-GEN-{uuid.uuid4().hex[:4].upper()}"
     campus = normalize_campus(random.choice(CAMPUSES))
     ta_recruit_count = random.randint(2, 15)
     student_count = random.choice([-1] + [random.randint(40, 280) for _ in range(3)])
@@ -321,38 +661,23 @@ def build_mo_input(existing_codes: set[str]) -> tuple[dict, dict]:
     job_id = "MOJOB-" + uuid.uuid4().hex[:8].upper()
 
     item: dict = {
+        **new_job_item_shell(now),
         "jobId": job_id,
         "courseCode": course_code,
         "courseName": course_name,
-        "ownerMoId": mo_id,
-        "ownerMoName": mo_id,
+        "ownerMoId": owner_mo_id,
+        "ownerMoName": owner_mo_name or owner_mo_id,
         "semester": semester,
         "status": recruitment_status,
         "recruitmentStatus": recruitment_status,
-        "publishStatus": "PENDING_REVIEW",
-        "visibility": "INTERNAL",
-        "isArchived": False,
-        "auditStatus": "PENDING",
-        "auditComment": "",
-        "priority": "NORMAL",
-        "dataVersion": 1,
-        "lastSyncedAt": "",
         "studentCount": student_count,
-        "recruitedCount": 0,
-        "applicationsTotal": 0,
-        "applicationsPending": 0,
-        "applicationsAccepted": 0,
-        "applicationsRejected": 0,
-        "lastApplicationAt": "",
-        "lastSelectionAt": "",
         "taRecruitCount": ta_recruit_count,
         "campus": campus,
         "applicationDeadline": application_deadline,
         "requiredSkills": required_skills,
         "courseDescription": course_description,
-        "createdAt": now,
-        "updatedAt": now,
         "source": "tools-genMoCourses",
+        "jobSlug": slugify_course_code(course_code),
     }
 
     if teaching_weeks["weeks"]:
@@ -364,32 +689,12 @@ def build_mo_input(existing_codes: set[str]) -> tuple[dict, dict]:
     if workload:
         item["workload"] = workload
 
-    mo_only: dict = {
-        "courseCode": course_code,
-        "courseName": course_name,
-        "recruitmentStatus": recruitment_status,
-        "semester": semester,
-        "applicationDeadline": application_deadline,
-        "campus": campus,
-        "studentCount": student_count,
-        "taRecruitCount": ta_recruit_count,
-        "teachingWeeks": format_teaching_weeks_plain(teaching_weeks),
-        "assessmentEvents": format_assessment_events_plain(assessment_events),
-        "fixedTags": format_fixed_tags_plain(required_skills),
-        "customTags": format_custom_tags_plain(required_skills),
-        "courseDescription": course_description,
-        "recruitmentBrief": recruitment_brief,
-        "workload": workload,
-        "ownerMoId": mo_id,
-        "ownerMoName": mo_id,
-        "source": "tools-genMoCourses",
-    }
-
+    mo_only: dict = json_item_to_excel_row(item)
     return item, mo_only
 
 
-def load_job_board() -> dict:
-    if not COURSES_JSON.exists():
+def load_job_board(courses_path: Path) -> dict:
+    if not courses_path.exists():
         return {
             "meta": {
                 "schema": JOB_BOARD_SCHEMA,
@@ -399,11 +704,11 @@ def load_job_board() -> dict:
             },
             "items": [],
         }
-    with COURSES_JSON.open(encoding="utf-8") as f:
+    with courses_path.open(encoding="utf-8") as f:
         return json.load(f)
 
 
-def save_job_board(root: dict, items: list) -> None:
+def save_job_board(root: dict, items: list, courses_path: Path) -> None:
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
     root["schema"] = JOB_BOARD_SCHEMA
     root["version"] = JOB_BOARD_VERSION
@@ -415,87 +720,278 @@ def save_job_board(root: dict, items: list) -> None:
         root["meta"]["entity"] = JOB_BOARD_ENTITY
         root["meta"]["version"] = JOB_BOARD_VERSION
         root["meta"]["updatedAt"] = now
-    COURSES_JSON.parent.mkdir(parents=True, exist_ok=True)
-    with COURSES_JSON.open("w", encoding="utf-8") as f:
+    courses_path.parent.mkdir(parents=True, exist_ok=True)
+    with courses_path.open("w", encoding="utf-8") as f:
         json.dump(root, f, ensure_ascii=False, indent=2)
         f.write("\n")
 
 
 def write_excel(rows: list[dict], path: Path) -> None:
-    LOG_DIR.mkdir(parents=True, exist_ok=True)
-    columns = [
-        "courseCode",
-        "courseName",
-        "recruitmentStatus",
-        "semester",
-        "applicationDeadline",
-        "campus",
-        "studentCount",
-        "taRecruitCount",
-        "teachingWeeks",
-        "assessmentEvents",
-        "fixedTags",
-        "customTags",
-        "courseDescription",
-        "recruitmentBrief",
-        "workload",
-        "ownerMoId",
-        "ownerMoName",
-        "source",
-    ]
-    df = pd.DataFrame(rows, columns=columns)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    df = pd.DataFrame(rows, columns=EXCEL_COLUMNS)
     from openpyxl.utils import get_column_letter
 
     with pd.ExcelWriter(path, engine="openpyxl") as writer:
-        df.to_excel(writer, index=False, sheet_name="mo_courses")
-        ws = writer.sheets["mo_courses"]
+        df.to_excel(writer, index=False, sheet_name=SHEET_NAME)
+        ws = writer.sheets[SHEET_NAME]
         for i, col in enumerate(df.columns, start=1):
             letter = get_column_letter(i)
-            maxlen = max(len(str(col)), int(df[col].astype(str).map(len).max())) + 2
+            collen = 0 if df.empty else int(df[col].astype(str).map(len).max())
+            maxlen = max(len(str(col)), collen) + 2
             ws.column_dimensions[letter].width = min(max(maxlen, 10), 50)
 
 
-def main() -> None:
-    if len(sys.argv) > 1 and re.fullmatch(r"\d+", sys.argv[1].strip()):
-        raw = sys.argv[1].strip()
-    else:
-        raw = input("请输入要生成的课程数量: ").strip()
-    if not re.fullmatch(r"\d+", raw):
-        print("请输入非负整数。", file=sys.stderr)
-        sys.exit(1)
-    n = int(raw)
-    if n <= 0:
-        print("数量须为正整数。", file=sys.stderr)
-        sys.exit(1)
-    if n > 500:
-        print("单次不建议超过 500，请改小后重试。", file=sys.stderr)
-        sys.exit(1)
+def read_excel_as_item_rows(path: Path) -> list[dict]:
+    if not path.is_file():
+        raise FileNotFoundError(f"找不到 Excel: {path}")
+    df = pd.read_excel(path, sheet_name=SHEET_NAME, dtype=object)
+    df = df.fillna("")
+    rows: list[dict] = []
+    for _, series in df.iterrows():
+        row = {k: series.get(k, "") for k in EXCEL_COLUMNS}
+        if all(_cell_str(row.get(c)) == "" for c in EXCEL_COLUMNS):
+            continue
+        rows.append(row)
+    return rows
 
-    root = load_job_board()
+
+def cmd_export(courses_path: Path, excel_path: Path) -> None:
+    root = load_job_board(courses_path)
     items = root.get("items")
     if not isinstance(items, list):
         items = []
-    existing_codes = {
-        _trim(str(it.get("courseCode", ""))) for it in items if isinstance(it, dict)
-    }
-    existing_codes.discard("")
+    rows = [json_item_to_excel_row(it) for it in items if isinstance(it, dict)]
+    write_excel(rows, excel_path)
+    print(f"已导出 {len(rows)} 条到: {excel_path}")
 
-    mo_rows: list[dict] = []
+
+def cmd_import(courses_path: Path, excel_path: Path, allow_empty: bool) -> None:
+    raw_rows = read_excel_as_item_rows(excel_path)
+    root = load_job_board(courses_path)
+    old_items = root.get("items")
+    if not isinstance(old_items, list):
+        old_items = []
+    by_code: dict[str, dict] = {}
+    for it in old_items:
+        if isinstance(it, dict):
+            k = _trim(str(it.get("courseCode", ""))).upper()
+            if k:
+                by_code[k] = it
+
     new_items: list[dict] = []
-    for _ in range(n):
-        item, mo_only = build_mo_input(existing_codes)
+    seen: set[str] = set()
+    errors: list[str] = []
+
+    for i, row in enumerate(raw_rows, start=1):
+        cc = _cell_str(row.get("courseCode"))
+        if not cc:
+            continue
+        ku = cc.upper()
+        if ku in seen:
+            errors.append(f"第 {i} 行: 重复的 courseCode {cc}")
+            continue
+        seen.add(ku)
+        try:
+            item = excel_row_to_item(row, by_code.get(ku))
+            new_items.append(item)
+        except ValueError as e:
+            errors.append(f"第 {i} 行: {e}")
+
+    if errors:
+        for e in errors:
+            print(e, file=sys.stderr)
+        print("导入因错误已中止。", file=sys.stderr)
+        sys.exit(1)
+
+    if not new_items and not allow_empty:
+        print("Excel 中无有效课程行；若需清空 JSON，请使用 --allow-empty", file=sys.stderr)
+        sys.exit(1)
+
+    old_codes = {_trim(str(it.get("courseCode", ""))).upper() for it in old_items if isinstance(it, dict)}
+    new_codes = {_trim(str(it.get("courseCode", ""))).upper() for it in new_items}
+    deleted = len(old_codes - new_codes)
+
+    save_job_board(root, new_items, courses_path)
+    print(f"已从 Excel 写回 {len(new_items)} 条到: {courses_path}")
+    if deleted:
+        print(f"已移除 JSON 中不在表内的课程: {deleted} 条")
+
+
+def cmd_generate(
+    n: int,
+    append_mode: bool,
+    courses_path: Path,
+    mos_path: Path,
+    profiles_path: Path,
+    excel_path: Path,
+) -> None:
+    mo_list = load_mo_accounts(mos_path, profiles_path)
+    root = load_job_board(courses_path)
+    items = root.get("items")
+    if not isinstance(items, list):
+        items = []
+
+    kept: list = []
+    if append_mode:
+        kept = [it for it in items if isinstance(it, dict)]
+        start_idx = max_ebt_numeric_suffix(kept) + 1
+    else:
+        kept = []
+        start_idx = 1
+
+    if start_idx + n - 1 > 9999:
+        print("EBT 编号将超过 9999。", file=sys.stderr)
+        sys.exit(1)
+
+    new_items: list[dict] = []
+    for i in range(n):
+        ebt_num = start_idx + i
+        mo_id, mo_name = mo_list[i % len(mo_list)]
+        item, _ = build_mo_input(ebt_num, mo_id, mo_name)
         new_items.append(item)
-        mo_rows.append(mo_only)
 
-    items.extend(new_items)
-    save_job_board(root, items)
+    final_items = kept + new_items
+    save_job_board(root, final_items, courses_path)
 
-    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    xlsx_path = LOG_DIR / f"mo_courses_generated_{stamp}.xlsx"
-    write_excel(mo_rows, xlsx_path)
+    excel_rows = [json_item_to_excel_row(it) for it in final_items]
+    write_excel(excel_rows, excel_path)
 
-    print(f"已追加 {n} 条课程到: {COURSES_JSON}")
-    print(f"MO 字段导出: {xlsx_path}")
+    mode = "追加" if append_mode else "覆盖"
+    print(f"{mode}：已写入 JSON {len(final_items)} 条，并同步 Excel: {excel_path}")
+
+
+def normalize_argv(argv: list[str]) -> list[str]:
+    if not argv:
+        return argv
+    if argv[0] in ("export", "import", "generate", "-h", "--help"):
+        return argv
+    if re.fullmatch(r"\d+", argv[0]):
+        return ["generate"] + argv
+    return argv
+
+
+def prompt_command() -> str:
+    print("未指定子命令，请选择操作：")
+    print("  1 — export   JSON → Excel")
+    print("  2 — import   Excel → JSON（以表中行为准）")
+    print("  3 — generate 随机生成 EBT 课程并同步 Excel")
+    while True:
+        try:
+            s = input("请输入 1 / 2 / 3: ").strip()
+        except EOFError:
+            print("", file=sys.stderr)
+            print("非交互环境请显式指定子命令，例如: export / import / generate", file=sys.stderr)
+            sys.exit(1)
+        if s == "1":
+            return "export"
+        if s == "2":
+            return "import"
+        if s == "3":
+            return "generate"
+        print("请输入 1、2 或 3。", file=sys.stderr)
+
+
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        description="MO 课程：单一 Excel 与 recruitment-courses.json 同步 / 随机生成"
+    )
+    p.add_argument(
+        "--excel",
+        default=DEFAULT_EXCEL_REL,
+        help=f"工作簿路径（相对仓库根，默认 {DEFAULT_EXCEL_REL}）",
+    )
+    p.add_argument(
+        "--courses-json",
+        default=DEFAULT_COURSES_JSON,
+        help=f"岗位 JSON（默认 {DEFAULT_COURSES_JSON}）",
+    )
+    p.add_argument(
+        "--allow-empty",
+        action="store_true",
+        help="仅 import：允许 Excel 无有效行时清空 JSON 中的 items",
+    )
+    p.add_argument(
+        "--mode",
+        choices=["1", "2"],
+        default=None,
+        help="仅 generate：1=追加，2=覆盖；省略则交互询问",
+    )
+    p.add_argument("--mos-json", default=DEFAULT_MOS_JSON, help="仅 generate")
+    p.add_argument("--profiles-json", default=DEFAULT_PROFILES_JSON, help="仅 generate")
+
+    sub = p.add_subparsers(
+        dest="command",
+        required=False,
+        metavar="{export,import,generate}",
+        help="子命令（可省略，省略时交互选择）",
+    )
+    sub.add_parser("export", help="JSON → Excel")
+    sub.add_parser("import", help="Excel → JSON（表中有则留/改，表中无则删）")
+    p_gen = sub.add_parser("generate", help="随机生成 EBT 课程并写 JSON + 同步全表到 Excel")
+    p_gen.add_argument(
+        "n",
+        nargs="?",
+        type=int,
+        default=None,
+        help="生成条数（省略则交互输入）",
+    )
+
+    return p
+
+
+def main(argv: list[str] | None = None) -> None:
+    argv = normalize_argv(argv if argv is not None else sys.argv[1:])
+    parser = build_parser()
+    args = parser.parse_args(argv)
+
+    command = args.command
+    if not command:
+        command = prompt_command()
+
+    excel_path = resolve_excel_path(args.excel)
+    courses_path = resolve_repo_path(args.courses_json)
+
+    if command == "export":
+        cmd_export(courses_path, excel_path)
+        return
+
+    if command == "import":
+        cmd_import(courses_path, excel_path, args.allow_empty)
+        return
+
+    if command == "generate":
+        n = getattr(args, "n", None)
+        if n is None:
+            raw = input("请输入要生成的课程数量: ").strip()
+            if not re.fullmatch(r"\d+", raw):
+                print("请输入非负整数。", file=sys.stderr)
+                sys.exit(1)
+            n = int(raw)
+
+        if args.mode is None:
+            while True:
+                m = input("请选择写入方式：1-追加记录，2-覆盖（清空后仅写入本次）: ").strip()
+                if m == "1":
+                    append_mode = True
+                    break
+                if m == "2":
+                    append_mode = False
+                    break
+                print("请输入 1 或 2。", file=sys.stderr)
+        else:
+            append_mode = args.mode == "1"
+
+        if n <= 0 or n > 500 or n > 9999:
+            print("数量须为 1–500（且 EBT 不超过 9999）。", file=sys.stderr)
+            sys.exit(1)
+
+        mos_path = resolve_repo_path(args.mos_json)
+        profiles_path = resolve_repo_path(args.profiles_json)
+        try:
+            cmd_generate(n, append_mode, courses_path, mos_path, profiles_path, excel_path)
+        except (OSError, ValueError, json.JSONDecodeError) as e:
+            print(f"失败: {e}", file=sys.stderr)
+            sys.exit(1)
 
 
 if __name__ == "__main__":

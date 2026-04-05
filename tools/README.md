@@ -17,6 +17,25 @@
 
 该工具是一个独立的 Java CLI 工程，后续可通过命令行运行。
 
+- [`genMoCourses.py`](genMoCourses.py)（Python 3）
+
+  在 **单一工作簿**（默认 **`docs/log/mo_courses.xlsx`**，工作表 `mo_courses`）中维护课程行，与 **`mountDataTAMObupter/common/recruitment-courses.json`** 双向同步：在 Excel 里**增行 / 删行 / 改行**后，用 `import` 写回 JSON；`export` 从 JSON 刷新整张表。
+
+  - **`export`**：`JSON → Excel`（便于首次生成表或从 JSON 重建表）。
+  - **`import`**：`Excel → JSON`。**以表中行为准**：表里没有的课程会从 JSON 删除；新行即新课程；改行即更新。可选 `--allow-empty` 在表无有效行时清空 JSON 中的 `items`。
+  - **`generate`**：从 **`mos.json`**、**`profiles.json`** 随机生成 **`EBT0001`–`EBT9999`** 课程写入 JSON，并 **重写同一 Excel** 为当前全量。招聘状态约 **70% OPEN / 30% CLOSED**（仅 generate）。`--mode 1` 追加、`--mode 2` 覆盖；省略则交互选择。兼容简写：首参数为数字时等价于 `generate`（例如 `python tools/genMoCourses.py 9 --mode 2`）。
+  - 路径均可覆盖（相对**仓库根目录**）：`--excel`、`--courses-json`、`--mos-json`、`--profiles-json`。
+  - **子命令可省略**：直接运行 `python tools/genMoCourses.py` 时会在终端用 **1 / 2 / 3** 选择 export / import / generate（非交互环境请仍写子命令名）。
+
+  ```bash
+  pip install pandas openpyxl
+  python tools/genMoCourses.py export
+  # 编辑 docs/log/mo_courses.xlsx 后：
+  python tools/genMoCourses.py import
+  python tools/genMoCourses.py generate 9 --mode 2
+  python tools/genMoCourses.py 12 --mode 1
+  ```
+
 ## 设计原则
 
 1. 工具独立于主站运行，不依赖 servlet 生命周期
