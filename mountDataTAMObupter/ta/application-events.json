@@ -3,23 +3,53 @@
   "version": 1,
   "items": [
     {
-      "eventId": "APP-TA-10258-EBU9900-20260405T055132Z-EVT-20260405T055132Z",
-      "applicationId": "APP-TA-10258-EBU9900-20260405T055132Z",
+      "eventId": "APP-TA-10258-AUTO-6438D7-20260405T075837Z-EVT-20260405T075837Z",
+      "applicationId": "APP-TA-10258-AUTO-6438D7-20260405T075837Z",
       "taId": "TA-10258",
       "eventType": "SUBMITTED",
       "label": "已投递申请",
       "content": "系统已记录你的岗位申请与简历文件。",
-      "time": "2026-04-05T05:51:32.572823300Z",
+      "time": "2026-04-05T07:58:37.764558500Z",
       "done": true
     },
     {
-      "eventId": "APP-TA-10258-AUTO-6438D7-20260405T060022Z-EVT-20260405T060022Z",
-      "applicationId": "APP-TA-10258-AUTO-6438D7-20260405T060022Z",
+      "eventId": "APP-TA-10258-AUTO-D78AEF-20260405T082458Z-EVT-20260405T082458Z",
+      "applicationId": "APP-TA-10258-AUTO-D78AEF-20260405T082458Z",
       "taId": "TA-10258",
       "eventType": "SUBMITTED",
       "label": "已投递申请",
       "content": "系统已记录你的岗位申请与简历文件。",
-      "time": "2026-04-05T06:00:22.511988200Z",
+      "time": "2026-04-05T08:24:58.481252800Z",
+      "done": true
+    },
+    {
+      "eventId": "APP-TA-10258-EBU9900-20260405T082813Z-EVT-20260405T082813Z",
+      "applicationId": "APP-TA-10258-EBU9900-20260405T082813Z",
+      "taId": "TA-10258",
+      "eventType": "SUBMITTED",
+      "label": "已投递申请",
+      "content": "系统已记录你的岗位申请与简历文件。",
+      "time": "2026-04-05T08:28:13.213074800Z",
+      "done": true
+    },
+    {
+      "eventId": "APP-TA-10258-AUTO-CCD805-20260405T082831Z-EVT-20260405T082831Z",
+      "applicationId": "APP-TA-10258-AUTO-CCD805-20260405T082831Z",
+      "taId": "TA-10258",
+      "eventType": "SUBMITTED",
+      "label": "已投递申请",
+      "content": "系统已记录你的岗位申请与简历文件。",
+      "time": "2026-04-05T08:28:31.063383900Z",
+      "done": true
+    },
+    {
+      "eventId": "APP-TA-10258-AUTO-90156C-20260405T082841Z-EVT-20260405T082841Z",
+      "applicationId": "APP-TA-10258-AUTO-90156C-20260405T082841Z",
+      "taId": "TA-10258",
+      "eventType": "SUBMITTED",
+      "label": "已投递申请",
+      "content": "系统已记录你的岗位申请与简历文件。",
+      "time": "2026-04-05T08:28:41.290696700Z",
       "done": true
     }
   ],
@@ -27,6 +57,6 @@
     "schema": "ta",
     "entity": "application-events",
     "version": "1.0",
-    "updatedAt": "2026-04-05T06:00:22.511988200Z"
+    "updatedAt": "2026-04-05T08:28:41.290696700Z"
   }
 }

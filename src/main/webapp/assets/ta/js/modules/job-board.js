@@ -5,7 +5,6 @@
     const modules = taApp.modules = taApp.modules || {};
 
     modules.jobBoard = function initJobBoardModule(app) {
-        // 仅保留最外层常驻容器的缓存（如果它们也会动态重建，建议也放进方法内实时查询）
         const jobSearchInput = document.getElementById('jobSearchInput');
         const jobPagination = document.getElementById('jobPagination');
         const jobsRoute = document.getElementById('route-jobs');
@@ -23,6 +22,22 @@
         let currentJobsPage = '1';
         let isJobFetching = false;
         let hasLoadedJobs = false;
+
+        function getAppliedCourseCodes() {
+            if (typeof app.getAppliedCourseCodes === 'function') {
+                return app.getAppliedCourseCodes();
+            }
+            if (Array.isArray(app.appliedCourseCodes)) {
+                return app.appliedCourseCodes.slice();
+            }
+            return [];
+        }
+
+        function isAppliedCourse(courseCode) {
+            const normalized = String(courseCode || '').trim().toUpperCase();
+            if (!normalized) return false;
+            return getAppliedCourseCodes().some((code) => String(code || '').trim().toUpperCase() === normalized);
+        }
 
         function scrollJobsBoardIntoView() {
             const target = jobsHallHeading || jobBoard || jobsRoute;
@@ -129,6 +144,7 @@
                 jobDetailApplyBtn.classList.remove('applied');
                 jobDetailApplyBtn.textContent = jobDetailApplyBtn.dataset.applyLabelDefault || 'Apply';
                 jobDetailApplyBtn.dataset.courseCode = course.code;
+                jobDetailApplyBtn.disabled = false;
             }
 
             syncApplyModal(course);
@@ -340,6 +356,7 @@
             }
             return payload.data || {};
         }
+
         async function fetchAndRefreshJobs() {
             if (isJobFetching) return;
 
@@ -373,17 +390,19 @@
                     return;
                 }
 
+                const appliedCourseCodes = getAppliedCourseCodes();
+                const appliedCourseSet = new Set(appliedCourseCodes.map((code) => String(code || '').trim().toUpperCase()).filter(Boolean));
+                const visibleItems = getSortedJobItems(data.items).filter((item) => !appliedCourseSet.has(String(item.courseCode || '').trim().toUpperCase()));
+
                 const countBadge = document.getElementById('openCoursesCount');
                 if (countBadge) {
-                    countBadge.textContent = '开放课程 ' + data.items.length;
+                    countBadge.textContent = '开放课程 ' + visibleItems.length;
                 }
 
                 courseDetailState = {};
                 const newCardsHTML = [];
 
-                const sortedItems = getSortedJobItems(data.items);
-
-                sortedItems.forEach(function (item) {
+                visibleItems.forEach(function (item) {
                     const keywordTags = Array.isArray(item.keywordTags) ? item.keywordTags : [];
                     const checklist = Array.isArray(item.checklist) ? item.checklist : [];
                     const taWorkContents = normalizeTaWorkContents(item.taWorkContents);
@@ -459,6 +478,9 @@
                 bindCardEvents();
                 currentJobsPage = '1';
                 renderJobsBoard();
+                if (!visibleItems.length) {
+                    renderJobsBoardState('当前职位大厅没有可再次申请的课程，已申请课程可在申请状态中查看。', 'job-board-state-empty');
+                }
             } catch (error) {
                 hasLoadedJobs = true;
                 renderJobsBoardState('课程列表加载失败，请点击“刷新列表”重试。', 'job-board-state-error');
@@ -488,7 +510,7 @@
             event.preventDefault();
             const courseCode = jobDetailApplyBtn.dataset.courseCode || activeCourseCode;
             const course = courseDetailState[courseCode];
-            if (!course) return;
+            if (!course || isAppliedCourse(courseCode)) return;
             syncApplyModal(course);
             if (typeof app.openModal === 'function') app.openModal('course-apply');
         });
@@ -518,7 +540,7 @@
             if (submitBtn) submitBtn.textContent = 'Submit Application · Ready';
         });
 
-
+        const jobResumeSubmitBtn = document.getElementById('jobResumeSubmitBtn');
         jobResumeSubmitBtn?.addEventListener('click', async (event) => {
             event.preventDefault();
             const resumeInput = document.getElementById('jobResumeFileInput');
@@ -540,12 +562,18 @@
                 if (jobDetailApplyBtn) {
                     jobDetailApplyBtn.classList.add('applied');
                     jobDetailApplyBtn.textContent = '已申请';
+                    jobDetailApplyBtn.disabled = true;
                 }
 
                 const resumeTrigger = document.querySelector('.resume-upload-trigger');
                 if (resumeTrigger) resumeTrigger.textContent = '已上传';
+                if (typeof app.setAppliedCourseCodes === 'function') {
+                    app.setAppliedCourseCodes(getAppliedCourseCodes().concat([courseCode]));
+                }
                 if (typeof app.loadStatusData === 'function') {
                     app.loadStatusData();
+                } else {
+                    fetchAndRefreshJobs();
                 }
                 console.log('[TA-APPLICATION] submit success', result);
             } catch (error) {
@@ -561,6 +589,7 @@
         fetchAndRefreshJobs();
 
         app.activeCourseCode = () => activeCourseCode;
+        app.refreshJobBoard = fetchAndRefreshJobs;
         Object.defineProperty(app, 'jobDetailApplyBtn', {
             get: () => document.getElementById('jobDetailApplyBtn')
         });

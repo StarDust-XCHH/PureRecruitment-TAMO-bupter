@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "application-status",
     "version": "1.0",
-    "updatedAt": "2026-04-05T07:45:33.197139300Z"
+    "updatedAt": "2026-04-05T07:47:19.546632200Z"
   },
   "items": [
     {
@@ -43,6 +43,25 @@
       "updatedAt": "2026-04-05T07:45:33.197139300Z",
       "category": "MO 招聘流程",
       "matchLevel": "中"
+    },
+    {
+      "applicationId": "APP-TA-10258-AUTO-D78AEF",
+      "taId": "TA-10258",
+      "courseName": "Natural Language Processing 701",
+      "jobSlug": "auto-d78aef",
+      "tags": [],
+      "timeline": [],
+      "details": [],
+      "notifications": [],
+      "status": "已录用",
+      "statusTone": "success",
+      "summary": "qwe",
+      "moComment": "qwe",
+      "nextAction": "请等待签约与排班通知。",
+      "nextStep": "请等待签约与排班通知。",
+      "updatedAt": "2026-04-05T07:47:19.546632200Z",
+      "category": "MO 招聘流程",
+      "matchLevel": "高"
     }
   ]
 }

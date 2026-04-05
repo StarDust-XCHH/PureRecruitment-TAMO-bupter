@@ -8,6 +8,25 @@
     const modules = taApp.modules = taApp.modules || {};
 
     taApp.state = taApp.state || {};
+    taApp.state.appliedCourseCodes = Array.isArray(taApp.state.appliedCourseCodes)
+        ? taApp.state.appliedCourseCodes
+        : [];
+
+    taApp.setAppliedCourseCodes = function setAppliedCourseCodes(courseCodes) {
+        const normalized = Array.isArray(courseCodes)
+            ? courseCodes.map((code) => String(code || '').trim().toUpperCase()).filter(Boolean)
+            : [];
+        taApp.state.appliedCourseCodes = Array.from(new Set(normalized));
+        if (typeof taApp.refreshJobBoard === 'function') {
+            taApp.refreshJobBoard();
+        }
+    };
+
+    taApp.getAppliedCourseCodes = function getAppliedCourseCodes() {
+        return Array.isArray(taApp.state.appliedCourseCodes)
+            ? taApp.state.appliedCourseCodes.slice()
+            : [];
+    };
 
     function getDomRefs() {
         return {

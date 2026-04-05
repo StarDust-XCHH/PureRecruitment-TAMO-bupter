@@ -17,7 +17,8 @@
             loading: false,
             taId: '',
             items: [],
-            details: {}
+            details: {},
+            appliedCourseCodes: []
         };
 
         function escapeHtml(value) {
@@ -28,12 +29,20 @@
                 .replace(/</g, '&lt;')
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#39;');
+                .replace(/'/g, '&#39;'); // 也可以使用 '&apos;'
         }
 
         function safeText(value, fallback) {
             const text = String(value == null ? '' : value).trim();
             return text || (fallback || '');
+        }
+
+        function formatFileSize(bytes) {
+            const size = Number(bytes);
+            if (!Number.isFinite(size) || size <= 0) return '--';
+            if (size >= 1024 * 1024) return (size / (1024 * 1024)).toFixed(2) + ' MB';
+            if (size >= 1024) return Math.round(size / 1024) + ' KB';
+            return size + ' B';
         }
 
         function resolveTaId() {
@@ -65,10 +74,24 @@
             };
         }
 
+        function normalizeResumeView(resumeView) {
+            const record = resumeView && typeof resumeView === 'object' ? resumeView : {};
+            const downloadUrl = safeText(record.downloadUrl);
+            return {
+                fileName: safeText(record.fileName, '简历文件'),
+                downloadUrl: downloadUrl,
+                mimeType: safeText(record.mimeType),
+                extension: safeText(record.extension),
+                size: Number(record.size || 0),
+                available: !!downloadUrl
+            };
+        }
+
         function normalizeItem(item) {
             const record = item && typeof item === 'object' ? item : {};
             return {
                 applicationId: safeText(record.applicationId),
+                courseCode: safeText(record.courseCode),
                 courseName: safeText(record.courseName, '未命名岗位'),
                 status: safeText(record.status, '处理中'),
                 statusTone: safeText(record.statusTone, 'warn'),
@@ -80,7 +103,8 @@
                 notifications: normalizeArray(record.notifications),
                 tags: normalizeArray(record.tags),
                 category: safeText(record.category),
-                matchLevel: safeText(record.matchLevel)
+                matchLevel: safeText(record.matchLevel),
+                resumeView: normalizeResumeView(record.resumeView)
             };
         }
 
@@ -138,6 +162,20 @@
             }).join('');
         }
 
+        function buildResumeActionHtml(item) {
+            if (!item.resumeView.available) {
+                return '<div class="status-resume-action muted">当前申请未找到可查看的简历文件。</div>';
+            }
+            const meta = [formatFileSize(item.resumeView.size), item.resumeView.extension ? String(item.resumeView.extension).toUpperCase() : '']
+                .filter(Boolean)
+                .join(' · ');
+            return ''
+                + '<div class="status-resume-action">'
+                + '  <a class="status-resume-link" href="' + escapeHtml(item.resumeView.downloadUrl) + '" target="_blank" rel="noopener noreferrer">查看简历</a>'
+                + '  <span class="muted">' + escapeHtml(item.resumeView.fileName) + (meta ? ' · ' + escapeHtml(meta) : '') + '</span>'
+                + '</div>';
+        }
+
         function renderTimeline(items) {
             if (!timeline) return;
             if (!items.length) {
@@ -168,6 +206,8 @@
                     ? '<div class="status-tag-list">' + item.tags.map((tag) => '<span class="pill">' + escapeHtml(safeText(tag)) + '</span>').join('') + '</div>'
                     : '';
 
+                const resumeActionHtml = buildResumeActionHtml(item);
+
                 return ''
                     + '<div class="timeline-item' + (index === 0 ? ' open' : '') + '" data-status="' + escapeHtml(item.statusTone) + '" data-application-id="' + escapeHtml(item.applicationId) + '">'
                     + '  <div class="timeline-node ' + escapeHtml(item.statusTone) + '"></div>'
@@ -177,6 +217,7 @@
                     + '      <p>' + escapeHtml(item.summary || '暂无状态说明。') + '</p>'
                     + '      <p>' + escapeHtml(item.nextAction || '暂无下一步提示。') + '</p>'
                     +        tagsHtml
+                    +        resumeActionHtml
                     +        detailsHtml
                     +        timelineHtml
                     + '  </div>'
@@ -189,7 +230,7 @@
                 if (item.dataset.timelineBound === 'true') return;
                 item.dataset.timelineBound = 'true';
                 item.addEventListener('click', (event) => {
-                    if (event.target.closest('.status-detail-row, .status-step, .pill')) return;
+                    if (event.target.closest('.status-detail-row, .status-step, .pill, .status-resume-link')) return;
                     item.classList.toggle('open');
                 });
             });
@@ -233,6 +274,10 @@
                 const items = normalizeArray(payload.items).map(normalizeItem);
                 state.items = items;
                 state.details = payload.details && typeof payload.details === 'object' ? payload.details : {};
+                state.appliedCourseCodes = normalizeArray(payload.appliedCourseCodes).map((code) => safeText(code)).filter(Boolean);
+                if (app && typeof app.setAppliedCourseCodes === 'function') {
+                    app.setAppliedCourseCodes(state.appliedCourseCodes);
+                }
 
                 renderTimeline(items);
                 renderSummary(payload.summary);
@@ -252,6 +297,10 @@
                 renderTimeline([]);
                 renderSummary({});
                 renderNotifications([], []);
+                state.appliedCourseCodes = [];
+                if (app && typeof app.setAppliedCourseCodes === 'function') {
+                    app.setAppliedCourseCodes([]);
+                }
                 if (emptyState) emptyState.hidden = false;
                 setStatusMessage(error.message || '申请状态加载失败', 'error');
             } finally {
@@ -260,18 +309,14 @@
             }
         }
 
-        if (refreshButton) {
-            refreshButton.addEventListener('click', () => {
-                loadStatusData();
-            });
-        }
+        refreshButton?.addEventListener('click', loadStatusData);
 
-        bindTimelineToggle(document);
-        bindSidePanelToggle(document);
-        loadStatusData();
-        app.bindTimelineToggle = bindTimelineToggle;
-        app.bindSidePanelToggle = bindSidePanelToggle;
-        app.loadStatusData = loadStatusData;
-        app.state.status = state;
+        return {
+            load: loadStatusData,
+            refresh: loadStatusData,
+            getAppliedCourseCodes() {
+                return state.appliedCourseCodes.slice();
+            }
+        };
     };
 })();
