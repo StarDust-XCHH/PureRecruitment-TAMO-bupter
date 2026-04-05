@@ -1,11 +1,12 @@
 <div class="route" id="route-status" data-route="status">
     <section class="route-card">
 
-        <div class="route-card-header" style="margin-bottom: 24px;">
+        <div class="route-card-header status-header">
             <div>
                 <h2>申请状态</h2>
                 <p>实时查看岗位申请进度、下一步提醒和历史时间线。</p>
             </div>
+            <button class="status-refresh-btn" type="button" id="statusRefreshButton">刷新状态</button>
         </div>
 
         <div class="status-grid">

@@ -1,5 +1,32 @@
 {
   "schema": "ta-application-events.v1",
   "version": 1,
-  "items": []
+  "items": [
+    {
+      "eventId": "APP-TA-10258-EBU9900-20260405T055132Z-EVT-20260405T055132Z",
+      "applicationId": "APP-TA-10258-EBU9900-20260405T055132Z",
+      "taId": "TA-10258",
+      "eventType": "SUBMITTED",
+      "label": "已投递申请",
+      "content": "系统已记录你的岗位申请与简历文件。",
+      "time": "2026-04-05T05:51:32.572823300Z",
+      "done": true
+    },
+    {
+      "eventId": "APP-TA-10258-AUTO-6438D7-20260405T060022Z-EVT-20260405T060022Z",
+      "applicationId": "APP-TA-10258-AUTO-6438D7-20260405T060022Z",
+      "taId": "TA-10258",
+      "eventType": "SUBMITTED",
+      "label": "已投递申请",
+      "content": "系统已记录你的岗位申请与简历文件。",
+      "time": "2026-04-05T06:00:22.511988200Z",
+      "done": true
+    }
+  ],
+  "meta": {
+    "schema": "ta",
+    "entity": "application-events",
+    "version": "1.0",
+    "updatedAt": "2026-04-05T06:00:22.511988200Z"
+  }
 }

@@ -11,6 +11,7 @@
         const notifications = document.getElementById('statusNotifications');
         const emptyState = document.getElementById('statusEmptyState');
         const statusMessage = document.getElementById('statusMessage');
+        const refreshButton = document.getElementById('statusRefreshButton');
 
         const state = {
             loading: false,
@@ -87,6 +88,12 @@
             if (!statusMessage) return;
             statusMessage.textContent = safeText(text, '');
             statusMessage.dataset.tone = safeText(tone, 'muted');
+        }
+
+        function setRefreshButtonState(loading) {
+            if (!refreshButton) return;
+            refreshButton.disabled = !!loading;
+            refreshButton.textContent = loading ? '刷新中...' : '刷新状态';
         }
 
         function renderSummary(summaryData) {
@@ -210,6 +217,7 @@
             if (!route || state.loading) return;
             state.loading = true;
             state.taId = resolveTaId();
+            setRefreshButtonState(true);
             setStatusMessage('申请状态加载中...', 'muted');
             if (emptyState) emptyState.hidden = true;
 
@@ -248,7 +256,14 @@
                 setStatusMessage(error.message || '申请状态加载失败', 'error');
             } finally {
                 state.loading = false;
+                setRefreshButtonState(false);
             }
+        }
+
+        if (refreshButton) {
+            refreshButton.addEventListener('click', () => {
+                loadStatusData();
+            });
         }
 
         bindTimelineToggle(document);

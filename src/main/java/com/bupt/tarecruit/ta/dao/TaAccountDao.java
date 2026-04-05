@@ -318,6 +318,7 @@ public class TaAccountDao {
         ensureStructuredJsonFile(APPLICATION_EVENT_PATH, APPLICATION_SCHEMA, APPLICATION_EVENT_ENTITY, buildDefaultApplicationEventsRoot());
         JsonObject applicationRoot = loadStructuredJson(APPLICATION_DATA_PATH, APPLICATION_SCHEMA, APPLICATION_ENTITY);
         JsonObject eventRoot = loadStructuredJson(APPLICATION_EVENT_PATH, APPLICATION_SCHEMA, APPLICATION_EVENT_ENTITY);
+        JsonObject moStatusRoot = loadMoStatusRoot();
         JsonArray items = applicationRoot.getAsJsonArray("items");
         JsonArray eventItems = eventRoot.getAsJsonArray("items");
 
@@ -347,7 +348,7 @@ public class TaAccountDao {
             if (!normalizedTaId.equalsIgnoreCase(getAsString(item, "taId"))) {
                 continue;
             }
-            JsonObject normalizedItem = normalizeApplicationRecord(item, eventItems);
+            JsonObject normalizedItem = normalizeApplicationRecord(mergeMoStatusIntoApplication(item, moStatusRoot), eventItems);
             userItems.add(normalizedItem);
             String status = getAsString(normalizedItem, "status");
             if (containsAny(status, "面试", "INTERVIEW")) {
@@ -368,6 +369,8 @@ public class TaAccountDao {
                 latestStatusLabel = status.isBlank() ? "处理中" : status;
             }
         }
+
+        sortByUpdatedAtDesc(userItems);
 
         summary.addProperty("totalCount", userItems.size());
         summary.addProperty("interviewCount", interviewCount);
@@ -720,6 +723,90 @@ public class TaAccountDao {
         };
     }
 
+    private JsonObject loadMoStatusRoot() throws IOException {
+        Path statusPath = DataMountPaths.taApplicationStatus();
+        if (!Files.exists(statusPath)) {
+            return null;
+        }
+        JsonElement parsed;
+        try (Reader reader = Files.newBufferedReader(statusPath, StandardCharsets.UTF_8)) {
+            parsed = JsonParser.parseReader(reader);
+        }
+        if (parsed == null || !parsed.isJsonObject()) {
+            return null;
+        }
+        JsonObject root = parsed.getAsJsonObject();
+        if (!root.has("items") || !root.get("items").isJsonArray()) {
+            return null;
+        }
+        return root;
+    }
+
+    private JsonObject mergeMoStatusIntoApplication(JsonObject applicationItem, JsonObject moStatusRoot) {
+        if (applicationItem == null || moStatusRoot == null) {
+            return applicationItem;
+        }
+        JsonObject latestMoStatus = findMoStatusForApplication(applicationItem, moStatusRoot.getAsJsonArray("items"));
+        if (latestMoStatus == null) {
+            return applicationItem;
+        }
+
+        JsonObject merged = applicationItem.deepCopy();
+        merged.addProperty("status", mapMoStatusToTaStatusCode(getAsString(latestMoStatus, "status")));
+        merged.addProperty("statusLabel", firstNonBlank(getAsString(latestMoStatus, "status"), getAsString(merged, "statusLabel")));
+        merged.addProperty("statusTone", firstNonBlank(getAsString(latestMoStatus, "statusTone"), getAsString(merged, "statusTone")));
+        merged.addProperty("summary", firstNonBlank(getAsString(latestMoStatus, "summary"), getAsString(merged, "summary")));
+        merged.addProperty("nextAction", firstNonBlank(getAsString(latestMoStatus, "nextAction"), getAsString(merged, "nextAction")));
+        merged.addProperty("updatedAt", firstNonBlank(getAsString(latestMoStatus, "updatedAt"), getAsString(merged, "updatedAt")));
+        if (latestMoStatus.has("matchLevel") && !latestMoStatus.get("matchLevel").isJsonNull()) {
+            merged.add("matchLevel", latestMoStatus.get("matchLevel").deepCopy());
+        }
+        return merged;
+    }
+
+    private JsonObject findMoStatusForApplication(JsonObject applicationItem, JsonArray moStatusItems) {
+        if (applicationItem == null || moStatusItems == null) {
+            return null;
+        }
+        String taId = getAsString(applicationItem, "taId");
+        String courseCode = getAsString(applicationItem, "courseCode");
+        JsonObject courseSnapshot = applicationItem.has("courseSnapshot") && applicationItem.get("courseSnapshot").isJsonObject()
+                ? applicationItem.getAsJsonObject("courseSnapshot") : new JsonObject();
+        String courseName = getAsString(courseSnapshot, "courseName");
+        JsonObject latest = null;
+        for (JsonElement element : moStatusItems) {
+            if (!element.isJsonObject()) {
+                continue;
+            }
+            JsonObject item = element.getAsJsonObject();
+            if (!taId.equalsIgnoreCase(getAsString(item, "taId"))) {
+                continue;
+            }
+            String jobSlug = trimToEmpty(getAsString(item, "jobSlug")).toLowerCase(Locale.ROOT);
+            String courseCodeSlug = trimToEmpty(courseCode).toLowerCase(Locale.ROOT);
+            boolean matched = (!courseCodeSlug.isBlank() && jobSlug.equals(courseCodeSlug))
+                    || (!courseName.isBlank() && courseName.equalsIgnoreCase(getAsString(item, "courseName")));
+            if (!matched) {
+                continue;
+            }
+            if (latest == null || getAsString(item, "updatedAt").compareTo(getAsString(latest, "updatedAt")) > 0) {
+                latest = item;
+            }
+        }
+        return latest;
+    }
+
+    private String mapMoStatusToTaStatusCode(String moStatusLabel) {
+        String label = trimToEmpty(moStatusLabel);
+        if (containsAny(label, "录用", "通过")) {
+            return "ACCEPTED";
+        }
+        if (containsAny(label, "拒绝", "未录用", "未通过")) {
+            return "REJECTED";
+        }
+        return label.isBlank() ? "SUBMITTED" : label;
+    }
+
     private String defaultNextAction(String statusCode) {
         String code = trimToEmpty(statusCode).toUpperCase(Locale.ROOT);
         return switch (code) {
@@ -731,6 +818,23 @@ public class TaAccountDao {
             case "WITHDRAWN" -> "该申请已结束，可投递其他课程。";
             default -> "请保持联系方式畅通，等待后续通知。";
         };
+    }
+
+    private void sortByUpdatedAtDesc(JsonArray items) {
+        if (items == null || items.size() <= 1) {
+            return;
+        }
+        List<JsonObject> sorted = new ArrayList<>();
+        for (JsonElement element : items) {
+            if (element != null && element.isJsonObject()) {
+                sorted.add(element.getAsJsonObject());
+            }
+        }
+        sorted.sort((left, right) -> getAsString(right, "updatedAt").compareTo(getAsString(left, "updatedAt")));
+        items.asList().clear();
+        for (JsonObject item : sorted) {
+            items.add(item);
+        }
     }
 
     private String buildApplicationId(String taId, String courseCode) {
