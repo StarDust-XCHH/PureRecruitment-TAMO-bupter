@@ -91,6 +91,71 @@ public final class RecruitmentCoursesDao {
         }
     }
 
+    /**
+     * Overwrites TA/MO-derived application aggregate fields on the on-disk row for {@code courseCode} (ignore case).
+     * Does not change other job fields (e.g. title, skills, {@code taRecruitCount}).
+     *
+     * @return {@code true} if a matching row was found and persisted
+     */
+    public static boolean syncPublishedJobApplicationStatsByCourseCode(
+            String courseCode,
+            int applicationsTotal,
+            int applicationsPending,
+            int applicationsAccepted,
+            int applicationsRejected,
+            int recruitedCount,
+            String lastApplicationAt,
+            String lastSelectionAt,
+            String lastSyncedAt) throws IOException {
+        String needle = trim(courseCode);
+        if (needle.isEmpty()) {
+            return false;
+        }
+        String la = trim(lastApplicationAt);
+        String ls = trim(lastSelectionAt);
+        String syncAt = trim(lastSyncedAt);
+        synchronized (FILE_LOCK) {
+            JsonObject root = ensureJobBoardRoot();
+            JsonArray items = root.getAsJsonArray("items");
+            for (int i = 0; i < items.size(); i++) {
+                JsonElement el = items.get(i);
+                if (el == null || !el.isJsonObject()) {
+                    continue;
+                }
+                JsonObject raw = el.getAsJsonObject();
+                if (!needle.equalsIgnoreCase(trim(getAsString(raw, "courseCode")))) {
+                    continue;
+                }
+                raw.addProperty("applicationsTotal", Math.max(0, applicationsTotal));
+                raw.addProperty("applicationsPending", Math.max(0, applicationsPending));
+                raw.addProperty("applicationsAccepted", Math.max(0, applicationsAccepted));
+                raw.addProperty("applicationsRejected", Math.max(0, applicationsRejected));
+                raw.addProperty("recruitedCount", Math.max(0, recruitedCount));
+                if (la.isEmpty()) {
+                    raw.remove("lastApplicationAt");
+                } else {
+                    raw.addProperty("lastApplicationAt", la);
+                }
+                if (ls.isEmpty()) {
+                    raw.remove("lastSelectionAt");
+                } else {
+                    raw.addProperty("lastSelectionAt", ls);
+                }
+                if (syncAt.isEmpty()) {
+                    raw.remove("lastSyncedAt");
+                } else {
+                    raw.addProperty("lastSyncedAt", syncAt);
+                }
+                raw.addProperty("updatedAt", Instant.now().toString());
+                updateMeta(root, JOB_BOARD_SCHEMA, JOB_BOARD_ENTITY, JOB_BOARD_VERSION);
+                syncJobBoardFileEnvelope(root, items);
+                writeJson(root);
+                return true;
+            }
+            return false;
+        }
+    }
+
     public static JsonObject findNormalizedJobByCourseCode(String courseCode) throws IOException {
         synchronized (FILE_LOCK) {
             JsonObject courses = ensureJobBoardRoot();
