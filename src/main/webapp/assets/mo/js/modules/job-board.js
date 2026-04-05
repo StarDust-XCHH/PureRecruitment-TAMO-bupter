@@ -5,6 +5,14 @@
     const modules = moApp.modules = moApp.modules || {};
 
     modules.jobBoard = function initJobBoard(app) {
+        function apiUrl(path) {
+            var p = path.charAt(0) === '/' ? path : '/' + path;
+            if (typeof window.moApiPath === 'function') {
+                return window.moApiPath(p);
+            }
+            return '../../' + p.replace(/^\//, '');
+        }
+
         const state = {
             jobs: [],
             page: 1,
@@ -57,7 +65,7 @@
         async function loadSkillTags() {
             if (!fixedSkillsInput) return;
             try {
-                const res = await fetch('../../api/mo/skill-tags', { headers: { Accept: 'application/json' } });
+                const res = await fetch(apiUrl('/api/mo/skill-tags'), { headers: { Accept: 'application/json' } });
                 if (!res.ok) return;
                 const payload = await res.json();
                 const items = Array.isArray(payload.items) ? payload.items : [];
@@ -271,7 +279,7 @@
                     return;
                 }
                 const res = await fetch(
-                    '../../api/mo/jobs?moId=' + encodeURIComponent(moId),
+                    apiUrl('/api/mo/jobs') + '?moId=' + encodeURIComponent(moId),
                     { headers: { Accept: 'application/json' } }
                 );
                 const payload = await res.json();
@@ -335,7 +343,7 @@
             publishStatus.textContent = '发布中...';
             try {
                 const res = await fetch(
-                    '../../api/mo/jobs?moId=' + encodeURIComponent(sessionMoId),
+                    apiUrl('/api/mo/jobs') + '?moId=' + encodeURIComponent(sessionMoId),
                     {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json;charset=UTF-8' },

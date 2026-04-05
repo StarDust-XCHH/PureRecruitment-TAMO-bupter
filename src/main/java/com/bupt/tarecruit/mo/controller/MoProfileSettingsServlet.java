@@ -105,7 +105,7 @@ public class MoProfileSettingsServlet extends HttpServlet {
             return;
         }
 
-        String realName = trim(req.getParameter("realName"));
+        String name = trim(req.getParameter("name"));
         String contactEmail = trim(req.getParameter("contactEmail"));
         String bio = trim(req.getParameter("bio"));
         List<String> skills = extractSkills(req.getParameterValues("skills[]"), req.getParameter("skills"));
@@ -130,7 +130,7 @@ public class MoProfileSettingsServlet extends HttpServlet {
 
         MoAccountDao.ProfileUpdateInput input = new MoAccountDao.ProfileUpdateInput(
                 moId,
-                realName,
+                name,
                 contactEmail,
                 bio,
                 skills,

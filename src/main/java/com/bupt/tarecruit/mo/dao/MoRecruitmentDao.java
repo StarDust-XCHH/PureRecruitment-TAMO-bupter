@@ -41,7 +41,7 @@ public class MoRecruitmentDao {
             .create();
 
     /**
-     * 岗位上的展示名：优先 {@code mos.json} 账号字段 {@code name}；勿用 profile 的 {@code realName} 或 {@code username}。
+     * 岗位上的展示名：取自 {@code mos.json} 账号字段 {@code name}（与 profile 无关；不使用 {@code username}）。
      * 仅当查不到账号时，才回退请求体中的 {@code ownerMoName}，最后回退 {@code ownerMoId}。
      */
     private static String resolveOwnerMoName(String ownerMoId, JsonObject input) throws IOException {
@@ -72,7 +72,7 @@ public class MoRecruitmentDao {
      * 当前 MO 可见的岗位：仅当 {@code item.ownerMoId} 与登录 {@code moId} 相同（忽略大小写）。
      */
     public JsonObject getJobBoardForMo(String moId) throws IOException {
-        String m = trim(moId);
+        String m = new MoAccountDao().resolveCanonicalMoId(moId);
         if (m.isBlank()) {
             throw new IllegalArgumentException("缺少 moId");
         }
@@ -138,7 +138,7 @@ public class MoRecruitmentDao {
         if (courseDescription.isEmpty()) {
             throw new IllegalArgumentException("岗位描述不能为空");
         }
-        String ownerMoId = trim(actingMoId);
+        String ownerMoId = new MoAccountDao().resolveCanonicalMoId(actingMoId);
         if (ownerMoId.isBlank()) {
             throw new IllegalArgumentException("缺少 moId");
         }
@@ -224,14 +224,14 @@ public class MoRecruitmentDao {
      */
     public synchronized JsonObject getApplicantsForCourse(String courseCode, String moId) throws IOException {
         String normalizedCourseCode = trim(courseCode);
-        String normalizedMoId = trim(moId);
+        String normalizedMoId = new MoAccountDao().resolveCanonicalMoId(moId);
         if (normalizedCourseCode.isBlank()) {
             throw new IllegalArgumentException("缺少 courseCode");
         }
         if (normalizedMoId.isBlank()) {
             throw new IllegalArgumentException("缺少 moId");
         }
-        assertMoOwnsCourse(normalizedMoId, normalizedCourseCode);
+        assertMoOwnsCourseResolved(normalizedMoId, normalizedCourseCode);
 
         MoTaApplicationReadService readService = new MoTaApplicationReadService();
         JsonObject appStatusRoot = ensureStructuredFile(TA_APPLICATION_STATUS, TA_ENTITY_APPLICATION_STATUS);
@@ -293,14 +293,22 @@ public class MoRecruitmentDao {
         return payload;
     }
 
-    public void assertMoOwnsCourse(String moId, String courseCode) throws IOException {
+    private void assertMoOwnsCourseResolved(String resolvedMoId, String courseCode) throws IOException {
         JsonObject job = RecruitmentCoursesDao.findNormalizedJobByCourseCode(trim(courseCode));
         if (job == null) {
             throw new IllegalArgumentException("课程不存在或未发布");
         }
-        if (!jobOwnerMoIdMatchesMo(trim(moId), getAsString(job, "ownerMoId"))) {
+        if (!jobOwnerMoIdMatchesMo(resolvedMoId, getAsString(job, "ownerMoId"))) {
             throw new IllegalArgumentException("当前 MO 无权管理该课程的申请人");
         }
+    }
+
+    public void assertMoOwnsCourse(String moId, String courseCode) throws IOException {
+        String m = new MoAccountDao().resolveCanonicalMoId(moId);
+        if (m.isBlank()) {
+            throw new IllegalArgumentException("缺少 moId");
+        }
+        assertMoOwnsCourseResolved(m, courseCode);
     }
 
     public synchronized JsonObject markApplicationReadByMo(String moId, String applicationId) throws IOException {
@@ -310,9 +318,13 @@ public class MoRecruitmentDao {
             throw new IllegalArgumentException("申请不存在");
         }
         String courseCode = firstNonBlank(getAsString(app, "courseCode"), "");
-        assertMoOwnsCourse(trim(moId), courseCode);
+        String m = new MoAccountDao().resolveCanonicalMoId(moId);
+        if (m.isBlank()) {
+            throw new IllegalArgumentException("缺少 moId");
+        }
+        assertMoOwnsCourseResolved(m, courseCode);
         mutationDao.markUnderReview(trim(applicationId));
-        new MoApplicationReadStateDao().markRead(trim(moId), trim(applicationId));
+        new MoApplicationReadStateDao().markRead(m, trim(applicationId));
         JsonObject ok = new JsonObject();
         ok.addProperty("success", true);
         ok.addProperty("message", "已标记已读，TA 侧申请已更新为审核中");
@@ -327,7 +339,11 @@ public class MoRecruitmentDao {
         if (rec == null) {
             throw new IllegalArgumentException("申请不存在");
         }
-        assertMoOwnsCourse(trim(moId), rec.courseCode());
+        String m = new MoAccountDao().resolveCanonicalMoId(moId);
+        if (m.isBlank()) {
+            throw new IllegalArgumentException("缺少 moId");
+        }
+        assertMoOwnsCourseResolved(m, rec.courseCode());
 
         JsonObject appStatusRoot = ensureStructuredFile(TA_APPLICATION_STATUS, TA_ENTITY_APPLICATION_STATUS);
         String targetSlug = normalizeSlug(rec.courseCode());
@@ -371,8 +387,12 @@ public class MoRecruitmentDao {
         if (rec == null) {
             throw new IllegalArgumentException("申请不存在");
         }
-        assertMoOwnsCourse(trim(moId), rec.courseCode());
-        JsonObject comment = new MoApplicationCommentsDao().addComment(applicationId, trim(moId), text);
+        String m = new MoAccountDao().resolveCanonicalMoId(moId);
+        if (m.isBlank()) {
+            throw new IllegalArgumentException("缺少 moId");
+        }
+        assertMoOwnsCourseResolved(m, rec.courseCode());
+        JsonObject comment = new MoApplicationCommentsDao().addComment(applicationId, m, text);
         JsonObject payload = new JsonObject();
         payload.addProperty("success", true);
         payload.add("comment", comment);
@@ -380,7 +400,7 @@ public class MoRecruitmentDao {
     }
 
     public synchronized int countUnreadApplicantsForMo(String moId) throws IOException {
-        String m = trim(moId);
+        String m = new MoAccountDao().resolveCanonicalMoId(moId);
         if (m.isBlank()) {
             return 0;
         }
@@ -484,7 +504,7 @@ public class MoRecruitmentDao {
     public synchronized JsonObject decideApplication(String courseCode, String taId, String moId, String decision, String comment) throws IOException {
         String normalizedCourseCode = trim(courseCode);
         String normalizedTaId = trim(taId);
-        String normalizedMoId = trim(moId);
+        String normalizedMoId = new MoAccountDao().resolveCanonicalMoId(moId);
         String normalizedDecision = trim(decision).toLowerCase(Locale.ROOT);
         String normalizedComment = trim(comment);
 
@@ -494,7 +514,7 @@ public class MoRecruitmentDao {
         if (normalizedMoId.isBlank()) {
             throw new IllegalArgumentException("缺少 moId");
         }
-        assertMoOwnsCourse(normalizedMoId, normalizedCourseCode);
+        assertMoOwnsCourseResolved(normalizedMoId, normalizedCourseCode);
         if (!"selected".equals(normalizedDecision) && !"rejected".equals(normalizedDecision)) {
             throw new IllegalArgumentException("decision 仅支持 selected 或 rejected");
         }

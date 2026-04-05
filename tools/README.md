@@ -13,9 +13,11 @@
 
 ## 当前提供的工具
 
-- [`dev-data-tools`](tools/dev-data-tools)
+- [`dev-data-tools`](dev-data-tools)
 
 该工具是一个独立的 Java CLI 工程，后续可通过命令行运行。
+
+- [**`ta-mo-submission-cleanup`**](ta-mo-submission-cleanup) — TA 申请 + TA AI + MO 已读/评论 **双端测试数据清理**（主类 `com.bupt.tarecruit.tools.DevApplicationDataCleanupTool`，与 WAR 同模块 `mvn exec:java` 运行；说明见子目录 README）。
 
 - [`genMoCourses.py`](genMoCourses.py)（Python 3）
 

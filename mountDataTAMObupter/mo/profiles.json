@@ -3,14 +3,13 @@
     "schema": "mo",
     "entity": "profiles",
     "version": "1.0",
-    "updatedAt": "2026-04-05T17:01:31.823552700Z"
+    "updatedAt": "2026-04-05T17:28:48.044723800Z"
   },
   "items": [
     {
       "id": "PROFILE-MO-195RR4",
       "moId": "MO-195RR4",
       "avatar": "",
-      "realName": "TestName",
       "title": "MO",
       "contactEmail": "123456@email.com",
       "bio": "",
@@ -21,7 +20,6 @@
       "id": "PROFILE-MO-137J3E",
       "moId": "MO-137J3E",
       "avatar": "",
-      "realName": "TestName2",
       "title": "MO",
       "contactEmail": "123457@email.com",
       "bio": "",
@@ -32,7 +30,6 @@
       "id": "PROFILE-MO-6601L9",
       "moId": "MO-6601L9",
       "avatar": "",
-      "realName": "testName3",
       "title": "MO",
       "contactEmail": "123458@email.com",
       "bio": "",

@@ -8,7 +8,7 @@ File-backed DAO classes for MO module, handling both recruitment flows and user 
 Manages MO recruitment operations:
 - **Job board file** (`recruitment-courses.json`) via `RecruitmentCoursesDao`
 - **Applicant list & decisions**: reads TA `applications.json` through `MoTaApplicationReadService`, merges `application-status.json`, enforces **`ownerMoId`**（仅账号 `id`）**=== `moId`** for course-scoped APIs
-- **Publish**: `ownerMoName` 取自 **`mos.json` 的 `name`**，不用 profile 的 `realName` / `username`
+- **Publish**: `ownerMoName` 取自 **`mos.json` 的 `name`**；MO `profiles.json` 不再使用 `realName` 字段
 - Methods (non-exhaustive): `getJobBoardForMo(moId)` (filters by `ownerMoId`), `createCourse(input, actingMoId)` (sets `ownerMoId` = `actingMoId`), `getApplicantsForCourse(courseCode, moId)`, `assertMoOwnsCourse()`, `markApplicationReadByMo()`, `getApplicantDetail()`, `addApplicationComment()`, `countUnreadApplicantsForMo()`, `decideApplication(...)` (4-arg resolves `moId` from job; 5-arg for explicit `moId`)
 
 ### `MoAccountDao`

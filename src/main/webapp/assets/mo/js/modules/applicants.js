@@ -5,6 +5,14 @@
     const modules = moApp.modules = moApp.modules || {};
 
     modules.applicants = function initApplicants(app) {
+        function apiUrl(path) {
+            var p = path.charAt(0) === '/' ? path : '/' + path;
+            if (typeof window.moApiPath === 'function') {
+                return window.moApiPath(p);
+            }
+            return '../../' + p.replace(/^\//, '');
+        }
+
         const courseSelect = document.getElementById('applicantCourseSelect');
         const refreshBtn = document.getElementById('refreshApplicantsBtn');
         const statusText = document.getElementById('applicantsStatusText');
@@ -49,7 +57,7 @@
             const moId = getMoId();
             if (!navBadge || !moId) return;
             try {
-                const res = await fetch('../../api/mo/applicants/unread-count?moId=' + encodeURIComponent(moId));
+                const res = await fetch(apiUrl('/api/mo/applicants/unread-count') + '?moId=' + encodeURIComponent(moId));
                 const payload = await res.json();
                 const n = typeof payload.unreadCount === 'number' ? payload.unreadCount : 0;
                 if (n > 0) {
@@ -146,7 +154,7 @@
             const moId = getMoId();
             if (!moId || !applicationId) return;
             try {
-                await fetch('../../api/mo/applications/mark-read', {
+                await fetch(apiUrl('/api/mo/applications/mark-read'), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json;charset=UTF-8' },
                     body: JSON.stringify({ moId: moId, applicationId: applicationId })
@@ -165,14 +173,14 @@
             await markRead(item.applicationId);
 
             try {
-                const res = await fetch('../../api/mo/applicants/detail?moId=' + encodeURIComponent(moId)
+                const res = await fetch(apiUrl('/api/mo/applicants/detail') + '?moId=' + encodeURIComponent(moId)
                     + '&applicationId=' + encodeURIComponent(item.applicationId));
                 const d = await res.json();
                 if (!res.ok || d.success === false) throw new Error(d.message || '加载失败');
 
                 const ts = d.taSnapshot || {};
                 const resume = d.resume || {};
-                const resumeUrl = '../../api/mo/applications/resume?moId=' + encodeURIComponent(moId)
+                const resumeUrl = apiUrl('/api/mo/applications/resume') + '?moId=' + encodeURIComponent(moId)
                     + '&applicationId=' + encodeURIComponent(item.applicationId);
 
                 let eventsHtml = '';
@@ -193,7 +201,7 @@
                     '<dt>申请 ID</dt><dd>' + escapeHtml(d.applicationId) + '</dd>' +
                     '<dt>TA ID</dt><dd>' + escapeHtml(d.taId) + '</dd>' +
                     '<dt>课程</dt><dd>' + escapeHtml(d.courseCode) + ' ' + escapeHtml(d.courseName) + '</dd>' +
-                    '<dt>姓名</dt><dd>' + escapeHtml(ts.realName || '') + '</dd>' +
+                    '<dt>姓名</dt><dd>' + escapeHtml((ts.name || ts.realName || '').trim()) + '</dd>' +
                     '<dt>学号</dt><dd>' + escapeHtml(ts.studentId || '') + '</dd>' +
                     '<dt>邮箱</dt><dd>' + escapeHtml(ts.contactEmail || '') + '</dd>' +
                     '<dt>电话</dt><dd>' + escapeHtml(ts.phone || '') + '</dd>' +
@@ -217,7 +225,7 @@
                         const text = (textarea.value || '').trim();
                         if (!text) return;
                         try {
-                            const cr = await fetch('../../api/mo/applications/comment', {
+                            const cr = await fetch(apiUrl('/api/mo/applications/comment'), {
                                 method: 'POST',
                                 headers: { 'Content-Type': 'application/json;charset=UTF-8' },
                                 body: JSON.stringify({
@@ -258,7 +266,7 @@
             }
             setStatus('加载中...');
             try {
-                const res = await fetch('../../api/mo/applicants?courseCode=' + encodeURIComponent(code)
+                const res = await fetch(apiUrl('/api/mo/applicants') + '?courseCode=' + encodeURIComponent(code)
                     + '&moId=' + encodeURIComponent(moId));
                 const payload = await res.json();
                 if (!res.ok || payload.success === false) throw new Error(payload.message || '加载失败');
@@ -281,7 +289,7 @@
             const comment = window.prompt('请输入' + actionText + '备注（可选）', '');
             if (comment === null) return;
             try {
-                const res = await fetch('../../api/mo/applications/select', {
+                const res = await fetch(apiUrl('/api/mo/applications/select'), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json;charset=UTF-8' },
                     body: JSON.stringify({

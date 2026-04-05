@@ -57,7 +57,9 @@ public final class RecruitmentCoursesDao {
         synchronized (FILE_LOCK) {
             JsonObject root = ensureJobBoardRoot();
 
-            JsonArray items = root.getAsJsonArray("items");
+            JsonArray items = root.has("items") && root.get("items").isJsonArray()
+                    ? root.getAsJsonArray("items")
+                    : new JsonArray();
             JsonArray normalizedItems = new JsonArray();
             for (JsonElement element : items) {
                 if (element != null && element.isJsonObject()) {
