@@ -175,6 +175,50 @@
     resize: vertical;
 }
 
+.ai-side-card-head-collapsible {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.ai-side-card-head-collapsible > div {
+    min-width: 0;
+    display: grid;
+    gap: 4px;
+}
+
+.ai-side-toggle {
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 12px;
+    line-height: 1;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.ai-side-toggle:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.ai-side-toggle[data-expanded="true"] {
+    background: rgba(100, 181, 246, 0.12);
+    border-color: rgba(100, 181, 246, 0.36);
+}
+
+.ai-session-history.is-collapsed .ai-session-item:nth-child(n + 3) {
+    display: none;
+}
+
+.ai-side-collapsible-panel.is-collapsed .ai-upload-filelist {
+    display: none;
+}
+
 .ta-modal-overlay {
     position: fixed;
     inset: 0;

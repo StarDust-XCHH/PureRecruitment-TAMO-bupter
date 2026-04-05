@@ -3,6 +3,7 @@
 
     const taApp = window.TAApp = window.TAApp || {};
     const modules = taApp.modules = taApp.modules || {};
+    const DEFAULT_HISTORY_VISIBLE_COUNT = 2;
 
     modules.aiAssistant = function initAiAssistantModule(app) {
         const state = app.state.aiAssistant = app.state.aiAssistant || {
@@ -21,15 +22,20 @@
                 defaultProvider: true
             },
             isSending: false,
-            activeResponseId: ''
+            activeResponseId: '',
+            historyExpanded: false,
+            attachmentPanelExpanded: false
         };
 
         const thread = document.getElementById('aiAssistantThread');
         const statusBadge = document.getElementById('aiAssistantStatusBadge');
         const pendingCount = document.getElementById('aiPendingAttachmentCount');
         const pendingList = document.getElementById('aiPendingAttachmentList');
+        const pendingPanel = document.getElementById('aiPendingAttachmentPanel');
+        const pendingToggle = document.getElementById('aiPendingAttachmentToggle');
         const historyCount = document.getElementById('aiConversationHistoryCount');
         const historyList = document.getElementById('aiAssistantSessionHistory');
+        const historyToggle = document.getElementById('aiConversationHistoryToggle');
         const composerInput = document.getElementById('aiAssistantComposerInput');
         const sendBtn = document.getElementById('aiAssistantSendBtn');
         const fileInput = document.getElementById('aiAssistantFileInput');
@@ -272,13 +278,66 @@
             }
         }
 
+        function setHistoryExpanded(expanded) {
+            state.historyExpanded = Boolean(expanded);
+            if (historyList) {
+                historyList.dataset.collapsed = state.historyExpanded ? 'false' : 'true';
+                historyList.classList.toggle('is-collapsed', !state.historyExpanded);
+            }
+            if (historyToggle) {
+                historyToggle.dataset.expanded = state.historyExpanded ? 'true' : 'false';
+                historyToggle.setAttribute('aria-expanded', state.historyExpanded ? 'true' : 'false');
+                historyToggle.textContent = state.historyExpanded ? '收起' : '展开';
+            }
+        }
+
+        function setAttachmentPanelExpanded(expanded) {
+            state.attachmentPanelExpanded = Boolean(expanded);
+            if (pendingPanel) {
+                pendingPanel.dataset.collapsed = state.attachmentPanelExpanded ? 'false' : 'true';
+                pendingPanel.classList.toggle('is-collapsed', !state.attachmentPanelExpanded);
+            }
+            if (pendingToggle) {
+                pendingToggle.dataset.expanded = state.attachmentPanelExpanded ? 'true' : 'false';
+                pendingToggle.setAttribute('aria-expanded', state.attachmentPanelExpanded ? 'true' : 'false');
+                pendingToggle.textContent = state.attachmentPanelExpanded ? '收起' : '展开';
+            }
+        }
+
+        function updateHistoryCollapseState() {
+            if (state.sessions.length <= DEFAULT_HISTORY_VISIBLE_COUNT) {
+                setHistoryExpanded(false);
+                if (historyToggle) {
+                    historyToggle.hidden = true;
+                }
+                return;
+            }
+            if (historyToggle) {
+                historyToggle.hidden = false;
+            }
+            setHistoryExpanded(state.historyExpanded);
+        }
+
+        function updateAttachmentCollapseState() {
+            const hasPendingAttachments = state.pendingAttachments.length > 0;
+            if (!hasPendingAttachments) {
+                setAttachmentPanelExpanded(false);
+            } else {
+                setAttachmentPanelExpanded(state.attachmentPanelExpanded);
+            }
+        }
+
         function renderPendingAttachments() {
             if (pendingCount) {
                 pendingCount.textContent = state.pendingAttachments.length + ' 份材料';
             }
-            if (!pendingList) return;
+            if (!pendingList) {
+                updateAttachmentCollapseState();
+                return;
+            }
             if (!state.pendingAttachments.length) {
                 pendingList.innerHTML = '<div class="ai-upload-file ai-upload-file-empty"><strong>暂无待发送附件</strong><span>你可以在这里上传文件，或从课程申请弹窗预载当前简历。</span></div>';
+                updateAttachmentCollapseState();
                 return;
             }
             pendingList.innerHTML = state.pendingAttachments.map((item) => {
@@ -288,6 +347,7 @@
                     '<span>' + escapeHtml(sourceLabel) + ' · ' + escapeHtml(formatFileSize(item.size)) + '</span>' +
                     '</div>';
             }).join('');
+            updateAttachmentCollapseState();
         }
 
         function getCurrentSession() {
@@ -317,9 +377,13 @@
             if (historyCount) {
                 historyCount.textContent = state.sessions.length + ' 条';
             }
-            if (!historyList) return;
+            if (!historyList) {
+                updateHistoryCollapseState();
+                return;
+            }
             if (!state.sessions.length) {
                 historyList.innerHTML = '<div class="ai-session-history-empty">暂无历史会话</div>';
+                updateHistoryCollapseState();
                 return;
             }
             historyList.innerHTML = state.sessions.map((session) => {
@@ -330,6 +394,7 @@
                     '<span class="ai-session-item-meta">' + escapeHtml(formatSessionTime(session?.updatedAt || session?.createdAt || '')) + '</span>' +
                     '</button>';
             }).join('');
+            updateHistoryCollapseState();
         }
 
         function normalizeMessage(message) {
@@ -371,6 +436,47 @@
             }
             ensureSessionMessages(session);
             return session;
+        }
+
+        function syncStateFromSession(session) {
+            if (!session) {
+                state.sessionId = '';
+                state.scene = 'general_chat';
+                state.title = 'AI 助理对话';
+                state.context = {};
+                return;
+            }
+            state.sessionId = String(session.sessionId || '').trim();
+            state.scene = String(session.scene || 'general_chat').trim() || 'general_chat';
+            state.title = String(session.title || 'AI 助理对话').trim() || 'AI 助理对话';
+            state.context = session.context && typeof session.context === 'object' ? { ...session.context } : {};
+        }
+
+        function openHistorySession(sessionId) {
+            const normalizedSessionId = String(sessionId || '').trim();
+            if (!normalizedSessionId) {
+                return;
+            }
+            const session = state.sessions.find((item) => String(item?.sessionId || '').trim() === normalizedSessionId);
+            if (!session) {
+                return;
+            }
+            syncStateFromSession(session);
+            state.activeResponseId = '';
+            state.isSending = false;
+            if (fileInput) {
+                fileInput.value = '';
+            }
+            if (composerHint) {
+                const preview = getSessionPreview(session);
+                composerHint.textContent = '已切换到历史会话：' + preview;
+            }
+            if (state.serviceStatus.available) {
+                setStatus('Ready');
+            }
+            renderSessionHistory();
+            renderThread();
+            applyServiceStatus(state.serviceStatus);
         }
 
         function renderMessageBubbleContent(message) {
@@ -426,6 +532,7 @@
             if (!state.sessionId && state.sessions.length) {
                 state.sessionId = String(state.sessions[0].sessionId || '').trim();
             }
+            syncStateFromSession(getCurrentSession());
             renderPendingAttachments();
             renderSessionHistory();
             renderThread();
@@ -469,6 +576,7 @@
             state.pendingAttachments = [];
             state.activeResponseId = '';
             state.isSending = false;
+            state.attachmentPanelExpanded = false;
             if (composerInput) {
                 composerInput.value = '';
             }
@@ -694,6 +802,7 @@
                     hydrateConversation(result.conversation);
                 }
                 state.pendingAttachments = [];
+                state.attachmentPanelExpanded = false;
                 if (fileInput) {
                     fileInput.value = '';
                 }
@@ -758,6 +867,7 @@
                 if (composerHint) {
                     composerHint.textContent = '课程申请简历已载入待发送附件，请确认消息后点击发送。';
                 }
+                state.attachmentPanelExpanded = true;
                 setStatus('Ready');
                 renderPendingAttachments();
             } catch (error) {
@@ -794,6 +904,7 @@
                 throw new Error(payload?.message || 'AI 附件载入失败');
             }
             state.pendingAttachments = Array.isArray(payload.data?.pendingAttachments) ? payload.data.pendingAttachments : state.pendingAttachments;
+            state.attachmentPanelExpanded = state.pendingAttachments.length > 0;
             if (payload.data?.serviceStatus) {
                 applyServiceStatus(payload.data.serviceStatus);
             }
@@ -823,6 +934,23 @@
                 console.error('[TA-AI] copy failed', error);
                 window.alert('复制失败，请手动选择内容后复制。');
             }
+        });
+
+        historyList?.addEventListener('click', (event) => {
+            const sessionButton = event.target.closest('[data-session-id]');
+            if (!sessionButton) {
+                return;
+            }
+            const sessionId = sessionButton.getAttribute('data-session-id') || '';
+            openHistorySession(sessionId);
+        });
+
+        historyToggle?.addEventListener('click', () => {
+            setHistoryExpanded(!state.historyExpanded);
+        });
+
+        pendingToggle?.addEventListener('click', () => {
+            setAttachmentPanelExpanded(!state.attachmentPanelExpanded);
         });
 
         chipButtons.forEach((button) => {
@@ -870,6 +998,8 @@
         app.openAiAssistantWithAttachment = preloadFromCourseApply;
         app.loadAiConversation = loadConversation;
 
+        setHistoryExpanded(state.historyExpanded);
+        setAttachmentPanelExpanded(state.attachmentPanelExpanded);
         applyServiceStatus(state.serviceStatus);
         loadConversation().catch((error) => {
             console.error('[TA-AI] initial load failed', error);
@@ -881,6 +1011,7 @@
                 defaultProvider: true
             });
             renderPendingAttachments();
+            renderSessionHistory();
             renderThread();
         });
     };
