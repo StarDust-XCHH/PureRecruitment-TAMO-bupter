@@ -17,10 +17,11 @@ import java.util.stream.Stream;
  * 用途：
  * 1. 清空 {@code applications.json}
  * 2. 清空 {@code application-events.json}
- * 3. 删除 {@code resume/} 目录下所有 TA 简历文件与子目录
+ * 3. 清空 {@code application-status.json}，以便同时移除该 TA 在本门课上的简历通过/拒绝状态
+ * 4. 删除 {@code resume/} 目录下所有 TA 简历文件与子目录
  * <p>
  * 运行方式（项目根目录）：
- * {@code mvn -q -DskipTests compile exec:java -Dexec.mainClass=tools.ta.TaSubmissionCleanupTool}
+ * {@code mvn -q -DskipTests compile exec:java -Dexec.mainClass=com.bupt.tarecruit.ta.util.TaSubmissionCleanupTool}
  */
 public final class TaSubmissionCleanupTool {
 
@@ -36,6 +37,12 @@ public final class TaSubmissionCleanupTool {
             + "  \"items\": []\n"
             + "}\n";
 
+    private static final String EMPTY_APPLICATION_STATUS_JSON = "{\n"
+            + "  \"schema\": \"ta-application-status.v1\",\n"
+            + "  \"version\": 1,\n"
+            + "  \"items\": []\n"
+            + "}\n";
+
     private TaSubmissionCleanupTool() {
     }
 
@@ -43,18 +50,21 @@ public final class TaSubmissionCleanupTool {
         Path taDir = DataMountPaths.taDir();
         Path applicationsPath = DataMountPaths.taApplications();
         Path applicationEventsPath = DataMountPaths.taApplicationEvents();
+        Path applicationStatusPath = DataMountPaths.taApplicationStatus();
         Path resumeRoot = DataMountPaths.taResumeRoot();
 
         Files.createDirectories(taDir);
 
         writeJsonFile(applicationsPath, EMPTY_APPLICATIONS_JSON);
         writeJsonFile(applicationEventsPath, EMPTY_APPLICATION_EVENTS_JSON);
+        writeJsonFile(applicationStatusPath, EMPTY_APPLICATION_STATUS_JSON);
         deleteDirectoryContents(resumeRoot);
         Files.createDirectories(resumeRoot);
 
         System.out.println("[TA-CLEANUP] 清理完成");
         System.out.println("[TA-CLEANUP] applications = " + applicationsPath.toAbsolutePath());
         System.out.println("[TA-CLEANUP] application-events = " + applicationEventsPath.toAbsolutePath());
+        System.out.println("[TA-CLEANUP] application-status = " + applicationStatusPath.toAbsolutePath());
         System.out.println("[TA-CLEANUP] resume-root = " + resumeRoot.toAbsolutePath());
     }
 
