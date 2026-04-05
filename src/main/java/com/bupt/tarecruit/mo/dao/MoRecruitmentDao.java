@@ -27,6 +27,7 @@ import java.util.UUID;
 import com.bupt.tarecruit.mo.service.MoTaApplicationReadService;
 
 import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.firstNonBlank;
+import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.getAsInt;
 import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.getAsString;
 import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.getOptionalInt;
 import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.trim;
@@ -269,6 +270,19 @@ public class MoRecruitmentDao {
                 : "";
         Integer studentCount = getOptionalInt(input, "studentCount");
         int normalizedStudentCount = studentCount == null ? -1 : studentCount;
+
+        if (input.has("taRecruitCount")) {
+            Integer requestedTaRecruit = getOptionalInt(input, "taRecruitCount");
+            if (requestedTaRecruit != null) {
+                JsonObject currentJob = RecruitmentCoursesDao.findNormalizedJobByCourseCode(courseCode);
+                int recruitedFromJson = currentJob == null ? 0 : getAsInt(currentJob, "recruitedCount", 0);
+                TaDerivedCourseApplicationStats derived = computeTaDerivedCourseApplicationStats(courseCode);
+                int floor = Math.max(derived.accepted, recruitedFromJson);
+                if (requestedTaRecruit < floor) {
+                    throw new IllegalArgumentException("TA 招聘人数不能少于已录用人数（当前下限为 " + floor + "）");
+                }
+            }
+        }
 
         JsonObject patch = new JsonObject();
         patch.addProperty("courseName", courseName);
@@ -593,10 +607,9 @@ public class MoRecruitmentDao {
     }
 
     /**
-     * 从 TA {@code applications.json} 与 {@code application-status.json} 重算该课程的投递统计，
-     * 并写回 {@code recruitment-courses.json}（与 {@link #getApplicantsForCourse} 的合并规则一致，非简单 +1）。
+     * 与 {@link #syncRecruitmentCourseApplicationStatsFromTa} 相同的 TA + application-status 合并规则下推导出的统计（不写入课程 JSON）。
      */
-    private void syncRecruitmentCourseApplicationStatsFromTa(String normalizedCourseCode) throws IOException {
+    private TaDerivedCourseApplicationStats computeTaDerivedCourseApplicationStats(String normalizedCourseCode) throws IOException {
         MoTaApplicationReadService readService = new MoTaApplicationReadService();
         JsonObject appStatusRoot = ensureStructuredFile(TA_APPLICATION_STATUS, TA_ENTITY_APPLICATION_STATUS);
         JsonArray moStatusItems = appStatusRoot.getAsJsonArray("items");
@@ -632,20 +645,74 @@ public class MoRecruitmentDao {
             }
         }
 
-        int pending = Math.max(0, total - accepted - rejected);
+        return new TaDerivedCourseApplicationStats(total, accepted, rejected, maxSubmitted, maxSelection);
+    }
+
+    /**
+     * 从 TA {@code applications.json} 与 {@code application-status.json} 重算该课程的投递统计，
+     * 并写回 {@code recruitment-courses.json}（与 {@link #getApplicantsForCourse} 的合并规则一致，非简单 +1）。
+     */
+    private void syncRecruitmentCourseApplicationStatsFromTa(String normalizedCourseCode) throws IOException {
+        TaDerivedCourseApplicationStats s = computeTaDerivedCourseApplicationStats(normalizedCourseCode);
+        int pending = Math.max(0, s.total - s.accepted - s.rejected);
         String now = Instant.now().toString();
         boolean ok = RecruitmentCoursesDao.syncPublishedJobApplicationStatsByCourseCode(
                 normalizedCourseCode,
-                total,
+                s.total,
                 pending,
-                accepted,
-                rejected,
-                accepted,
-                maxSubmitted,
-                maxSelection,
+                s.accepted,
+                s.rejected,
+                s.accepted,
+                s.maxSubmitted,
+                s.maxSelection,
                 now);
         if (!ok) {
             throw new IllegalStateException("课程统计同步失败：未找到 courseCode 对应岗位");
+        }
+    }
+
+    /**
+     * 对岗位板中每一门课程按 TA 投递与 {@code application-status.json} 重算并写回
+     * {@code recruitment-courses.json} 的申请统计（{@link RecruitmentCoursesDao#syncPublishedJobApplicationStatsByCourseCode}）。
+     * 双端清理等维护工具在清空 TA 数据后应调用此方法，由 DAO 写盘，不要直接改写课程 JSON。
+     */
+    public synchronized void syncAllPublishedJobApplicationStatsFromTa() throws IOException {
+        JsonObject board = RecruitmentCoursesDao.readJobBoard();
+        JsonArray items = board.getAsJsonArray("items");
+        for (JsonElement el : items) {
+            if (el == null || !el.isJsonObject()) {
+                continue;
+            }
+            String cc = trim(getAsString(el.getAsJsonObject(), "courseCode"));
+            if (cc.isEmpty()) {
+                continue;
+            }
+            syncRecruitmentCourseApplicationStatsFromTa(cc);
+        }
+    }
+
+    /**
+     * 单门课程下，按 {@link #computeTaDerivedCourseApplicationStats} 与 {@link #getApplicantsForCourse} 相同合并规则
+     * 从 TA {@code applications.json} + {@code application-status.json} 推导出的聚合结果；用于写回课程 JSON 或校验招聘人数下限。
+     */
+    private static final class TaDerivedCourseApplicationStats {
+        /** 有效（active）投递条数，对应课程 JSON 的 {@code applicationsTotal}。 */
+        final int total;
+        /** 展示状态为已录用的人数，与 {@code recruitedCount} / {@code applicationsAccepted} 对齐。 */
+        final int accepted;
+        /** 展示状态为未录用/拒绝的人数，对应 {@code applicationsRejected}。 */
+        final int rejected;
+        /** 上述投递中最大的 {@code submittedAt}（ISO 字符串比较），用于 {@code lastApplicationAt}；无则空串。 */
+        final String maxSubmitted;
+        /** 已录用路径上 MO 行或申请上较新的 {@code updatedAt}，用于 {@code lastSelectionAt}；无则空串。 */
+        final String maxSelection;
+
+        private TaDerivedCourseApplicationStats(int total, int accepted, int rejected, String maxSubmitted, String maxSelection) {
+            this.total = total;
+            this.accepted = accepted;
+            this.rejected = rejected;
+            this.maxSubmitted = maxSubmitted;
+            this.maxSelection = maxSelection;
         }
     }
 

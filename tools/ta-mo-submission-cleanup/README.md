@@ -6,7 +6,8 @@
 
 - 复用 **`TaSubmissionCleanupTool.main`**、**`TaAiDataCleanupTool.main`**
 - 重置 **`mo-application-read-state.json`**、**`mo-application-comments.json`** 为空 `items`
-- **不清理**：`recruitment-courses.json`、账号类 JSON
+- 流程结束后调用 **`MoRecruitmentDao.syncAllPublishedJobApplicationStatsFromTa()`**，按当前 TA 投递与 **`application-status.json`** 重算并写回 **`recruitment-courses.json`** 中的申请/已录用等统计字段（本工具**不直接改写**课程 JSON）
+- **不删除**岗位条目：不清理 `recruitment-courses.json` 里的课程行本身；**不清理**账号类 JSON
 
 ## 运行（仓库根目录）
 

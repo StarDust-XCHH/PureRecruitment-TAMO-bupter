@@ -1,6 +1,7 @@
 package com.bupt.tarecruit.tools;
 
 import com.bupt.tarecruit.common.config.DataMountPaths;
+import com.bupt.tarecruit.mo.dao.MoRecruitmentDao;
 import com.bupt.tarecruit.ta.util.TaAiDataCleanupTool;
 import com.bupt.tarecruit.ta.util.TaSubmissionCleanupTool;
 
@@ -20,8 +21,10 @@ import java.time.Instant;
  * {@code mo-application-comments.json} 仍引用已不存在的 {@code applicationId}，导致未读红点、评论等残留；
  * 本工具在<strong>不修改</strong>既有 {@link TaSubmissionCleanupTool} / {@link TaAiDataCleanupTool} 源码的前提下，
  * 通过调用其 {@code main} 并重写 MO 两个文件，使双端与「零申请」状态一致。
+ * 清理结束后会调用 {@link MoRecruitmentDao#syncAllPublishedJobApplicationStatsFromTa()}，按当前 TA 数据重算并写回
+ * {@code recruitment-courses.json} 中的申请/已录用统计；本工具<strong>不直接改写</strong>课程 JSON。
  * <p>
- * <strong>不清理</strong>：{@code recruitment-courses.json}、MO/TA 账号与 profile（{@code mos.json}、{@code tas.json} 等）。
+ * <strong>不清理</strong>：课程岗位条目本身（仅刷新统计字段）、MO/TA 账号与 profile（{@code mos.json}、{@code tas.json} 等）。
  * <p>
  * 命令行参数（可选）：
  * <ul>
@@ -190,6 +193,9 @@ public final class DevApplicationDataCleanupTool {
             System.out.println("[DUAL-CLEANUP] --- MO：已读状态 + 申请评论 ---");
             resetMoApplicationSidecarFiles();
         }
+
+        System.out.println("[DUAL-CLEANUP] --- 课程岗位：MoRecruitmentDao 按 TA 数据同步申请/已录用统计 ---");
+        new MoRecruitmentDao().syncAllPublishedJobApplicationStatsFromTa();
 
         System.out.println("[DUAL-CLEANUP] 完成。");
     }
