@@ -20,6 +20,9 @@
             details: {},
             appliedCourseCodes: []
         };
+        const STATUS_SCROLL_OFFSET = 20;
+        let highlightResetTimer = null;
+        let hasAutoLoaded = false;
 
         function escapeHtml(value) {
             const str = value == null ? '' : String(value);
@@ -209,7 +212,7 @@
                 const resumeActionHtml = buildResumeActionHtml(item);
 
                 return ''
-                    + '<div class="timeline-item' + (index === 0 ? ' open' : '') + '" data-status="' + escapeHtml(item.statusTone) + '" data-application-id="' + escapeHtml(item.applicationId) + '">'
+                    + '<div class="timeline-item' + (index === 0 ? ' open' : '') + '" data-status="' + escapeHtml(item.statusTone) + '" data-application-id="' + escapeHtml(item.applicationId) + '" data-course-code="' + escapeHtml(item.courseCode) + '">'
                     + '  <div class="timeline-node ' + escapeHtml(item.statusTone) + '"></div>'
                     + '  <strong>' + escapeHtml(item.courseName) + '</strong>'
                     + '  <div class="timeline-meta">' + escapeHtml(item.status) + ' · ' + escapeHtml(item.updatedAt || '--') + '</div>'
@@ -223,6 +226,52 @@
                     + '  </div>'
                     + '</div>';
             }).join('');
+        }
+
+        function findTimelineItem(focus) {
+            if (!timeline || !focus) return null;
+            const applicationId = safeText(focus.applicationId);
+            if (applicationId) {
+                const byApplicationId = timeline.querySelector('[data-application-id="' + applicationId + '"]');
+                if (byApplicationId) return byApplicationId;
+            }
+
+            const courseCode = safeText(focus.courseCode).toUpperCase();
+            if (!courseCode) return null;
+            return Array.from(timeline.querySelectorAll('.timeline-item')).find((item) => {
+                return safeText(item.dataset.courseCode).toUpperCase() === courseCode;
+            }) || null;
+        }
+
+        function focusTimelineItem(focus) {
+            if (!focus || !timeline) return false;
+            const targetItem = findTimelineItem(focus);
+            if (!targetItem) return false;
+
+            if (highlightResetTimer) {
+                window.clearTimeout(highlightResetTimer);
+                highlightResetTimer = null;
+            }
+
+            timeline.querySelectorAll('.timeline-item.is-submission-focus').forEach((item) => {
+                item.classList.remove('is-submission-focus');
+                item.style.removeProperty('--submission-pulse-count');
+            });
+
+            targetItem.classList.add('open');
+            targetItem.classList.add('is-submission-focus');
+            targetItem.style.setProperty('--submission-pulse-count', String(Math.max(1, Number(focus.pulseCount || 3))));
+
+            const rect = targetItem.getBoundingClientRect();
+            const targetTop = Math.max(0, window.scrollY + rect.top - STATUS_SCROLL_OFFSET);
+            window.scrollTo({ top: targetTop, behavior: 'smooth' });
+
+            highlightResetTimer = window.setTimeout(() => {
+                targetItem.classList.remove('is-submission-focus');
+                targetItem.style.removeProperty('--submission-pulse-count');
+                highlightResetTimer = null;
+            }, 3600);
+            return true;
         }
 
         function bindTimelineToggle(scope) {
@@ -254,7 +303,7 @@
             });
         }
 
-        async function loadStatusData() {
+        async function loadStatusData(options) {
             if (!route || state.loading) return;
             state.loading = true;
             state.taId = resolveTaId();
@@ -284,14 +333,22 @@
                 renderNotifications(items, payload.notifications || payload.messages);
                 bindTimelineToggle(route);
                 bindSidePanelToggle(route);
+                const shouldConsumeFocus = options?.consumeFocus !== false;
+                const focus = shouldConsumeFocus && typeof app.consumeStatusFocus === 'function'
+                    ? app.consumeStatusFocus()
+                    : null;
+                const focused = focusTimelineItem(focus);
 
                 if (!items.length) {
                     if (emptyState) emptyState.hidden = false;
                     setStatusMessage('当前还没有申请记录，可前往职位大厅投递岗位。', 'muted');
                 } else {
                     if (emptyState) emptyState.hidden = true;
-                    setStatusMessage('已同步 ' + items.length + ' 条申请状态。', 'success');
+                    setStatusMessage(focused
+                        ? '已同步 ' + items.length + ' 条申请状态，并已定位到最新申请。'
+                        : '已同步 ' + items.length + ' 条申请状态。', 'success');
                 }
+                hasAutoLoaded = true;
             } catch (error) {
                 console.error('[TA-STATUS] load failed', error);
                 renderTimeline([]);
@@ -309,7 +366,16 @@
             }
         }
 
-        refreshButton?.addEventListener('click', loadStatusData);
+        refreshButton?.addEventListener('click', () => loadStatusData({ consumeFocus: true }));
+
+        if (!hasAutoLoaded) {
+            window.setTimeout(() => {
+                loadStatusData({ consumeFocus: true });
+            }, 0);
+        }
+
+        app.loadStatusData = loadStatusData;
+        app.refreshStatusData = loadStatusData;
 
         return {
             load: loadStatusData,

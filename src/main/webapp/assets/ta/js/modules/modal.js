@@ -91,19 +91,58 @@
             logModalState('close');
         }
 
-        function openModal(target) {
+        function dismissModalStack() {
+            if (!modalOverlay) return;
+            const overlayClickEvent = new MouseEvent('click', {
+                bubbles: true,
+                cancelable: true,
+                view: window
+            });
+            modalOverlay.dispatchEvent(overlayClickEvent);
+            if (modalOverlay.classList.contains('show')) {
+                closeAllModals();
+            }
+        }
+
+        function closeModal(target) {
+            if (!modalOverlay) return;
+            const safeTarget = String(target || '').trim();
+            if (!safeTarget) {
+                closeAllModals();
+                return;
+            }
+            const panel = modalPanels.find((item) => item.dataset.modal === safeTarget);
+            if (!panel) {
+                closeAllModals();
+                return;
+            }
+            panel.classList.remove('active');
+            const hasActivePanel = modalPanels.some((item) => item.classList.contains('active'));
+            if (!hasActivePanel) {
+                closeAllModals();
+                return;
+            }
+            app.state.modal.currentModal = modalPanels.find((item) => item.classList.contains('active'))?.dataset.modal || null;
+            userTrigger?.setAttribute('aria-expanded', app.state.modal.currentModal === 'settings' ? 'true' : 'false');
+            logModalState('close-one', { target: safeTarget, currentModal: app.state.modal.currentModal });
+        }
+
+        function openModal(target, options) {
             if (!modalOverlay) return;
             const panel = modalPanels.find((item) => item.dataset.modal === target);
             if (!panel) return;
             const appRoot = getAppRoot();
+            const keepStack = !!options?.keepStack;
             modalOverlay.classList.add('show');
-            modalPanels.forEach((item) => item.classList.remove('active'));
+            if (!keepStack) {
+                modalPanels.forEach((item) => item.classList.remove('active'));
+            }
             panel.classList.add('active');
             modalOverlay.setAttribute('aria-hidden', 'false');
             appRoot?.classList.add('modal-open');
             app.state.modal.currentModal = target;
             userTrigger?.setAttribute('aria-expanded', target === 'settings' ? 'true' : 'false');
-            logModalState('open', { target });
+            logModalState('open', { target, keepStack });
         }
 
         statCards.forEach((card) => {
@@ -146,7 +185,9 @@
         if (modalOverlay) logModalState('init');
 
         app.openModal = openModal;
+        app.closeModal = closeModal;
         app.closeAllModals = closeAllModals;
+        app.dismissModalStack = dismissModalStack;
         app.logModalState = logModalState;
         app.logGlobalMaskState = logGlobalMaskState;
     };

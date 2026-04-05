@@ -15,6 +15,7 @@
         const JOBS_SCROLL_OFFSET = 24;
         const TA_WORK_CONTENT_FALLBACK = '待确定';
         const RECRUITMENT_STATUS_FALLBACK = '待确定';
+        const STATUS_ROUTE_KEY = 'status';
 
         let courseJobCards = [];
         let courseDetailState = {};
@@ -333,6 +334,47 @@
             return name.endsWith('.pdf') || name.endsWith('.doc') || name.endsWith('.docx');
         }
 
+        function openStatusRoute(afterNavigate) {
+            if (typeof app.navigateToRoute === 'function') {
+                app.navigateToRoute(STATUS_ROUTE_KEY, {
+                    smooth: true,
+                    afterNavigate: afterNavigate
+                });
+                return;
+            }
+
+            const statusNav = document.querySelector('.nav-item[data-route="' + STATUS_ROUTE_KEY + '"]');
+            if (statusNav) {
+                statusNav.click();
+                if (typeof afterNavigate === 'function') {
+                    window.setTimeout(() => afterNavigate(document.getElementById('route-' + STATUS_ROUTE_KEY)), 380);
+                }
+                return;
+            }
+
+            const statusRoute = document.getElementById('route-status');
+            if (statusRoute) {
+                document.querySelectorAll('.route').forEach((routeElement) => {
+                    routeElement.classList.toggle('active', routeElement === statusRoute);
+                });
+                statusRoute.classList.add('active');
+                statusRoute.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                if (typeof afterNavigate === 'function') {
+                    window.setTimeout(() => afterNavigate(statusRoute), 380);
+                }
+            }
+        }
+
+        function focusSubmittedApplication(result, courseCode) {
+            if (typeof app.setStatusFocus !== 'function') return;
+            app.setStatusFocus({
+                courseCode: courseCode,
+                applicationId: result?.applicationId || result?.id || '',
+                pulseCount: 3,
+                source: 'resume-submit'
+            });
+        }
+
         async function submitCourseApplication(courseCode, selectedFile) {
             const taId = getCurrentTaId();
             if (!taId) throw new Error('当前未获取到 TA 身份，请重新登录后再试。');
@@ -512,7 +554,7 @@
             const course = courseDetailState[courseCode];
             if (!course || isAppliedCourse(courseCode)) return;
             syncApplyModal(course);
-            if (typeof app.openModal === 'function') app.openModal('course-apply');
+            if (typeof app.openModal === 'function') app.openModal('course-apply', { keepStack: true });
         });
 
         const jobResumeFileInput = document.getElementById('jobResumeFileInput');
@@ -570,11 +612,25 @@
                 if (typeof app.setAppliedCourseCodes === 'function') {
                     app.setAppliedCourseCodes(getAppliedCourseCodes().concat([courseCode]));
                 }
-                if (typeof app.loadStatusData === 'function') {
-                    app.loadStatusData();
-                } else {
-                    fetchAndRefreshJobs();
+                focusSubmittedApplication(result, courseCode);
+                if (typeof app.dismissModalStack === 'function') {
+                    app.dismissModalStack();
+                } else if (typeof app.closeAllModals === 'function') {
+                    app.closeAllModals();
+                } else if (typeof app.closeModal === 'function') {
+                    app.closeModal('course-apply');
+                    app.closeModal('course-detail');
                 }
+                if (typeof app.loadStatusData === 'function') {
+                    openStatusRoute(() => {
+                        window.setTimeout(() => {
+                            app.loadStatusData({ consumeFocus: true });
+                        }, 80);
+                    });
+                } else {
+                    openStatusRoute();
+                }
+                fetchAndRefreshJobs();
                 console.log('[TA-APPLICATION] submit success', result);
             } catch (error) {
                 console.error('[TA-APPLICATION] submit failed', error);
