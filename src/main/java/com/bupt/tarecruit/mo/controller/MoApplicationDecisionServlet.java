@@ -34,8 +34,11 @@ public class MoApplicationDecisionServlet extends HttpServlet {
             String comment = body.has("comment") && !body.get("comment").isJsonNull()
                     ? body.get("comment").getAsString()
                     : "";
+            String moId = body.has("moId") && !body.get("moId").isJsonNull()
+                    ? body.get("moId").getAsString().trim()
+                    : "";
 
-            JsonObject payload = recruitmentDao.decideApplication(courseCode, taId, decision, comment);
+            JsonObject payload = recruitmentDao.decideApplication(courseCode, taId, moId, decision, comment);
             writeJson(resp, 200, payload);
         } catch (IllegalArgumentException ex) {
             writeJson(resp, 400, gson.toJsonTree(ApiResponse.failure(ex.getMessage())).getAsJsonObject());

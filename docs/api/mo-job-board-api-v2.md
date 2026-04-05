@@ -489,3 +489,8 @@ This section describes **who should own lifecycle semantics** (long-term target)
 - Prefer event-driven updates for counters and timestamps once workflow code exists.  
   流程代码就绪后，计数与时间戳建议事件驱动更新。
 
+---
+
+## 10. Related: applicant & selection HTTP APIs / 相关：申请人与筛选接口
+
+岗位发布与列表由本文档覆盖；**按课程查看投递、详情、已读、评论、简历下载、录用/拒绝**等 MO 侧 HTTP 行为与数据文件路径见 **[`docs/backend/mo-ta-interaction-log.md`](../backend/mo-ta-interaction-log.md)**（与 `ownerMoId` / `moId` 校验一致）。

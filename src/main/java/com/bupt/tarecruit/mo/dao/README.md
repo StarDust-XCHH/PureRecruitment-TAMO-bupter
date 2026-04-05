@@ -1,4 +1,3 @@
-
 # MO Data Access Objects (`com.bupt.tarecruit.mo.dao`)
 
 File-backed DAO classes for MO module, handling both recruitment flows and user authentication.
@@ -8,8 +7,8 @@ File-backed DAO classes for MO module, handling both recruitment flows and user 
 ### `MoRecruitmentDao`
 Manages MO recruitment operations:
 - **Job board file** (`recruitment-courses.json`) via `RecruitmentCoursesDao`
-- **TA applicant data** from `taApplicationStatus()`, `taProfiles()`, `taAccounts()`
-- Methods: `getPendingCourses()`, `createCourse()`, `getApplicantsForCourse()`, `decideApplication()`
+- **Applicant list & decisions**: reads TA `applications.json` through `MoTaApplicationReadService`, merges `application-status.json`, enforces **`ownerMoId` === `moId`** for course-scoped APIs
+- Methods (non-exhaustive): `getPendingCourses()`, `createCourse()`, `getApplicantsForCourse(courseCode, moId)`, `assertMoOwnsCourse()`, `markApplicationReadByMo()`, `getApplicantDetail()`, `addApplicationComment()`, `countUnreadApplicantsForMo()`, `decideApplication(...)` (4-arg resolves `moId` from job; 5-arg for explicit `moId`)
 
 ### `MoAccountDao`
 Manages MO user authentication and profile operations:
@@ -18,10 +17,22 @@ Manages MO user authentication and profile operations:
 - **Settings file** (`settings.json`) - System preferences
 - Methods: `login()`, `register()`, and internal helpers
 
+### `MoApplicationReadStateDao`
+- File: `mountDataTAMObupter/mo/mo-application-read-state.json`
+- Tracks MO “read” state per `(moId, applicationId)` for unread badges vs `applications.json` `updatedAt`
+
+### `MoApplicationCommentsDao`
+- File: `mountDataTAMObupter/mo/mo-application-comments.json`
+- Append/list MO comments per `applicationId` (MO-only storage)
+
+### `MoTaApplicationsMutationDao`
+- Controlled writes to TA `applications.json` (e.g. set `UNDER_REVIEW` when MO marks an application read)
+- Does not modify TA module Java code; used from MO servlets/DAO only
+
 ## Thread Safety
 
-All write methods in `MoAccountDao` use `synchronized` keyword to prevent concurrent modification issues.
+`synchronized` is used on DAO methods that mutate shared JSON files (`MoAccountDao`, `MoRecruitmentDao`, and the smaller MO DAOs above) to reduce concurrent write corruption risk.
 
 ## Data Location
 
-MO data files are stored under `mountDataTAMObupter/mo/` directory, configured via `DataMountPaths.moDir()`.
+MO data files are stored under `mountDataTAMObupter/mo/` directory, configured via `DataMountPaths.moDir()`. TA files touched in workflows live under `mountDataTAMObupter/ta/` (`applications.json`, `application-status.json`, …).
