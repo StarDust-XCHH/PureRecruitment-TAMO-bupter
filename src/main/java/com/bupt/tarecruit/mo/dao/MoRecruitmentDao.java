@@ -593,6 +593,63 @@ public class MoRecruitmentDao {
     }
 
     /**
+     * 从 TA {@code applications.json} 与 {@code application-status.json} 重算该课程的投递统计，
+     * 并写回 {@code recruitment-courses.json}（与 {@link #getApplicantsForCourse} 的合并规则一致，非简单 +1）。
+     */
+    private void syncRecruitmentCourseApplicationStatsFromTa(String normalizedCourseCode) throws IOException {
+        MoTaApplicationReadService readService = new MoTaApplicationReadService();
+        JsonObject appStatusRoot = ensureStructuredFile(TA_APPLICATION_STATUS, TA_ENTITY_APPLICATION_STATUS);
+        JsonArray moStatusItems = appStatusRoot.getAsJsonArray("items");
+        String targetSlug = normalizeSlug(normalizedCourseCode);
+        List<MoTaApplicationReadService.TaApplicationRecord> applications =
+                readService.getApplicationsByCourseCode(normalizedCourseCode);
+
+        int total = 0;
+        int accepted = 0;
+        int rejected = 0;
+        String maxSubmitted = "";
+        String maxSelection = "";
+
+        for (MoTaApplicationReadService.TaApplicationRecord rec : applications) {
+            if (!rec.active()) {
+                continue;
+            }
+            total++;
+            JsonObject moRow = findLatestApplicationForCourse(moStatusItems, rec.taId(), normalizedCourseCode, targetSlug);
+            String displayStatus = resolveApplicantDisplayStatus(rec, moRow);
+            if (isAcceptedDecisionText(displayStatus)) {
+                accepted++;
+                String decisionAt = firstNonBlank(moRow != null ? getAsString(moRow, "updatedAt") : "", rec.updatedAt());
+                if (decisionAt.compareTo(maxSelection) > 0) {
+                    maxSelection = decisionAt;
+                }
+            } else if (isRejectedDecisionText(displayStatus)) {
+                rejected++;
+            }
+            String submitted = trim(rec.submittedAt());
+            if (!submitted.isEmpty() && submitted.compareTo(maxSubmitted) > 0) {
+                maxSubmitted = submitted;
+            }
+        }
+
+        int pending = Math.max(0, total - accepted - rejected);
+        String now = Instant.now().toString();
+        boolean ok = RecruitmentCoursesDao.syncPublishedJobApplicationStatsByCourseCode(
+                normalizedCourseCode,
+                total,
+                pending,
+                accepted,
+                rejected,
+                accepted,
+                maxSubmitted,
+                maxSelection,
+                now);
+        if (!ok) {
+            throw new IllegalStateException("课程统计同步失败：未找到 courseCode 对应岗位");
+        }
+    }
+
+    /**
      * 兼容旧调用方：从岗位 {@code ownerMoId} 推导 {@code moId}（仅适用于本地脚本等场景；HTTP 接口应显式传 moId）。
      */
     public synchronized JsonObject decideApplication(String courseCode, String taId, String decision, String comment) throws IOException {
@@ -686,6 +743,8 @@ public class MoRecruitmentDao {
 
         updateMeta(appRoot, TA_SCHEMA, TA_ENTITY_APPLICATION_STATUS, "1.0");
         writeJson(TA_APPLICATION_STATUS, appRoot);
+
+        syncRecruitmentCourseApplicationStatsFromTa(normalizedCourseCode);
 
         JsonObject payload = new JsonObject();
         payload.addProperty("success", true);
