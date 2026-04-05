@@ -328,6 +328,7 @@ public class MoRecruitmentDao {
         if (!RecruitmentCoursesDao.mergePublishedJobContentByCourseCode(courseCode, patch)) {
             throw new IllegalArgumentException("课程不存在");
         }
+        new MoTaApplicationsMutationDao().refreshCourseSnapshotsForCourseCode(courseCode);
         JsonObject item = RecruitmentCoursesDao.findNormalizedJobByCourseCode(courseCode);
         JsonObject result = new JsonObject();
         result.addProperty("success", true);
@@ -352,6 +353,8 @@ public class MoRecruitmentDao {
             throw new IllegalArgumentException("缺少 moId");
         }
         assertMoOwnsCourseResolved(normalizedMoId, normalizedCourseCode);
+
+        syncRecruitmentCourseApplicationStatsFromTa(normalizedCourseCode);
 
         MoTaApplicationReadService readService = new MoTaApplicationReadService();
         JsonObject appStatusRoot = ensureStructuredFile(TA_APPLICATION_STATUS, TA_ENTITY_APPLICATION_STATUS);
@@ -688,6 +691,17 @@ public class MoRecruitmentDao {
             }
             syncRecruitmentCourseApplicationStatsFromTa(cc);
         }
+    }
+
+    /**
+     * 按当前 TA 数据重算并写回单门课程的申请统计（投递成功、MO 拉取应聘列表等触发）。
+     */
+    public synchronized void syncPublishedJobApplicationStatsForCourse(String courseCode) throws IOException {
+        String cc = trim(courseCode);
+        if (cc.isEmpty()) {
+            return;
+        }
+        syncRecruitmentCourseApplicationStatsFromTa(cc);
     }
 
     /**

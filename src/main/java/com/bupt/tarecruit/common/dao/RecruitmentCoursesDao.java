@@ -564,6 +564,36 @@ public final class RecruitmentCoursesDao {
         return "";
     }
 
+    /**
+     * TA 申请中 {@code courseSnapshot} 的字段集合，与 {@link com.bupt.tarecruit.ta.dao.TaAccountDao} 投递写入保持一致；
+     * {@code normalizedJob} 宜为 {@link #normalizeJobItem(JsonObject)} 的结果或等价岗位 JSON。
+     */
+    public static JsonObject taFacingCourseSnapshotFromNormalizedJob(JsonObject normalizedJob) {
+        JsonObject snapshot = new JsonObject();
+        if (normalizedJob == null) {
+            return snapshot;
+        }
+        snapshot.addProperty("courseCode", getAsString(normalizedJob, "courseCode"));
+        snapshot.addProperty("courseName", getAsString(normalizedJob, "courseName"));
+        snapshot.addProperty("ownerMoName", getAsString(normalizedJob, "ownerMoName"));
+        snapshot.addProperty("semester", getAsString(normalizedJob, "semester"));
+        snapshot.addProperty("campus", getAsString(normalizedJob, "campus"));
+        snapshot.addProperty("studentCount", snapshotStudentCountTextForTa(normalizedJob));
+        return snapshot;
+    }
+
+    private static String snapshotStudentCountTextForTa(JsonObject job) {
+        if (job == null || !job.has("studentCount") || job.get("studentCount").isJsonNull()) {
+            return "";
+        }
+        JsonElement e = job.get("studentCount");
+        if (e.isJsonPrimitive() && e.getAsJsonPrimitive().isNumber()) {
+            int v = getAsInt(job, "studentCount", -1);
+            return v < 0 ? "" : String.valueOf(v);
+        }
+        return getAsString(job, "studentCount");
+    }
+
     public static JsonObject normalizeJobItem(JsonObject source) {
         JsonObject item = source.deepCopy();
         String legacyMoName = trim(getAsString(item, "moName"));

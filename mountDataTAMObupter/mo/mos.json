@@ -3,7 +3,7 @@
     "schema": "mo",
     "entity": "mos",
     "version": "1.0",
-    "updatedAt": "2026-04-05T20:16:23.962635700Z"
+    "updatedAt": "2026-04-05T22:41:21.306895100Z"
   },
   "items": [
     {
@@ -49,11 +49,11 @@
       "department": "",
       "status": "active",
       "createdAt": "2026-04-05T15:46:28.695396100Z",
-      "updatedAt": "2026-04-05T20:16:23.961056400Z",
+      "updatedAt": "2026-04-05T22:41:21.306385100Z",
       "auth": {
         "passwordHash": "f842d3a01818414c004424c54a0d975c5e03cb04b8d9473bd4b6e083f24ae14f",
         "passwordSalt": "40741f1d-7ef8-43d7-9af7-4824b1efb107",
-        "lastLoginAt": "2026-04-05T20:16:23.961056400Z",
+        "lastLoginAt": "2026-04-05T22:41:21.306385100Z",
         "failedAttempts": 0
       }
     }

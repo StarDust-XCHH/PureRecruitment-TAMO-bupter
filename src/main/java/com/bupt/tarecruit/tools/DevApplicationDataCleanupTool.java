@@ -197,7 +197,8 @@ public final class DevApplicationDataCleanupTool {
         System.out.println("[DUAL-CLEANUP] --- 课程岗位：MoRecruitmentDao 按 TA 数据同步申请/已录用统计 ---");
         new MoRecruitmentDao().syncAllPublishedJobApplicationStatsFromTa();
 
-        System.out.println("[DUAL-CLEANUP] 完成。");
+        System.out.println("[DUAL-CLEANUP] 清理完成。");
+        System.out.println("[DUAL-CLEANUP] 提示：如有课程修改操作，请运行 \"tools/genMoCourses.py\"，选择 import 模式（mode2），将 \"recruitment-courses.json\" 从 Excel 文档复原。");
     }
 
     private record Mode(boolean moOnly, boolean taOnly, boolean skipAi) {
