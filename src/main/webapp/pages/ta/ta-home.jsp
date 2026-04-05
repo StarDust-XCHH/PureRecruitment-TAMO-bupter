@@ -42,6 +42,7 @@
 <script src="${pageContext.request.contextPath}/assets/ta/js/modules/profile.js"></script>
 <script src="${pageContext.request.contextPath}/assets/ta/js/modules/password.js"></script>
 <script src="${pageContext.request.contextPath}/assets/ta/js/modules/job-board.js"></script>
+<script src="${pageContext.request.contextPath}/assets/ta/js/modules/ai-assistant.js"></script>
 <script src="${pageContext.request.contextPath}/assets/ta/js/modules/dashboard-cards.js"></script>
 <script src="${pageContext.request.contextPath}/assets/ta/js/modules/status.js"></script>
 <script src="${pageContext.request.contextPath}/assets/ta/js/modules/onboarding.js"></script>

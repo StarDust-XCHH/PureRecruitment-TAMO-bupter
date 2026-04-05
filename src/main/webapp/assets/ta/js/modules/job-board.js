@@ -76,6 +76,7 @@
             const resumeFileName = document.getElementById('jobResumeFileName');
             const resumeFileSize = document.getElementById('jobResumeFileSize');
             const submitBtn = document.getElementById('jobResumeSubmitBtn');
+            const aiOptimizeBtn = document.getElementById('jobResumeAiOptimizeBtn');
             const resumeTrigger = document.querySelector('.resume-upload-trigger');
 
             if (applyCourseCode) applyCourseCode.textContent = course.code;
@@ -88,6 +89,7 @@
             if (resumeInput) {
                 resumeInput.value = '';
                 resumeInput.dataset.courseCode = course.code;
+                resumeInput.dataset.courseName = course.name;
             }
             if (resumeMeta) resumeMeta.hidden = true;
             if (resumeFileName) resumeFileName.textContent = '未选择';
@@ -97,6 +99,11 @@
                 submitBtn.textContent = 'Submit Application';
                 submitBtn.dataset.courseCode = course.code;
                 submitBtn.disabled = false;
+            }
+            if (aiOptimizeBtn) {
+                aiOptimizeBtn.dataset.courseCode = course.code;
+                aiOptimizeBtn.dataset.courseName = course.name;
+                aiOptimizeBtn.disabled = false;
             }
         }
 
@@ -564,6 +571,7 @@
             const resumeFileName = document.getElementById('jobResumeFileName');
             const resumeFileSize = document.getElementById('jobResumeFileSize');
             const submitBtn = document.getElementById('jobResumeSubmitBtn');
+            const aiOptimizeBtn = document.getElementById('jobResumeAiOptimizeBtn');
             const resumeTrigger = document.querySelector('.resume-upload-trigger');
 
             if (!file) {
@@ -572,6 +580,7 @@
                 if (resumeFileSize) resumeFileSize.textContent = '--';
                 if (resumeTrigger) resumeTrigger.textContent = '选择简历文件';
                 if (submitBtn) submitBtn.textContent = 'Submit Application';
+                if (aiOptimizeBtn) aiOptimizeBtn.disabled = false;
                 return;
             }
 
@@ -580,6 +589,7 @@
             if (resumeFileSize) resumeFileSize.textContent = formatFileSize(file.size);
             if (resumeTrigger) resumeTrigger.textContent = '重新选择';
             if (submitBtn) submitBtn.textContent = 'Submit Application · Ready';
+            if (aiOptimizeBtn) aiOptimizeBtn.textContent = 'AI优化后再发送';
         });
 
         const jobResumeSubmitBtn = document.getElementById('jobResumeSubmitBtn');
@@ -637,6 +647,45 @@
                 jobResumeSubmitBtn.disabled = false;
                 jobResumeSubmitBtn.textContent = defaultText;
                 window.alert(error.message || '申请提交失败，请稍后重试。');
+            }
+        });
+
+        const jobResumeAiOptimizeBtn = document.getElementById('jobResumeAiOptimizeBtn');
+        jobResumeAiOptimizeBtn?.addEventListener('click', async (event) => {
+            event.preventDefault();
+            const resumeInput = document.getElementById('jobResumeFileInput');
+            const selectedFile = resumeInput?.files && resumeInput.files[0];
+            const courseCode = (jobResumeAiOptimizeBtn.dataset.courseCode || resumeInput?.dataset.courseCode || activeCourseCode || '').trim();
+            const courseName = (jobResumeAiOptimizeBtn.dataset.courseName || resumeInput?.dataset.courseName || '').trim();
+            if (!selectedFile) {
+                resumeInput?.click();
+                return;
+            }
+            if (!isAllowedResumeFile(selectedFile)) {
+                window.alert('仅支持上传 PDF / DOC / DOCX 简历文件。');
+                return;
+            }
+            if (typeof app.openAiAssistantWithAttachment !== 'function') {
+                window.alert('AI 助理模块尚未完成初始化，请刷新页面后重试。');
+                return;
+            }
+
+            jobResumeAiOptimizeBtn.disabled = true;
+            jobResumeAiOptimizeBtn.textContent = '载入中...';
+            try {
+                await app.openAiAssistantWithAttachment({
+                    file: selectedFile,
+                    courseCode: courseCode,
+                    courseName: courseName,
+                    sourcePath: courseCode ? 'course-apply/' + courseCode + '/' + selectedFile.name : selectedFile.name,
+                    applicationId: ''
+                });
+            } catch (error) {
+                console.error('[TA-AI] preload from course apply failed', error);
+                window.alert(error.message || '载入 AI 助理失败，请稍后重试。');
+            } finally {
+                jobResumeAiOptimizeBtn.disabled = false;
+                jobResumeAiOptimizeBtn.textContent = 'AI优化后再发送';
             }
         });
 

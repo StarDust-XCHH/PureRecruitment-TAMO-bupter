@@ -97,70 +97,63 @@
         </div>
     </div>
 
-    <div class="ta-modal-panel drawer" data-modal="planner" role="dialog" aria-labelledby="modalPlannerTitle">
+    <div class="ta-modal-panel wide ai-assistant-modal ai-assistant-modal-landscape" data-modal="planner" role="dialog" aria-labelledby="modalPlannerTitle" aria-modal="true">
         <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
-        <div class="modal-head">
-            <h3 id="modalPlannerTitle">日程与任务规划</h3>
-            <p class="muted">集中管理课程、TA 任务与空闲时间，实时评估排班负荷。</p>
-        </div>
-        <div class="modal-body">
-            <div class="planner-layout">
-                <section class="calendar-pane">
-                    <div class="calendar-header">
-                        <strong>Week 08 · 2026</strong>
-                        <span class="muted">03/16 - 03/22</span>
-                    </div>
-                    <div class="calendar-grid">
-                        <div class="calendar-cell">
-                            <span class="day-label">Mon</span>
-                            <div class="calendar-slot busy">09:00 - 11:00 · 数据结构助教</div>
-                            <div class="calendar-slot">14:00 - 15:00 · 自习</div>
-                        </div>
-                        <div class="calendar-cell">
-                            <span class="day-label">Tue</span>
-                            <div class="calendar-slot">10:00 - 11:30 · 面试模拟</div>
-                        </div>
-                        <div class="calendar-cell">
-                            <span class="day-label">Wed</span>
-                            <div class="calendar-slot busy">13:30 - 16:30 · 信号处理实验班</div>
-                        </div>
-                    </div>
-                </section>
-                <section class="planner-form">
-                    <h4>添加日程</h4>
-                    <label class="planner-field">
-                        <span>事件名称</span>
-                        <input type="text" placeholder="如：EBU6304 课堂演练">
-                    </label>
-                    <label class="planner-field">
-                        <span>事件类型</span>
-                        <select>
-                            <option value="course">课程</option>
-                            <option value="ta">TA 任务</option>
-                            <option value="interview">面试/沟通</option>
-                        </select>
-                    </label>
-                    <div class="planner-field grid">
-                        <label>
-                            <span>开始时间</span>
-                            <input type="time" value="09:00">
-                        </label>
-                        <label>
-                            <span>结束时间</span>
-                            <input type="time" value="11:00">
-                        </label>
-                    </div>
-                    <label class="planner-field">
-                        <span>日期</span>
-                        <input type="date">
-                    </label>
-                    <label class="planner-field">
-                        <span>备注</span>
-                        <textarea rows="3" placeholder="可记录授课内容、准备物料等"></textarea>
-                    </label>
-                    <button class="pill-btn" type="button">保存日程</button>
-                </section>
+        <div class="modal-head ai-assistant-head">
+            <div>
+                <h3 id="modalPlannerTitle">AI助理</h3>
+                <p class="muted">支持连续对话、预载课程申请简历，并在发送后自动生成可下载的 PDF 结果。</p>
             </div>
+            <div class="ai-assistant-head-actions">
+                <button class="pill-btn ghost" type="button" id="aiAssistantNewSessionBtn">新建会话</button>
+                <span class="ai-assistant-status" id="aiAssistantStatusBadge">Ready</span>
+            </div>
+        </div>
+        <div class="ai-service-banner" id="aiAssistantServiceBanner" data-available="false">
+            <strong>AI 服务状态</strong>
+            <span id="aiAssistantServiceText">正在检测服务端 API 配置…</span>
+        </div>
+        <div class="modal-body ai-assistant-body ai-assistant-body-landscape" id="aiAssistantModalBody">
+            <section class="ai-assistant-chat-shell">
+                <div class="ai-chat-toolbar" aria-label="AI助理快捷操作">
+                    <button class="ai-chat-chip" type="button" data-ai-prompt="请帮我诊断当前简历的岗位匹配度，并指出最值得优先补强的内容。">简历诊断</button>
+                    <button class="ai-chat-chip" type="button" data-ai-prompt="请结合课程要求，帮我整理一份试讲准备大纲。">试讲准备</button>
+                    <button class="ai-chat-chip" type="button" data-ai-prompt="请分析我上传的材料和课程要求，给出岗位匹配建议。">岗位匹配</button>
+                    <button class="ai-chat-chip" type="button" data-ai-prompt="请总结我上传材料中的关键信息，并给出适合 TA 申请的表述。">材料总结</button>
+                </div>
+                <div class="ai-chat-thread" id="aiAssistantThread" aria-live="polite"></div>
+            </section>
+            <aside class="ai-assistant-side">
+                <div class="ai-side-card">
+                    <div class="ai-side-card-head">
+                        <h4>待发送附件</h4>
+                        <span class="ai-side-card-note" id="aiPendingAttachmentCount">0 份材料</span>
+                    </div>
+                    <label class="ai-upload-dropzone" for="aiAssistantFileInput">
+                        <input id="aiAssistantFileInput" class="ai-upload-input" type="file" accept=".pdf,.doc,.docx,.txt,.md,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown" multiple>
+                        <span class="ai-upload-icon" aria-hidden="true">⤴</span>
+                        <strong>上传用于对话分析的文件</strong>
+                        <span>支持 PDF / Word / TXT / Markdown</span>
+                    </label>
+                    <div class="ai-upload-filelist" id="aiPendingAttachmentList"></div>
+                </div>
+                <div class="ai-side-card ai-side-card-compact">
+                    <h4>当前可做</h4>
+                    <ul class="ai-feature-list">
+                        <li>根据附件生成新的 PDF 简历结果</li>
+                        <li>从课程申请弹窗预载当前上传的简历</li>
+                        <li>保留每个 TA 的独立 JSON 对话记录</li>
+                    </ul>
+                </div>
+            </aside>
+            <section class="ai-composer" aria-label="AI助理输入区">
+                <div class="ai-composer-hint" id="aiComposerHint">可以直接输入问题，也可以先上传或预载课程申请简历后再发送。</div>
+                <div class="ai-composer-main">
+                    <label class="pill-btn ghost ai-attach-btn" for="aiAssistantFileInput">上传附件</label>
+                    <textarea class="ai-composer-input" id="aiAssistantComposerInput" rows="3" placeholder="给 AI 助理发送消息，例如：请根据我上传的课程说明和简历，生成一版适合当前课程申请的新 PDF。"></textarea>
+                    <button class="pill-btn ai-send-btn" type="button" id="aiAssistantSendBtn">发送</button>
+                </div>
+            </section>
         </div>
     </div>
 
@@ -269,7 +262,10 @@
                     <div class="job-detail-side-card">
                         <h5>申请课程</h5>
                         <p>确认简历无误后提交，系统将把该课程加入你的投递记录。</p>
-                        <button class="pill-btn" type="button" id="jobResumeSubmitBtn">提交课程申请</button>
+                        <div class="job-apply-action-stack">
+                            <button class="pill-btn ghost" type="button" id="jobResumeAiOptimizeBtn">AI优化后再发送</button>
+                            <button class="pill-btn" type="button" id="jobResumeSubmitBtn">提交课程申请</button>
+                        </div>
                     </div>
                     <div class="job-detail-side-card">
                         <h5>投递说明</h5>

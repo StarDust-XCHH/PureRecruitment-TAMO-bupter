@@ -52,16 +52,16 @@
                     </div>
                 </div>
             </div>
-            <div class="insight-card upcoming-card" data-modal-target="planner">
+            <div class="insight-card upcoming-card ai-assistant-card" data-modal-target="planner">
                 <div class="insight-card-header">
-                    <span class="insight-icon calendar-icon" aria-hidden="true"></span>
+                    <span class="insight-icon assistant-icon" aria-hidden="true"></span>
                     <div>
-                        <p class="insight-label">待办日程</p>
-                        <p class="insight-subtitle">后续接入日程与任务规划</p>
+                        <p class="insight-label">AI助理</p>
+                        <p class="insight-subtitle">支持对话问答与简历/材料辅助分析</p>
                     </div>
                 </div>
-                <div class="insight-core-number accent-warn">2</div>
-                <p class="insight-meta">明日：1 场助教面试 ｜ 1 门课程</p>
+                <div class="insight-core-number accent-ai">24h</div>
+                <p class="insight-meta">点击打开聊天面板 ｜ 支持 PDF / Word 等文件上传</p>
             </div>
         </div>
         <div class="hero-card" id="heroCard" aria-live="polite">
