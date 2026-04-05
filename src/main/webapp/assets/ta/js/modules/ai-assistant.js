@@ -12,7 +12,16 @@
             title: 'AI 助理对话',
             context: {},
             pendingAttachments: [],
-            sessions: []
+            sessions: [],
+            serviceStatus: {
+                provider: '',
+                available: false,
+                configured: false,
+                message: '正在检测 AI 服务状态…',
+                defaultProvider: true
+            },
+            isSending: false,
+            activeResponseId: ''
         };
 
         const thread = document.getElementById('aiAssistantThread');
@@ -25,6 +34,8 @@
         const composerHint = document.getElementById('aiComposerHint');
         const newSessionBtn = document.getElementById('aiAssistantNewSessionBtn');
         const chipButtons = Array.from(document.querySelectorAll('.ai-chat-chip[data-ai-prompt]'));
+        const serviceBanner = document.getElementById('aiAssistantServiceBanner');
+        const serviceText = document.getElementById('aiAssistantServiceText');
 
         function resolveTaId() {
             const userData = typeof app.getUserData === 'function' ? app.getUserData() : null;
@@ -37,7 +48,10 @@
         }
 
         function resolveDefaultAssistantMessage() {
-            return '你好，我是你的 AI 助理。你可以直接输入问题，也可以从课程申请弹窗预载简历后再发送，我会生成新的 PDF 结果供你下载。';
+            if (!state.serviceStatus.available) {
+                return state.serviceStatus.message || '服务端当前未配置 AI API，AI 助理功能已禁用。';
+            }
+            return '你好，我是你的 AI 助理。你可以直接输入问题，也可以从课程申请弹窗预载简历后再发送，我会结合当前会话与附件内容继续回答。';
         }
 
         function formatFileSize(bytes) {
@@ -63,6 +77,47 @@
             }
         }
 
+        function normalizeServiceStatus(serviceStatus) {
+            return {
+                provider: String(serviceStatus?.provider || '').trim(),
+                available: Boolean(serviceStatus?.available),
+                configured: Boolean(serviceStatus?.configured),
+                message: String(serviceStatus?.message || 'AI 服务状态未知').trim(),
+                defaultProvider: Boolean(serviceStatus?.defaultProvider)
+            };
+        }
+
+        function applyServiceStatus(serviceStatus) {
+            state.serviceStatus = normalizeServiceStatus(serviceStatus);
+            const available = state.serviceStatus.available;
+            const providerName = state.serviceStatus.provider || '未配置';
+            const statusMessage = state.serviceStatus.message || 'AI 服务状态未知';
+
+            if (serviceBanner) {
+                serviceBanner.dataset.available = available ? 'true' : 'false';
+            }
+            if (serviceText) {
+                serviceText.textContent = available
+                    ? '当前服务：' + providerName + ' · ' + statusMessage
+                    : '当前服务不可用 · ' + statusMessage;
+            }
+            if (composerInput) {
+                composerInput.disabled = !available || state.isSending;
+            }
+            if (fileInput) {
+                fileInput.disabled = !available || state.isSending;
+            }
+            if (sendBtn) {
+                sendBtn.disabled = !available || state.isSending;
+            }
+            chipButtons.forEach((button) => {
+                button.disabled = !available || state.isSending;
+            });
+            if (!available) {
+                setStatus('Disabled');
+            }
+        }
+
         function renderPendingAttachments() {
             if (pendingCount) {
                 pendingCount.textContent = state.pendingAttachments.length + ' 份材料';
@@ -81,9 +136,78 @@
             }).join('');
         }
 
+        function getCurrentSession() {
+            return state.sessions.find((item) => item.sessionId === state.sessionId) || state.sessions[0] || null;
+        }
+
+        function normalizeMessage(message) {
+            const artifact = message?.artifact && typeof message.artifact === 'object' ? message.artifact : null;
+            return {
+                messageId: String(message?.messageId || '').trim(),
+                role: String(message?.role || '').trim(),
+                type: String(message?.type || 'text').trim() || 'text',
+                content: String(message?.content || ''),
+                createdAt: String(message?.createdAt || ''),
+                artifact: artifact
+            };
+        }
+
+        function ensureSessionMessages(session) {
+            if (!session) return [];
+            if (!Array.isArray(session.messages)) {
+                session.messages = [];
+            }
+            return session.messages;
+        }
+
+        function ensureSessionState() {
+            let session = state.sessions.find((item) => item.sessionId === state.sessionId);
+            if (!session) {
+                session = {
+                    sessionId: state.sessionId || '',
+                    scene: state.scene || 'general_chat',
+                    title: state.title || 'AI 助理对话',
+                    status: 'active',
+                    createdAt: '',
+                    updatedAt: '',
+                    provider: '',
+                    context: state.context || {},
+                    messages: [],
+                    attachments: []
+                };
+                state.sessions = [session].concat(state.sessions.filter((item) => item && item.sessionId !== session.sessionId));
+            }
+            ensureSessionMessages(session);
+            return session;
+        }
+
+        function ensureParagraphHtml(text) {
+            const safeText = escapeHtml(text || '');
+            if (!safeText) {
+                return '<p></p>';
+            }
+            const blocks = safeText
+                .replace(/\r\n/g, '\n')
+                .split(/\n{2,}/)
+                .map((item) => item.trim())
+                .filter(Boolean);
+            if (!blocks.length) {
+                return '<p></p>';
+            }
+            return blocks.map((block) => '<p>' + block.replace(/\n/g, '<br>') + '</p>').join('');
+        }
+
+        function renderMessageBubbleContent(message) {
+            const artifact = message.artifact && typeof message.artifact === 'object' ? message.artifact : null;
+            return ensureParagraphHtml(message.content || '') +
+                (artifact && artifact.downloadUrl
+                    ? '<div class="ai-message-download"><a class="pill-btn" href="' + escapeHtml(artifact.downloadUrl) + '" download>下载生成的 PDF</a></div>'
+                    : '');
+        }
+
         function renderThread() {
             if (!thread) return;
-            const currentSession = state.sessions.find((item) => item.sessionId === state.sessionId) || state.sessions[0] || null;
+            const currentSession = getCurrentSession();
             if (!currentSession || !Array.isArray(currentSession.messages) || !currentSession.messages.length) {
                 thread.innerHTML = '' +
                     '<div class="ai-chat-date">今天</div>' +
@@ -95,16 +219,11 @@
             }
 
             const messageHtml = currentSession.messages.map((message) => {
-                const isUser = message.role === 'user';
-                const artifact = message.artifact && typeof message.artifact === 'object' ? message.artifact : null;
-                return '<article class="ai-message ' + (isUser ? 'ai-message-user' : 'ai-message-assistant') + '">' +
+                const normalized = normalizeMessage(message);
+                const isUser = normalized.role === 'user';
+                return '<article class="ai-message ' + (isUser ? 'ai-message-user' : 'ai-message-assistant') + '" data-message-id="' + escapeHtml(normalized.messageId) + '">' +
                     '<div class="ai-avatar" aria-hidden="true">' + (isUser ? 'TA' : 'AI') + '</div>' +
-                    '<div class="ai-bubble">' +
-                    '<p>' + escapeHtml(message.content || '') + '</p>' +
-                    (artifact && artifact.downloadUrl
-                        ? '<div class="ai-message-download"><a class="pill-btn" href="' + escapeHtml(artifact.downloadUrl) + '" download>下载生成的 PDF</a></div>'
-                        : '') +
-                    '</div>' +
+                    '<div class="ai-bubble">' + renderMessageBubbleContent(normalized) + '</div>' +
                     '</article>';
             }).join('');
 
@@ -113,8 +232,16 @@
         }
 
         function hydrateConversation(data) {
-            state.sessions = Array.isArray(data?.sessions) ? data.sessions : [];
+            state.sessions = Array.isArray(data?.sessions)
+                ? data.sessions.map((session) => ({
+                    ...session,
+                    messages: Array.isArray(session?.messages) ? session.messages.map(normalizeMessage) : []
+                }))
+                : [];
             state.pendingAttachments = Array.isArray(data?.pendingAttachments) ? data.pendingAttachments : [];
+            if (data?.serviceStatus) {
+                applyServiceStatus(data.serviceStatus);
+            }
             if (!state.sessionId && state.sessions.length) {
                 state.sessionId = String(state.sessions[0].sessionId || '').trim();
             }
@@ -122,9 +249,22 @@
             renderThread();
         }
 
+        async function fetchServiceStatus() {
+            const response = await fetch(resolveAiApiUrl() + '?action=status', {
+                method: 'GET',
+                headers: { Accept: 'application/json' }
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload?.success) {
+                throw new Error(payload?.message || 'AI 服务状态读取失败');
+            }
+            applyServiceStatus(payload.data || {});
+        }
+
         async function loadConversation() {
             const taId = resolveTaId();
             if (!taId) return;
+            await fetchServiceStatus();
             const response = await fetch(resolveAiApiUrl() + '?taId=' + encodeURIComponent(taId), {
                 method: 'GET',
                 headers: { Accept: 'application/json' }
@@ -134,6 +274,9 @@
                 throw new Error(payload?.message || 'AI 会话读取失败');
             }
             hydrateConversation(payload.data || {});
+            if (state.serviceStatus.available) {
+                setStatus('Ready');
+            }
         }
 
         function startNewSession() {
@@ -142,6 +285,8 @@
             state.title = 'AI 助理对话';
             state.context = {};
             state.pendingAttachments = [];
+            state.activeResponseId = '';
+            state.isSending = false;
             if (composerInput) {
                 composerInput.value = '';
             }
@@ -149,36 +294,150 @@
                 fileInput.value = '';
             }
             if (composerHint) {
-                composerHint.textContent = '已切换到新会话。你可以直接输入问题，或先上传附件后再发送。';
+                composerHint.textContent = state.serviceStatus.available
+                    ? '已切换到新会话。你可以直接输入问题，或先上传附件后再发送。'
+                    : (state.serviceStatus.message || '当前 AI 服务不可用');
             }
-            setStatus('Ready');
+            if (state.serviceStatus.available) {
+                setStatus('Ready');
+            }
             renderPendingAttachments();
+            renderThread();
+            applyServiceStatus(state.serviceStatus);
+        }
+
+        function appendOptimisticUserMessage(message, responseId) {
+            const session = ensureSessionState();
+            const messages = ensureSessionMessages(session);
+            const now = new Date().toISOString();
+            messages.push(normalizeMessage({
+                messageId: 'client_user_' + responseId,
+                role: 'user',
+                type: 'text',
+                content: message,
+                createdAt: now
+            }));
+            messages.push(normalizeMessage({
+                messageId: 'client_assistant_' + responseId,
+                role: 'assistant',
+                type: 'text',
+                content: '',
+                createdAt: now
+            }));
             renderThread();
         }
 
-        async function uploadPendingFile(file, meta) {
-            const taId = resolveTaId();
-            if (!taId) throw new Error('当前未获取到 TA 身份，请重新登录后再试。');
-            const formData = new FormData();
-            formData.append('action', 'upload-pending');
-            formData.append('taId', taId);
-            formData.append('file', file, file.name);
-            formData.append('sourceType', meta?.sourceType || 'manual');
-            formData.append('sourcePath', meta?.sourcePath || '');
-            formData.append('courseCode', meta?.courseCode || '');
-            formData.append('applicationId', meta?.applicationId || '');
-
-            const response = await fetch(resolveAiApiUrl(), {
-                method: 'POST',
-                body: formData
-            });
-            const payload = await response.json();
-            if (!response.ok || !payload?.success) {
-                throw new Error(payload?.message || 'AI 附件载入失败');
+        function updateStreamingAssistantMessage(responseId, content, done, artifact) {
+            const session = ensureSessionState();
+            const messages = ensureSessionMessages(session);
+            const targetId = 'client_assistant_' + responseId;
+            let target = messages.find((item) => item.messageId === targetId);
+            if (!target) {
+                target = normalizeMessage({
+                    messageId: targetId,
+                    role: 'assistant',
+                    type: 'text',
+                    content: '',
+                    createdAt: new Date().toISOString()
+                });
+                messages.push(target);
             }
-            state.pendingAttachments = Array.isArray(payload.data?.pendingAttachments) ? payload.data.pendingAttachments : state.pendingAttachments;
-            renderPendingAttachments();
-            return payload.data || {};
+            target.content = String(content || '');
+            if (artifact && typeof artifact === 'object') {
+                target.artifact = artifact;
+            }
+            if (done && !target.content.trim()) {
+                target.content = 'AI 未返回可展示内容。';
+            }
+            renderThread();
+        }
+
+        function decodeStreamChunk(chunk) {
+            const lines = String(chunk || '').split(/\r?\n/);
+            const events = [];
+            for (const rawLine of lines) {
+                const line = rawLine.trim();
+                if (!line || !line.startsWith('data:')) {
+                    continue;
+                }
+                const jsonText = line.slice(5).trim();
+                if (!jsonText) {
+                    continue;
+                }
+                try {
+                    events.push(JSON.parse(jsonText));
+                } catch (error) {
+                    console.warn('[TA-AI] stream chunk parse failed', error, jsonText);
+                }
+            }
+            return events;
+        }
+
+        async function consumeChatStream(response, responseId) {
+            if (!response.body || typeof response.body.getReader !== 'function') {
+                throw new Error('当前浏览器不支持流式读取 AI 回复');
+            }
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder('utf-8');
+            let buffer = '';
+            let fullText = '';
+            let finalPayload = null;
+
+            while (true) {
+                const result = await reader.read();
+                if (result.done) {
+                    break;
+                }
+                buffer += decoder.decode(result.value, { stream: true });
+                const segments = buffer.split(/\r?\n\r?\n/);
+                buffer = segments.pop() || '';
+                for (const segment of segments) {
+                    const events = decodeStreamChunk(segment);
+                    events.forEach((event) => {
+                        if (event?.type === 'delta') {
+                            const delta = String(event.delta || '');
+                            if (delta) {
+                                fullText += delta;
+                                updateStreamingAssistantMessage(responseId, fullText, false, null);
+                            }
+                        } else if (event?.type === 'complete') {
+                            finalPayload = event.data || null;
+                            const finalText = String(event.data?.reply || fullText || '');
+                            fullText = finalText;
+                            updateStreamingAssistantMessage(responseId, fullText, true, event.data?.artifact || null);
+                        } else if (event?.type === 'error') {
+                            throw new Error(event.message || 'AI 对话失败');
+                        }
+                    });
+                }
+            }
+
+            buffer += decoder.decode();
+            if (buffer.trim()) {
+                const events = decodeStreamChunk(buffer);
+                events.forEach((event) => {
+                    if (event?.type === 'delta') {
+                        const delta = String(event.delta || '');
+                        if (delta) {
+                            fullText += delta;
+                        }
+                    } else if (event?.type === 'complete') {
+                        finalPayload = event.data || null;
+                        fullText = String(event.data?.reply || fullText || '');
+                    } else if (event?.type === 'error') {
+                        throw new Error(event.message || 'AI 对话失败');
+                    }
+                });
+            }
+
+            updateStreamingAssistantMessage(responseId, fullText, true, finalPayload?.artifact || null);
+            return finalPayload || {
+                reply: fullText,
+                conversation: null,
+                pendingAttachments: [],
+                serviceStatus: state.serviceStatus,
+                sessionId: state.sessionId
+            };
         }
 
         async function sendMessage() {
@@ -187,24 +446,38 @@
                 window.alert('当前未获取到 TA 身份，请重新登录后再试。');
                 return;
             }
+            if (!state.serviceStatus.available) {
+                window.alert(state.serviceStatus.message || '当前 AI 服务不可用。');
+                return;
+            }
+            if (state.isSending) {
+                return;
+            }
             const message = String(composerInput?.value || '').trim();
             if (!message && !state.pendingAttachments.length) {
                 window.alert('请先输入消息，或准备至少一个附件。');
                 return;
             }
 
-            sendBtn.disabled = true;
-            setStatus('Sending');
+            const responseId = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+            state.isSending = true;
+            state.activeResponseId = responseId;
+            appendOptimisticUserMessage(message, responseId);
+            if (composerInput) {
+                composerInput.value = '';
+            }
+            applyServiceStatus(state.serviceStatus);
+            setStatus('Streaming');
             if (composerHint) {
-                composerHint.textContent = 'AI 正在生成结果，请稍候…';
+                composerHint.textContent = 'AI 正在流式生成结果…';
             }
 
             try {
-                const response = await fetch(resolveAiApiUrl(), {
+                const response = await fetch(resolveAiApiUrl() + '?stream=true', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        Accept: 'application/json'
+                        Accept: 'text/event-stream, application/json'
                     },
                     body: JSON.stringify({
                         action: 'chat',
@@ -217,43 +490,58 @@
                         context: state.context
                     })
                 });
-                const payload = await response.json();
-                if (!response.ok || !payload?.success) {
-                    throw new Error(payload?.message || 'AI 对话失败');
+
+                if (!response.ok) {
+                    let failureMessage = 'AI 对话失败';
+                    try {
+                        const payload = await response.json();
+                        failureMessage = payload?.message || failureMessage;
+                    } catch (error) {
+                        const failureText = await response.text();
+                        if (failureText) {
+                            failureMessage = failureText;
+                        }
+                    }
+                    throw new Error(failureMessage);
                 }
 
-                state.sessionId = String(payload.data?.sessionId || state.sessionId || '').trim();
-                hydrateConversation(payload.data?.conversation || {});
-                state.pendingAttachments = Array.isArray(payload.data?.pendingAttachments) ? payload.data.pendingAttachments : [];
+                const result = await consumeChatStream(response, responseId);
+                state.sessionId = String(result?.sessionId || state.sessionId || '').trim();
+                if (result?.conversation) {
+                    hydrateConversation(result.conversation);
+                }
+                state.pendingAttachments = Array.isArray(result?.pendingAttachments) ? result.pendingAttachments : [];
                 renderPendingAttachments();
                 renderThread();
-                if (composerInput) composerInput.value = '';
+                if (result?.serviceStatus) {
+                    applyServiceStatus(result.serviceStatus);
+                }
                 setStatus('Completed');
                 if (composerHint) {
-                    composerHint.textContent = payload.data?.downloadUrl
-                        ? 'AI 已生成新的 PDF，浏览器将自动开始下载。'
-                        : 'AI 回复已完成。';
-                }
-                if (payload.data?.downloadUrl) {
-                    window.setTimeout(() => {
-                        window.location.href = payload.data.downloadUrl;
-                    }, 180);
+                    composerHint.textContent = 'AI 回复已完成。';
                 }
             } catch (error) {
                 console.error('[TA-AI] send failed', error);
+                updateStreamingAssistantMessage(responseId, error.message || 'AI 助理处理失败，请稍后重试。', true, null);
                 setStatus('Error');
                 if (composerHint) {
                     composerHint.textContent = error.message || 'AI 助理处理失败，请稍后重试。';
                 }
                 window.alert(error.message || 'AI 助理处理失败，请稍后重试。');
             } finally {
-                sendBtn.disabled = false;
+                state.isSending = false;
+                state.activeResponseId = '';
+                applyServiceStatus(state.serviceStatus);
             }
         }
 
         async function preloadFromCourseApply(payload) {
             if (!payload?.file) {
                 window.alert('请先在课程申请弹窗中选择简历文件。');
+                return;
+            }
+            if (!state.serviceStatus.available) {
+                window.alert(state.serviceStatus.message || '当前 AI 服务不可用。');
                 return;
             }
             try {
@@ -279,7 +567,7 @@
                 };
                 state.sessionId = '';
                 if (composerInput && !composerInput.value.trim()) {
-                    composerInput.value = '请根据当前课程申请要求，帮我优化这份简历，并重新生成一版适合投递的 PDF。';
+                    composerInput.value = '请根据当前课程申请要求，帮我优化这份简历，并指出最值得优先调整的内容。';
                 }
                 if (composerHint) {
                     composerHint.textContent = '课程申请简历已载入待发送附件，请确认消息后点击发送。';
@@ -296,8 +584,42 @@
             }
         }
 
+        async function uploadPendingFile(file, meta) {
+            if (!state.serviceStatus.available) {
+                throw new Error(state.serviceStatus.message || '当前 AI 服务不可用，无法上传附件');
+            }
+            const taId = resolveTaId();
+            if (!taId) throw new Error('当前未获取到 TA 身份，请重新登录后再试。');
+            const formData = new FormData();
+            formData.append('action', 'upload-pending');
+            formData.append('taId', taId);
+            formData.append('file', file, file.name);
+            formData.append('sourceType', meta?.sourceType || 'manual');
+            formData.append('sourcePath', meta?.sourcePath || '');
+            formData.append('courseCode', meta?.courseCode || '');
+            formData.append('applicationId', meta?.applicationId || '');
+
+            const response = await fetch(resolveAiApiUrl(), {
+                method: 'POST',
+                body: formData
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload?.success) {
+                throw new Error(payload?.message || 'AI 附件载入失败');
+            }
+            state.pendingAttachments = Array.isArray(payload.data?.pendingAttachments) ? payload.data.pendingAttachments : state.pendingAttachments;
+            if (payload.data?.serviceStatus) {
+                applyServiceStatus(payload.data.serviceStatus);
+            }
+            renderPendingAttachments();
+            return payload.data || {};
+        }
+
         chipButtons.forEach((button) => {
             button.addEventListener('click', () => {
+                if (!state.serviceStatus.available) {
+                    return;
+                }
                 if (composerInput) {
                     composerInput.value = button.dataset.aiPrompt || '';
                     composerInput.focus();
@@ -338,8 +660,16 @@
         app.openAiAssistantWithAttachment = preloadFromCourseApply;
         app.loadAiConversation = loadConversation;
 
+        applyServiceStatus(state.serviceStatus);
         loadConversation().catch((error) => {
             console.error('[TA-AI] initial load failed', error);
+            applyServiceStatus({
+                provider: '',
+                available: false,
+                configured: false,
+                message: error.message || 'AI 服务初始化失败',
+                defaultProvider: true
+            });
             renderPendingAttachments();
             renderThread();
         });

@@ -216,6 +216,37 @@ public class TaAiConversationDao {
         return items;
     }
 
+    public synchronized PendingAttachment findPendingAttachment(String taId, String attachmentId) throws IOException {
+        String normalizedTaId = requireTaId(taId);
+        String normalizedAttachmentId = trim(attachmentId);
+        if (normalizedAttachmentId.isEmpty()) {
+            return null;
+        }
+
+        JsonObject root = loadConversationRoot(normalizedTaId);
+        JsonArray pendingAttachments = ensureArray(root, "pendingAttachments");
+        for (JsonElement element : pendingAttachments) {
+            if (!element.isJsonObject()) {
+                continue;
+            }
+            JsonObject attachment = element.getAsJsonObject();
+            if (normalizedAttachmentId.equals(getAsString(attachment, "attachmentId"))) {
+                return new PendingAttachment(
+                        getAsString(attachment, "attachmentId"),
+                        getAsString(attachment, "originalFileName"),
+                        getAsString(attachment, "mimeType"),
+                        attachment.has("size") ? attachment.get("size").getAsLong() : 0L,
+                        getAsString(attachment, "storedPath"),
+                        getAsString(attachment, "sourceType"),
+                        getAsString(attachment, "sourcePath"),
+                        getAsString(attachment, "courseCode"),
+                        getAsString(attachment, "applicationId")
+                );
+            }
+        }
+        return null;
+    }
+
     public synchronized PendingAttachment consumePendingAttachment(String taId, String attachmentId, String sessionId) throws IOException {
         String normalizedTaId = requireTaId(taId);
         String normalizedAttachmentId = trim(attachmentId);
@@ -659,12 +690,16 @@ public class TaAiConversationDao {
         return normalizedPath.toString().replace('\\', '/');
     }
 
-    private Path resolveStoredPath(String storedPath) {
+    public synchronized Path resolveStoredPathForService(String storedPath) {
         Path path = Path.of(trim(storedPath));
         if (path.isAbsolute()) {
             return path.toAbsolutePath().normalize();
         }
         return DataMountPaths.root().resolve(path).toAbsolutePath().normalize();
+    }
+
+    private Path resolveStoredPath(String storedPath) {
+        return resolveStoredPathForService(storedPath);
     }
 
     private String encodeQuery(String value) {

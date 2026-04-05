@@ -109,6 +109,10 @@
                 <span class="ai-assistant-status" id="aiAssistantStatusBadge">Ready</span>
             </div>
         </div>
+        <div class="ai-service-banner" id="aiAssistantServiceBanner" data-available="false">
+            <strong>AI 服务状态</strong>
+            <span id="aiAssistantServiceText">正在检测服务端 API 配置…</span>
+        </div>
         <div class="modal-body ai-assistant-body ai-assistant-body-landscape" id="aiAssistantModalBody">
             <section class="ai-assistant-chat-shell">
                 <div class="ai-chat-toolbar" aria-label="AI助理快捷操作">

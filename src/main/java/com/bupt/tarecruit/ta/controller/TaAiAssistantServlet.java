@@ -4,9 +4,11 @@ import com.bupt.tarecruit.common.model.ApiResponse;
 import com.bupt.tarecruit.common.util.ServletJsonResponseWriter;
 import com.bupt.tarecruit.ta.service.TaAiAssistantService;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -33,13 +35,19 @@ import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.trim;
         maxRequestSize = 12 * 1024 * 1024
 )
 public class TaAiAssistantServlet extends HttpServlet {
+    private static final Gson SSE_GSON = new GsonBuilder().disableHtmlEscaping().create();
     private final TaAiAssistantService aiAssistantService = new TaAiAssistantService();
-    private final Gson gson = new Gson();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding(StandardCharsets.UTF_8.name());
         resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
+
+        String action = trim(req.getParameter("action"));
+        if ("status".equalsIgnoreCase(action)) {
+            ServletJsonResponseWriter.write(resp, 200, ApiResponse.success("AI 服务状态读取成功", aiAssistantService.getServiceStatus()));
+            return;
+        }
 
         String taId = trim(req.getParameter("taId"));
         if (taId.isEmpty()) {
@@ -67,7 +75,11 @@ public class TaAiAssistantServlet extends HttpServlet {
                 return;
             }
             if ("chat".equalsIgnoreCase(action)) {
-                handleChat(req, resp);
+                if ("true".equalsIgnoreCase(trim(req.getParameter("stream")))) {
+                    handleChatStream(req, resp);
+                } else {
+                    handleChat(req, resp);
+                }
                 return;
             }
             ServletJsonResponseWriter.write(resp, 400, ApiResponse.failure("不支持的 AI 操作"));
@@ -112,13 +124,65 @@ public class TaAiAssistantServlet extends HttpServlet {
     }
 
     private void handleChat(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        JsonObject body = readJsonBody(req);
-        String taId = getAsString(body, "taId");
-        if (taId.isBlank()) {
+        ChatRequest chatRequest = parseChatRequest(req);
+        if (chatRequest.taId().isBlank()) {
             ServletJsonResponseWriter.write(resp, 400, ApiResponse.failure("缺少 TA 标识"));
             return;
         }
 
+        Map<String, Object> result = aiAssistantService.sendMessage(
+                chatRequest.taId(),
+                chatRequest.sessionId(),
+                chatRequest.message(),
+                chatRequest.attachmentIds(),
+                chatRequest.scene(),
+                chatRequest.title(),
+                chatRequest.context()
+        );
+        ServletJsonResponseWriter.write(resp, 200, ApiResponse.success("AI 对话完成", result));
+    }
+
+    private void handleChatStream(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        ChatRequest chatRequest = parseChatRequest(req);
+        if (chatRequest.taId().isBlank()) {
+            ServletJsonResponseWriter.write(resp, 400, ApiResponse.failure("缺少 TA 标识"));
+            return;
+        }
+
+        resp.setStatus(HttpServletResponse.SC_OK);
+        resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
+        resp.setContentType("text/event-stream;charset=UTF-8");
+        resp.setHeader("Cache-Control", "no-cache");
+        resp.setHeader("Connection", "keep-alive");
+
+        ServletOutputStream outputStream = resp.getOutputStream();
+        try {
+            Map<String, Object> result = aiAssistantService.sendMessageStream(
+                    chatRequest.taId(),
+                    chatRequest.sessionId(),
+                    chatRequest.message(),
+                    chatRequest.attachmentIds(),
+                    chatRequest.scene(),
+                    chatRequest.title(),
+                    chatRequest.context(),
+                    delta -> {
+                        try {
+                            writeSseEvent(outputStream, "delta", Map.of("delta", delta));
+                        } catch (IOException ioException) {
+                            throw new RuntimeException(ioException);
+                        }
+                    }
+            );
+            writeSseEvent(outputStream, "complete", Map.of("data", result));
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            writeSseEvent(outputStream, "error", Map.of("message", ex.getMessage() == null ? "AI 助理操作失败" : ex.getMessage()));
+        }
+    }
+
+    private ChatRequest parseChatRequest(HttpServletRequest req) throws IOException {
+        JsonObject body = readJsonBody(req);
+        String taId = getAsString(body, "taId");
         String sessionId = getAsString(body, "sessionId");
         String message = getAsString(body, "message");
         String scene = getAsString(body, "scene");
@@ -148,9 +212,7 @@ public class TaAiAssistantServlet extends HttpServlet {
                 }
             });
         }
-
-        Map<String, Object> result = aiAssistantService.sendMessage(taId, sessionId, message, attachmentIds, scene, title, context);
-        ServletJsonResponseWriter.write(resp, 200, ApiResponse.success("AI 对话完成", result));
+        return new ChatRequest(taId, sessionId, message, scene, title, attachmentIds, context);
     }
 
     private JsonObject readJsonBody(HttpServletRequest req) throws IOException {
@@ -175,5 +237,23 @@ public class TaAiAssistantServlet extends HttpServlet {
         String normalized = submitted.replace('\\', '/');
         int slashIndex = normalized.lastIndexOf('/');
         return slashIndex >= 0 ? normalized.substring(slashIndex + 1) : normalized;
+    }
+
+    private void writeSseEvent(ServletOutputStream outputStream, String type, Map<String, Object> payload) throws IOException {
+        Map<String, Object> eventPayload = new LinkedHashMap<>();
+        eventPayload.put("type", type);
+        eventPayload.putAll(payload);
+        String json = SSE_GSON.toJson(eventPayload);
+        outputStream.write(("data: " + json + "\n\n").getBytes(StandardCharsets.UTF_8));
+        outputStream.flush();
+    }
+
+    private record ChatRequest(String taId,
+                               String sessionId,
+                               String message,
+                               String scene,
+                               String title,
+                               List<String> attachmentIds,
+                               Map<String, Object> context) {
     }
 }
