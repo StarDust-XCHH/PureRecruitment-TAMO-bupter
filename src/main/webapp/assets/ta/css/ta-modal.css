@@ -536,6 +536,111 @@
     line-height: 1.7;
 }
 
+.ai-message-main {
+    display: grid;
+    gap: 12px;
+    min-width: 0;
+}
+
+.ai-message-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.ai-copy-btn {
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text);
+    font-size: 12px;
+    line-height: 1;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.ai-copy-btn:hover {
+    background: rgba(124, 58, 237, 0.16);
+    border-color: rgba(168, 85, 247, 0.32);
+}
+
+.ai-markdown-heading {
+    margin: 0;
+    font-weight: 700;
+    line-height: 1.45;
+}
+
+.ai-markdown-heading-1,
+.ai-markdown-heading-2 {
+    font-size: 20px;
+}
+
+.ai-markdown-heading-3,
+.ai-markdown-heading-4 {
+    font-size: 17px;
+}
+
+.ai-markdown-heading-5,
+.ai-markdown-heading-6 {
+    font-size: 15px;
+}
+
+.ai-markdown-list {
+    margin: 0;
+    padding-left: 20px;
+    display: grid;
+    gap: 8px;
+}
+
+.ai-markdown-pre {
+    margin: 0;
+    padding: 14px 16px;
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow-x: auto;
+}
+
+.ai-markdown-pre code,
+.ai-bubble code {
+    font-family: Consolas, "SFMono-Regular", Monaco, monospace;
+    font-size: 13px;
+}
+
+.ai-bubble :not(pre) > code {
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.ai-markdown-blockquote {
+    margin: 0;
+    padding: 10px 14px;
+    border-left: 3px solid rgba(168, 85, 247, 0.72);
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 0 12px 12px 0;
+}
+
+.ai-markdown-divider {
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    margin: 2px 0;
+}
+
+.ai-bubble a {
+    color: #93c5fd;
+    text-decoration: underline;
+    word-break: break-word;
+}
+
+.ai-bubble strong {
+    font-weight: 700;
+}
+
+.ai-bubble em {
+    font-style: italic;
+}
+
 .ai-bubble-list {
     margin: 0;
     padding-left: 18px;

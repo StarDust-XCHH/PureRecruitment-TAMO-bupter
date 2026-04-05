@@ -71,6 +71,158 @@
                 .replace(/'/g, '&#39;');
         }
 
+        function normalizeInline(text) {
+            let normalized = String(text || '');
+            normalized = escapeHtml(normalized);
+            normalized = normalized.replace(/`([^`]+)`/g, '<code>$1</code>');
+            normalized = normalized.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            normalized = normalized.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+            normalized = normalized.replace(/(^|[^*])\*([^*]+)\*(?!\*)/g, '$1<em>$2</em>');
+            normalized = normalized.replace(/(^|[^_])_([^_]+)_(?!_)/g, '$1<em>$2</em>');
+            normalized = normalized.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+            return normalized;
+        }
+
+        function renderMarkdown(markdownText) {
+            const normalizedText = String(markdownText || '').replace(/\r\n/g, '\n');
+            if (!normalizedText.trim()) {
+                return '<p></p>';
+            }
+
+            const lines = normalizedText.split('\n');
+            const html = [];
+            let paragraph = [];
+            let listBuffer = [];
+            let listType = '';
+            let inCodeBlock = false;
+            let codeBuffer = [];
+
+            function flushParagraph() {
+                if (!paragraph.length) return;
+                html.push('<p>' + normalizeInline(paragraph.join('<br>')) + '</p>');
+                paragraph = [];
+            }
+
+            function flushList() {
+                if (!listBuffer.length || !listType) return;
+                html.push('<' + listType + ' class="ai-markdown-list">' + listBuffer.join('') + '</' + listType + '>');
+                listBuffer = [];
+                listType = '';
+            }
+
+            function flushCodeBlock() {
+                if (!inCodeBlock) return;
+                html.push('<pre class="ai-markdown-pre"><code>' + escapeHtml(codeBuffer.join('\n')) + '</code></pre>');
+                inCodeBlock = false;
+                codeBuffer = [];
+            }
+
+            lines.forEach((line) => {
+                const trimmed = line.trim();
+
+                if (trimmed.startsWith('```')) {
+                    flushParagraph();
+                    flushList();
+                    if (inCodeBlock) {
+                        flushCodeBlock();
+                    } else {
+                        inCodeBlock = true;
+                        codeBuffer = [];
+                    }
+                    return;
+                }
+
+                if (inCodeBlock) {
+                    codeBuffer.push(line);
+                    return;
+                }
+
+                if (!trimmed) {
+                    flushParagraph();
+                    flushList();
+                    return;
+                }
+
+                const headingMatch = trimmed.match(/^(#{1,6})\s+(.*)$/);
+                if (headingMatch) {
+                    flushParagraph();
+                    flushList();
+                    const level = headingMatch[1].length;
+                    html.push('<h' + level + ' class="ai-markdown-heading ai-markdown-heading-' + level + '">' + normalizeInline(headingMatch[2]) + '</h' + level + '>');
+                    return;
+                }
+
+                const orderedMatch = trimmed.match(/^(\d+)\.\s+(.*)$/);
+                if (orderedMatch) {
+                    flushParagraph();
+                    if (listType && listType !== 'ol') {
+                        flushList();
+                    }
+                    listType = 'ol';
+                    listBuffer.push('<li>' + normalizeInline(orderedMatch[2]) + '</li>');
+                    return;
+                }
+
+                const unorderedMatch = trimmed.match(/^[-*+]\s+(.*)$/);
+                if (unorderedMatch) {
+                    flushParagraph();
+                    if (listType && listType !== 'ul') {
+                        flushList();
+                    }
+                    listType = 'ul';
+                    listBuffer.push('<li>' + normalizeInline(unorderedMatch[1]) + '</li>');
+                    return;
+                }
+
+                if (trimmed === '---' || trimmed === '***') {
+                    flushParagraph();
+                    flushList();
+                    html.push('<hr class="ai-markdown-divider">');
+                    return;
+                }
+
+                if (trimmed.startsWith('>')) {
+                    flushParagraph();
+                    flushList();
+                    html.push('<blockquote class="ai-markdown-blockquote"><p>' + normalizeInline(trimmed.replace(/^>\s?/, '')) + '</p></blockquote>');
+                    return;
+                }
+
+                if (listBuffer.length) {
+                    flushList();
+                }
+                paragraph.push(line);
+            });
+
+            flushParagraph();
+            flushList();
+            flushCodeBlock();
+
+            return html.join('');
+        }
+
+        async function copyText(text) {
+            const content = String(text || '');
+            if (!content) {
+                return;
+            }
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(content);
+                return;
+            }
+            const textarea = document.createElement('textarea');
+            textarea.value = content;
+            textarea.setAttribute('readonly', 'readonly');
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            textarea.style.pointerEvents = 'none';
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+        }
+
         function setStatus(text) {
             if (statusBadge) {
                 statusBadge.textContent = text || 'Ready';
@@ -181,25 +333,14 @@
             return session;
         }
 
-        function ensureParagraphHtml(text) {
-            const safeText = escapeHtml(text || '');
-            if (!safeText) {
-                return '<p></p>';
-            }
-            const blocks = safeText
-                .replace(/\r\n/g, '\n')
-                .split(/\n{2,}/)
-                .map((item) => item.trim())
-                .filter(Boolean);
-            if (!blocks.length) {
-                return '<p></p>';
-            }
-            return blocks.map((block) => '<p>' + block.replace(/\n/g, '<br>') + '</p>').join('');
-        }
-
         function renderMessageBubbleContent(message) {
             const artifact = message.artifact && typeof message.artifact === 'object' ? message.artifact : null;
-            return ensureParagraphHtml(message.content || '') +
+            const messageHtml = message.role === 'assistant'
+                ? renderMarkdown(message.content || '')
+                : '<p>' + normalizeInline(message.content || '') + '</p>';
+            const copyButton = '<button class="ai-copy-btn" type="button" data-copy-message="' + escapeHtml(message.messageId) + '">复制</button>';
+            return '<div class="ai-message-main">' + messageHtml + '</div>' +
+                '<div class="ai-message-actions">' + copyButton + '</div>' +
                 (artifact && artifact.downloadUrl
                     ? '<div class="ai-message-download"><a class="pill-btn" href="' + escapeHtml(artifact.downloadUrl) + '" download>下载生成的 PDF</a></div>'
                     : '');
@@ -213,7 +354,7 @@
                     '<div class="ai-chat-date">今天</div>' +
                     '<article class="ai-message ai-message-assistant">' +
                     '  <div class="ai-avatar" aria-hidden="true">AI</div>' +
-                    '  <div class="ai-bubble"><p>' + escapeHtml(resolveDefaultAssistantMessage()) + '</p></div>' +
+                    '  <div class="ai-bubble"><div class="ai-message-main"><p>' + escapeHtml(resolveDefaultAssistantMessage()) + '</p></div></div>' +
                     '</article>';
                 return;
             }
@@ -614,6 +755,30 @@
             renderPendingAttachments();
             return payload.data || {};
         }
+
+        thread?.addEventListener('click', async (event) => {
+            const copyButton = event.target.closest('[data-copy-message]');
+            if (!copyButton) {
+                return;
+            }
+            const messageId = copyButton.getAttribute('data-copy-message') || '';
+            const currentSession = getCurrentSession();
+            const message = currentSession?.messages?.find((item) => String(item?.messageId || '') === messageId);
+            if (!message) {
+                return;
+            }
+            const originalLabel = copyButton.textContent;
+            try {
+                await copyText(message.content || '');
+                copyButton.textContent = '已复制';
+                window.setTimeout(() => {
+                    copyButton.textContent = originalLabel || '复制';
+                }, 1500);
+            } catch (error) {
+                console.error('[TA-AI] copy failed', error);
+                window.alert('复制失败，请手动选择内容后复制。');
+            }
+        });
 
         chipButtons.forEach((button) => {
             button.addEventListener('click', () => {
