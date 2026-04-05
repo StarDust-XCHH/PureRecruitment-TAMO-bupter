@@ -659,12 +659,16 @@ public class TaAiConversationDao {
         return normalizedPath.toString().replace('\\', '/');
     }
 
-    private Path resolveStoredPath(String storedPath) {
+    public synchronized Path resolveStoredPathForService(String storedPath) {
         Path path = Path.of(trim(storedPath));
         if (path.isAbsolute()) {
             return path.toAbsolutePath().normalize();
         }
         return DataMountPaths.root().resolve(path).toAbsolutePath().normalize();
+    }
+
+    private Path resolveStoredPath(String storedPath) {
+        return resolveStoredPathForService(storedPath);
     }
 
     private String encodeQuery(String value) {

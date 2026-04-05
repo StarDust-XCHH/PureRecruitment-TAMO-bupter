@@ -1,0 +1,36 @@
+{
+  "schema": "ta-ai-conversations.v1",
+  "version": 1,
+  "taId": "TA-10258",
+  "updatedAt": "2026-04-05T16:47:43.670664500Z",
+  "sessions": [
+    {
+      "sessionId": "sess_913d3be86fb042c19bc8fd82ac184a34",
+      "scene": "general_chat",
+      "title": "AI 助理对话",
+      "status": "active",
+      "createdAt": "2026-04-05T16:47:37.602103100Z",
+      "updatedAt": "2026-04-05T16:47:43.670664500Z",
+      "messages": [
+        {
+          "messageId": "msg_f10709282b694601b6d1d4abafd33e20",
+          "role": "user",
+          "type": "text",
+          "content": "你好，测试链接",
+          "createdAt": "2026-04-05T16:47:37.622077Z"
+        },
+        {
+          "messageId": "msg_15d9b495e3274ee181c73fdf90f0cd11",
+          "role": "assistant",
+          "type": "text",
+          "content": "你好！看起来你可能想测试某个链接，但当前消息中没有附带具体的链接内容或说明。如果你有以下任一需求，欢迎告诉我，我会尽力协助：\n\n✅ 想验证某个招聘页面/申请链接是否有效  \n✅ 需要检查链接是否符合 TA（招聘专员）工作场景的规范（如ATS友好、移动端适配、追踪参数等）  \n✅ 希望我帮你生成一个专业的招聘落地页链接（例如指向 PureRecruitment 职位详情页、申请表单或雇主品牌页）  \n✅ 上传了文件（如JD、网页截图、PDF），需要我结合内容分析链接上下文  \n\n请补充一点信息，比如：  \n🔹 链接地址（可粘贴）  \n🔹 你想用这个链接做什么（例如“发给候选人”“嵌入邮件签名”“用于LinkedIn广告”）  \n🔹 是否已上传相关材料？我可以基于文件内容给出针对性建议  \n\n随时等你继续 👇",
+          "createdAt": "2026-04-05T16:47:43.670664500Z"
+        }
+      ],
+      "attachments": [],
+      "context": {},
+      "provider": "qwen-long"
+    }
+  ],
+  "pendingAttachments": []
+}

@@ -3,7 +3,6 @@ package com.bupt.tarecruit.ta.controller;
 import com.bupt.tarecruit.common.model.ApiResponse;
 import com.bupt.tarecruit.common.util.ServletJsonResponseWriter;
 import com.bupt.tarecruit.ta.service.TaAiAssistantService;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import jakarta.servlet.ServletException;
@@ -34,12 +33,17 @@ import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.trim;
 )
 public class TaAiAssistantServlet extends HttpServlet {
     private final TaAiAssistantService aiAssistantService = new TaAiAssistantService();
-    private final Gson gson = new Gson();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding(StandardCharsets.UTF_8.name());
         resp.setCharacterEncoding(StandardCharsets.UTF_8.name());
+
+        String action = trim(req.getParameter("action"));
+        if ("status".equalsIgnoreCase(action)) {
+            ServletJsonResponseWriter.write(resp, 200, ApiResponse.success("AI 服务状态读取成功", aiAssistantService.getServiceStatus()));
+            return;
+        }
 
         String taId = trim(req.getParameter("taId"));
         if (taId.isEmpty()) {

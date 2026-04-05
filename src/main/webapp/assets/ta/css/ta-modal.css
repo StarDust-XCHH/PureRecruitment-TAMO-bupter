@@ -260,6 +260,44 @@
     gap: 18px;
 }
 
+.ai-service-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 32px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 13px;
+}
+
+.ai-service-banner strong {
+    color: var(--text);
+    white-space: nowrap;
+}
+
+.ai-service-banner span {
+    color: var(--muted);
+}
+
+.ai-service-banner[data-available="true"] {
+    background: rgba(16, 185, 129, 0.12);
+}
+
+.ai-service-banner[data-available="false"] {
+    background: rgba(239, 68, 68, 0.12);
+}
+
+.ai-chat-chip:disabled,
+.ai-composer-input:disabled,
+.ai-send-btn:disabled,
+.ai-upload-input:disabled + .ai-upload-icon,
+.ai-upload-input:disabled ~ strong,
+.ai-upload-input:disabled ~ span {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
 .modal-close {
     position: absolute;
     right: 18px;
