@@ -91,6 +91,148 @@ public final class RecruitmentCoursesDao {
         }
     }
 
+    /**
+     * Merges editable course/job fields onto the on-disk row for {@code courseCode} (ignore case).
+     * Does not change {@code jobId}, {@code courseCode}, {@code ownerMoId}, application counters, or audit fields.
+     * Keys in {@code patch} follow the same shapes as {@link #appendPublishedJob(JsonObject)} inputs.
+     *
+     * @return {@code true} if a row was updated
+     */
+    public static boolean mergePublishedJobContentByCourseCode(String courseCode, JsonObject patch) throws IOException {
+        String needle = trim(courseCode);
+        if (needle.isEmpty() || patch == null) {
+            return false;
+        }
+        synchronized (FILE_LOCK) {
+            JsonObject root = ensureJobBoardRoot();
+            JsonArray items = root.getAsJsonArray("items");
+            for (int i = 0; i < items.size(); i++) {
+                JsonElement el = items.get(i);
+                if (el == null || !el.isJsonObject()) {
+                    continue;
+                }
+                JsonObject raw = el.getAsJsonObject();
+                if (!needle.equalsIgnoreCase(trim(getAsString(raw, "courseCode")))) {
+                    continue;
+                }
+                applyPublishedJobContentPatch(raw, patch);
+                raw.addProperty("updatedAt", Instant.now().toString());
+                updateMeta(root, JOB_BOARD_SCHEMA, JOB_BOARD_ENTITY, JOB_BOARD_VERSION);
+                syncJobBoardFileEnvelope(root, items);
+                writeJson(root);
+                return true;
+            }
+            return false;
+        }
+    }
+
+    private static void applyPublishedJobContentPatch(JsonObject raw, JsonObject patch) {
+        if (patch.has("courseName") && patch.get("courseName").isJsonPrimitive()) {
+            raw.add("courseName", patch.get("courseName").deepCopy());
+        }
+        if (patch.has("ownerMoName") && patch.get("ownerMoName").isJsonPrimitive()) {
+            raw.add("ownerMoName", patch.get("ownerMoName").deepCopy());
+        }
+        if (patch.has("semester")) {
+            String s = trim(getAsString(patch, "semester"));
+            if (s.isEmpty()) {
+                raw.remove("semester");
+            } else {
+                raw.addProperty("semester", s);
+            }
+        }
+        if (patch.has("recruitmentStatus") && patch.get("recruitmentStatus").isJsonPrimitive()) {
+            raw.add("recruitmentStatus", patch.get("recruitmentStatus").deepCopy());
+        }
+        if (patch.has("status") && patch.get("status").isJsonPrimitive()) {
+            raw.add("status", patch.get("status").deepCopy());
+        }
+        if (patch.has("applicationDeadline")) {
+            if (patch.get("applicationDeadline").isJsonNull()) {
+                raw.remove("applicationDeadline");
+            } else {
+                String d = trim(getAsString(patch, "applicationDeadline"));
+                if (d.isEmpty()) {
+                    raw.remove("applicationDeadline");
+                } else {
+                    raw.addProperty("applicationDeadline", d);
+                }
+            }
+        }
+        if (patch.has("teachingWeeks")) {
+            if (patch.get("teachingWeeks").isJsonObject()) {
+                JsonObject tw = patch.getAsJsonObject("teachingWeeks");
+                if (tw.has("weeks") && tw.get("weeks").isJsonArray() && tw.getAsJsonArray("weeks").isEmpty()) {
+                    raw.remove("teachingWeeks");
+                } else {
+                    raw.add("teachingWeeks", tw.deepCopy());
+                }
+            }
+        }
+        if (patch.has("assessmentEvents")) {
+            if (patch.get("assessmentEvents").isJsonArray()) {
+                JsonArray arr = patch.getAsJsonArray("assessmentEvents");
+                if (arr.isEmpty()) {
+                    raw.remove("assessmentEvents");
+                } else {
+                    raw.add("assessmentEvents", arr.deepCopy());
+                }
+            }
+        }
+        if (patch.has("requiredSkills") && patch.get("requiredSkills").isJsonObject()) {
+            raw.add("requiredSkills", patch.getAsJsonObject("requiredSkills").deepCopy());
+        }
+        if (patch.has("courseDescription") && patch.get("courseDescription").isJsonPrimitive()) {
+            raw.add("courseDescription", patch.get("courseDescription").deepCopy());
+        }
+        if (patch.has("recruitmentBrief")) {
+            String b = trim(getAsString(patch, "recruitmentBrief"));
+            if (b.isEmpty()) {
+                raw.remove("recruitmentBrief");
+            } else {
+                raw.addProperty("recruitmentBrief", b);
+            }
+        }
+        if (patch.has("workload")) {
+            String w = trim(getAsString(patch, "workload"));
+            if (w.isEmpty()) {
+                raw.remove("workload");
+            } else {
+                raw.addProperty("workload", w);
+            }
+        }
+        if (patch.has("campus")) {
+            String campus = normalizeCampus(getAsString(patch, "campus"));
+            if (campus.isBlank()) {
+                raw.remove("campus");
+            } else {
+                raw.addProperty("campus", campus);
+            }
+        }
+        if (patch.has("studentCount")) {
+            raw.addProperty("studentCount", getAsInt(patch, "studentCount", -1));
+        }
+        if (patch.has("taRecruitCount")) {
+            if (patch.get("taRecruitCount").isJsonNull()) {
+                raw.remove("taRecruitCount");
+            } else {
+                try {
+                    raw.addProperty("taRecruitCount", patch.get("taRecruitCount").getAsInt());
+                } catch (Exception ignore) {
+                    raw.remove("taRecruitCount");
+                }
+            }
+        }
+        if (patch.has("source") && patch.get("source").isJsonPrimitive()) {
+            String sourceText = trim(getAsString(patch, "source"));
+            if (sourceText.isBlank()) {
+                raw.remove("source");
+            } else {
+                raw.addProperty("source", sourceText);
+            }
+        }
+    }
+
     public static JsonObject findNormalizedJobByCourseCode(String courseCode) throws IOException {
         synchronized (FILE_LOCK) {
             JsonObject courses = ensureJobBoardRoot();

@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -213,6 +214,112 @@ public class MoRecruitmentDao {
         result.addProperty("success", true);
         result.addProperty("message", "课程发布成功");
         result.add("item", item.deepCopy());
+        return result;
+    }
+
+    /**
+     * 更新当前 MO 已发布课程的可编辑信息（课程编号不可改）；归属与 {@code jobId} 不变。
+     */
+    public JsonObject updateCourse(JsonObject input, String actingMoId) throws IOException {
+        String ownerMoId = new MoAccountDao().resolveCanonicalMoId(actingMoId);
+        if (ownerMoId.isBlank()) {
+            throw new IllegalArgumentException("缺少 moId");
+        }
+        String courseCode = trim(getAsString(input, "courseCode"));
+        if (courseCode.isEmpty()) {
+            throw new IllegalArgumentException("课程编号不能为空");
+        }
+        assertMoOwnsCourseResolved(ownerMoId, courseCode);
+
+        String courseName = trim(getAsString(input, "courseName"));
+        if (courseName.isEmpty()) {
+            throw new IllegalArgumentException("课程名称不能为空");
+        }
+        String recruitmentStatus = firstNonBlank(
+                trim(getAsString(input, "recruitmentStatus")),
+                trim(getAsString(input, "status")));
+        if (recruitmentStatus.isEmpty()) {
+            throw new IllegalArgumentException("招聘状态不能为空");
+        }
+        String semester = trim(getAsString(input, "semester"));
+        boolean hasApplicationDeadlineField = input.has("applicationDeadline");
+        String applicationDeadline = hasApplicationDeadlineField ? trim(getAsString(input, "applicationDeadline")) : "";
+
+        JsonObject teachingWeeks = RecruitmentCoursesDao.normalizeTeachingWeeks(
+                input.has("teachingWeeks") && input.get("teachingWeeks").isJsonObject()
+                        ? input.getAsJsonObject("teachingWeeks")
+                        : null);
+        JsonArray assessmentEvents = RecruitmentCoursesDao.normalizeAssessmentEvents(
+                input.has("assessmentEvents") ? input.get("assessmentEvents") : null);
+        JsonObject requiredSkills = RecruitmentCoursesDao.normalizeRequiredSkills(
+                input.has("requiredSkills") ? input.get("requiredSkills") : null);
+        if (!RecruitmentCoursesDao.hasRequiredSkills(requiredSkills)) {
+            throw new IllegalArgumentException("技能标签不能为空");
+        }
+
+        String courseDescription = trim(getAsString(input, "courseDescription"));
+        if (courseDescription.isEmpty()) {
+            throw new IllegalArgumentException("岗位描述不能为空");
+        }
+        String ownerMoName = resolveOwnerMoName(ownerMoId, input);
+        String recruitmentBrief = trim(getAsString(input, "recruitmentBrief"));
+        String workload = input.has("workload") ? trim(getAsString(input, "workload")) : null;
+        String campus = input.has("campus")
+                ? RecruitmentCoursesDao.normalizeCampus(getAsString(input, "campus"))
+                : "";
+        Integer studentCount = getOptionalInt(input, "studentCount");
+        int normalizedStudentCount = studentCount == null ? -1 : studentCount;
+
+        JsonObject patch = new JsonObject();
+        patch.addProperty("courseName", courseName);
+        patch.addProperty("ownerMoName", ownerMoName);
+        patch.addProperty("semester", semester);
+        patch.addProperty("recruitmentStatus", recruitmentStatus);
+        patch.addProperty("status", recruitmentStatus);
+        if (hasApplicationDeadlineField) {
+            if (applicationDeadline.isEmpty()) {
+                patch.add("applicationDeadline", JsonNull.INSTANCE);
+            } else {
+                patch.addProperty("applicationDeadline", applicationDeadline);
+            }
+        }
+        patch.add("teachingWeeks", teachingWeeks);
+        patch.add("assessmentEvents", assessmentEvents);
+        patch.add("requiredSkills", requiredSkills);
+        patch.addProperty("courseDescription", courseDescription);
+        patch.addProperty("recruitmentBrief", recruitmentBrief);
+        if (workload != null) {
+            patch.addProperty("workload", workload);
+        }
+        if (input.has("campus")) {
+            patch.addProperty("campus", campus);
+        }
+        patch.addProperty("studentCount", normalizedStudentCount);
+        if (input.has("taRecruitCount")) {
+            Integer taRecruitCount = getOptionalInt(input, "taRecruitCount");
+            if (taRecruitCount != null) {
+                patch.addProperty("taRecruitCount", taRecruitCount);
+            } else {
+                patch.add("taRecruitCount", JsonNull.INSTANCE);
+            }
+        }
+        if (input.has("source")) {
+            String source = trim(getAsString(input, "source"));
+            if (!source.isBlank()) {
+                patch.addProperty("source", source);
+            } else {
+                patch.addProperty("source", "");
+            }
+        }
+
+        if (!RecruitmentCoursesDao.mergePublishedJobContentByCourseCode(courseCode, patch)) {
+            throw new IllegalArgumentException("课程不存在");
+        }
+        JsonObject item = RecruitmentCoursesDao.findNormalizedJobByCourseCode(courseCode);
+        JsonObject result = new JsonObject();
+        result.addProperty("success", true);
+        result.addProperty("message", "课程信息已更新");
+        result.add("item", item != null ? item.deepCopy() : new JsonObject());
         return result;
     }
 
