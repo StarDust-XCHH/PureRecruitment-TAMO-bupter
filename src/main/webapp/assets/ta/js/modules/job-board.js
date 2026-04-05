@@ -554,7 +554,7 @@
             const course = courseDetailState[courseCode];
             if (!course || isAppliedCourse(courseCode)) return;
             syncApplyModal(course);
-            if (typeof app.openModal === 'function') app.openModal('course-apply', { keepStack: true });
+            if (typeof app.openModal === 'function') app.openModal('course-apply');
         });
 
         const jobResumeFileInput = document.getElementById('jobResumeFileInput');
