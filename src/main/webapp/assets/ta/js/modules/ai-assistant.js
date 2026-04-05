@@ -28,6 +28,8 @@
         const statusBadge = document.getElementById('aiAssistantStatusBadge');
         const pendingCount = document.getElementById('aiPendingAttachmentCount');
         const pendingList = document.getElementById('aiPendingAttachmentList');
+        const historyCount = document.getElementById('aiConversationHistoryCount');
+        const historyList = document.getElementById('aiAssistantSessionHistory');
         const composerInput = document.getElementById('aiAssistantComposerInput');
         const sendBtn = document.getElementById('aiAssistantSendBtn');
         const fileInput = document.getElementById('aiAssistantFileInput');
@@ -289,7 +291,45 @@
         }
 
         function getCurrentSession() {
-            return state.sessions.find((item) => item.sessionId === state.sessionId) || state.sessions[0] || null;
+            return state.sessions.find((item) => item.sessionId === state.sessionId) || null;
+        }
+
+        function formatSessionTime(value) {
+            const raw = String(value || '').trim();
+            if (!raw) return '未开始';
+            const date = new Date(raw);
+            if (Number.isNaN(date.getTime())) return raw;
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hour = String(date.getHours()).padStart(2, '0');
+            const minute = String(date.getMinutes()).padStart(2, '0');
+            return month + '-' + day + ' ' + hour + ':' + minute;
+        }
+
+        function getSessionPreview(session) {
+            const messages = Array.isArray(session?.messages) ? session.messages : [];
+            const firstUserMessage = messages.find((item) => String(item?.role || '') === 'user' && String(item?.content || '').trim());
+            const preview = String(firstUserMessage?.content || session?.title || '新会话').trim();
+            return preview.length > 20 ? preview.slice(0, 20) + '…' : preview;
+        }
+
+        function renderSessionHistory() {
+            if (historyCount) {
+                historyCount.textContent = state.sessions.length + ' 条';
+            }
+            if (!historyList) return;
+            if (!state.sessions.length) {
+                historyList.innerHTML = '<div class="ai-session-history-empty">暂无历史会话</div>';
+                return;
+            }
+            historyList.innerHTML = state.sessions.map((session) => {
+                const sessionId = String(session?.sessionId || '').trim();
+                const activeClass = sessionId && sessionId === state.sessionId ? ' active' : '';
+                return '<button class="ai-session-item' + activeClass + '" type="button" data-session-id="' + escapeHtml(sessionId) + '">' +
+                    '<span class="ai-session-item-title">' + escapeHtml(getSessionPreview(session)) + '</span>' +
+                    '<span class="ai-session-item-meta">' + escapeHtml(formatSessionTime(session?.updatedAt || session?.createdAt || '')) + '</span>' +
+                    '</button>';
+            }).join('');
         }
 
         function normalizeMessage(message) {
@@ -351,7 +391,7 @@
             const currentSession = getCurrentSession();
             if (!currentSession || !Array.isArray(currentSession.messages) || !currentSession.messages.length) {
                 thread.innerHTML = '' +
-                    '<div class="ai-chat-date">今天</div>' +
+                    '<div class="ai-chat-date">新会话</div>' +
                     '<article class="ai-message ai-message-assistant">' +
                     '  <div class="ai-avatar" aria-hidden="true">AI</div>' +
                     '  <div class="ai-bubble"><div class="ai-message-main"><p>' + escapeHtml(resolveDefaultAssistantMessage()) + '</p></div></div>' +
@@ -387,6 +427,7 @@
                 state.sessionId = String(state.sessions[0].sessionId || '').trim();
             }
             renderPendingAttachments();
+            renderSessionHistory();
             renderThread();
         }
 
@@ -436,13 +477,14 @@
             }
             if (composerHint) {
                 composerHint.textContent = state.serviceStatus.available
-                    ? '已切换到新会话。你可以直接输入问题，或先上传附件后再发送。'
+                    ? '已切换到新的空白会话。你可以继续输入新问题，右侧仍可查阅历史会话。'
                     : (state.serviceStatus.message || '当前 AI 服务不可用');
             }
             if (state.serviceStatus.available) {
                 setStatus('Ready');
             }
             renderPendingAttachments();
+            renderSessionHistory();
             renderThread();
             applyServiceStatus(state.serviceStatus);
         }
@@ -651,7 +693,10 @@
                 if (result?.conversation) {
                     hydrateConversation(result.conversation);
                 }
-                state.pendingAttachments = Array.isArray(result?.pendingAttachments) ? result.pendingAttachments : [];
+                state.pendingAttachments = [];
+                if (fileInput) {
+                    fileInput.value = '';
+                }
                 renderPendingAttachments();
                 renderThread();
                 if (result?.serviceStatus) {
