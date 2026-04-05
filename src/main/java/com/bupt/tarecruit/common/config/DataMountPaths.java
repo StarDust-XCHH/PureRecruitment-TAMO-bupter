@@ -37,6 +37,7 @@ public final class DataMountPaths {
     public static Path moDir() {
         return root().resolve("mo");
     }
+
     /** Returns path to MO accounts file ({@code mos.json}). */
     public static Path moAccounts() {
         return moDir().resolve("mos.json");
@@ -93,6 +94,38 @@ public final class DataMountPaths {
         return taResumeDir(taId).resolve(safePathSegment(courseCode));
     }
 
+    public static Path taAiRoot() {
+        return taDir().resolve("ai");
+    }
+
+    public static Path taAiConversationRoot() {
+        return taAiRoot().resolve("conversations");
+    }
+
+    public static Path taAiConversationFile(String taId) {
+        return taAiConversationRoot().resolve(safePathSegment(taId) + ".json");
+    }
+
+    public static Path taAiAttachmentRoot(String taId) {
+        return taAiRoot().resolve("attachments").resolve(safePathSegment(taId));
+    }
+
+    public static Path taAiAttachmentTempRoot(String taId) {
+        return taAiAttachmentRoot(taId).resolve("temp");
+    }
+
+    public static Path taAiAttachmentUploadedRoot(String taId) {
+        return taAiAttachmentRoot(taId).resolve("uploaded");
+    }
+
+    public static Path taAiAttachmentGeneratedRoot(String taId) {
+        return taAiAttachmentRoot(taId).resolve("generated");
+    }
+
+    public static Path taAiExportRoot(String taId) {
+        return taAiRoot().resolve("exports").resolve(safePathSegment(taId));
+    }
+
     private static String safePathSegment(String value) {
         String normalized = value == null ? "unknown" : value.trim();
         if (normalized.isEmpty()) {
@@ -112,4 +145,3 @@ public final class DataMountPaths {
     private record ResolvedDataRoot(boolean fromEnvironment, Path rootPath) {
     }
 }
-

@@ -75,6 +75,7 @@
         'profile',
         'password',
         'jobBoard',
+        'aiAssistant',
         'dashboardCards',
         'status',
         'onboarding'

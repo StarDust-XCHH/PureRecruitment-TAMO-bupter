@@ -521,6 +521,36 @@
     gap: 14px;
 }
 
+.ai-composer-hint {
+    font-size: 13px;
+    color: rgba(226, 232, 240, 0.76);
+    padding: 10px 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.ai-upload-file-empty {
+    opacity: 0.86;
+}
+
+.ai-message-download {
+    display: flex;
+    justify-content: flex-start;
+}
+
+.job-apply-action-stack {
+    display: grid;
+    gap: 10px;
+}
+
+.ai-assistant-head-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
 .ai-side-card h4 {
     margin: 0;
 }
