@@ -14,12 +14,12 @@
 
         const heroScenarios = [
             {
-                key: 'urgent',
-                badge: '⏰ 紧急待办',
-                title: 'Seele，明天下午有一场微处理器课程的 TA 面试。',
-                desc: '教授留言提醒你需要准备一段关于 C 语言和底层通信逻辑的试讲。点击下方按钮查看面试指南与注意事项。',
-                primary: '查看面试详情',
-                secondary: '已准备妥当',
+                key: 'assistant',
+                badge: '🤖 AI 助理',
+                title: '你的 TA 智能助手已经就绪。',
+                desc: '现在可以在工作台中直接打开 AI 对话面板，后续接入 API 后即可围绕简历优化、课程材料总结、岗位匹配和试讲准备进行辅助分析。',
+                primary: '打开 AI 助理',
+                secondary: '查看下一个建议',
                 modalTarget: 'planner',
                 routeJump: 'profile'
             },
