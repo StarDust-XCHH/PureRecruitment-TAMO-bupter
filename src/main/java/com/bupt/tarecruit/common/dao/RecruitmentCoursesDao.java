@@ -351,7 +351,7 @@ public final class RecruitmentCoursesDao {
         String ownerMoName = firstNonBlank(trim(getAsString(item, "ownerMoName")),
                 firstNonBlank(legacyMoName, "MO"));
         item.addProperty("ownerMoName", ownerMoName);
-        item.addProperty("ownerMoId", firstNonBlank(trim(getAsString(item, "ownerMoId")), ownerMoName));
+        item.addProperty("ownerMoId", trim(getAsString(item, "ownerMoId")));
         if (trim(getAsString(item, "semester")).isBlank()) {
             item.remove("semester");
         } else {

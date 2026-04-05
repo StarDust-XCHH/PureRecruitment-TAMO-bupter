@@ -40,11 +40,69 @@ public class MoRecruitmentDao {
             .disableHtmlEscaping()
             .create();
 
-    public JsonObject getPendingCourses() throws IOException {
-        return RecruitmentCoursesDao.readJobBoard();
+    /**
+     * 岗位上的展示名：优先 {@code mos.json} 账号字段 {@code name}；勿用 profile 的 {@code realName} 或 {@code username}。
+     * 仅当查不到账号时，才回退请求体中的 {@code ownerMoName}，最后回退 {@code ownerMoId}。
+     */
+    private static String resolveOwnerMoName(String ownerMoId, JsonObject input) throws IOException {
+        MoAccountDao.ProfileResult pr = new MoAccountDao().getProfileSettings(ownerMoId);
+        if (pr.isSuccess() && pr.getData() != null) {
+            Object n = pr.getData().get("name");
+            if (n != null) {
+                String accountName = String.valueOf(n).trim();
+                if (!accountName.isBlank()) {
+                    return accountName;
+                }
+            }
+        }
+        String fromInput = trim(getAsString(input, "ownerMoName"));
+        if (!fromInput.isBlank()) {
+            return fromInput;
+        }
+        return trim(ownerMoId);
     }
 
-    public JsonObject createCourse(JsonObject input) throws IOException {
+    private static boolean jobOwnerMoIdMatchesMo(String moId, String ownerMoIdOnJob) {
+        String m = trim(moId);
+        String o = trim(ownerMoIdOnJob);
+        return !m.isBlank() && !o.isBlank() && o.equalsIgnoreCase(m);
+    }
+
+    /**
+     * 当前 MO 可见的岗位：仅当 {@code item.ownerMoId} 与登录 {@code moId} 相同（忽略大小写）。
+     */
+    public JsonObject getJobBoardForMo(String moId) throws IOException {
+        String m = trim(moId);
+        if (m.isBlank()) {
+            throw new IllegalArgumentException("缺少 moId");
+        }
+        JsonObject full = RecruitmentCoursesDao.readJobBoard();
+        JsonArray items = full.getAsJsonArray("items");
+        JsonArray owned = new JsonArray();
+        for (JsonElement e : items) {
+            if (e == null || !e.isJsonObject()) {
+                continue;
+            }
+            JsonObject j = e.getAsJsonObject();
+            if (jobOwnerMoIdMatchesMo(m, getAsString(j, "ownerMoId"))) {
+                owned.add(j.deepCopy());
+            }
+        }
+        JsonObject payload = new JsonObject();
+        payload.addProperty("schema", getAsString(full, "schema"));
+        payload.addProperty("version", getAsString(full, "version"));
+        if (full.has("generatedAt") && !full.get("generatedAt").isJsonNull()) {
+            payload.add("generatedAt", full.get("generatedAt").deepCopy());
+        }
+        payload.addProperty("count", owned.size());
+        payload.add("items", owned);
+        return payload;
+    }
+
+    /**
+     * 发布课程：{@code ownerMoId} 必须为 {@code actingMoId}，不可由客户端伪造。
+     */
+    public JsonObject createCourse(JsonObject input, String actingMoId) throws IOException {
         String now = Instant.now().toString();
         String courseName = trim(getAsString(input, "courseName"));
         if (courseName.isEmpty()) {
@@ -80,12 +138,11 @@ public class MoRecruitmentDao {
         if (courseDescription.isEmpty()) {
             throw new IllegalArgumentException("岗位描述不能为空");
         }
-        String ownerMoName = firstNonBlank(
-                trim(getAsString(input, "ownerMoName")),
-                firstNonBlank(
-                        trim(getAsString(input, "ownerMoId")), "MO"));
-        String ownerMoId = firstNonBlank(
-                trim(getAsString(input, "ownerMoId")), ownerMoName);
+        String ownerMoId = trim(actingMoId);
+        if (ownerMoId.isBlank()) {
+            throw new IllegalArgumentException("缺少 moId");
+        }
+        String ownerMoName = resolveOwnerMoName(ownerMoId, input);
         String recruitmentBrief = trim(getAsString(input, "recruitmentBrief"));
         String workload = trim(getAsString(input, "workload"));
         String campus = RecruitmentCoursesDao.normalizeCampus(getAsString(input, "campus"));
@@ -241,8 +298,7 @@ public class MoRecruitmentDao {
         if (job == null) {
             throw new IllegalArgumentException("课程不存在或未发布");
         }
-        String owner = firstNonBlank(getAsString(job, "ownerMoId"), "");
-        if (owner.isBlank() || !owner.equalsIgnoreCase(trim(moId))) {
+        if (!jobOwnerMoIdMatchesMo(trim(moId), getAsString(job, "ownerMoId"))) {
             throw new IllegalArgumentException("当前 MO 无权管理该课程的申请人");
         }
     }
@@ -336,7 +392,7 @@ public class MoRecruitmentDao {
                 continue;
             }
             JsonObject j = e.getAsJsonObject();
-            if (m.equalsIgnoreCase(getAsString(j, "ownerMoId"))) {
+            if (jobOwnerMoIdMatchesMo(m, getAsString(j, "ownerMoId"))) {
                 String cc = trim(getAsString(j, "courseCode")).toUpperCase(Locale.ROOT);
                 if (!cc.isBlank()) {
                     owned.add(cc);

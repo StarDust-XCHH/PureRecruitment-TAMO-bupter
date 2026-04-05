@@ -4,7 +4,7 @@ Jakarta servlets exposing JSON APIs for the Module Organizer (MO) workspace. The
 
 | Servlet | URL pattern | Role |
 | --- | --- | --- |
-| `MoJobBoardServlet` | `/api/mo/jobs` | `GET` lists published jobs (v2 schema); `POST` creates a job from JSON and persists to shared recruitment data. |
+| `MoJobBoardServlet` | `/api/mo/jobs` | `GET` lists jobs **for the caller’s `moId`** (query `moId`, matches `items[].ownerMoId`); `POST` creates a job: **`ownerMoId` is taken from query/body `moId`**, not from client `ownerMoId`. |
 | `MoApplicantsServlet` | `/api/mo/applicants` | `GET` lists **submitted** applicants for a course; query **`courseCode`** and **`moId`** (must own the job via `ownerMoId`). Returns `items`, `count`, `unreadCount`. |
 | `MoApplicantDetailServlet` | `/api/mo/applicants/detail` | `GET` single-application detail: **`moId`**, **`applicationId`**. |
 | `MoApplicantsUnreadServlet` | `/api/mo/applicants/unread-count` | `GET` **`moId`** — unread count for sidebar badge. |

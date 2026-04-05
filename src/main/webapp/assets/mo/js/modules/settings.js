@@ -23,6 +23,8 @@
             }
         }
 
+        app.getMoUser = getMoUser;
+
         function ensureLoggedIn() {
             if (!getMoUser()) {
                 window.location.replace('../../index.jsp');
@@ -35,10 +37,10 @@
             const safeTheme = theme === 'light' ? 'light' : 'dark';
             if (safeTheme === 'light') {
                 root.setAttribute('data-theme', 'light');
-                themeToggle.textContent = '☀️';
+                if (themeToggle) themeToggle.textContent = '☀️';
             } else {
                 root.removeAttribute('data-theme');
-                themeToggle.textContent = '🌙';
+                if (themeToggle) themeToggle.textContent = '🌙';
             }
             localStorage.setItem('mo-theme', safeTheme);
             if (settingsTheme) settingsTheme.textContent = safeTheme;
@@ -59,13 +61,13 @@
 
         applyTheme(localStorage.getItem('mo-theme') || 'dark');
 
-        themeToggle.addEventListener('click', toggleTheme);
-        logoutBtn.addEventListener('click', function () {
-            sessionStorage.removeItem('mo-user');
-            localStorage.removeItem('mo-user');
-            window.location.replace('../../index.jsp');
-        });
-
-        app.getMoUser = getMoUser;
+        if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', function () {
+                sessionStorage.removeItem('mo-user');
+                localStorage.removeItem('mo-user');
+                window.location.replace('../../index.jsp');
+            });
+        }
     };
 })();

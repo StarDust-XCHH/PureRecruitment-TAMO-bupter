@@ -28,6 +28,7 @@ This log tracks MO-side changes that interact with TA-side interfaces or TA data
 ## New/Updated MO Interfaces (v2)
 
 - `GET /api/mo/jobs`
+  - Query **`moId`**（必填）: 仅返回 `items[].ownerMoId` 与该账号 **`id`** 相同的岗位（忽略大小写）；`ownerMoId` 应为 MO 主键 id，非用户名。
   - Returns job board payload in v2 shape:
     - `schema: mo-ta-job-board`
     - `version: 2.0`
@@ -36,10 +37,11 @@ This log tracks MO-side changes that interact with TA-side interfaces or TA data
     - `items`
   - Reads from:
     - `mountDataTAMObupter/common/recruitment-courses.json`
-  - Normalizes each item **in memory** for the response only; **does not** write `recruitment-courses.json`. Listing jobs therefore does not rewrite or “clean up” other courses on disk.
+  - Normalizes each **filtered** item **in memory** for the response only; **does not** write `recruitment-courses.json`.
 
 - `POST /api/mo/jobs`
   - Creates one MO job using semester-scale fields (see `docs/mo-job-board-api-v2.md`).
+  - **身份**：查询参数或 JSON 根字段 **`moId`**（必填其一，查询优先）；持久化的 **`ownerMoId`** 取该值（账号 id）。**`ownerMoName`** 由服务端从 **`mos.json` 的 `name`** 写入；`username` / `realName` 仅存在于个人资料数据，不写入岗位。
   - Writes to:
     - `mountDataTAMObupter/common/recruitment-courses.json`
   - Adds/normalizes v2 fields.

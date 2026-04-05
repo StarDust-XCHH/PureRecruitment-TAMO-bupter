@@ -7,7 +7,7 @@ MO 端课程工具：在 **单一 Excel 工作簿**（默认 docs/log/mo_courses
 子命令（可省略，省略时在终端交互选择）：
   export   — JSON → Excel（导出当前全部岗位到表内，便于编辑）
   import   — Excel → JSON（**以表中行为准**：新增行=新课程，删行=从 JSON 删除，改行=更新）
-  generate — 按 mos/profiles 随机生成 EBT#### 课程写入 JSON，并 **重写同一 Excel** 为当前全量
+  generate — 按 mos.json（ownerMoId=id，ownerMoName=name）随机生成 EBT#### 课程；profiles 文件仅须存在；**重写同一 Excel** 为当前全量
 
 招聘状态随机（仅 generate）：**70% OPEN**、**30% CLOSED**。
 
@@ -541,22 +541,10 @@ def load_mo_accounts(mos_path: Path, profiles_path: Path) -> list[tuple[str, str
 
     with mos_path.open(encoding="utf-8") as f:
         mos_root = json.load(f)
-    with profiles_path.open(encoding="utf-8") as f:
-        prof_root = json.load(f)
 
     mos_items = mos_root.get("items")
-    prof_items = prof_root.get("items")
     if not isinstance(mos_items, list):
         raise ValueError("mos.json 缺少 items 数组")
-    if not isinstance(prof_items, list):
-        prof_items = []
-
-    by_mo_id: dict[str, dict] = {}
-    for row in prof_items:
-        if isinstance(row, dict):
-            mid = _trim(row.get("moId"))
-            if mid:
-                by_mo_id[mid.lower()] = row
 
     out: list[tuple[str, str]] = []
     for acc in mos_items:
@@ -565,10 +553,8 @@ def load_mo_accounts(mos_path: Path, profiles_path: Path) -> list[tuple[str, str
         mo_id = _trim(acc.get("id"))
         if not mo_id:
             continue
-        prof = by_mo_id.get(mo_id.lower())
-        real = _trim(prof.get("realName")) if prof else ""
         name = _trim(acc.get("name"))
-        display = real or name or mo_id
+        display = name or mo_id
         out.append((mo_id, display))
 
     if not out:
