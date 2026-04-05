@@ -13,8 +13,6 @@
 
 **不传 `-Dexec.args` 时**会在终端打印菜单（1～4 选模式，0 退出）；与 `genMoCourses.py` 无参交互类似。无 stdin 时自动按「全部清理」执行。
 
-清理成功结束后会**再询问一次**：是否执行 `tools/genMoCourses.py import`（默认 Excel `docs/log/mo_courses.xlsx` → 当前数据挂载下的 `recruitment-courses.json`）。需本机已安装 Python 且可运行 `pandas`/`openpyxl`。自动化或脚本中若不想停顿，可加 **`--no-gen-mo-courses-offer`**（可与 `--mo-only` 等组合）。
-
 ```bash
 mvn -q -DskipTests compile exec:java -Dexec.mainClass=com.bupt.tarecruit.tools.DevApplicationDataCleanupTool
 ```
@@ -25,7 +23,7 @@ mvn -q -DskipTests compile exec:java -Dexec.mainClass=com.bupt.tarecruit.tools.D
 mvn -q -DskipTests compile exec:java -Dexec.mainClass=com.bupt.tarecruit.tools.DevApplicationDataCleanupTool -Dexec.args="--mo-only"
 ```
 
-参数：`--mo-only` | `--ta-only` | `--skip-ai` | `--no-gen-mo-courses-offer`（说明见类 Javadoc）。
+参数：`--mo-only` | `--ta-only` | `--skip-ai`（说明见类 Javadoc）。
 
 ## 脚本
 

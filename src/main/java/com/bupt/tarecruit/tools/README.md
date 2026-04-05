@@ -21,8 +21,7 @@ mvn -q -DskipTests compile exec:java -Dexec.mainClass=com.bupt.tarecruit.tools.D
 ```
 
 - **无命令行参数**：终端交互菜单选模式（无 stdin 时退化为「全部清理」）。
-- **有参数**：`--mo-only` | `--ta-only` | `--skip-ai` | `--no-gen-mo-courses-offer`（与菜单选项对应；最后一项表示清理结束后不询问是否运行 `genMoCourses.py import`，见类 Javadoc）。
-- **清理结束后**（未加 `--no-gen-mo-courses-offer` 且 stdin 可用时）：可选择执行 `tools/genMoCourses.py import`，将 Excel 同步到 `recruitment-courses.json`（路径与 `DataMountPaths` 一致）。
+- **有参数**：`--mo-only` | `--ta-only` | `--skip-ai`（与菜单选项对应，见类 Javadoc）。
 
 **可编程调用**：`resetMoApplicationSidecarFiles()` 仅重置 MO 两个结构化文件。
 
