@@ -1,6 +1,7 @@
 package com.bupt.tarecruit.mo.dao;
 
 import com.bupt.tarecruit.common.config.DataMountPaths;
+import com.bupt.tarecruit.common.dao.RecruitmentCoursesDao;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -122,6 +123,43 @@ public final class MoTaApplicationsMutationDao {
         item.addProperty("updatedAt", now);
         touchMeta(root);
         writeRoot(root);
+    }
+
+    /**
+     * 将岗位板中当前课程的规范化信息写回所有 {@code courseCode} 匹配的申请的 {@code courseSnapshot}（与 TA 投递时形状一致）。
+     */
+    public synchronized void refreshCourseSnapshotsForCourseCode(String courseCode) throws IOException {
+        String c = trim(courseCode).toUpperCase(Locale.ROOT);
+        if (c.isEmpty()) {
+            return;
+        }
+        JsonObject job = RecruitmentCoursesDao.findNormalizedJobByCourseCode(c);
+        if (job == null) {
+            return;
+        }
+        if (!Files.exists(PATH)) {
+            return;
+        }
+        JsonObject snapshot = RecruitmentCoursesDao.taFacingCourseSnapshotFromNormalizedJob(job);
+        JsonObject root = loadRoot();
+        JsonArray items = root.getAsJsonArray("items");
+        boolean changed = false;
+        for (JsonElement element : items) {
+            if (!element.isJsonObject()) {
+                continue;
+            }
+            JsonObject item = element.getAsJsonObject();
+            String ic = trim(getAsString(item, "courseCode")).toUpperCase(Locale.ROOT);
+            if (!c.equals(ic)) {
+                continue;
+            }
+            item.add("courseSnapshot", snapshot.deepCopy());
+            changed = true;
+        }
+        if (changed) {
+            touchMeta(root);
+            writeRoot(root);
+        }
     }
 
     private JsonObject loadRoot() throws IOException {

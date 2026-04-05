@@ -3,6 +3,7 @@ package com.bupt.tarecruit.ta.dao;
 import com.bupt.tarecruit.common.config.DataMountPaths;
 import com.bupt.tarecruit.common.dao.RecruitmentCoursesDao;
 import com.bupt.tarecruit.common.util.AuthUtils;
+import com.bupt.tarecruit.mo.dao.MoRecruitmentDao;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -493,6 +494,12 @@ public class TaAccountDao {
             eventRoot.getAsJsonObject("meta").addProperty("updatedAt", submittedAt);
             writeStructuredJson(APPLICATION_EVENT_PATH, eventRoot);
 
+            try {
+                new MoRecruitmentDao().syncPublishedJobApplicationStatsForCourse(courseCode);
+            } catch (Exception syncEx) {
+                System.err.println("[TA-APPLY] recruitment stats sync skipped: " + syncEx.getMessage());
+            }
+
             JsonObject payload = new JsonObject();
             payload.addProperty("applicationId", applicationId);
             payload.addProperty("courseCode", courseCode);
@@ -558,14 +565,7 @@ public class TaAccountDao {
     }
 
     private JsonObject buildCourseSnapshot(JsonObject course) {
-        JsonObject snapshot = new JsonObject();
-        snapshot.addProperty("courseCode", getAsString(course, "courseCode"));
-        snapshot.addProperty("courseName", getAsString(course, "courseName"));
-        snapshot.addProperty("ownerMoName", getAsString(course, "ownerMoName"));
-        snapshot.addProperty("semester", getAsString(course, "semester"));
-        snapshot.addProperty("campus", getAsString(course, "campus"));
-        snapshot.addProperty("studentCount", getAsString(course, "studentCount"));
-        return snapshot;
+        return RecruitmentCoursesDao.taFacingCourseSnapshotFromNormalizedJob(course);
     }
 
     private JsonObject buildTaSnapshot(Map<String, Object> account, Map<String, Object> profile) {
