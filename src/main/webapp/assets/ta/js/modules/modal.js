@@ -82,8 +82,10 @@
         function closeAllModals() {
             if (!modalOverlay) return;
             const appRoot = getAppRoot();
-            modalOverlay.classList.remove('show');
-            modalPanels.forEach((panel) => panel.classList.remove('active'));
+            modalOverlay.classList.remove('show', 'ai-assistant-overlay');
+            modalPanels.forEach((panel) => {
+                panel.classList.remove('active', 'is-landscape-modal');
+            });
             modalOverlay.setAttribute('aria-hidden', 'true');
             appRoot?.classList.remove('modal-open');
             app.state.modal.currentModal = null;
@@ -133,16 +135,19 @@
             if (!panel) return;
             const appRoot = getAppRoot();
             const keepStack = !!options?.keepStack;
+            const isAiAssistant = target === 'planner';
             modalOverlay.classList.add('show');
+            modalOverlay.classList.toggle('ai-assistant-overlay', isAiAssistant);
             if (!keepStack) {
                 modalPanels.forEach((item) => item.classList.remove('active'));
             }
+            modalPanels.forEach((item) => item.classList.toggle('is-landscape-modal', item === panel && isAiAssistant));
             panel.classList.add('active');
             modalOverlay.setAttribute('aria-hidden', 'false');
             appRoot?.classList.add('modal-open');
             app.state.modal.currentModal = target;
             userTrigger?.setAttribute('aria-expanded', target === 'settings' ? 'true' : 'false');
-            logModalState('open', { target, keepStack });
+            logModalState('open', { target, keepStack, isAiAssistant });
         }
 
         statCards.forEach((card) => {

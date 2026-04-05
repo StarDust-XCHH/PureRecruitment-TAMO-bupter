@@ -97,89 +97,88 @@
         </div>
     </div>
 
-    <div class="ta-modal-panel drawer ai-assistant-modal" data-modal="planner" role="dialog" aria-labelledby="modalPlannerTitle">
+    <div class="ta-modal-panel wide ai-assistant-modal ai-assistant-modal-landscape" data-modal="planner" role="dialog" aria-labelledby="modalPlannerTitle" aria-modal="true">
         <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head ai-assistant-head">
             <div>
                 <h3 id="modalPlannerTitle">AI助理</h3>
-                <p class="muted">后续可接入 AI API 实现简历优化、岗位问答、面试准备与材料分析。</p>
+                <p class="muted">像常见聊天助手一样直接发问、附加材料，并在这里查看连续对话。</p>
             </div>
-            <span class="ai-assistant-status">Beta Preview</span>
+            <span class="ai-assistant-status">Chat Preview</span>
         </div>
-        <div class="modal-body ai-assistant-body">
+        <div class="modal-body ai-assistant-body ai-assistant-body-landscape">
             <section class="ai-assistant-chat-shell">
-                <div class="ai-chat-tips">
-                    <span class="ai-chat-chip">简历诊断</span>
-                    <span class="ai-chat-chip">面试准备</span>
-                    <span class="ai-chat-chip">岗位匹配分析</span>
-                    <span class="ai-chat-chip">课程材料总结</span>
+                <div class="ai-chat-toolbar" aria-label="AI助理快捷操作">
+                    <button class="ai-chat-chip" type="button">简历诊断</button>
+                    <button class="ai-chat-chip" type="button">试讲准备</button>
+                    <button class="ai-chat-chip" type="button">岗位匹配</button>
+                    <button class="ai-chat-chip" type="button">材料总结</button>
                 </div>
                 <div class="ai-chat-thread" aria-live="polite">
+                    <div class="ai-chat-date">今天</div>
                     <article class="ai-message ai-message-assistant">
                         <div class="ai-avatar" aria-hidden="true">AI</div>
                         <div class="ai-bubble">
-                            <p>你好，我是你的 AI 助理。</p>
-                            <p>你可以直接输入问题，或者上传 PDF、Word 等文件，后续接入 API 后我将基于材料帮助你完成简历优化、岗位分析与面试准备。</p>
+                            <p>你好，我是你的 AI 助理。你可以直接输入问题，或者先上传简历、课程说明等材料，我会基于上下文继续对话。</p>
                         </div>
                     </article>
                     <article class="ai-message ai-message-user">
                         <div class="ai-avatar" aria-hidden="true">TA</div>
                         <div class="ai-bubble">
-                            <p>请帮我分析这份课程要求里，适合我提前准备的试讲重点。</p>
+                            <p>我准备申请“软件工程基础训练营”，想先知道试讲时应该重点准备哪些内容。</p>
                         </div>
                     </article>
                     <article class="ai-message ai-message-assistant">
                         <div class="ai-avatar" aria-hidden="true">AI</div>
                         <div class="ai-bubble">
-                            <p>已为你预留对话区与附件入口。</p>
+                            <p>可以优先准备这 3 类内容：</p>
                             <ul class="ai-bubble-list">
-                                <li>可展示上传文件名、类型与状态</li>
-                                <li>可扩展接入流式回答与消息历史</li>
-                                <li>可继续增加“总结”“润色”“提问建议”等快捷操作</li>
+                                <li>用 3~5 分钟讲清课程目标、课堂节奏和你能提供的辅导支持</li>
+                                <li>挑一个你熟悉的软件工程基础主题，展示如何拆解知识点并回答常见提问</li>
+                                <li>结合你的项目经历，说明你如何协助实验答疑、作业批改和课堂沟通</li>
                             </ul>
+                            <p>如果你上传课程说明或简历，我还可以继续帮你细化成试讲提纲。</p>
                         </div>
                     </article>
                 </div>
             </section>
             <aside class="ai-assistant-side">
                 <div class="ai-side-card">
-                    <h4>上传材料</h4>
-                    <p class="muted">支持把简历、课程说明、面试材料等作为 AI 分析上下文。</p>
+                    <div class="ai-side-card-head">
+                        <h4>上下文附件</h4>
+                        <span class="ai-side-card-note">2 份材料</span>
+                    </div>
                     <label class="ai-upload-dropzone" for="aiAssistantFileInput">
                         <input id="aiAssistantFileInput" class="ai-upload-input" type="file" accept=".pdf,.doc,.docx,.rtf,.odt,.txt,.md,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/rtf,application/vnd.oasis.opendocument.text,text/plain,text/markdown" multiple>
                         <span class="ai-upload-icon" aria-hidden="true">⤴</span>
-                        <strong>点击或拖拽上传文件</strong>
+                        <strong>上传用于对话分析的文件</strong>
                         <span>支持 PDF / Word / RTF / ODT / TXT / Markdown</span>
                     </label>
                     <div class="ai-upload-filelist">
                         <div class="ai-upload-file">
                             <strong>resume_latest.pdf</strong>
-                            <span>PDF · 2.4 MB · 待接入解析</span>
+                            <span>PDF · 2.4 MB</span>
                         </div>
                         <div class="ai-upload-file">
                             <strong>course-brief.docx</strong>
-                            <span>Word · 318 KB · 待发送到 AI 服务</span>
+                            <span>Word · 318 KB</span>
                         </div>
                     </div>
                 </div>
-                <div class="ai-side-card">
-                    <h4>可扩展能力</h4>
+                <div class="ai-side-card ai-side-card-compact">
+                    <h4>当前可做</h4>
                     <ul class="ai-feature-list">
-                        <li>基于上传文件生成摘要</li>
-                        <li>针对 TA 岗位给出简历优化建议</li>
-                        <li>模拟面试问答与试讲提纲</li>
-                        <li>结合岗位描述输出匹配点评</li>
+                        <li>根据附件整理试讲提纲</li>
+                        <li>结合 TA 岗位优化简历表述</li>
+                        <li>围绕课程要求生成面试问答</li>
                     </ul>
                 </div>
             </aside>
             <section class="ai-composer" aria-label="AI助理输入区">
-                <div class="ai-composer-tools">
-                    <label class="pill-btn ghost ai-attach-btn" for="aiAssistantFileInput">上传附件</label>
-                    <span class="ai-composer-hint">后续可在此接入消息发送、流式响应与会话状态管理</span>
-                </div>
                 <div class="ai-composer-main">
-                    <textarea class="ai-composer-input" rows="4" placeholder="输入你想让 AI 助理处理的问题，例如：请总结这份课程说明，并给出试讲准备建议。"></textarea>
-                    <button class="pill-btn" type="button">发送消息</button>
+                    <label class="pill-btn ghost ai-attach-btn" for="aiAssistantFileInput">上传附件</label>
+                    <textarea class="ai-composer-input" rows="3" placeholder="给 AI 助理发送消息，例如：请根据我上传的课程说明，帮我整理一份 5 分钟试讲提纲。"></textarea>
+                    <button class="pill-btn ai-send-btn" type="button">发送</button>
                 </div>
             </section>
         </div>
