@@ -28,12 +28,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.function.Consumer;
 
 public class TaAiAssistantService {
     private static final long MAX_ATTACHMENT_SIZE = 10L * 1024 * 1024;
@@ -110,6 +113,17 @@ public class TaAiAssistantService {
                                            String scene,
                                            String title,
                                            Map<String, Object> context) throws IOException {
+        return sendMessageStream(taId, sessionId, message, attachmentIds, scene, title, context, null);
+    }
+
+    public Map<String, Object> sendMessageStream(String taId,
+                                                 String sessionId,
+                                                 String message,
+                                                 List<String> attachmentIds,
+                                                 String scene,
+                                                 String title,
+                                                 Map<String, Object> context,
+                                                 Consumer<String> chunkConsumer) throws IOException {
         AiProviderStatus providerStatus = provider.getStatus();
         if (!providerStatus.available()) {
             throw new IOException(providerStatus.message().isBlank() ? "当前 AI 服务不可用" : providerStatus.message());
@@ -118,10 +132,27 @@ public class TaAiAssistantService {
         String normalizedMessage = message == null ? "" : message.trim();
         String resolvedSessionId = sessionId;
         if (resolvedSessionId == null || resolvedSessionId.trim().isEmpty()) {
-            resolvedSessionId = conversationDao.createSession(taId, scene, title, context);
+            resolvedSessionId = "sess_stream_" + UUID.randomUUID().toString().replace("-", "");
         }
 
         List<String> effectiveAttachmentIds = attachmentIds == null ? List.of() : attachmentIds;
+        Map<String, Object> existingConversation = conversationDao.getOrCreateConversation(taId).data();
+        AiChatRequest chatRequest = buildChatRequest(
+                taId,
+                resolvedSessionId,
+                normalizedMessage,
+                context,
+                existingConversation,
+                effectiveAttachmentIds,
+                scene,
+                title
+        );
+        AiChatResult aiChatResult = provider.chat(chatRequest, chunkConsumer);
+
+        if (sessionId == null || sessionId.trim().isEmpty()) {
+            resolvedSessionId = conversationDao.createSession(taId, scene, title, context);
+        }
+
         List<TaAiConversationDao.PendingAttachment> linkedAttachments = new ArrayList<>();
         for (String attachmentId : effectiveAttachmentIds) {
             TaAiConversationDao.PendingAttachment linkedAttachment = conversationDao.consumePendingAttachment(taId, attachmentId, resolvedSessionId);
@@ -131,10 +162,6 @@ public class TaAiAssistantService {
         }
 
         conversationDao.appendUserMessageAndPendingAttachments(taId, resolvedSessionId, normalizedMessage, scene, effectiveAttachmentIds, context);
-
-        TaAiConversationDao.ConversationSnapshot snapshotAfterUser = conversationDao.getOrCreateConversation(taId);
-        AiChatRequest chatRequest = buildChatRequest(taId, resolvedSessionId, normalizedMessage, context, snapshotAfterUser.data(), linkedAttachments);
-        AiChatResult aiChatResult = provider.chat(chatRequest);
 
         Map<String, Object> snapshot = conversationDao.appendAssistantResult(
                 taId,
@@ -146,9 +173,11 @@ public class TaAiAssistantService {
 
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("sessionId", resolvedSessionId);
+        result.put("reply", aiChatResult.text());
         result.put("downloadUrl", "");
         result.put("generatedAttachmentId", "");
         result.put("generatedFileName", "");
+        result.put("artifact", null);
         result.put("conversation", snapshot);
         result.put("pendingAttachments", conversationDao.listPendingAttachments(taId));
         result.put("serviceStatus", buildServiceStatus());
@@ -164,7 +193,9 @@ public class TaAiAssistantService {
                                            String currentMessage,
                                            Map<String, Object> context,
                                            Map<String, Object> conversation,
-                                           List<TaAiConversationDao.PendingAttachment> linkedAttachments) throws IOException {
+                                           List<String> attachmentIds,
+                                           String scene,
+                                           String title) throws IOException {
         List<Message> providerMessages = new ArrayList<>();
         providerMessages.add(Message.builder()
                 .role(Role.SYSTEM.getValue())
@@ -178,6 +209,16 @@ public class TaAiAssistantService {
                 currentSession = session;
                 break;
             }
+        }
+
+        if (currentSession == null) {
+            currentSession = new LinkedHashMap<>();
+            currentSession.put("sessionId", sessionId);
+            currentSession.put("scene", scene == null ? "general_chat" : scene);
+            currentSession.put("title", title == null ? "AI 助理对话" : title);
+            currentSession.put("messages", List.of());
+            currentSession.put("attachments", List.of());
+            currentSession.put("context", context == null ? Map.of() : new LinkedHashMap<>(context));
         }
 
         List<Map<String, Object>> messages = currentSession == null
@@ -200,8 +241,19 @@ public class TaAiAssistantService {
                     .build());
         }
 
+        if (!currentMessage.isBlank()) {
+            providerMessages.add(Message.builder()
+                    .role(Role.USER.getValue())
+                    .content(currentMessage)
+                    .build());
+        }
+
         List<AiAttachmentRef> attachmentRefs = new ArrayList<>();
-        for (TaAiConversationDao.PendingAttachment attachment : linkedAttachments) {
+        for (String attachmentId : attachmentIds == null ? List.<String>of() : attachmentIds) {
+            TaAiConversationDao.PendingAttachment attachment = conversationDao.findPendingAttachment(taId, attachmentId);
+            if (attachment == null) {
+                continue;
+            }
             Path attachmentPath = conversationDao.resolveStoredPathForService(attachment.storedPath());
             attachmentRefs.add(new AiAttachmentRef(
                     attachment.attachmentId(),
@@ -224,7 +276,8 @@ public class TaAiAssistantService {
                 .append("你的职责是基于 TA 当前问题、历史会话和上传材料，提供真实、直接、可执行的建议。")
                 .append("请使用简体中文回答，避免编造未在材料中出现的具体事实。")
                 .append("如果用户上传了文件，请优先结合文件内容分析；如果文件暂时不可读取，请明确说明。")
-                .append("回答请尽量结构化，必要时使用分点。不要声称已经生成或导出了 PDF，除非用户明确询问且系统真的提供了该能力。");
+                .append("回答请尽量结构化，必要时使用分点。不要声称已经生成或导出了 PDF，除非用户明确询问且系统真的提供了该能力。")
+                .append("输出时请直接给出正文内容，不要使用```markdown或```text代码块包裹整段回答。");
 
         if (context != null && !context.isEmpty()) {
             String courseCode = String.valueOf(context.getOrDefault("courseCode", "")).trim();
@@ -290,7 +343,7 @@ public class TaAiAssistantService {
     interface AiProvider {
         AiProviderStatus getStatus();
 
-        AiChatResult chat(AiChatRequest request) throws IOException;
+        AiChatResult chat(AiChatRequest request, Consumer<String> chunkConsumer) throws IOException;
     }
 
     record AiProviderStatus(String providerName,
@@ -342,7 +395,7 @@ public class TaAiAssistantService {
         }
 
         @Override
-        public AiChatResult chat(AiChatRequest request) throws IOException {
+        public AiChatResult chat(AiChatRequest request, Consumer<String> chunkConsumer) throws IOException {
             String apiKey = readApiKey();
             if (apiKey.isEmpty()) {
                 throw new IOException("服务端未读取到环境变量 TONGYI_API_KEY，无法调用 AI 服务");
@@ -369,13 +422,16 @@ public class TaAiAssistantService {
                 Flowable<GenerationResult> result = generation.streamCall(param);
                 StringBuilder fullResponse = new StringBuilder();
                 result.blockingForEach(item -> {
-                    String incrementalText = extractAssistantText(item);
+                    String incrementalText = sanitizeAssistantText(extractAssistantText(item));
                     if (incrementalText != null && !incrementalText.isBlank()) {
                         fullResponse.append(incrementalText);
+                        if (chunkConsumer != null) {
+                            chunkConsumer.accept(incrementalText);
+                        }
                     }
                 });
 
-                String text = fullResponse.toString().trim();
+                String text = sanitizeAssistantText(fullResponse.toString()).trim();
                 if (text.isEmpty()) {
                     throw new IOException("AI 服务未返回有效内容");
                 }
@@ -529,6 +585,14 @@ public class TaAiAssistantService {
                 return result.getOutput().getText();
             }
             return result.getOutput().getChoices().get(0).getMessage().getContent();
+        }
+
+        private String sanitizeAssistantText(String text) {
+            String normalized = text == null ? "" : text;
+            normalized = normalized.replace("\r\n", "\n");
+            normalized = normalized.replaceAll("^```[a-zA-Z0-9_-]*\\s*", "");
+            normalized = normalized.replaceAll("\\s*```$", "");
+            return normalized;
         }
     }
 
