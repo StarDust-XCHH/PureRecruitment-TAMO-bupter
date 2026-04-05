@@ -388,6 +388,21 @@ def parse_custom_tags_plain(s: str) -> list[dict]:
     return out
 
 
+def _job_id_key(job_id: object) -> str:
+    return _trim(str(job_id)).upper()
+
+
+def new_unique_mo_job_id(occupied_upper: set[str]) -> str:
+    """Return MOJOB-xxxxxxxx not in occupied_upper (case-insensitive); register the key in the set."""
+    for _ in range(64):
+        jid = "MOJOB-" + uuid.uuid4().hex[:8].upper()
+        k = _job_id_key(jid)
+        if k not in occupied_upper:
+            occupied_upper.add(k)
+            return jid
+    raise RuntimeError("无法生成唯一的 jobId")
+
+
 def new_job_item_shell(now: str) -> dict:
     return {
         "publishStatus": "PENDING_REVIEW",
@@ -439,8 +454,16 @@ def json_item_to_excel_row(it: dict) -> dict:
     }
 
 
-def excel_row_to_item(row: dict, existing: dict | None) -> dict:
-    """由 Excel 行构造/更新 JSON item；existing 为同 courseCode 的旧记录（可保留计数等）。"""
+def excel_row_to_item(
+    row: dict,
+    existing: dict | None,
+    taken_job_ids_upper: set[str] | None = None,
+) -> dict:
+    """由 Excel 行构造/更新 JSON item；existing 为同 courseCode 的旧记录（可保留计数等）。
+
+    若提供 taken_job_ids_upper（大写 jobId），新增课程时生成的 jobId 不与其中任一重复；
+    用户填写的新增 jobId 若与集合冲突则报错。更新行时调用方应先暂移本条旧 jobId 再校验。
+    """
     cc = _cell_str(row.get("courseCode"))
     if not cc:
         raise ValueError("courseCode 不能为空")
@@ -478,12 +501,27 @@ def excel_row_to_item(row: dict, existing: dict | None) -> dict:
         if not job_id:
             job_id = _trim(str(base.get("jobId", "")))
         if not job_id:
-            job_id = "MOJOB-" + uuid.uuid4().hex[:8].upper()
+            if taken_job_ids_upper is not None:
+                job_id = new_unique_mo_job_id(taken_job_ids_upper)
+            else:
+                job_id = "MOJOB-" + uuid.uuid4().hex[:8].upper()
+        elif taken_job_ids_upper is not None:
+            k = _job_id_key(job_id)
+            if k in taken_job_ids_upper:
+                raise ValueError(f"课程 {cc}: jobId 与已有岗位重复: {job_id}")
         created = base.get("createdAt") or now
     else:
         base = new_job_item_shell(now)
         if not job_id:
-            job_id = "MOJOB-" + uuid.uuid4().hex[:8].upper()
+            if taken_job_ids_upper is not None:
+                job_id = new_unique_mo_job_id(taken_job_ids_upper)
+            else:
+                job_id = "MOJOB-" + uuid.uuid4().hex[:8].upper()
+        else:
+            if taken_job_ids_upper is not None:
+                k = _job_id_key(job_id)
+                if k in taken_job_ids_upper:
+                    raise ValueError(f"课程 {cc}: jobId 与已有岗位重复: {job_id}")
         created = now
 
     sc = parse_int_cell(row.get("studentCount"), -1)
@@ -578,6 +616,7 @@ def build_mo_input(
     ebt_index: int,
     owner_mo_id: str,
     owner_mo_name: str,
+    occupied_job_ids_upper: set[str],
 ) -> tuple[dict, dict]:
     course_name = random_course_name()
     course_code = f"EBT{ebt_index:04d}"
@@ -644,7 +683,7 @@ def build_mo_input(
     student_count = random.choice([-1] + [random.randint(40, 280) for _ in range(3)])
 
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S.%f")[:-3] + "Z"
-    job_id = "MOJOB-" + uuid.uuid4().hex[:8].upper()
+    job_id = new_unique_mo_job_id(occupied_job_ids_upper)
 
     item: dict = {
         **new_job_item_shell(now),
@@ -767,6 +806,12 @@ def cmd_import(courses_path: Path, excel_path: Path, allow_empty: bool) -> None:
     new_items: list[dict] = []
     seen: set[str] = set()
     errors: list[str] = []
+    taken_job_ids_upper: set[str] = set()
+    for it in old_items:
+        if isinstance(it, dict):
+            jk = _job_id_key(it.get("jobId", ""))
+            if jk:
+                taken_job_ids_upper.add(jk)
 
     for i, row in enumerate(raw_rows, start=1):
         cc = _cell_str(row.get("courseCode"))
@@ -777,11 +822,21 @@ def cmd_import(courses_path: Path, excel_path: Path, allow_empty: bool) -> None:
             errors.append(f"第 {i} 行: 重复的 courseCode {cc}")
             continue
         seen.add(ku)
+        existing = by_code.get(ku)
+        prev_job_key = _job_id_key(existing.get("jobId", "")) if existing else ""
+        if prev_job_key:
+            taken_job_ids_upper.discard(prev_job_key)
         try:
-            item = excel_row_to_item(row, by_code.get(ku))
-            new_items.append(item)
+            item = excel_row_to_item(row, existing, taken_job_ids_upper)
         except ValueError as e:
+            if prev_job_key:
+                taken_job_ids_upper.add(prev_job_key)
             errors.append(f"第 {i} 行: {e}")
+            continue
+        jk = _job_id_key(item.get("jobId", ""))
+        if jk:
+            taken_job_ids_upper.add(jk)
+        new_items.append(item)
 
     if errors:
         for e in errors:
@@ -829,11 +884,18 @@ def cmd_generate(
         print("EBT 编号将超过 9999。", file=sys.stderr)
         sys.exit(1)
 
+    occupied_job_ids_upper: set[str] = set()
+    for it in kept:
+        if isinstance(it, dict):
+            jk = _job_id_key(it.get("jobId", ""))
+            if jk:
+                occupied_job_ids_upper.add(jk)
+
     new_items: list[dict] = []
     for i in range(n):
         ebt_num = start_idx + i
         mo_id, mo_name = mo_list[i % len(mo_list)]
-        item, _ = build_mo_input(ebt_num, mo_id, mo_name)
+        item, _ = build_mo_input(ebt_num, mo_id, mo_name, occupied_job_ids_upper)
         new_items.append(item)
 
     final_items = kept + new_items

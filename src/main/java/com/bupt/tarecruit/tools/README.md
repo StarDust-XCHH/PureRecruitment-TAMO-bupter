@@ -10,7 +10,9 @@
 
 **用途**：测试环境下一次性对齐 **TA 申请 / TA AI / MO 申请旁路 JSON**（已读状态、申请评论），避免只清 TA 后 MO 侧仍引用旧 `applicationId`。类名刻意不用 `Ta*` 前缀，以免与 **`TaSubmissionCleanupTool`** 等 TA 专用工具混淆。
 
-**不清理**：`recruitment-courses.json`、账号与 profile 类 JSON。
+结束前会调用 **`MoRecruitmentDao.syncAllPublishedJobApplicationStatsFromTa()`**，仅刷新 **`recruitment-courses.json`** 中与申请相关的统计字段；本工具**不直接改写**课程文件。
+
+**不清理**：课程岗位条目本身（不删 JSON 中的课程行）、账号与 profile 类 JSON。
 
 **运行**（仓库根目录）：
 

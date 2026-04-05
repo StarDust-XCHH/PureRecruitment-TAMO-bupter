@@ -56,6 +56,26 @@ public class MoJobBoardServlet extends HttpServlet {
         }
     }
 
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        try {
+            JsonObject body = JsonParser.parseReader(req.getReader()).getAsJsonObject();
+            String moId = readMoIdForPost(req, body);
+            if (moId.isEmpty()) {
+                writeJson(resp, 400, buildV2Error("缺少 moId（请使用查询参数 moId 或 JSON 字段 moId）"));
+                return;
+            }
+            JsonObject payload = recruitmentDao.updateCourse(body, moId);
+            writeJson(resp, 200, payload);
+        } catch (IllegalStateException | ClassCastException ex) {
+            writeJson(resp, 400, buildV2Error("请求体不是合法 JSON 对象"));
+        } catch (IllegalArgumentException ex) {
+            writeJson(resp, 400, buildV2Error(ex.getMessage()));
+        } catch (Exception ex) {
+            writeJson(resp, 500, buildV2Error("更新课程信息失败: " + ex.getMessage()));
+        }
+    }
+
     private static String readMoIdParam(HttpServletRequest req) {
         String q = req.getParameter("moId");
         return q == null ? "" : q.trim();

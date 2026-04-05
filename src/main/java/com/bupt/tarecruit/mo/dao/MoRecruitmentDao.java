@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
@@ -21,11 +22,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.UUID;
 
 import com.bupt.tarecruit.mo.service.MoTaApplicationReadService;
 
 import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.firstNonBlank;
+import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.getAsInt;
 import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.getAsString;
 import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.getOptionalInt;
 import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.trim;
@@ -108,7 +109,7 @@ public class MoRecruitmentDao {
         if (courseName.isEmpty()) {
             throw new IllegalArgumentException("课程名称不能为空");
         }
-        String jobId = "MOJOB-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase(Locale.ROOT);
+        String jobId = RecruitmentCoursesDao.allocateUniqueMoJobId();
         String courseCode = trim(getAsString(input, "courseCode"));
         if (courseCode.isEmpty()) {
             throw new IllegalArgumentException("课程编号不能为空");
@@ -213,6 +214,125 @@ public class MoRecruitmentDao {
         result.addProperty("success", true);
         result.addProperty("message", "课程发布成功");
         result.add("item", item.deepCopy());
+        return result;
+    }
+
+    /**
+     * 更新当前 MO 已发布课程的可编辑信息（课程编号不可改）；归属与 {@code jobId} 不变。
+     */
+    public JsonObject updateCourse(JsonObject input, String actingMoId) throws IOException {
+        String ownerMoId = new MoAccountDao().resolveCanonicalMoId(actingMoId);
+        if (ownerMoId.isBlank()) {
+            throw new IllegalArgumentException("缺少 moId");
+        }
+        String courseCode = trim(getAsString(input, "courseCode"));
+        if (courseCode.isEmpty()) {
+            throw new IllegalArgumentException("课程编号不能为空");
+        }
+        assertMoOwnsCourseResolved(ownerMoId, courseCode);
+
+        String courseName = trim(getAsString(input, "courseName"));
+        if (courseName.isEmpty()) {
+            throw new IllegalArgumentException("课程名称不能为空");
+        }
+        String recruitmentStatus = firstNonBlank(
+                trim(getAsString(input, "recruitmentStatus")),
+                trim(getAsString(input, "status")));
+        if (recruitmentStatus.isEmpty()) {
+            throw new IllegalArgumentException("招聘状态不能为空");
+        }
+        String semester = trim(getAsString(input, "semester"));
+        boolean hasApplicationDeadlineField = input.has("applicationDeadline");
+        String applicationDeadline = hasApplicationDeadlineField ? trim(getAsString(input, "applicationDeadline")) : "";
+
+        JsonObject teachingWeeks = RecruitmentCoursesDao.normalizeTeachingWeeks(
+                input.has("teachingWeeks") && input.get("teachingWeeks").isJsonObject()
+                        ? input.getAsJsonObject("teachingWeeks")
+                        : null);
+        JsonArray assessmentEvents = RecruitmentCoursesDao.normalizeAssessmentEvents(
+                input.has("assessmentEvents") ? input.get("assessmentEvents") : null);
+        JsonObject requiredSkills = RecruitmentCoursesDao.normalizeRequiredSkills(
+                input.has("requiredSkills") ? input.get("requiredSkills") : null);
+        if (!RecruitmentCoursesDao.hasRequiredSkills(requiredSkills)) {
+            throw new IllegalArgumentException("技能标签不能为空");
+        }
+
+        String courseDescription = trim(getAsString(input, "courseDescription"));
+        if (courseDescription.isEmpty()) {
+            throw new IllegalArgumentException("岗位描述不能为空");
+        }
+        String ownerMoName = resolveOwnerMoName(ownerMoId, input);
+        String recruitmentBrief = trim(getAsString(input, "recruitmentBrief"));
+        String workload = input.has("workload") ? trim(getAsString(input, "workload")) : null;
+        String campus = input.has("campus")
+                ? RecruitmentCoursesDao.normalizeCampus(getAsString(input, "campus"))
+                : "";
+        Integer studentCount = getOptionalInt(input, "studentCount");
+        int normalizedStudentCount = studentCount == null ? -1 : studentCount;
+
+        if (input.has("taRecruitCount")) {
+            Integer requestedTaRecruit = getOptionalInt(input, "taRecruitCount");
+            if (requestedTaRecruit != null) {
+                JsonObject currentJob = RecruitmentCoursesDao.findNormalizedJobByCourseCode(courseCode);
+                int recruitedFromJson = currentJob == null ? 0 : getAsInt(currentJob, "recruitedCount", 0);
+                TaDerivedCourseApplicationStats derived = computeTaDerivedCourseApplicationStats(courseCode);
+                int floor = Math.max(derived.accepted, recruitedFromJson);
+                if (requestedTaRecruit < floor) {
+                    throw new IllegalArgumentException("TA 招聘人数不能少于已录用人数（当前下限为 " + floor + "）");
+                }
+            }
+        }
+
+        JsonObject patch = new JsonObject();
+        patch.addProperty("courseName", courseName);
+        patch.addProperty("ownerMoName", ownerMoName);
+        patch.addProperty("semester", semester);
+        patch.addProperty("recruitmentStatus", recruitmentStatus);
+        patch.addProperty("status", recruitmentStatus);
+        if (hasApplicationDeadlineField) {
+            if (applicationDeadline.isEmpty()) {
+                patch.add("applicationDeadline", JsonNull.INSTANCE);
+            } else {
+                patch.addProperty("applicationDeadline", applicationDeadline);
+            }
+        }
+        patch.add("teachingWeeks", teachingWeeks);
+        patch.add("assessmentEvents", assessmentEvents);
+        patch.add("requiredSkills", requiredSkills);
+        patch.addProperty("courseDescription", courseDescription);
+        patch.addProperty("recruitmentBrief", recruitmentBrief);
+        if (workload != null) {
+            patch.addProperty("workload", workload);
+        }
+        if (input.has("campus")) {
+            patch.addProperty("campus", campus);
+        }
+        patch.addProperty("studentCount", normalizedStudentCount);
+        if (input.has("taRecruitCount")) {
+            Integer taRecruitCount = getOptionalInt(input, "taRecruitCount");
+            if (taRecruitCount != null) {
+                patch.addProperty("taRecruitCount", taRecruitCount);
+            } else {
+                patch.add("taRecruitCount", JsonNull.INSTANCE);
+            }
+        }
+        if (input.has("source")) {
+            String source = trim(getAsString(input, "source"));
+            if (!source.isBlank()) {
+                patch.addProperty("source", source);
+            } else {
+                patch.addProperty("source", "");
+            }
+        }
+
+        if (!RecruitmentCoursesDao.mergePublishedJobContentByCourseCode(courseCode, patch)) {
+            throw new IllegalArgumentException("课程不存在");
+        }
+        JsonObject item = RecruitmentCoursesDao.findNormalizedJobByCourseCode(courseCode);
+        JsonObject result = new JsonObject();
+        result.addProperty("success", true);
+        result.addProperty("message", "课程信息已更新");
+        result.add("item", item != null ? item.deepCopy() : new JsonObject());
         return result;
     }
 
@@ -486,6 +606,116 @@ public class MoRecruitmentDao {
     }
 
     /**
+     * 与 {@link #syncRecruitmentCourseApplicationStatsFromTa} 相同的 TA + application-status 合并规则下推导出的统计（不写入课程 JSON）。
+     */
+    private TaDerivedCourseApplicationStats computeTaDerivedCourseApplicationStats(String normalizedCourseCode) throws IOException {
+        MoTaApplicationReadService readService = new MoTaApplicationReadService();
+        JsonObject appStatusRoot = ensureStructuredFile(TA_APPLICATION_STATUS, TA_ENTITY_APPLICATION_STATUS);
+        JsonArray moStatusItems = appStatusRoot.getAsJsonArray("items");
+        String targetSlug = normalizeSlug(normalizedCourseCode);
+        List<MoTaApplicationReadService.TaApplicationRecord> applications =
+                readService.getApplicationsByCourseCode(normalizedCourseCode);
+
+        int total = 0;
+        int accepted = 0;
+        int rejected = 0;
+        String maxSubmitted = "";
+        String maxSelection = "";
+
+        for (MoTaApplicationReadService.TaApplicationRecord rec : applications) {
+            if (!rec.active()) {
+                continue;
+            }
+            total++;
+            JsonObject moRow = findLatestApplicationForCourse(moStatusItems, rec.taId(), normalizedCourseCode, targetSlug);
+            String displayStatus = resolveApplicantDisplayStatus(rec, moRow);
+            if (isAcceptedDecisionText(displayStatus)) {
+                accepted++;
+                String decisionAt = firstNonBlank(moRow != null ? getAsString(moRow, "updatedAt") : "", rec.updatedAt());
+                if (decisionAt.compareTo(maxSelection) > 0) {
+                    maxSelection = decisionAt;
+                }
+            } else if (isRejectedDecisionText(displayStatus)) {
+                rejected++;
+            }
+            String submitted = trim(rec.submittedAt());
+            if (!submitted.isEmpty() && submitted.compareTo(maxSubmitted) > 0) {
+                maxSubmitted = submitted;
+            }
+        }
+
+        return new TaDerivedCourseApplicationStats(total, accepted, rejected, maxSubmitted, maxSelection);
+    }
+
+    /**
+     * 从 TA {@code applications.json} 与 {@code application-status.json} 重算该课程的投递统计，
+     * 并写回 {@code recruitment-courses.json}（与 {@link #getApplicantsForCourse} 的合并规则一致，非简单 +1）。
+     */
+    private void syncRecruitmentCourseApplicationStatsFromTa(String normalizedCourseCode) throws IOException {
+        TaDerivedCourseApplicationStats s = computeTaDerivedCourseApplicationStats(normalizedCourseCode);
+        int pending = Math.max(0, s.total - s.accepted - s.rejected);
+        String now = Instant.now().toString();
+        boolean ok = RecruitmentCoursesDao.syncPublishedJobApplicationStatsByCourseCode(
+                normalizedCourseCode,
+                s.total,
+                pending,
+                s.accepted,
+                s.rejected,
+                s.accepted,
+                s.maxSubmitted,
+                s.maxSelection,
+                now);
+        if (!ok) {
+            throw new IllegalStateException("课程统计同步失败：未找到 courseCode 对应岗位");
+        }
+    }
+
+    /**
+     * 对岗位板中每一门课程按 TA 投递与 {@code application-status.json} 重算并写回
+     * {@code recruitment-courses.json} 的申请统计（{@link RecruitmentCoursesDao#syncPublishedJobApplicationStatsByCourseCode}）。
+     * 双端清理等维护工具在清空 TA 数据后应调用此方法，由 DAO 写盘，不要直接改写课程 JSON。
+     */
+    public synchronized void syncAllPublishedJobApplicationStatsFromTa() throws IOException {
+        JsonObject board = RecruitmentCoursesDao.readJobBoard();
+        JsonArray items = board.getAsJsonArray("items");
+        for (JsonElement el : items) {
+            if (el == null || !el.isJsonObject()) {
+                continue;
+            }
+            String cc = trim(getAsString(el.getAsJsonObject(), "courseCode"));
+            if (cc.isEmpty()) {
+                continue;
+            }
+            syncRecruitmentCourseApplicationStatsFromTa(cc);
+        }
+    }
+
+    /**
+     * 单门课程下，按 {@link #computeTaDerivedCourseApplicationStats} 与 {@link #getApplicantsForCourse} 相同合并规则
+     * 从 TA {@code applications.json} + {@code application-status.json} 推导出的聚合结果；用于写回课程 JSON 或校验招聘人数下限。
+     */
+    private static final class TaDerivedCourseApplicationStats {
+        /** 有效（active）投递条数，对应课程 JSON 的 {@code applicationsTotal}。 */
+        final int total;
+        /** 展示状态为已录用的人数，与 {@code recruitedCount} / {@code applicationsAccepted} 对齐。 */
+        final int accepted;
+        /** 展示状态为未录用/拒绝的人数，对应 {@code applicationsRejected}。 */
+        final int rejected;
+        /** 上述投递中最大的 {@code submittedAt}（ISO 字符串比较），用于 {@code lastApplicationAt}；无则空串。 */
+        final String maxSubmitted;
+        /** 已录用路径上 MO 行或申请上较新的 {@code updatedAt}，用于 {@code lastSelectionAt}；无则空串。 */
+        final String maxSelection;
+
+        private TaDerivedCourseApplicationStats(int total, int accepted, int rejected, String maxSubmitted, String maxSelection) {
+            this.total = total;
+            this.accepted = accepted;
+            this.rejected = rejected;
+            this.maxSubmitted = maxSubmitted;
+            this.maxSelection = maxSelection;
+        }
+    }
+
+    /**
      * 兼容旧调用方：从岗位 {@code ownerMoId} 推导 {@code moId}（仅适用于本地脚本等场景；HTTP 接口应显式传 moId）。
      */
     public synchronized JsonObject decideApplication(String courseCode, String taId, String decision, String comment) throws IOException {
@@ -579,6 +809,8 @@ public class MoRecruitmentDao {
 
         updateMeta(appRoot, TA_SCHEMA, TA_ENTITY_APPLICATION_STATUS, "1.0");
         writeJson(TA_APPLICATION_STATUS, appRoot);
+
+        syncRecruitmentCourseApplicationStatsFromTa(normalizedCourseCode);
 
         JsonObject payload = new JsonObject();
         payload.addProperty("success", true);
