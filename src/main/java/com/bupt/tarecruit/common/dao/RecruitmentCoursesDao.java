@@ -420,6 +420,19 @@ public final class RecruitmentCoursesDao {
         }
     }
 
+    /**
+     * Allocates a new {@code MOJOB-XXXXXXXX} that is not already used on the job board (case-insensitive match).
+     */
+    public static String allocateUniqueMoJobId() throws IOException {
+        for (int attempt = 0; attempt < 64; attempt++) {
+            String id = "MOJOB-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase(Locale.ROOT);
+            if (!existsJobId(id)) {
+                return id;
+            }
+        }
+        throw new IllegalStateException("无法生成唯一的 jobId，请稍后重试");
+    }
+
     public static JsonObject normalizeTeachingWeeks(JsonObject source) {
         JsonObject out = new JsonObject();
         JsonArray weeks = new JsonArray();

@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.UUID;
 
 import com.bupt.tarecruit.mo.service.MoTaApplicationReadService;
 
@@ -110,7 +109,7 @@ public class MoRecruitmentDao {
         if (courseName.isEmpty()) {
             throw new IllegalArgumentException("课程名称不能为空");
         }
-        String jobId = "MOJOB-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase(Locale.ROOT);
+        String jobId = RecruitmentCoursesDao.allocateUniqueMoJobId();
         String courseCode = trim(getAsString(input, "courseCode"));
         if (courseCode.isEmpty()) {
             throw new IllegalArgumentException("课程编号不能为空");
