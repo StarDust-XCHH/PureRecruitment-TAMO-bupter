@@ -2,31 +2,31 @@
     <div class="card jobs-hall-card">
         <div class="overview-top" id="jobsHallHeading">
             <div>
-                <h1>职位大厅</h1>
-                <p class="muted">浏览等待招聘的课程卡片，当前阶段保留搜索、详情入口与容器骨架。</p>
+                <h1 data-i18n="jobs.title" data-i18n-zh="职位大厅" data-i18n-en="Jobs">职位大厅</h1>
+                <p class="muted" data-i18n="jobs.desc" data-i18n-zh="浏览等待招聘的课程卡片，当前阶段保留搜索、详情入口与容器骨架。" data-i18n-en="Browse open course cards with search, detail entry points, and the current board layout.">浏览等待招聘的课程卡片，当前阶段保留搜索、详情入口与容器骨架。</p>
             </div>
             <div class="overview-badges">
                 <span class="pill" id="openCoursesCount">开放课程 8</span>
                 <button id="refreshJobsBtn" class="refresh-btn pill" type="button">
                     <span class="refresh-icon">↻</span>
-                    <span class="refresh-text">刷新列表</span>
+                    <span class="refresh-text" data-i18n="jobs.refresh" data-i18n-zh="刷新列表" data-i18n-en="Refresh">刷新列表</span>
                 </button>
             </div>
         </div>
         <label class="job-search-box" for="jobSearchInput">
             <span class="job-search-icon" aria-hidden="true">⌕</span>
-            <input id="jobSearchInput" type="text" placeholder="搜索课程编号 / 名称 / 标签 / MO">
+            <input id="jobSearchInput" type="text" placeholder="搜索课程编号 / 名称 / 标签 / MO" data-i18n-placeholder="jobs.searchPlaceholder" data-i18n-placeholder-zh="搜索课程编号 / 名称 / 标签 / MO" data-i18n-placeholder-en="Search course code / name / tag / MO">
         </label>
         <div class="job-board course-board" id="jobBoard" aria-live="polite"></div>
-        <div class="job-pagination" aria-label="职位大厅分页" id="jobPagination"></div>
+        <div class="job-pagination" aria-label="职位大厅分页" data-i18n-aria-label="jobs.paginationAria" data-i18n-aria-label-zh="职位大厅分页" data-i18n-aria-label-en="Jobs pagination" id="jobPagination"></div>
         <div class="job-extra course-job-extra">
             <div class="task-row">
-                <span>系统提示：本周内优先开放 MO 待招聘课程，点击卡片可查看完整课程介绍与申请入口。</span>
-                <span class="pill">本周新增 3 门</span>
+                <span data-i18n="jobs.tip1" data-i18n-zh="系统提示：本周内优先开放 MO 待招聘课程，点击卡片可查看完整课程介绍与申请入口。" data-i18n-en="System tip: courses currently recruiting from MOs are prioritized this week. Open a card to view the full description and application entry.">系统提示：本周内优先开放 MO 待招聘课程，点击卡片可查看完整课程介绍与申请入口。</span>
+                <span class="pill" data-i18n="jobs.tip1Badge" data-i18n-zh="本周新增 3 门" data-i18n-en="3 new this week">本周新增 3 门</span>
             </div>
             <div class="task-row">
-                <span>推荐策略：优先展示与你技能画像和最近投递方向更接近的课程。</span>
-                <span class="pill">推荐匹配度 88%</span>
+                <span data-i18n="jobs.tip2" data-i18n-zh="推荐策略：优先展示与你技能画像和最近投递方向更接近的课程。" data-i18n-en="Recommendation strategy: courses closer to your skill profile and recent application direction are shown first.">推荐策略：优先展示与你技能画像和最近投递方向更接近的课程。</span>
+                <span class="pill" data-i18n="jobs.tip2Badge" data-i18n-zh="推荐匹配度 88%" data-i18n-en="Recommendation match 88%">推荐匹配度 88%</span>
             </div>
         </div>
     </div>

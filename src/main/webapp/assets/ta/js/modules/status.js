@@ -24,6 +24,10 @@
         let highlightResetTimer = null;
         let hasAutoLoaded = false;
 
+        function t(zh, en) {
+            return typeof app.t === 'function' ? app.t(zh, en) : zh;
+        }
+
         function escapeHtml(value) {
             const str = value == null ? '' : String(value);
 
@@ -73,7 +77,7 @@
                 needMaterialCount: Number(summary.needMaterialCount || 0),
                 offerCount: Number(summary.offerCount || 0),
                 estimatedFeedbackTime: safeText(summary.estimatedFeedbackTime, '--'),
-                latestStatusLabel: safeText(summary.latestStatusLabel, '暂无申请')
+                latestStatusLabel: safeText(summary.latestStatusLabel, t('暂无申请', 'No applications yet'))
             };
         }
 
@@ -81,7 +85,7 @@
             const record = resumeView && typeof resumeView === 'object' ? resumeView : {};
             const downloadUrl = safeText(record.downloadUrl);
             return {
-                fileName: safeText(record.fileName, '简历文件'),
+                fileName: safeText(record.fileName, t('简历文件', 'Resume file')),
                 downloadUrl: downloadUrl,
                 mimeType: safeText(record.mimeType),
                 extension: safeText(record.extension),
@@ -95,8 +99,8 @@
             return {
                 applicationId: safeText(record.applicationId),
                 courseCode: safeText(record.courseCode),
-                courseName: safeText(record.courseName, '未命名岗位'),
-                status: safeText(record.status, '处理中'),
+                courseName: safeText(record.courseName, t('未命名岗位', 'Untitled role')),
+                status: safeText(record.status, t('处理中', 'In progress')),
                 statusTone: safeText(record.statusTone, 'warn'),
                 summary: safeText(record.summary || record.moComment),
                 nextAction: safeText(record.nextAction || record.nextStep),
@@ -120,20 +124,20 @@
         function setRefreshButtonState(loading) {
             if (!refreshButton) return;
             refreshButton.disabled = !!loading;
-            refreshButton.textContent = loading ? '刷新中...' : '刷新状态';
+            refreshButton.textContent = loading ? t('刷新中...', 'Refreshing...') : t('刷新状态', 'Refresh Status');
         }
 
         function renderSummary(summaryData) {
             if (!summary) return;
             const data = normalizeSummary(summaryData);
             summary.innerHTML = [
-                ['当前申请数', data.totalCount],
-                ['推进中', data.activeCount],
-                ['面试邀约', data.interviewCount],
-                ['待补充资料', data.needMaterialCount],
-                ['已录用', data.offerCount],
-                ['预计反馈时间', data.estimatedFeedbackTime],
-                ['最新状态', data.latestStatusLabel]
+                [t('当前申请数', 'Applications'), data.totalCount],
+                [t('推进中', 'Active'), data.activeCount],
+                [t('面试邀约', 'Interviews'), data.interviewCount],
+                [t('待补充资料', 'Need Materials'), data.needMaterialCount],
+                [t('已录用', 'Offers'), data.offerCount],
+                [t('预计反馈时间', 'Estimated Feedback'), data.estimatedFeedbackTime],
+                [t('最新状态', 'Latest Status'), data.latestStatusLabel]
             ].map(([label, value]) => {
                 return '<div class="status-line"><span>' + escapeHtml(label) + '</span><span class="pill">' + escapeHtml(value) + '</span></div>';
             }).join('');
@@ -148,13 +152,13 @@
             });
 
             if (!merged.length) {
-                notifications.innerHTML = '<div class="message-item"><strong>暂无通知</strong><div class="muted">当前没有新的状态提醒。</div></div>';
+                notifications.innerHTML = '<div class="message-item"><strong>' + t('暂无通知', 'No notifications') + '</strong><div class="muted">' + t('当前没有新的状态提醒。', 'There are no new status updates right now.') + '</div></div>';
                 return;
             }
 
             notifications.innerHTML = merged.map((entry) => {
-                const title = safeText(entry?.title, '状态提醒');
-                const content = safeText(entry?.content, '暂无内容');
+                const title = safeText(entry?.title, t('状态提醒', 'Status Update'));
+                const content = safeText(entry?.content, t('暂无内容', 'No details available'));
                 const meta = safeText(entry?.createdAt || entry?.time || entry?.tone);
                 return ''
                     + '<div class="message-item">'
@@ -167,14 +171,14 @@
 
         function buildResumeActionHtml(item) {
             if (!item.resumeView.available) {
-                return '<div class="status-resume-action muted">当前申请未找到可查看的简历文件。</div>';
+                return '<div class="status-resume-action muted">' + t('当前申请未找到可查看的简历文件。', 'No resume file is available for this application.') + '</div>';
             }
             const meta = [formatFileSize(item.resumeView.size), item.resumeView.extension ? String(item.resumeView.extension).toUpperCase() : '']
                 .filter(Boolean)
                 .join(' · ');
             return ''
                 + '<div class="status-resume-action">'
-                + '  <a class="status-resume-link" href="' + escapeHtml(item.resumeView.downloadUrl) + '" target="_blank" rel="noopener noreferrer">查看简历</a>'
+                + '  <a class="status-resume-link" href="' + escapeHtml(item.resumeView.downloadUrl) + '" target="_blank" rel="noopener noreferrer">' + t('查看简历', 'View Resume') + '</a>'
                 + '  <span class="muted">' + escapeHtml(item.resumeView.fileName) + (meta ? ' · ' + escapeHtml(meta) : '') + '</span>'
                 + '</div>';
         }
@@ -189,7 +193,7 @@
             timeline.innerHTML = items.map((item, index) => {
                 const detailsHtml = item.details.length
                     ? '<div class="status-detail-list">' + item.details.map((detail) => {
-                        return '<div class="status-detail-row"><span>' + escapeHtml(safeText(detail?.label, '字段')) + '</span><strong>' + escapeHtml(safeText(detail?.value, '--')) + '</strong></div>';
+                        return '<div class="status-detail-row"><span>' + escapeHtml(safeText(detail?.label, t('字段', 'Field'))) + '</span><strong>' + escapeHtml(safeText(detail?.value, '--')) + '</strong></div>';
                     }).join('') + '</div>'
                     : '';
 
@@ -198,7 +202,7 @@
                         const doneClass = step?.done ? ' is-done' : '';
                         return ''
                             + '<div class="status-step' + doneClass + '">'
-                            + '  <strong>' + escapeHtml(safeText(step?.label, '状态节点')) + '</strong>'
+                            + '  <strong>' + escapeHtml(safeText(step?.label, t('状态节点', 'Status Step'))) + '</strong>'
                             + '  <div class="muted">' + escapeHtml(safeText(step?.content, '')) + '</div>'
                             + '  <small class="muted">' + escapeHtml(safeText(step?.time, '--')) + '</small>'
                             + '</div>';
@@ -217,8 +221,8 @@
                     + '  <strong>' + escapeHtml(item.courseName) + '</strong>'
                     + '  <div class="timeline-meta">' + escapeHtml(item.status) + ' · ' + escapeHtml(item.updatedAt || '--') + '</div>'
                     + '  <div class="accordion-content">'
-                    + '      <p>' + escapeHtml(item.summary || '暂无状态说明。') + '</p>'
-                    + '      <p>' + escapeHtml(item.nextAction || '暂无下一步提示。') + '</p>'
+                    + '      <p>' + escapeHtml(item.summary || t('暂无状态说明。', 'No status details available.')) + '</p>'
+                    + '      <p>' + escapeHtml(item.nextAction || t('暂无下一步提示。', 'No next-step suggestion available.')) + '</p>'
                     +        tagsHtml
                     +        resumeActionHtml
                     +        detailsHtml
@@ -308,7 +312,7 @@
             state.loading = true;
             state.taId = resolveTaId();
             setRefreshButtonState(true);
-            setStatusMessage('申请状态加载中...', 'muted');
+            setStatusMessage(t('申请状态加载中...', 'Loading application status...'), 'muted');
             if (emptyState) emptyState.hidden = true;
 
             try {
@@ -317,7 +321,7 @@
                 });
                 const payload = await response.json();
                 if (!response.ok || !payload?.success) {
-                    throw new Error(payload?.message || '读取申请状态失败');
+                    throw new Error(payload?.message || t('读取申请状态失败', 'Failed to load application status'));
                 }
 
                 const items = normalizeArray(payload.items).map(normalizeItem);
@@ -341,12 +345,12 @@
 
                 if (!items.length) {
                     if (emptyState) emptyState.hidden = false;
-                    setStatusMessage('当前还没有申请记录，可前往职位大厅投递岗位。', 'muted');
+                    setStatusMessage(t('当前还没有申请记录，可前往职位大厅投递岗位。', 'You do not have any applications yet. Visit the Jobs page to apply.'), 'muted');
                 } else {
                     if (emptyState) emptyState.hidden = true;
                     setStatusMessage(focused
-                        ? '已同步 ' + items.length + ' 条申请状态，并已定位到最新申请。'
-                        : '已同步 ' + items.length + ' 条申请状态。', 'success');
+                        ? t('已同步 ' + items.length + ' 条申请状态，并已定位到最新申请。', 'Synced ' + items.length + ' application updates and focused on the latest submission.')
+                        : t('已同步 ' + items.length + ' 条申请状态。', 'Synced ' + items.length + ' application updates.'), 'success');
                 }
                 hasAutoLoaded = true;
             } catch (error) {
@@ -359,7 +363,7 @@
                     app.setAppliedCourseCodes([]);
                 }
                 if (emptyState) emptyState.hidden = false;
-                setStatusMessage(error.message || '申请状态加载失败', 'error');
+                setStatusMessage(error.message || t('申请状态加载失败', 'Failed to load application status'), 'error');
             } finally {
                 state.loading = false;
                 setRefreshButtonState(false);

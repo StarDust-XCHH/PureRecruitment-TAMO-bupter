@@ -8,6 +8,7 @@
         const root = document.documentElement;
         const themeToggle = document.getElementById('themeToggle');
         const logoutBtn = document.getElementById('logoutBtn');
+        const languageToggle = document.getElementById('languageToggle');
         const welcomeTitle = document.getElementById('welcomeTitle');
         const welcomeName = document.getElementById('welcomeName');
         const userTrigger = document.getElementById('userTrigger');
@@ -18,6 +19,7 @@
         const settingsTabs = Array.from(document.querySelectorAll('.settings-tab'));
         const settingsPanels = Array.from(document.querySelectorAll('.settings-panel'));
         const storedTheme = localStorage.getItem('ta-theme');
+        const storedLanguage = localStorage.getItem('ta-language');
         const DEBUG_THEME = true;
 
         let userRaw = sessionStorage.getItem('ta-user') || localStorage.getItem('ta-user');
@@ -33,6 +35,7 @@
             root,
             themeToggle,
             logoutBtn,
+            languageToggle,
             welcomeTitle,
             welcomeName,
             userTrigger,
@@ -45,8 +48,10 @@
             userRaw,
             userData,
             storedTheme,
+            storedLanguage,
             guideActive: false,
-            currentSettingsTab: 'profile'
+            currentSettingsTab: 'profile',
+            currentLanguage: storedLanguage === 'en' ? 'en' : 'zh'
         };
 
         function debugThemeLog(stage, extra) {
@@ -57,6 +62,86 @@
         function resolveWelcomeName(data) {
             if (!data) return 'TA';
             return data.username || data.name || data.account || 'TA';
+        }
+
+        function getCurrentLanguage() {
+            return app.state.settings.currentLanguage === 'en' ? 'en' : 'zh';
+        }
+
+        function getTranslationValue(el, lang, type) {
+            if (!el) return '';
+            const suffix = lang === 'en' ? 'en' : 'zh';
+            if (type === 'html') {
+                const raw = el.getAttribute('data-i18n-html') || '';
+                const parts = raw.split('|');
+                return suffix === 'en' ? (parts[1] || parts[0] || '') : (parts[0] || '');
+            }
+            if (type === 'aria-label') {
+                return el.getAttribute('data-i18n-aria-label-' + suffix) || '';
+            }
+            if (type === 'placeholder') {
+                return el.getAttribute('data-i18n-placeholder-' + suffix) || '';
+            }
+            if (type === 'title') {
+                return el.getAttribute('data-i18n-title-' + suffix) || '';
+            }
+            return el.getAttribute('data-i18n-' + suffix) || '';
+        }
+
+        function applyI18nToElement(el, lang) {
+            if (!el) return;
+            if (el.hasAttribute('data-i18n-html')) {
+                el.innerHTML = getTranslationValue(el, lang, 'html');
+                return;
+            }
+            if (el.hasAttribute('data-i18n')) {
+                const value = getTranslationValue(el, lang, 'text');
+                if (value) el.textContent = value;
+            }
+            if (el.hasAttribute('data-i18n-placeholder')) {
+                const placeholder = getTranslationValue(el, lang, 'placeholder');
+                if (placeholder) el.setAttribute('placeholder', placeholder);
+            }
+            if (el.hasAttribute('data-i18n-aria-label')) {
+                const ariaLabel = getTranslationValue(el, lang, 'aria-label');
+                if (ariaLabel) el.setAttribute('aria-label', ariaLabel);
+            }
+            if (el.hasAttribute('data-i18n-title')) {
+                const title = getTranslationValue(el, lang, 'title');
+                if (title) el.setAttribute('title', title);
+            }
+        }
+
+        function refreshWelcomeNodes() {
+            app.state.settings.welcomeTitle = document.getElementById('welcomeTitle');
+            app.state.settings.welcomeName = document.getElementById('welcomeName');
+        }
+
+        function applyLanguage(reason) {
+            const lang = getCurrentLanguage();
+            root.lang = lang === 'en' ? 'en' : 'zh-CN';
+            document.querySelectorAll('[data-i18n], [data-i18n-html], [data-i18n-placeholder], [data-i18n-aria-label], [data-i18n-title]').forEach((el) => {
+                applyI18nToElement(el, lang);
+            });
+            refreshWelcomeNodes();
+            app.state.settings.welcomeTitle = document.getElementById('welcomeTitle');
+            app.state.settings.welcomeName = document.getElementById('welcomeName');
+            app.state.settings.languageToggle = document.getElementById('languageToggle');
+            localStorage.setItem('ta-language', lang);
+            applyWelcomeTitle(reason || 'language');
+            if (typeof app.refreshLanguageBindings === 'function') {
+                app.refreshLanguageBindings(lang);
+            }
+            debugThemeLog('language-applied', { reason, lang });
+        }
+
+        function toggleLanguage() {
+            app.state.settings.currentLanguage = getCurrentLanguage() === 'zh' ? 'en' : 'zh';
+            applyLanguage('toggle');
+        }
+
+        function t(zh, en) {
+            return getCurrentLanguage() === 'en' ? en : zh;
         }
 
         function getUserData() {
@@ -80,17 +165,21 @@
         }
 
         function applyWelcomeTitle(reason) {
-            if (!welcomeTitle) {
+            const currentWelcomeTitle = document.getElementById('welcomeTitle');
+            const currentWelcomeName = document.getElementById('welcomeName');
+            if (!currentWelcomeTitle) {
                 console.warn('[TA-WELCOME] welcomeTitle not found:', reason);
                 return;
             }
             const displayName = resolveWelcomeName(getUserData());
-            if (welcomeName) {
-                welcomeName.textContent = displayName;
+            if (currentWelcomeName) {
+                currentWelcomeName.textContent = displayName;
             } else {
-                welcomeTitle.textContent = '欢迎回来，' + displayName;
+                currentWelcomeTitle.textContent = t('欢迎回来，', 'Welcome back, ') + displayName;
             }
             if (userName) userName.textContent = displayName;
+            app.state.settings.welcomeTitle = currentWelcomeTitle;
+            app.state.settings.welcomeName = currentWelcomeName;
             debugThemeLog('welcome-title-updated', { reason, displayName });
         }
 
@@ -188,13 +277,17 @@
             throw new Error('未登录，已重定向到登录页');
         }
 
+        applyLanguage('init');
         applyWelcomeTitle('init');
         requestAnimationFrame(() => applyWelcomeTitle('raf'));
-        window.addEventListener('pageshow', () => applyWelcomeTitle('pageshow'));
+        window.addEventListener('pageshow', () => {
+            applyLanguage('pageshow');
+            applyWelcomeTitle('pageshow');
+        });
 
         if (logoutBtn) {
             logoutBtn.addEventListener('click', () => {
-                if (!window.confirm('确认退出登录吗？')) return;
+                if (!window.confirm(t('确认退出登录吗？', 'Are you sure you want to log out?'))) return;
                 setUserData(null);
                 redirectToLogin();
             });
@@ -207,6 +300,7 @@
         history.replaceState({ taHome: true }, '', window.location.href);
 
         themeToggle?.addEventListener('click', toggleTheme);
+        languageToggle?.addEventListener('click', toggleLanguage);
         themeSelect?.addEventListener('change', (event) => applyThemeChoice(event.target.value));
 
         settingsTabs.forEach((tab) => {
@@ -243,6 +337,10 @@
         app.openSettingsModal = openSettingsModal;
         app.activateSettingsTab = activateSettingsTab;
         app.applyThemeChoice = applyThemeChoice;
+        app.applyLanguage = applyLanguage;
+        app.toggleLanguage = toggleLanguage;
+        app.getCurrentLanguage = getCurrentLanguage;
+        app.t = t;
         app.getUserData = getUserData;
         app.setUserData = setUserData;
     };
