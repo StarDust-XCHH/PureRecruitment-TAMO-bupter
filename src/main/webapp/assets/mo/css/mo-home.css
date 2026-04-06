@@ -113,3 +113,128 @@
 .mo-status-warn {
     color: #fbbf24;
 }
+
+.mo-nav-label {
+    flex: 1;
+    text-align: left;
+}
+
+.mo-nav-badge {
+    margin-left: 6px;
+    font-size: 10px;
+    line-height: 1;
+    color: #ef4444;
+    font-weight: 700;
+}
+
+.mo-applicant-head {
+    position: relative;
+}
+
+.mo-unread-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ef4444;
+    margin-left: 6px;
+    vertical-align: middle;
+}
+
+.mo-detail-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+.mo-detail-modal[hidden] {
+    display: none !important;
+}
+
+.mo-detail-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+}
+
+.mo-detail-modal__panel {
+    position: relative;
+    z-index: 1;
+    width: min(640px, 100%);
+    max-height: min(88vh, 900px);
+    overflow: auto;
+    border-radius: 16px;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg, rgba(20, 20, 28, 0.96));
+    padding: 18px 20px 20px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="light"] .mo-detail-modal__panel {
+    background: rgba(255, 255, 255, 0.98);
+}
+
+.mo-detail-modal__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+}
+
+.mo-detail-modal__head h2 {
+    margin: 0;
+    font-size: 1.15rem;
+}
+
+.mo-detail-modal__body {
+    font-size: 14px;
+    line-height: 1.5;
+    display: grid;
+    gap: 12px;
+}
+
+.mo-detail-kv {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 8px;
+    font-size: 13px;
+}
+
+.mo-detail-kv dt {
+    margin: 0;
+    color: var(--muted);
+}
+
+.mo-detail-kv dd {
+    margin: 0;
+}
+
+.mo-detail-section-title {
+    font-weight: 600;
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--muted);
+}
+
+.mo-comment-list {
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    padding: 10px;
+    max-height: 160px;
+    overflow: auto;
+    font-size: 13px;
+}
+
+.mo-comment-item {
+    padding: 6px 0;
+    border-bottom: 1px dashed var(--card-border);
+}
+
+.mo-comment-item:last-child {
+    border-bottom: none;
+}

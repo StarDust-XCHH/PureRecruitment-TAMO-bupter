@@ -1,0 +1,34 @@
+{
+  "meta": {
+    "schema": "mo",
+    "entity": "settings",
+    "version": "1.0",
+    "updatedAt": "2026-04-05T22:43:24.236107500Z"
+  },
+  "items": [
+    {
+      "id": "SETTING-MO-195RR4",
+      "moId": "MO-195RR4",
+      "theme": "dark",
+      "avatar": "",
+      "createdAt": "2026-04-05T13:33:24.598425200Z",
+      "updatedAt": "2026-04-05T13:33:24.598425200Z"
+    },
+    {
+      "id": "SETTING-MO-137J3E",
+      "moId": "MO-137J3E",
+      "theme": "dark",
+      "avatar": "",
+      "createdAt": "2026-04-05T15:44:39.645789100Z",
+      "updatedAt": "2026-04-05T15:44:39.645789100Z"
+    },
+    {
+      "id": "SETTING-MO-6601L9",
+      "moId": "MO-6601L9",
+      "theme": "dark",
+      "avatar": "",
+      "createdAt": "2026-04-05T15:46:28.695396100Z",
+      "updatedAt": "2026-04-05T15:46:28.695396100Z"
+    }
+  ]
+}

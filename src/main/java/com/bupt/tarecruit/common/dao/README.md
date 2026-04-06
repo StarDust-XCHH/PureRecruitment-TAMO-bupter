@@ -54,7 +54,7 @@
 
 ### 调用关系（业务 DAO）
 
-- **MO**（`MoRecruitmentDao`）：`getPendingCourses` → `readJobBoard()`；`createCourse` → `appendPublishedJob`；`decideApplication` → `findNormalizedJobByCourseCode`；发布入参解析 → **`RecruitmentCoursesDao` 的 C 类方法** + **`GsonJsonObjectUtils`**。
+- **MO**（`MoRecruitmentDao`）：`getJobBoardForMo(moId)` → `readJobBoard()` 后按 `ownerMoId` 过滤；`createCourse` → `appendPublishedJob`（`ownerMoId` 由服务端 `moId` 决定）；`decideApplication` → `findNormalizedJobByCourseCode`；发布入参解析 → **`RecruitmentCoursesDao` 的 C 类方法** + **`GsonJsonObjectUtils`**。
 - **TA**（`TaAccountDao`）：岗位大厅 → `readJobBoard()`；申请状态等 JSON 读字段 → **`GsonJsonObjectUtils`**。
 
 Admin 对治理字段的专用写接口、TA 对岗位流程统计字段的更新 **尚未在本包实现**（见数据目录下 `recruitment-courses-dao-notes.md`）。

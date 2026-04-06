@@ -28,6 +28,7 @@ This log tracks MO-side changes that interact with TA-side interfaces or TA data
 ## New/Updated MO Interfaces (v2)
 
 - `GET /api/mo/jobs`
+  - Query **`moId`**（必填）: 仅返回 `items[].ownerMoId` 与该账号 **`id`** 相同的岗位（忽略大小写）；`ownerMoId` 应为 MO 主键 id，非用户名。
   - Returns job board payload in v2 shape:
     - `schema: mo-ta-job-board`
     - `version: 2.0`
@@ -36,10 +37,11 @@ This log tracks MO-side changes that interact with TA-side interfaces or TA data
     - `items`
   - Reads from:
     - `mountDataTAMObupter/common/recruitment-courses.json`
-  - Normalizes each item **in memory** for the response only; **does not** write `recruitment-courses.json`. Listing jobs therefore does not rewrite or “clean up” other courses on disk.
+  - Normalizes each **filtered** item **in memory** for the response only; **does not** write `recruitment-courses.json`.
 
 - `POST /api/mo/jobs`
   - Creates one MO job using semester-scale fields (see `docs/mo-job-board-api-v2.md`).
+  - **身份**：查询参数或 JSON 根字段 **`moId`**（必填其一，查询优先）；持久化的 **`ownerMoId`** 取该值（账号 id）。**`ownerMoName`** 由服务端从 **`mos.json` 的 `name`** 写入；`username` / `realName` 仅存在于个人资料数据，不写入岗位。
   - Writes to:
     - `mountDataTAMObupter/common/recruitment-courses.json`
   - Adds/normalizes v2 fields.
@@ -52,31 +54,46 @@ This log tracks MO-side changes that interact with TA-side interfaces or TA data
 - `GET /api/common/skill-tags`
   - Alias endpoint of MO skill tags for contract-level reuse.
 
-- `GET /api/mo/applicants?courseCode=...`
-  - Reads TA account/profile/application status data.
-  - Data sources:
-    - `mountDataTAMObupter/ta/tas.json`
-    - `mountDataTAMObupter/ta/profiles.json`
-    - `mountDataTAMObupter/ta/application-status.json`
+- `GET /api/mo/applicants?courseCode=...&moId=...` (**required** `moId`)
+  - Lists **real submissions** for the course from `mountDataTAMObupter/ta/applications.json` (via `MoTaApplicationReadService`), merged with MO decision rows in `application-status.json`.
+  - **Authorization**: `moId` must match the job’s `ownerMoId` in `recruitment-courses.json` for that `courseCode` (403 otherwise).
+  - Response includes `items` (per applicant: `applicationId`, `taId`, contact fields, `status`, `comment` preview, `unread`, `resumeFileName`, …), `count`, and `unreadCount`.
+  - Data sources (read): `applications.json`, `application-status.json`, MO read-state file (below); TA account/profile snapshots are embedded in application records where present.
+
+- `GET /api/mo/applicants/detail?moId=...&applicationId=...`
+  - Full detail for one application: `taSnapshot`, `courseSnapshot`, `resume` meta, `events` (from `application-events.json`), `comments` (MO-only file), `moDecision` overlay from `application-status.json` if any.
+  - Same `ownerMoId` / `moId` check as list API.
+
+- `GET /api/mo/applicants/unread-count?moId=...`
+  - Count of unread applications across all jobs owned by that MO (used for sidebar badge). Unread = no read record or `applications.json` `updatedAt` newer than `lastReadAt` for `(moId, applicationId)`.
+
+- `POST /api/mo/applications/mark-read`
+  - JSON body: `moId`, `applicationId`.
+  - Writes `lastReadAt` to `mountDataTAMObupter/mo/mo-application-read-state.json`.
+  - Updates the matching row in `mountDataTAMObupter/ta/applications.json` to **`UNDER_REVIEW`** / **审核中** (MO `MoTaApplicationsMutationDao`), so TA status APIs reflect “under review” after MO opens the detail view.
+
+- `POST /api/mo/applications/comment`
+  - JSON body: `moId`, `applicationId`, `text`.
+  - Appends to `mountDataTAMObupter/mo/mo-application-comments.json` (MO-only thread; does not change TA servlet code).
+
+- `GET /api/mo/applications/resume?moId=...&applicationId=...`
+  - Streams resume file after the same ownership/detail checks; path resolved from `applications.json` → `resume.relativePath` under `ta/resume/`.
 
 - `POST /api/mo/applications/select`
-  - Writes MO selection decision back to TA application status data.
-  - Writes to:
-    - `mountDataTAMObupter/ta/application-status.json`
-  - Fields updated/created include:
-    - `status`
-    - `statusTone`
-    - `summary`
-    - `moComment`
-    - `nextAction`
-    - `nextStep`
-    - `updatedAt`
-    - `jobSlug`
+  - JSON body: `courseCode`, `taId`, **`moId`** (required), `decision` (`selected` | `rejected`), optional `comment`.
+  - Writes MO selection to `mountDataTAMObupter/ta/application-status.json`, aligned with real `applicationId` from `applications.json` when present.
+  - Typical fields on the status row: `status` (e.g. 已录用 / 未录用), `statusTone`, `summary`, `moComment`, `nextAction`, `nextStep`, `updatedAt`, `jobSlug`, `courseCode`, `courseName`, `taId`, `ownerMoId`, optional `comments` array preserved across updates.
+
+- **MO-only data files** (under `mountDataTAMObupter/mo/`):
+  - `mo-application-read-state.json` — schema `mo` / entity `mo-application-read-state`; items: `moId`, `applicationId`, `lastReadAt`.
+  - `mo-application-comments.json` — schema `mo` / entity `mo-application-comments`; items group `comments[]` by `applicationId`.
+
+- **Compatibility**: `MoRecruitmentDao.decideApplication(courseCode, taId, decision, comment)` (4-arg) still resolves `moId` from the job’s `ownerMoId` for local tools; HTTP clients should pass `moId` explicitly on the 5-arg path.
 
 ## TA UI Impact
 
-- No TA page/JSP/CSS/JS file was modified.
-- TA interface behavior remains unchanged.
+- No TA page/JSP/CSS/JS file was modified for this workflow.
+- TA-visible data may change when MO marks read (`applications.json` → `UNDER_REVIEW`) or writes `application-status.json` (录用/拒绝); that is intentional shared JSON behavior, not a TA module code change.
 
 ## Admin UI Impact
 

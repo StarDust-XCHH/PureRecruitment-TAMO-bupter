@@ -25,7 +25,7 @@
                 <p class="muted small">支持 PNG/JPG/WEBP/GIF，最大 10MB，自动裁剪为正方形</p>
             </div>
 
-            <label>真实姓名<input id="realNameInput" name="realName" type="text" placeholder="如：张教授"></label>
+            <label>姓名<input id="moNameInput" name="name" type="text" placeholder="如：张教授" autocomplete="name"></label>
             <label>联系邮箱<input id="contactEmailInput" name="contactEmail" type="email" placeholder="如：professor@example.com"></label>
 
             <label class="full">个人简介<textarea id="bioInput" name="bio" rows="4" placeholder="简要介绍您的教学背景、研究方向等信息..."></textarea></label>

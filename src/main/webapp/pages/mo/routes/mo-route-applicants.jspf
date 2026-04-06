@@ -25,4 +25,15 @@
             <p>请先选择岗位或发布新岗位，系统将聚合 TA 候选池。</p>
         </div>
     </div>
+
+    <div id="moApplicantDetailModal" class="mo-detail-modal" hidden aria-hidden="true">
+        <div class="mo-detail-modal__backdrop" data-close-applicant-detail="1"></div>
+        <div class="mo-detail-modal__panel" role="dialog" aria-modal="true" aria-labelledby="moApplicantDetailTitle">
+            <div class="mo-detail-modal__head">
+                <h2 id="moApplicantDetailTitle">申请人详情</h2>
+                <button type="button" class="pill-btn ghost" id="moApplicantDetailClose" aria-label="关闭">关闭</button>
+            </div>
+            <div class="mo-detail-modal__body" id="moApplicantDetailBody"></div>
+        </div>
+    </div>
 </div>

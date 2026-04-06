@@ -41,6 +41,41 @@
                     </div>
                 </aside>
             </div>
+            <div class="job-detail-section" id="courseEditPanel" style="display:none;">
+                <h5>修改课程信息</h5>
+                <p class="muted">课程编号 <strong id="editCourseCodeDisplay"></strong> 不可修改。</p>
+                <div class="mo-form-grid" style="max-width:42rem;">
+                    <label>课程名称<input id="editCourseNameInput" type="text" autocomplete="off"></label>
+                    <label>学期<input id="editSemesterInput" type="text" autocomplete="off"></label>
+                    <label>招聘状态
+                        <select id="editRecruitmentStatusInput">
+                            <option value="OPEN">OPEN</option>
+                            <option value="CLOSED">CLOSED</option>
+                        </select>
+                    </label>
+                    <label>预计学生人数<input id="editStudentCountInput" type="number" min="0"></label>
+                    <label>TA招聘人数<input id="editTaRecruitCountInput" type="number" min="0"></label>
+                    <label>校区
+                        <select id="editCampusInput">
+                            <option value="">（可选）</option>
+                            <option value="Main">Main</option>
+                            <option value="Shahe">Shahe</option>
+                        </select>
+                    </label>
+                    <label>申请截止时间<input id="editApplicationDeadlineInput" type="datetime-local"></label>
+                    <label class="full">自定义教学周（逗号分隔）<input id="editTeachingWeeksInput" type="text" autocomplete="off"></label>
+                    <label class="full">Assessment Events<textarea id="editAssessmentEventsInput" rows="2" placeholder="每行：name|week(s)|description"></textarea></label>
+                    <label class="full">固定技能 Tags（多选）<select id="editFixedSkillsInput" multiple size="6"></select></label>
+                    <label class="full">自定义技能<textarea id="editCustomSkillsInput" rows="2"></textarea></label>
+                    <label class="full">岗位描述<textarea id="editCourseDescInput" rows="3"></textarea></label>
+                    <label class="full">招募说明<textarea id="editRecruitmentBriefInput" rows="4"></textarea></label>
+                    <div class="full">
+                        <button type="button" class="pill-btn" id="saveCourseEditBtn">保存修改</button>
+                        <span id="courseEditStatus" class="muted"></span>
+                    </div>
+                </div>
+            </div>
+            <p style="margin-top:1rem;"><button type="button" class="pill-btn" id="toggleCourseEditBtn">修改课程信息</button></p>
         </div>
     </div>
 

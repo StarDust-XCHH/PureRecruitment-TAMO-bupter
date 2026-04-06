@@ -2,6 +2,8 @@
 
 本文档用于指导 MO 端开发者如何使用 [`MoTaApplicationReadService`](src/main/java/com/bupt/tarecruit/mo/service/MoTaApplicationReadService.java) 直接读取 TA 侧提交的申请信息与简历文件。
 
+**与 HTTP 层的关系**：面向页面的筛选、已读、评论、录用/拒绝等已由 `MoRecruitmentDao` 与各 MO Servlet 串起（见 [`../controller/README.md`](../controller/README.md) 与仓库 [`docs/backend/mo-ta-interaction-log.md`](../../../../../../../../docs/backend/mo-ta-interaction-log.md)）。`MoTaApplicationReadService` 仍是**只读**工具方法的首选；写 `applications.json`（如 `UNDER_REVIEW`）请通过 MO 包内 `MoTaApplicationsMutationDao`，不要绕过 DAO 直接改文件。
+
 ---
 
 ## 1. 目标与定位

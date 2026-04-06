@@ -54,6 +54,16 @@ public final class DataMountPaths {
         return moDir().resolve("settings.json");
     }
 
+    /** MO 端「已读」记录：按 moId + applicationId 记录最后查看时间，用于未读红点。 */
+    public static Path moApplicationReadState() {
+        return moDir().resolve("mo-application-read-state.json");
+    }
+
+    /** MO 端对 TA 申请的评论线程（仅存 MO 侧，按 applicationId 聚合）。 */
+    public static Path moApplicationComments() {
+        return moDir().resolve("mo-application-comments.json");
+    }
+
     public static Path taDir() {
         return root().resolve("ta");
     }
