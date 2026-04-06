@@ -343,11 +343,44 @@
             pendingList.innerHTML = state.pendingAttachments.map((item) => {
                 const sourceLabel = item.sourceType === 'course-apply' ? '来自课程申请' : '手动上传';
                 return '<div class="ai-upload-file" data-attachment-id="' + escapeHtml(item.attachmentId) + '">' +
+                    '<div class="ai-upload-file-main">' +
                     '<strong>' + escapeHtml(item.originalFileName) + '</strong>' +
                     '<span>' + escapeHtml(sourceLabel) + ' · ' + escapeHtml(formatFileSize(item.size)) + '</span>' +
+                    '</div>' +
+                    '<button class="ai-upload-file-remove" type="button" data-remove-pending-attachment="' + escapeHtml(item.attachmentId) + '" aria-label="移除附件">×</button>' +
                     '</div>';
             }).join('');
             updateAttachmentCollapseState();
+        }
+
+        async function removePendingAttachment(attachmentId) {
+            const normalizedAttachmentId = String(attachmentId || '').trim();
+            if (!normalizedAttachmentId) {
+                return;
+            }
+            const taId = resolveTaId();
+            if (!taId) {
+                throw new Error('当前未获取到 TA 身份，请重新登录后再试。');
+            }
+            const formData = new FormData();
+            formData.append('action', 'remove-pending');
+            formData.append('taId', taId);
+            formData.append('attachmentId', normalizedAttachmentId);
+
+            const response = await fetch(resolveAiApiUrl(), {
+                method: 'POST',
+                body: formData
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload?.success) {
+                throw new Error(payload?.message || '移除待发送附件失败');
+            }
+            state.pendingAttachments = Array.isArray(payload.data?.pendingAttachments) ? payload.data.pendingAttachments : [];
+            state.attachmentPanelExpanded = state.pendingAttachments.length > 0 && state.attachmentPanelExpanded;
+            if (payload.data?.serviceStatus) {
+                applyServiceStatus(payload.data.serviceStatus);
+            }
+            renderPendingAttachments();
         }
 
         function getCurrentSession() {
@@ -933,6 +966,30 @@
             } catch (error) {
                 console.error('[TA-AI] copy failed', error);
                 window.alert('复制失败，请手动选择内容后复制。');
+            }
+        });
+
+        pendingList?.addEventListener('click', async (event) => {
+            const removeButton = event.target.closest('[data-remove-pending-attachment]');
+            if (!removeButton) {
+                return;
+            }
+            const attachmentId = removeButton.getAttribute('data-remove-pending-attachment') || '';
+            const originalLabel = removeButton.textContent;
+            try {
+                removeButton.disabled = true;
+                removeButton.textContent = '…';
+                setStatus('Loading');
+                await removePendingAttachment(attachmentId);
+                if (state.serviceStatus.available) {
+                    setStatus('Ready');
+                }
+            } catch (error) {
+                console.error('[TA-AI] remove pending attachment failed', error);
+                setStatus('Error');
+                removeButton.disabled = false;
+                removeButton.textContent = originalLabel || '×';
+                window.alert(error.message || '移除待发送附件失败。');
             }
         });
 

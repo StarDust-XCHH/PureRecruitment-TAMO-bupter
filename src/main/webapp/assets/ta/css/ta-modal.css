@@ -219,6 +219,47 @@
     display: none;
 }
 
+.ai-upload-file {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.ai-upload-file-main {
+    min-width: 0;
+    display: grid;
+    gap: 4px;
+    flex: 1;
+}
+
+.ai-upload-file-remove {
+    width: 28px;
+    height: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.ai-upload-file-remove:hover {
+    background: rgba(244, 67, 54, 0.16);
+    border-color: rgba(244, 67, 54, 0.36);
+}
+
+.ai-upload-file-remove:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
 .ta-modal-overlay {
     position: fixed;
     inset: 0;
