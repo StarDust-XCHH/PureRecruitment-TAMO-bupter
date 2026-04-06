@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "settings",
     "version": "1.0",
-    "updatedAt": "2026-04-06T04:37:50.662606800Z"
+    "updatedAt": "2026-04-06T04:43:32.579448700Z"
   },
   "items": [
     {
@@ -22,11 +22,11 @@
       "onboardingStep": 0.0,
       "guideCompleted": false,
       "profileSaved": true,
-      "profileSavedAt": "2026-04-06T04:37:50.659104100Z",
+      "profileSavedAt": "2026-04-06T04:43:32.573961300Z",
       "lastProfileSyncStatus": "success",
       "lastProfileSyncMessage": "资料保存成功",
-      "updatedAt": "2026-04-06T04:37:50.659104100Z",
-      "avatar": "image/TA-10258_1775450270526_37e5a4622745492e8b07c778df68be55.png",
+      "updatedAt": "2026-04-06T04:43:32.573961300Z",
+      "avatar": "image/TA-10258_1775450612257_dfcf4f22c8864fa2afa0a9bb5904fcd4.png",
       "onboardingCompletedAt": "",
       "onboardingDismissed": false
     },
