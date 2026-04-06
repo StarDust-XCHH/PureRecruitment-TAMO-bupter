@@ -100,18 +100,27 @@ public class TaProfileSettingsServlet extends HttpServlet {
         String bio = trim(req.getParameter("bio"));
         List<String> skills = extractSkills(req.getParameterValues("skills[]"), req.getParameter("skills"));
 
-        String previousAvatar = null;
-        String avatarPath = null;
+        TaAccountDao.ProfileResult current;
+        try {
+            current = taAccountDao.getProfileSettings(taId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            ServletJsonResponseWriter.write(resp, 500, ApiResponse.failure("读取当前资料失败: " + e.getMessage()));
+            return;
+        }
+        if (!current.isSuccess()) {
+            ServletJsonResponseWriter.write(resp, current.getStatus(), ApiResponse.failure(current.getMessage()));
+            return;
+        }
+
+        String previousAvatar = current.getData() == null ? "" : trim(String.valueOf(current.getData().getOrDefault("avatar", "")));
+        String avatarPath = previousAvatar;
+        boolean avatarUpdated = false;
         try {
             Part avatarPart = req.getPart("avatarFile");
-            if (avatarPart != null && avatarPart.getSize() > 0) {
-                TaAccountDao.ProfileResult current = taAccountDao.getProfileSettings(taId);
-                if (!current.isSuccess()) {
-                    ServletJsonResponseWriter.write(resp, current.getStatus(), ApiResponse.failure(current.getMessage()));
-                    return;
-                }
-                previousAvatar = current.getData() == null ? null : String.valueOf(current.getData().getOrDefault("avatar", ""));
+            if (hasUploadedAvatar(avatarPart)) {
                 avatarPath = storeAvatar(taId, avatarPart);
+                avatarUpdated = true;
             }
         } catch (IllegalStateException ex) {
             ServletJsonResponseWriter.write(resp, 400, ApiResponse.failure("头像大小不能超过 10MB"));
@@ -125,24 +134,24 @@ public class TaProfileSettingsServlet extends HttpServlet {
                 contactEmail,
                 bio,
                 skills,
-                avatarPath == null ? nullSafe(previousAvatar) : avatarPath
+                avatarPath
         );
 
         try {
             TaAccountDao.ProfileResult result = taAccountDao.saveProfileSettings(input);
             if (result.isSuccess()) {
-                if (avatarPath != null) {
+                if (avatarUpdated) {
                     deleteOldAvatar(previousAvatar, avatarPath);
                 }
                 ServletJsonResponseWriter.write(resp, result.getStatus(), ApiResponse.success(result.getMessage(), result.getData()));
             } else {
-                if (avatarPath != null) {
+                if (avatarUpdated) {
                     deleteStoredAvatarQuietly(avatarPath);
                 }
                 ServletJsonResponseWriter.write(resp, result.getStatus(), ApiResponse.failure(result.getMessage()));
             }
         } catch (Exception e) {
-            if (avatarPath != null) {
+            if (avatarUpdated) {
                 deleteStoredAvatarQuietly(avatarPath);
             }
             e.printStackTrace();
@@ -340,7 +349,12 @@ public class TaProfileSettingsServlet extends HttpServlet {
         return normalized;
     }
 
-    private String nullSafe(String value) {
-        return value == null ? "" : value;
+    private boolean hasUploadedAvatar(Part avatarPart) {
+        if (avatarPart == null) {
+            return false;
+        }
+        return avatarPart.getSize() > 0
+                && !trim(avatarPart.getSubmittedFileName()).isBlank()
+                && !trim(avatarPart.getContentType()).isBlank();
     }
 }
