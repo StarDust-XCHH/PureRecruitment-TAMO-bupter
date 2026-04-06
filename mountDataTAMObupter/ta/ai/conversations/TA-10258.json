@@ -2,7 +2,7 @@
   "schema": "ta-ai-conversations.v1",
   "version": 1,
   "taId": "TA-10258",
-  "updatedAt": "2026-04-06T00:13:09.775502100Z",
+  "updatedAt": "2026-04-06T00:16:30.708363800Z",
   "sessions": [
     {
       "sessionId": "sess_913d3be86fb042c19bc8fd82ac184a34",
@@ -129,35 +129,19 @@
   ],
   "pendingAttachments": [
     {
-      "attachmentId": "att_f9687853ed09434294539ad743bc5e93",
+      "attachmentId": "att_712bc7e680c3438c9d123a20e77db5df",
       "status": "pending",
       "kind": "resume_source",
-      "originalFileName": "___4C2026_________.pdf",
-      "storedFileName": "att_f9687853ed09434294539ad743bc5e93____4C2026_________.pdf",
-      "storedPath": "ta/ai/attachments/TA-10258/temp/att_f9687853ed09434294539ad743bc5e93____4C2026_________.pdf",
+      "originalFileName": "EBU6335_Tutorial_8.pdf",
+      "storedFileName": "att_712bc7e680c3438c9d123a20e77db5df_EBU6335_Tutorial_8.pdf",
+      "storedPath": "ta/ai/attachments/TA-10258/temp/att_712bc7e680c3438c9d123a20e77db5df_EBU6335_Tutorial_8.pdf",
       "mimeType": "application/pdf",
-      "size": 1185751,
-      "createdAt": "2026-04-06T00:13:03.357362300Z",
-      "sha256": "9ae6b216d0c6da678e0847ef6a6b07b8dd23114d27bb013a9d452234091546b0",
-      "sourceType": "manual",
-      "sourcePath": "",
-      "courseCode": "",
-      "applicationId": ""
-    },
-    {
-      "attachmentId": "att_81d10e4a53414e1a954cf608f3a9c921",
-      "status": "pending",
-      "kind": "resume_source",
-      "originalFileName": "___4C2026_________.pdf",
-      "storedFileName": "att_81d10e4a53414e1a954cf608f3a9c921____4C2026_________.pdf",
-      "storedPath": "ta/ai/attachments/TA-10258/temp/att_81d10e4a53414e1a954cf608f3a9c921____4C2026_________.pdf",
-      "mimeType": "application/pdf",
-      "size": 1185751,
-      "createdAt": "2026-04-06T00:13:09.775502100Z",
-      "sha256": "9ae6b216d0c6da678e0847ef6a6b07b8dd23114d27bb013a9d452234091546b0",
-      "sourceType": "manual",
-      "sourcePath": "",
-      "courseCode": "",
+      "size": 186463,
+      "createdAt": "2026-04-06T00:16:26.835796700Z",
+      "sha256": "bbdc4d7d2735cfe9102e2bc6dc56cb9a954d3d9f323d5a5938fb6bbdd2375d3e",
+      "sourceType": "course-apply",
+      "sourcePath": "course-apply/AUTO-6438D7/EBU6335_Tutorial_8.pdf",
+      "courseCode": "AUTO-6438D7",
       "applicationId": ""
     }
   ]

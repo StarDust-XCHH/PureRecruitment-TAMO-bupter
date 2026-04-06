@@ -601,33 +601,89 @@
             }
         }
 
-        function startNewSession() {
-            state.sessionId = '';
-            state.scene = 'general_chat';
-            state.title = 'AI 助理对话';
-            state.context = {};
-            state.pendingAttachments = [];
-            state.activeResponseId = '';
-            state.isSending = false;
-            state.attachmentPanelExpanded = false;
-            if (composerInput) {
-                composerInput.value = '';
+        async function clearPendingAttachments() {
+            const attachments = Array.isArray(state.pendingAttachments) ? state.pendingAttachments.slice() : [];
+            if (!attachments.length) {
+                state.pendingAttachments = [];
+                state.attachmentPanelExpanded = false;
+                if (fileInput) {
+                    fileInput.value = '';
+                }
+                renderPendingAttachments();
+                return;
             }
+
+            const taId = resolveTaId();
+            if (!taId) {
+                throw new Error('当前未获取到 TA 身份，请重新登录后再试。');
+            }
+
+            for (const attachment of attachments) {
+                const attachmentId = String(attachment?.attachmentId || '').trim();
+                if (!attachmentId) {
+                    continue;
+                }
+                const formData = new FormData();
+                formData.append('action', 'remove-pending');
+                formData.append('taId', taId);
+                formData.append('attachmentId', attachmentId);
+
+                const response = await fetch(resolveAiApiUrl(), {
+                    method: 'POST',
+                    body: formData
+                });
+                const payload = await response.json();
+                if (!response.ok || !payload?.success) {
+                    throw new Error(payload?.message || '清空待发送附件失败');
+                }
+                state.pendingAttachments = Array.isArray(payload.data?.pendingAttachments) ? payload.data.pendingAttachments : [];
+                if (payload.data?.serviceStatus) {
+                    applyServiceStatus(payload.data.serviceStatus);
+                }
+            }
+
+            state.pendingAttachments = [];
+            state.attachmentPanelExpanded = false;
             if (fileInput) {
                 fileInput.value = '';
             }
-            if (composerHint) {
-                composerHint.textContent = state.serviceStatus.available
-                    ? '已切换到新的空白会话。你可以继续输入新问题，右侧仍可查阅历史会话。'
-                    : (state.serviceStatus.message || '当前 AI 服务不可用');
-            }
-            if (state.serviceStatus.available) {
-                setStatus('Ready');
-            }
             renderPendingAttachments();
-            renderSessionHistory();
-            renderThread();
-            applyServiceStatus(state.serviceStatus);
+        }
+
+        async function startNewSession() {
+            setStatus('Loading');
+            try {
+                await clearPendingAttachments();
+                state.sessionId = '';
+                state.scene = 'general_chat';
+                state.title = 'AI 助理对话';
+                state.context = {};
+                state.activeResponseId = '';
+                state.isSending = false;
+                state.attachmentPanelExpanded = false;
+                if (composerInput) {
+                    composerInput.value = '';
+                }
+                if (composerHint) {
+                    composerHint.textContent = state.serviceStatus.available
+                        ? '已切换到新的空白会话。你可以继续输入新问题，右侧仍可查阅历史会话。'
+                        : (state.serviceStatus.message || '当前 AI 服务不可用');
+                }
+                if (state.serviceStatus.available) {
+                    setStatus('Ready');
+                }
+                renderPendingAttachments();
+                renderSessionHistory();
+                renderThread();
+                applyServiceStatus(state.serviceStatus);
+            } catch (error) {
+                console.error('[TA-AI] start new session failed', error);
+                setStatus('Error');
+                if (composerHint) {
+                    composerHint.textContent = error.message || '新建会话失败，待发送附件未能清空。';
+                }
+                window.alert(error.message || '新建会话失败，待发送附件未能清空。');
+            }
         }
 
         function appendOptimisticUserMessage(message, responseId) {
@@ -1043,7 +1099,9 @@
             }
         });
 
-        newSessionBtn?.addEventListener('click', startNewSession);
+        newSessionBtn?.addEventListener('click', () => {
+            startNewSession();
+        });
         sendBtn?.addEventListener('click', sendMessage);
         composerInput?.addEventListener('keydown', (event) => {
             if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
