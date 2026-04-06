@@ -300,19 +300,20 @@
             <p class="muted">快速更新档案、账号安全与偏好设置，资料修改需点击保存后才会写入。</p>
         </div>
         <div class="modal-body settings-body">
-            <aside class="settings-tabs" role="tablist" aria-label="设置菜单">
-                <button class="settings-tab active" type="button" data-settings-tab="profile" role="tab" aria-selected="true">
+            <div class="settings-tabs" role="tablist" aria-label="设置菜单">
+                <button class="settings-tab active" type="button" data-settings-tab="profile" role="tab" aria-selected="true" aria-controls="panel-profile">
                     <span>👤</span> 基础资料
                 </button>
-                <button class="settings-tab" type="button" data-settings-tab="security" role="tab" aria-selected="false">
+                <button class="settings-tab" type="button" data-settings-tab="security" role="tab" aria-selected="false" aria-controls="panel-security">
                     <span>🔒</span> 账号与安全
                 </button>
-                <button class="settings-tab" type="button" data-settings-tab="preferences" role="tab" aria-selected="false">
+                <button class="settings-tab" type="button" data-settings-tab="preferences" role="tab" aria-selected="false" aria-controls="panel-preferences">
                     <span>⚙️</span> 系统偏好
                 </button>
-            </aside>
+            </div>
+
             <section class="settings-content">
-                <div class="settings-panel active" data-settings-panel="profile" role="tabpanel">
+                <div class="settings-panel active" id="panel-profile" data-settings-panel="profile" role="tabpanel">
                     <div class="settings-section">
                         <div class="settings-profile-toolbar">
                             <div class="settings-status-group">
@@ -351,7 +352,8 @@
                         </label>
                     </div>
                 </div>
-                <div class="settings-panel" data-settings-panel="security" role="tabpanel" hidden>
+
+                <div class="settings-panel" id="panel-security" data-settings-panel="security" role="tabpanel" hidden>
                     <div class="settings-section">
                         <h4>修改密码</h4>
                         <div class="settings-grid">
@@ -374,7 +376,8 @@
                         <p class="muted" id="passwordFeedback">为确保账号安全，建议定期更新密码。</p>
                     </div>
                 </div>
-                <div class="settings-panel" data-settings-panel="preferences" role="tabpanel" hidden>
+
+                <div class="settings-panel" id="panel-preferences" data-settings-panel="preferences" role="tabpanel" hidden>
                     <div class="settings-section">
                         <h4>通知与偏好</h4>
                         <label class="settings-toggle">

@@ -2,7 +2,7 @@
   "schema": "ta-ai-conversations.v1",
   "version": 1,
   "taId": "TA-10258",
-  "updatedAt": "2026-04-06T00:24:04.571397800Z",
+  "updatedAt": "2026-04-06T00:31:16.160426100Z",
   "sessions": [
     {
       "sessionId": "sess_913d3be86fb042c19bc8fd82ac184a34",
@@ -125,7 +125,51 @@
       "attachments": [],
       "context": {},
       "provider": "qwen-long"
+    },
+    {
+      "sessionId": "sess_241e7ff78cbd421bbead10f5693e611e",
+      "scene": "general_chat",
+      "title": "AI 助理对话",
+      "status": "active",
+      "createdAt": "2026-04-06T00:28:46.060482400Z",
+      "updatedAt": "2026-04-06T00:28:46.112038100Z",
+      "messages": [
+        {
+          "messageId": "msg_546d0ccb136c40c7ac699dbd38bf5f47",
+          "role": "user",
+          "type": "text",
+          "content": "分析这个pdf",
+          "createdAt": "2026-04-06T00:28:46.094037400Z"
+        },
+        {
+          "messageId": "msg_cb8c41788e05412298737c8db157569c",
+          "role": "assistant",
+          "type": "text",
+          "content": "这份 PDF 是 **PureRecruitment TA 页面**中与嵌入式系统课程第二周“编码日”（Coding Day）相关的教学指导文档，标题为《Week 2: Coding Day – Teamworking and Collaborative Learning》。以下是对其内容的详细分析：\n\n---\n\n### 一、整体目标\n本 Coding Day 的核心目的是：  \n✅ **巩固第2周所学知识**，并通过团队协作完成一个**集成式的嵌入式应用项目**，体现对多个外设模块的理解与整合能力。\n\n强调：\n- 团队合作（Teamworking）\n- 协作学习（Collaborative Learning）\n- 实践中理解硬件行为与软件配置的关系\n- 使用调试工具验证系统功能\n\n---\n\n### 二、任务分为两个主要步骤\n\n#### 🔹 步骤 1：运行并理解 Week 2 实验\n在开始综合任务前，每个团队必须先掌握以下四个实验内容：\n\n| 实验 | 核心知识点 |\n|------|-----------|\n| **GPIO 实验** | - PA5 配置为输出，控制 LED<br>- PC13 配置为输入，检测用户按键（带中断处理） |\n| **Timer 实验** | - TIM4_CH1：PWM 输出<br>- TIM3_CH2：输入捕获（Input Capture），通过回环(loopback)测量 PWM 频率，含中断处理 |\n| **ADC 实验** | - 使用 3 个 ADC 通道读取三联电位器（3-gang potentiometer）<br>- 采样值用于调节三个 PWM 输出（TIM1_CH4, TIM3_CH1, TIM3_CH3）<br>- 引入了：<br>  ① 中断和 DMA 处理多通道 ADC<br>  ② 使用 TIM3 触发 ADC 采样（外部触发 TRGO） |\n| **高级调试实验** | （虽未展开，但暗示需掌握调试技巧） |\n\n📌 学生应能解释：\n- 每个外设是如何配置的？\n- 它们在硬件上如何工作？\n- 软件代码如何支持预期行为？\n- 如何使用调试工具来验证系统？\n\n---\n\n#### 🔹 步骤 2：开发集成嵌入式应用程序（主任务）\n\n基于上述实验知识，构建一个模拟的**简易电机控制系统**，要求实现如下功能：\n\n| 功能模块 | 技术实现要求 |\n|--------|-------------|\n| **方向选择** | 使用 3 个按钮分别表示：<br>- 前进（Forward）<br>- 左转（Left Turn）<br>- 右转（Right Turn） |\n| **速度设置** | 使用 3 个 ADC 通道采集电位器输入，设定对应的 PWM 输出值（即电机速度） |\n| **电机控制** | 使用 PWM 输出模拟控制两个直流电机（如左右轮） |\n| **速度反馈测量** | 使用 **输入捕获（Input Capture）** 功能，从 PWM 输出进行回环(loopback)，测量反馈脉冲频率 → 模拟实际电机转速反馈 |\n| **系统验证** | 必须采用合适的调试与验证技术确认系统正常运行（如逻辑分析仪、串口打印、断点调试等） |\n\n---\n\n### 三、评分标准（Mark Qualification）\n\n要获得成绩，必须满足以下条件：\n\n1. ✅ 团队成功演示完整的集成应用；\n2. ✅ 展现出对 Week 2 各项实验内容的理解与有效整合；\n3. ✅ **每位成员**必须能够清晰说明自己的贡献（个体打分依据）；\n\n👉 强调：不仅是“做出来”，更要“讲清楚”。\n\n---\n\n### 四、关键技能点总结\n\n| 技术领域 | 掌握要点 |\n|--------|---------|\n| GPIO | 输入/输出配置、中断响应按钮事件 |\n| Timers | PWM 生成、输入捕获测频、定时器联动 |\n| ADC | 多通道采样、DMA/中断传输、定时器触发采样（TRGO） |\n| 系统集成 | 将多个外设协同工作，形成完整控制闭环 |\n| 调试能力 | 使用工具验证信号正确性（示波器、IDE 调试器等） |\n\n---\n\n### 五、建议执行流程（给学生的实用建议）\n\n1. **分工研究各实验**：每人负责一个实验模块，确保全组理解代码逻辑与硬件连接；\n2. **搭建基础工程框架**：合并所有外设初始化代码，避免冲突（注意时钟、引脚复用）；\n3. **逐步集成功能**：\n   - 先实现按钮控制方向状态切换；\n   - 再接入 ADC 控制 PWM 占空比；\n   - 最后加入 Input Capture 测量回环 PWM 频率；\n4. **使用调试手段验证每一步**：\n   - 打印 ADC 值、PWM 占空比、捕获到的频率；\n   - 利用 Keil/STM32CubeIDE 的外设寄存器视图或逻辑分析仪观察信号；\n5. **准备答辩陈述**：\n   - 明确记录每个人的工作（如：A 负责 ADC 集成，B 实现 Input Capture 等）；\n   - 练习口头解释系统架构与关键技术点。\n\n---\n\n### 六、结论\n\n该文档是一个典型的嵌入式系统实践教学任务书，旨在引导学生将分散的知识点（GPIO、Timer、ADC、中断、DMA、TRGO）融合到一个具有实际控制意义的应用中 —— 类似于机器人小车的简化版电机控制系统。\n\n🎯 目标不仅是编程实现功能，更是培养：\n- 外设协同设计能力\n- 硬件-软件联合调试思维\n- 团队协作与表达能力\n\n建议团队严格按照“先理解实验 → 再逐步集成”的路径推进，避免盲目编码导致系统混乱。",
+          "createdAt": "2026-04-06T00:28:46.112038100Z"
+        }
+      ],
+      "attachments": [],
+      "context": {},
+      "provider": "qwen-long"
     }
   ],
-  "pendingAttachments": []
+  "pendingAttachments": [
+    {
+      "attachmentId": "att_a881ebbac44441a0b9b2cf2765ebe52b",
+      "status": "pending",
+      "kind": "resume_source",
+      "originalFileName": "SSD1306.pdf",
+      "storedFileName": "att_a881ebbac44441a0b9b2cf2765ebe52b_SSD1306.pdf",
+      "storedPath": "ta/ai/attachments/TA-10258/temp/att_a881ebbac44441a0b9b2cf2765ebe52b_SSD1306.pdf",
+      "mimeType": "application/pdf",
+      "size": 1876686,
+      "createdAt": "2026-04-06T00:31:16.160426100Z",
+      "sha256": "d55f875357de96d8c0e92153a389acc57e8bab4db7a0687f2e0bd3362f0036f6",
+      "sourceType": "manual",
+      "sourcePath": "",
+      "courseCode": "",
+      "applicationId": ""
+    }
+  ]
 }

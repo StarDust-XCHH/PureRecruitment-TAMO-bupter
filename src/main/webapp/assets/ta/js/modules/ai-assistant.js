@@ -552,17 +552,24 @@
         }
 
         function hydrateConversation(data) {
-            state.sessions = Array.isArray(data?.sessions)
+            const incomingSessions = Array.isArray(data?.sessions)
                 ? data.sessions.map((session) => ({
                     ...session,
                     messages: Array.isArray(session?.messages) ? session.messages.map(normalizeMessage) : []
                 }))
                 : [];
+            const hasActiveDraftSession = !state.sessionId && String(composerInput?.value || '').trim() === '';
+            const isCurrentDraftEmpty = !state.sessionId
+                && !state.pendingAttachments.length
+                && !state.isSending
+                && (!getCurrentSession() || !Array.isArray(getCurrentSession().messages) || !getCurrentSession().messages.length);
+
+            state.sessions = incomingSessions;
             state.pendingAttachments = Array.isArray(data?.pendingAttachments) ? data.pendingAttachments : [];
             if (data?.serviceStatus) {
                 applyServiceStatus(data.serviceStatus);
             }
-            if (!state.sessionId && state.sessions.length) {
+            if (!state.sessionId && state.sessions.length && !hasActiveDraftSession && !isCurrentDraftEmpty) {
                 state.sessionId = String(state.sessions[0].sessionId || '').trim();
             }
             syncStateFromSession(getCurrentSession());
