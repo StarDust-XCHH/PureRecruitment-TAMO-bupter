@@ -650,24 +650,38 @@
             renderPendingAttachments();
         }
 
-        async function startNewSession() {
+        async function startNewSession(options) {
+            const sessionOptions = options && typeof options === 'object' ? options : {};
+            const keepPendingAttachments = Boolean(sessionOptions.keepPendingAttachments);
+            const nextScene = String(sessionOptions.scene || 'general_chat').trim() || 'general_chat';
+            const nextTitle = String(sessionOptions.title || 'AI 助理对话').trim() || 'AI 助理对话';
+            const nextContext = sessionOptions.context && typeof sessionOptions.context === 'object'
+                ? { ...sessionOptions.context }
+                : {};
+            const nextHint = String(sessionOptions.hint || '').trim();
+            const nextComposerValue = typeof sessionOptions.composerValue === 'string'
+                ? sessionOptions.composerValue
+                : null;
+
             setStatus('Loading');
             try {
-                await clearPendingAttachments();
+                if (!keepPendingAttachments) {
+                    await clearPendingAttachments();
+                }
                 state.sessionId = '';
-                state.scene = 'general_chat';
-                state.title = 'AI 助理对话';
-                state.context = {};
+                state.scene = nextScene;
+                state.title = nextTitle;
+                state.context = nextContext;
                 state.activeResponseId = '';
                 state.isSending = false;
-                state.attachmentPanelExpanded = false;
+                state.attachmentPanelExpanded = state.pendingAttachments.length > 0;
                 if (composerInput) {
-                    composerInput.value = '';
+                    composerInput.value = nextComposerValue !== null ? nextComposerValue : '';
                 }
                 if (composerHint) {
-                    composerHint.textContent = state.serviceStatus.available
+                    composerHint.textContent = nextHint || (state.serviceStatus.available
                         ? '已切换到新的空白会话。你可以继续输入新问题，右侧仍可查阅历史会话。'
-                        : (state.serviceStatus.message || '当前 AI 服务不可用');
+                        : (state.serviceStatus.message || '当前 AI 服务不可用'));
                 }
                 if (state.serviceStatus.available) {
                     setStatus('Ready');
@@ -931,34 +945,40 @@
             try {
                 setStatus('Loading');
                 if (composerHint) {
-                    composerHint.textContent = '正在将课程申请简历载入 AI 待发送附件…';
+                    composerHint.textContent = '正在为课程申请创建新的 AI 会话并载入简历…';
                 }
                 if (typeof app.openModal === 'function') {
                     app.openModal('planner');
                 }
+
+                await startNewSession({
+                    keepPendingAttachments: false,
+                    scene: 'resume_optimize',
+                    title: '课程申请简历优化',
+                    context: {
+                        courseCode: payload.courseCode || '',
+                        applicationId: payload.applicationId || '',
+                        sourcePath: payload.sourcePath || ''
+                    },
+                    composerValue: '请根据当前课程申请要求，帮我优化这份简历，并指出最值得优先调整的内容。',
+                    hint: '新会话已创建，正在载入课程申请简历…'
+                });
+
                 await uploadPendingFile(payload.file, {
                     sourceType: 'course-apply',
                     sourcePath: payload.sourcePath || '',
                     courseCode: payload.courseCode || '',
                     applicationId: payload.applicationId || ''
                 });
-                state.scene = 'resume_optimize';
-                state.title = '课程申请简历优化';
-                state.context = {
-                    courseCode: payload.courseCode || '',
-                    applicationId: payload.applicationId || '',
-                    sourcePath: payload.sourcePath || ''
-                };
-                state.sessionId = '';
-                if (composerInput && !composerInput.value.trim()) {
-                    composerInput.value = '请根据当前课程申请要求，帮我优化这份简历，并指出最值得优先调整的内容。';
-                }
-                if (composerHint) {
-                    composerHint.textContent = '课程申请简历已载入待发送附件，请确认消息后点击发送。';
-                }
+
                 state.attachmentPanelExpanded = true;
+                if (composerHint) {
+                    composerHint.textContent = '已为课程申请创建新会话，简历 PDF 已载入待发送附件，请确认消息后点击发送。';
+                }
                 setStatus('Ready');
                 renderPendingAttachments();
+                renderSessionHistory();
+                renderThread();
             } catch (error) {
                 console.error('[TA-AI] preload failed', error);
                 setStatus('Error');
