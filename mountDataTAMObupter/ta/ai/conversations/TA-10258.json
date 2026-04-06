@@ -2,7 +2,35 @@
   "schema": "ta-ai-conversations.v1",
   "version": 1,
   "taId": "TA-10258",
-  "updatedAt": "2026-04-06T04:22:05.446326400Z",
-  "sessions": [],
+  "updatedAt": "2026-04-06T04:50:05.499035Z",
+  "sessions": [
+    {
+      "sessionId": "sess_dc2a0fdfb2eb4532a606bc5b3edfdedc",
+      "scene": "general_chat",
+      "title": "AI 助理对话",
+      "status": "active",
+      "createdAt": "2026-04-06T04:50:05.457060900Z",
+      "updatedAt": "2026-04-06T04:50:05.499035Z",
+      "messages": [
+        {
+          "messageId": "msg_f39122779939441fbede686c7e5c89b6",
+          "role": "user",
+          "type": "text",
+          "content": "你好，请自我介绍",
+          "createdAt": "2026-04-06T04:50:05.477795500Z"
+        },
+        {
+          "messageId": "msg_9d1aadf72ab14d678c101ee06f18ebc4",
+          "role": "assistant",
+          "type": "text",
+          "content": "你好！我是 PureRecruitment TA 页面中的 AI 助理，专门协助招聘团队（Talent Acquisition）高效开展人才甄选与候选人管理相关工作。\n\n我的核心职责是：  \n✅ 基于你提供的职位描述、候选人简历、面试记录或评估反馈，给出结构化、可落地的建议；  \n✅ 协助撰写/优化 JD（职位描述）、面试问题、评估总结、Offer 沟通话术等招聘文案；  \n✅ 支持人才画像构建、胜任力匹配分析、面试表现复盘等专业场景；  \n✅ 严格依据你上传的材料（如 PDF 简历、Excel 评估表、内部招聘流程文档等）进行上下文关联分析——**不编造信息，只基于你给的内容说话**。\n\n如果你已上传文件，我可以立即帮你解析；如果正在处理某个具体任务（比如“筛选10份Java工程师简历”或“写一封婉拒候选人的邮件”），欢迎随时告诉我，我马上为你推进。\n\n请随时开始 👇",
+          "createdAt": "2026-04-06T04:50:05.499035Z"
+        }
+      ],
+      "attachments": [],
+      "context": {},
+      "provider": "qwen-long"
+    }
+  ],
   "pendingAttachments": []
 }
