@@ -305,6 +305,37 @@ public class TaAiConversationDao {
         );
     }
 
+    public synchronized boolean removePendingAttachment(String taId, String attachmentId) throws IOException {
+        String normalizedTaId = requireTaId(taId);
+        String normalizedAttachmentId = trim(attachmentId);
+        if (normalizedAttachmentId.isEmpty()) {
+            return false;
+        }
+
+        JsonObject root = loadConversationRoot(normalizedTaId);
+        JsonArray pendingAttachments = ensureArray(root, "pendingAttachments");
+        for (int i = 0; i < pendingAttachments.size(); i++) {
+            JsonElement element = pendingAttachments.get(i);
+            if (!element.isJsonObject()) {
+                continue;
+            }
+            JsonObject attachment = element.getAsJsonObject();
+            if (!normalizedAttachmentId.equals(getAsString(attachment, "attachmentId"))) {
+                continue;
+            }
+
+            Path storedPath = resolveStoredPath(getAsString(attachment, "storedPath"));
+            if (Files.exists(storedPath) && !Files.isDirectory(storedPath)) {
+                Files.delete(storedPath);
+            }
+            pendingAttachments.remove(i);
+            root.addProperty("updatedAt", nowIso());
+            saveConversationRoot(normalizedTaId, root);
+            return true;
+        }
+        return false;
+    }
+
     public synchronized String createSession(String taId, String scene, String title, Map<String, Object> context) throws IOException {
         String normalizedTaId = requireTaId(taId);
         JsonObject root = loadConversationRoot(normalizedTaId);

@@ -106,6 +106,14 @@ public class TaAiAssistantService {
         return result;
     }
 
+    public Map<String, Object> removePendingAttachment(String taId, String attachmentId) throws IOException {
+        conversationDao.removePendingAttachment(taId, attachmentId);
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("pendingAttachments", conversationDao.listPendingAttachments(taId));
+        result.put("serviceStatus", buildServiceStatus());
+        return result;
+    }
+
     public Map<String, Object> sendMessage(String taId,
                                            String sessionId,
                                            String message,
@@ -197,10 +205,7 @@ public class TaAiAssistantService {
                                            String scene,
                                            String title) throws IOException {
         List<Message> providerMessages = new ArrayList<>();
-        providerMessages.add(Message.builder()
-                .role(Role.SYSTEM.getValue())
-                .content(buildSystemPrompt(context))
-                .build());
+        String systemPrompt = buildSystemPrompt(context);
 
         List<Map<String, Object>> sessions = castList(conversation.get("sessions"));
         Map<String, Object> currentSession = null;
@@ -228,7 +233,7 @@ public class TaAiAssistantService {
         for (int i = startIndex; i < messages.size(); i++) {
             Map<String, Object> item = messages.get(i);
             String role = String.valueOf(item.getOrDefault("role", "")).trim().toLowerCase(Locale.ROOT);
-            if (!"user".equals(role) && !"assistant".equals(role) && !"system".equals(role)) {
+            if (!"user".equals(role) && !"assistant".equals(role)) {
                 continue;
             }
             String content = String.valueOf(item.getOrDefault("content", "")).trim();
@@ -267,7 +272,9 @@ public class TaAiAssistantService {
             ));
         }
 
-        return new AiChatRequest(taId, sessionId, currentMessage, context == null ? Map.of() : new LinkedHashMap<>(context), providerMessages, attachmentRefs);
+        Map<String, Object> requestContext = context == null ? new LinkedHashMap<>() : new LinkedHashMap<>(context);
+        requestContext.put("_systemPrompt", systemPrompt);
+        return new AiChatRequest(taId, sessionId, currentMessage, requestContext, providerMessages, attachmentRefs);
     }
 
     private String buildSystemPrompt(Map<String, Object> context) {
@@ -401,13 +408,18 @@ public class TaAiAssistantService {
                 throw new IOException("服务端未读取到环境变量 TONGYI_API_KEY，无法调用 AI 服务");
             }
 
-            List<Message> providerMessages = new ArrayList<>(request.messages());
+            List<Message> providerMessages = new ArrayList<>();
+            providerMessages.add(Message.builder()
+                    .role(Role.SYSTEM.getValue())
+                    .content(resolveSystemPrompt(request))
+                    .build());
             for (AiAttachmentRef attachment : request.attachments()) {
                 providerMessages.add(Message.builder()
                         .role(Role.SYSTEM.getValue())
                         .content("fileid://" + uploadAndEnsureParsed(apiKey, attachment))
                         .build());
             }
+            providerMessages.addAll(request.messages());
 
             Generation generation = new Generation();
             try {
@@ -572,6 +584,17 @@ public class TaAiAssistantService {
                 Thread.currentThread().interrupt();
                 throw new IOException("等待附件解析时被中断", e);
             }
+        }
+
+        private String resolveSystemPrompt(AiChatRequest request) {
+            if (request == null || request.context() == null) {
+                return "你是 PureRecruitment TA 页面中的 AI 助理。请使用简体中文回答。";
+            }
+            Object prompt = request.context().get("_systemPrompt");
+            String normalized = prompt == null ? "" : String.valueOf(prompt).trim();
+            return normalized.isEmpty()
+                    ? "你是 PureRecruitment TA 页面中的 AI 助理。请使用简体中文回答。"
+                    : normalized;
         }
 
         private String extractAssistantText(GenerationResult result) {

@@ -74,6 +74,10 @@ public class TaAiAssistantServlet extends HttpServlet {
                 handleUploadPending(req, resp);
                 return;
             }
+            if ("remove-pending".equalsIgnoreCase(action)) {
+                handleRemovePendingAttachment(req, resp);
+                return;
+            }
             if ("chat".equalsIgnoreCase(action)) {
                 if ("true".equalsIgnoreCase(trim(req.getParameter("stream")))) {
                     handleChatStream(req, resp);
@@ -121,6 +125,22 @@ public class TaAiAssistantServlet extends HttpServlet {
                 trim(req.getParameter("applicationId"))
         );
         ServletJsonResponseWriter.write(resp, 200, ApiResponse.success("AI 待发送附件已载入", result));
+    }
+
+    private void handleRemovePendingAttachment(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String taId = trim(req.getParameter("taId"));
+        String attachmentId = trim(req.getParameter("attachmentId"));
+        if (taId.isEmpty()) {
+            ServletJsonResponseWriter.write(resp, 400, ApiResponse.failure("缺少 TA 标识"));
+            return;
+        }
+        if (attachmentId.isEmpty()) {
+            ServletJsonResponseWriter.write(resp, 400, ApiResponse.failure("缺少待移除附件标识"));
+            return;
+        }
+
+        Map<String, Object> result = aiAssistantService.removePendingAttachment(taId, attachmentId);
+        ServletJsonResponseWriter.write(resp, 200, ApiResponse.success("待发送附件已移除", result));
     }
 
     private void handleChat(HttpServletRequest req, HttpServletResponse resp) throws IOException {

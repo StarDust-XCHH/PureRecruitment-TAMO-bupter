@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "tas",
     "version": "1.0",
-    "updatedAt": "2026-04-05T22:39:44.105842500Z"
+    "updatedAt": "2026-04-06T00:30:54.704075Z"
   },
   "items": [
     {
@@ -32,12 +32,12 @@
       "department": "",
       "status": "active",
       "createdAt": "2026-03-16T13:28:45.257077Z",
-      "updatedAt": "2026-04-05T17:01:06.685075900Z",
+      "updatedAt": "2026-04-06T00:30:54.702073100Z",
       "auth": {
         "passwordHash": "8b5361414eb8fa038ca9279a55be8b3b44791939d89475d1618d50230c01d65f",
         "passwordSalt": "cebb50b5-9797-4732-a22a-df78ae1c88da",
-        "lastLoginAt": "2026-04-05T17:01:06.685075900Z",
-        "failedAttempts": 0.0
+        "lastLoginAt": "2026-04-06T00:30:54.702073100Z",
+        "failedAttempts": 0
       }
     },
     {
@@ -117,29 +117,12 @@
       "department": "",
       "status": "active",
       "createdAt": "2026-03-21T13:12:54.282282500Z",
-      "updatedAt": "2026-04-05T22:16:56.204636200Z",
+      "updatedAt": "2026-04-01T18:18:41.187369500Z",
       "auth": {
         "passwordHash": "5ffe2b47aa70ecc089b7d9311ef3ff2fb72195411b1b98d210d2b686afaf5ee9",
         "passwordSalt": "08a2d292-32bc-46e7-936a-45a132381204",
-        "lastLoginAt": "2026-04-05T22:16:56.204636200Z",
+        "lastLoginAt": "2026-04-01T18:18:41.187369500Z",
         "failedAttempts": 0.0
-      }
-    },
-    {
-      "id": "TA-98683",
-      "name": "Benny",
-      "username": "test0",
-      "email": "12345t6@e.com",
-      "phone": "12345675678",
-      "department": "",
-      "status": "active",
-      "createdAt": "2026-04-05T22:16:20.111579700Z",
-      "updatedAt": "2026-04-05T22:39:44.104268300Z",
-      "auth": {
-        "passwordHash": "34a7789e0123a5d029f4bed54097b43984eea544f8db1068d575eee4ba6e23e2",
-        "passwordSalt": "7f340ad9-10b9-4b7e-b168-b7912c8fa6de",
-        "lastLoginAt": "2026-04-05T22:39:44.104268300Z",
-        "failedAttempts": 0
       }
     }
   ]

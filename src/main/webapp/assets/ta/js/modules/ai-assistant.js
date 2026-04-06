@@ -3,6 +3,7 @@
 
     const taApp = window.TAApp = window.TAApp || {};
     const modules = taApp.modules = taApp.modules || {};
+    const DEFAULT_HISTORY_VISIBLE_COUNT = 2;
 
     modules.aiAssistant = function initAiAssistantModule(app) {
         const state = app.state.aiAssistant = app.state.aiAssistant || {
@@ -21,13 +22,20 @@
                 defaultProvider: true
             },
             isSending: false,
-            activeResponseId: ''
+            activeResponseId: '',
+            historyExpanded: false,
+            attachmentPanelExpanded: false
         };
 
         const thread = document.getElementById('aiAssistantThread');
         const statusBadge = document.getElementById('aiAssistantStatusBadge');
         const pendingCount = document.getElementById('aiPendingAttachmentCount');
         const pendingList = document.getElementById('aiPendingAttachmentList');
+        const pendingPanel = document.getElementById('aiPendingAttachmentPanel');
+        const pendingToggle = document.getElementById('aiPendingAttachmentToggle');
+        const historyCount = document.getElementById('aiConversationHistoryCount');
+        const historyList = document.getElementById('aiAssistantSessionHistory');
+        const historyToggle = document.getElementById('aiConversationHistoryToggle');
         const composerInput = document.getElementById('aiAssistantComposerInput');
         const sendBtn = document.getElementById('aiAssistantSendBtn');
         const fileInput = document.getElementById('aiAssistantFileInput');
@@ -69,6 +77,158 @@
                 .replace(/>/g, '&gt;')
                 .replace(/"/g, '&quot;')
                 .replace(/'/g, '&#39;');
+        }
+
+        function normalizeInline(text) {
+            let normalized = String(text || '');
+            normalized = escapeHtml(normalized);
+            normalized = normalized.replace(/`([^`]+)`/g, '<code>$1</code>');
+            normalized = normalized.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+            normalized = normalized.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+            normalized = normalized.replace(/(^|[^*])\*([^*]+)\*(?!\*)/g, '$1<em>$2</em>');
+            normalized = normalized.replace(/(^|[^_])_([^_]+)_(?!_)/g, '$1<em>$2</em>');
+            normalized = normalized.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+            return normalized;
+        }
+
+        function renderMarkdown(markdownText) {
+            const normalizedText = String(markdownText || '').replace(/\r\n/g, '\n');
+            if (!normalizedText.trim()) {
+                return '<p></p>';
+            }
+
+            const lines = normalizedText.split('\n');
+            const html = [];
+            let paragraph = [];
+            let listBuffer = [];
+            let listType = '';
+            let inCodeBlock = false;
+            let codeBuffer = [];
+
+            function flushParagraph() {
+                if (!paragraph.length) return;
+                html.push('<p>' + normalizeInline(paragraph.join('<br>')) + '</p>');
+                paragraph = [];
+            }
+
+            function flushList() {
+                if (!listBuffer.length || !listType) return;
+                html.push('<' + listType + ' class="ai-markdown-list">' + listBuffer.join('') + '</' + listType + '>');
+                listBuffer = [];
+                listType = '';
+            }
+
+            function flushCodeBlock() {
+                if (!inCodeBlock) return;
+                html.push('<pre class="ai-markdown-pre"><code>' + escapeHtml(codeBuffer.join('\n')) + '</code></pre>');
+                inCodeBlock = false;
+                codeBuffer = [];
+            }
+
+            lines.forEach((line) => {
+                const trimmed = line.trim();
+
+                if (trimmed.startsWith('```')) {
+                    flushParagraph();
+                    flushList();
+                    if (inCodeBlock) {
+                        flushCodeBlock();
+                    } else {
+                        inCodeBlock = true;
+                        codeBuffer = [];
+                    }
+                    return;
+                }
+
+                if (inCodeBlock) {
+                    codeBuffer.push(line);
+                    return;
+                }
+
+                if (!trimmed) {
+                    flushParagraph();
+                    flushList();
+                    return;
+                }
+
+                const headingMatch = trimmed.match(/^(#{1,6})\s+(.*)$/);
+                if (headingMatch) {
+                    flushParagraph();
+                    flushList();
+                    const level = headingMatch[1].length;
+                    html.push('<h' + level + ' class="ai-markdown-heading ai-markdown-heading-' + level + '">' + normalizeInline(headingMatch[2]) + '</h' + level + '>');
+                    return;
+                }
+
+                const orderedMatch = trimmed.match(/^(\d+)\.\s+(.*)$/);
+                if (orderedMatch) {
+                    flushParagraph();
+                    if (listType && listType !== 'ol') {
+                        flushList();
+                    }
+                    listType = 'ol';
+                    listBuffer.push('<li>' + normalizeInline(orderedMatch[2]) + '</li>');
+                    return;
+                }
+
+                const unorderedMatch = trimmed.match(/^[-*+]\s+(.*)$/);
+                if (unorderedMatch) {
+                    flushParagraph();
+                    if (listType && listType !== 'ul') {
+                        flushList();
+                    }
+                    listType = 'ul';
+                    listBuffer.push('<li>' + normalizeInline(unorderedMatch[1]) + '</li>');
+                    return;
+                }
+
+                if (trimmed === '---' || trimmed === '***') {
+                    flushParagraph();
+                    flushList();
+                    html.push('<hr class="ai-markdown-divider">');
+                    return;
+                }
+
+                if (trimmed.startsWith('>')) {
+                    flushParagraph();
+                    flushList();
+                    html.push('<blockquote class="ai-markdown-blockquote"><p>' + normalizeInline(trimmed.replace(/^>\s?/, '')) + '</p></blockquote>');
+                    return;
+                }
+
+                if (listBuffer.length) {
+                    flushList();
+                }
+                paragraph.push(line);
+            });
+
+            flushParagraph();
+            flushList();
+            flushCodeBlock();
+
+            return html.join('');
+        }
+
+        async function copyText(text) {
+            const content = String(text || '');
+            if (!content) {
+                return;
+            }
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(content);
+                return;
+            }
+            const textarea = document.createElement('textarea');
+            textarea.value = content;
+            textarea.setAttribute('readonly', 'readonly');
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            textarea.style.pointerEvents = 'none';
+            document.body.appendChild(textarea);
+            textarea.focus();
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
         }
 
         function setStatus(text) {
@@ -118,26 +278,156 @@
             }
         }
 
+        function setHistoryExpanded(expanded) {
+            state.historyExpanded = Boolean(expanded);
+            if (historyList) {
+                historyList.dataset.collapsed = state.historyExpanded ? 'false' : 'true';
+                historyList.classList.toggle('is-collapsed', !state.historyExpanded);
+            }
+            if (historyToggle) {
+                historyToggle.dataset.expanded = state.historyExpanded ? 'true' : 'false';
+                historyToggle.setAttribute('aria-expanded', state.historyExpanded ? 'true' : 'false');
+                historyToggle.textContent = state.historyExpanded ? '收起' : '展开';
+            }
+        }
+
+        function setAttachmentPanelExpanded(expanded) {
+            state.attachmentPanelExpanded = Boolean(expanded);
+            if (pendingPanel) {
+                pendingPanel.dataset.collapsed = state.attachmentPanelExpanded ? 'false' : 'true';
+                pendingPanel.classList.toggle('is-collapsed', !state.attachmentPanelExpanded);
+            }
+            if (pendingToggle) {
+                pendingToggle.dataset.expanded = state.attachmentPanelExpanded ? 'true' : 'false';
+                pendingToggle.setAttribute('aria-expanded', state.attachmentPanelExpanded ? 'true' : 'false');
+                pendingToggle.textContent = state.attachmentPanelExpanded ? '收起' : '展开';
+            }
+        }
+
+        function updateHistoryCollapseState() {
+            if (state.sessions.length <= DEFAULT_HISTORY_VISIBLE_COUNT) {
+                setHistoryExpanded(false);
+                if (historyToggle) {
+                    historyToggle.hidden = true;
+                }
+                return;
+            }
+            if (historyToggle) {
+                historyToggle.hidden = false;
+            }
+            setHistoryExpanded(state.historyExpanded);
+        }
+
+        function updateAttachmentCollapseState() {
+            const hasPendingAttachments = state.pendingAttachments.length > 0;
+            if (!hasPendingAttachments) {
+                setAttachmentPanelExpanded(false);
+            } else {
+                setAttachmentPanelExpanded(state.attachmentPanelExpanded);
+            }
+        }
+
         function renderPendingAttachments() {
             if (pendingCount) {
                 pendingCount.textContent = state.pendingAttachments.length + ' 份材料';
             }
-            if (!pendingList) return;
+            if (!pendingList) {
+                updateAttachmentCollapseState();
+                return;
+            }
             if (!state.pendingAttachments.length) {
                 pendingList.innerHTML = '<div class="ai-upload-file ai-upload-file-empty"><strong>暂无待发送附件</strong><span>你可以在这里上传文件，或从课程申请弹窗预载当前简历。</span></div>';
+                updateAttachmentCollapseState();
                 return;
             }
             pendingList.innerHTML = state.pendingAttachments.map((item) => {
                 const sourceLabel = item.sourceType === 'course-apply' ? '来自课程申请' : '手动上传';
                 return '<div class="ai-upload-file" data-attachment-id="' + escapeHtml(item.attachmentId) + '">' +
+                    '<div class="ai-upload-file-main">' +
                     '<strong>' + escapeHtml(item.originalFileName) + '</strong>' +
                     '<span>' + escapeHtml(sourceLabel) + ' · ' + escapeHtml(formatFileSize(item.size)) + '</span>' +
+                    '</div>' +
+                    '<button class="ai-upload-file-remove" type="button" data-remove-pending-attachment="' + escapeHtml(item.attachmentId) + '" aria-label="移除附件">×</button>' +
                     '</div>';
             }).join('');
+            updateAttachmentCollapseState();
+        }
+
+        async function removePendingAttachment(attachmentId) {
+            const normalizedAttachmentId = String(attachmentId || '').trim();
+            if (!normalizedAttachmentId) {
+                return;
+            }
+            const taId = resolveTaId();
+            if (!taId) {
+                throw new Error('当前未获取到 TA 身份，请重新登录后再试。');
+            }
+            const formData = new FormData();
+            formData.append('action', 'remove-pending');
+            formData.append('taId', taId);
+            formData.append('attachmentId', normalizedAttachmentId);
+
+            const response = await fetch(resolveAiApiUrl(), {
+                method: 'POST',
+                body: formData
+            });
+            const payload = await response.json();
+            if (!response.ok || !payload?.success) {
+                throw new Error(payload?.message || '移除待发送附件失败');
+            }
+            state.pendingAttachments = Array.isArray(payload.data?.pendingAttachments) ? payload.data.pendingAttachments : [];
+            state.attachmentPanelExpanded = state.pendingAttachments.length > 0 && state.attachmentPanelExpanded;
+            if (payload.data?.serviceStatus) {
+                applyServiceStatus(payload.data.serviceStatus);
+            }
+            renderPendingAttachments();
         }
 
         function getCurrentSession() {
-            return state.sessions.find((item) => item.sessionId === state.sessionId) || state.sessions[0] || null;
+            return state.sessions.find((item) => item.sessionId === state.sessionId) || null;
+        }
+
+        function formatSessionTime(value) {
+            const raw = String(value || '').trim();
+            if (!raw) return '未开始';
+            const date = new Date(raw);
+            if (Number.isNaN(date.getTime())) return raw;
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            const hour = String(date.getHours()).padStart(2, '0');
+            const minute = String(date.getMinutes()).padStart(2, '0');
+            return month + '-' + day + ' ' + hour + ':' + minute;
+        }
+
+        function getSessionPreview(session) {
+            const messages = Array.isArray(session?.messages) ? session.messages : [];
+            const firstUserMessage = messages.find((item) => String(item?.role || '') === 'user' && String(item?.content || '').trim());
+            const preview = String(firstUserMessage?.content || session?.title || '新会话').trim();
+            return preview.length > 20 ? preview.slice(0, 20) + '…' : preview;
+        }
+
+        function renderSessionHistory() {
+            if (historyCount) {
+                historyCount.textContent = state.sessions.length + ' 条';
+            }
+            if (!historyList) {
+                updateHistoryCollapseState();
+                return;
+            }
+            if (!state.sessions.length) {
+                historyList.innerHTML = '<div class="ai-session-history-empty">暂无历史会话</div>';
+                updateHistoryCollapseState();
+                return;
+            }
+            historyList.innerHTML = state.sessions.map((session) => {
+                const sessionId = String(session?.sessionId || '').trim();
+                const activeClass = sessionId && sessionId === state.sessionId ? ' active' : '';
+                return '<button class="ai-session-item' + activeClass + '" type="button" data-session-id="' + escapeHtml(sessionId) + '">' +
+                    '<span class="ai-session-item-title">' + escapeHtml(getSessionPreview(session)) + '</span>' +
+                    '<span class="ai-session-item-meta">' + escapeHtml(formatSessionTime(session?.updatedAt || session?.createdAt || '')) + '</span>' +
+                    '</button>';
+            }).join('');
+            updateHistoryCollapseState();
         }
 
         function normalizeMessage(message) {
@@ -181,25 +471,55 @@
             return session;
         }
 
-        function ensureParagraphHtml(text) {
-            const safeText = escapeHtml(text || '');
-            if (!safeText) {
-                return '<p></p>';
+        function syncStateFromSession(session) {
+            if (!session) {
+                state.sessionId = '';
+                state.scene = 'general_chat';
+                state.title = 'AI 助理对话';
+                state.context = {};
+                return;
             }
-            const blocks = safeText
-                .replace(/\r\n/g, '\n')
-                .split(/\n{2,}/)
-                .map((item) => item.trim())
-                .filter(Boolean);
-            if (!blocks.length) {
-                return '<p></p>';
+            state.sessionId = String(session.sessionId || '').trim();
+            state.scene = String(session.scene || 'general_chat').trim() || 'general_chat';
+            state.title = String(session.title || 'AI 助理对话').trim() || 'AI 助理对话';
+            state.context = session.context && typeof session.context === 'object' ? { ...session.context } : {};
+        }
+
+        function openHistorySession(sessionId) {
+            const normalizedSessionId = String(sessionId || '').trim();
+            if (!normalizedSessionId) {
+                return;
             }
-            return blocks.map((block) => '<p>' + block.replace(/\n/g, '<br>') + '</p>').join('');
+            const session = state.sessions.find((item) => String(item?.sessionId || '').trim() === normalizedSessionId);
+            if (!session) {
+                return;
+            }
+            syncStateFromSession(session);
+            state.activeResponseId = '';
+            state.isSending = false;
+            if (fileInput) {
+                fileInput.value = '';
+            }
+            if (composerHint) {
+                const preview = getSessionPreview(session);
+                composerHint.textContent = '已切换到历史会话：' + preview;
+            }
+            if (state.serviceStatus.available) {
+                setStatus('Ready');
+            }
+            renderSessionHistory();
+            renderThread();
+            applyServiceStatus(state.serviceStatus);
         }
 
         function renderMessageBubbleContent(message) {
             const artifact = message.artifact && typeof message.artifact === 'object' ? message.artifact : null;
-            return ensureParagraphHtml(message.content || '') +
+            const messageHtml = message.role === 'assistant'
+                ? renderMarkdown(message.content || '')
+                : '<p>' + normalizeInline(message.content || '') + '</p>';
+            const copyButton = '<button class="ai-copy-btn" type="button" data-copy-message="' + escapeHtml(message.messageId) + '">复制</button>';
+            return '<div class="ai-message-main">' + messageHtml + '</div>' +
+                '<div class="ai-message-actions">' + copyButton + '</div>' +
                 (artifact && artifact.downloadUrl
                     ? '<div class="ai-message-download"><a class="pill-btn" href="' + escapeHtml(artifact.downloadUrl) + '" download>下载生成的 PDF</a></div>'
                     : '');
@@ -210,10 +530,10 @@
             const currentSession = getCurrentSession();
             if (!currentSession || !Array.isArray(currentSession.messages) || !currentSession.messages.length) {
                 thread.innerHTML = '' +
-                    '<div class="ai-chat-date">今天</div>' +
+                    '<div class="ai-chat-date">新会话</div>' +
                     '<article class="ai-message ai-message-assistant">' +
                     '  <div class="ai-avatar" aria-hidden="true">AI</div>' +
-                    '  <div class="ai-bubble"><p>' + escapeHtml(resolveDefaultAssistantMessage()) + '</p></div>' +
+                    '  <div class="ai-bubble"><div class="ai-message-main"><p>' + escapeHtml(resolveDefaultAssistantMessage()) + '</p></div></div>' +
                     '</article>';
                 return;
             }
@@ -232,20 +552,29 @@
         }
 
         function hydrateConversation(data) {
-            state.sessions = Array.isArray(data?.sessions)
+            const incomingSessions = Array.isArray(data?.sessions)
                 ? data.sessions.map((session) => ({
                     ...session,
                     messages: Array.isArray(session?.messages) ? session.messages.map(normalizeMessage) : []
                 }))
                 : [];
+            const hasActiveDraftSession = !state.sessionId && String(composerInput?.value || '').trim() === '';
+            const isCurrentDraftEmpty = !state.sessionId
+                && !state.pendingAttachments.length
+                && !state.isSending
+                && (!getCurrentSession() || !Array.isArray(getCurrentSession().messages) || !getCurrentSession().messages.length);
+
+            state.sessions = incomingSessions;
             state.pendingAttachments = Array.isArray(data?.pendingAttachments) ? data.pendingAttachments : [];
             if (data?.serviceStatus) {
                 applyServiceStatus(data.serviceStatus);
             }
-            if (!state.sessionId && state.sessions.length) {
+            if (!state.sessionId && state.sessions.length && !hasActiveDraftSession && !isCurrentDraftEmpty) {
                 state.sessionId = String(state.sessions[0].sessionId || '').trim();
             }
+            syncStateFromSession(getCurrentSession());
             renderPendingAttachments();
+            renderSessionHistory();
             renderThread();
         }
 
@@ -279,31 +608,103 @@
             }
         }
 
-        function startNewSession() {
-            state.sessionId = '';
-            state.scene = 'general_chat';
-            state.title = 'AI 助理对话';
-            state.context = {};
-            state.pendingAttachments = [];
-            state.activeResponseId = '';
-            state.isSending = false;
-            if (composerInput) {
-                composerInput.value = '';
+        async function clearPendingAttachments() {
+            const attachments = Array.isArray(state.pendingAttachments) ? state.pendingAttachments.slice() : [];
+            if (!attachments.length) {
+                state.pendingAttachments = [];
+                state.attachmentPanelExpanded = false;
+                if (fileInput) {
+                    fileInput.value = '';
+                }
+                renderPendingAttachments();
+                return;
             }
+
+            const taId = resolveTaId();
+            if (!taId) {
+                throw new Error('当前未获取到 TA 身份，请重新登录后再试。');
+            }
+
+            for (const attachment of attachments) {
+                const attachmentId = String(attachment?.attachmentId || '').trim();
+                if (!attachmentId) {
+                    continue;
+                }
+                const formData = new FormData();
+                formData.append('action', 'remove-pending');
+                formData.append('taId', taId);
+                formData.append('attachmentId', attachmentId);
+
+                const response = await fetch(resolveAiApiUrl(), {
+                    method: 'POST',
+                    body: formData
+                });
+                const payload = await response.json();
+                if (!response.ok || !payload?.success) {
+                    throw new Error(payload?.message || '清空待发送附件失败');
+                }
+                state.pendingAttachments = Array.isArray(payload.data?.pendingAttachments) ? payload.data.pendingAttachments : [];
+                if (payload.data?.serviceStatus) {
+                    applyServiceStatus(payload.data.serviceStatus);
+                }
+            }
+
+            state.pendingAttachments = [];
+            state.attachmentPanelExpanded = false;
             if (fileInput) {
                 fileInput.value = '';
             }
-            if (composerHint) {
-                composerHint.textContent = state.serviceStatus.available
-                    ? '已切换到新会话。你可以直接输入问题，或先上传附件后再发送。'
-                    : (state.serviceStatus.message || '当前 AI 服务不可用');
-            }
-            if (state.serviceStatus.available) {
-                setStatus('Ready');
-            }
             renderPendingAttachments();
-            renderThread();
-            applyServiceStatus(state.serviceStatus);
+        }
+
+        async function startNewSession(options) {
+            const sessionOptions = options && typeof options === 'object' ? options : {};
+            const keepPendingAttachments = Boolean(sessionOptions.keepPendingAttachments);
+            const nextScene = String(sessionOptions.scene || 'general_chat').trim() || 'general_chat';
+            const nextTitle = String(sessionOptions.title || 'AI 助理对话').trim() || 'AI 助理对话';
+            const nextContext = sessionOptions.context && typeof sessionOptions.context === 'object'
+                ? { ...sessionOptions.context }
+                : {};
+            const nextHint = String(sessionOptions.hint || '').trim();
+            const nextComposerValue = typeof sessionOptions.composerValue === 'string'
+                ? sessionOptions.composerValue
+                : null;
+
+            setStatus('Loading');
+            try {
+                if (!keepPendingAttachments) {
+                    await clearPendingAttachments();
+                }
+                state.sessionId = '';
+                state.scene = nextScene;
+                state.title = nextTitle;
+                state.context = nextContext;
+                state.activeResponseId = '';
+                state.isSending = false;
+                state.attachmentPanelExpanded = state.pendingAttachments.length > 0;
+                if (composerInput) {
+                    composerInput.value = nextComposerValue !== null ? nextComposerValue : '';
+                }
+                if (composerHint) {
+                    composerHint.textContent = nextHint || (state.serviceStatus.available
+                        ? '已切换到新的空白会话。你可以继续输入新问题，右侧仍可查阅历史会话。'
+                        : (state.serviceStatus.message || '当前 AI 服务不可用'));
+                }
+                if (state.serviceStatus.available) {
+                    setStatus('Ready');
+                }
+                renderPendingAttachments();
+                renderSessionHistory();
+                renderThread();
+                applyServiceStatus(state.serviceStatus);
+            } catch (error) {
+                console.error('[TA-AI] start new session failed', error);
+                setStatus('Error');
+                if (composerHint) {
+                    composerHint.textContent = error.message || '新建会话失败，待发送附件未能清空。';
+                }
+                window.alert(error.message || '新建会话失败，待发送附件未能清空。');
+            }
         }
 
         function appendOptimisticUserMessage(message, responseId) {
@@ -510,7 +911,11 @@
                 if (result?.conversation) {
                     hydrateConversation(result.conversation);
                 }
-                state.pendingAttachments = Array.isArray(result?.pendingAttachments) ? result.pendingAttachments : [];
+                state.pendingAttachments = [];
+                state.attachmentPanelExpanded = false;
+                if (fileInput) {
+                    fileInput.value = '';
+                }
                 renderPendingAttachments();
                 renderThread();
                 if (result?.serviceStatus) {
@@ -547,33 +952,40 @@
             try {
                 setStatus('Loading');
                 if (composerHint) {
-                    composerHint.textContent = '正在将课程申请简历载入 AI 待发送附件…';
+                    composerHint.textContent = '正在为课程申请创建新的 AI 会话并载入简历…';
                 }
                 if (typeof app.openModal === 'function') {
                     app.openModal('planner');
                 }
+
+                await startNewSession({
+                    keepPendingAttachments: false,
+                    scene: 'resume_optimize',
+                    title: '课程申请简历优化',
+                    context: {
+                        courseCode: payload.courseCode || '',
+                        applicationId: payload.applicationId || '',
+                        sourcePath: payload.sourcePath || ''
+                    },
+                    composerValue: '请根据当前课程申请要求，帮我优化这份简历，并指出最值得优先调整的内容。',
+                    hint: '新会话已创建，正在载入课程申请简历…'
+                });
+
                 await uploadPendingFile(payload.file, {
                     sourceType: 'course-apply',
                     sourcePath: payload.sourcePath || '',
                     courseCode: payload.courseCode || '',
                     applicationId: payload.applicationId || ''
                 });
-                state.scene = 'resume_optimize';
-                state.title = '课程申请简历优化';
-                state.context = {
-                    courseCode: payload.courseCode || '',
-                    applicationId: payload.applicationId || '',
-                    sourcePath: payload.sourcePath || ''
-                };
-                state.sessionId = '';
-                if (composerInput && !composerInput.value.trim()) {
-                    composerInput.value = '请根据当前课程申请要求，帮我优化这份简历，并指出最值得优先调整的内容。';
-                }
+
+                state.attachmentPanelExpanded = true;
                 if (composerHint) {
-                    composerHint.textContent = '课程申请简历已载入待发送附件，请确认消息后点击发送。';
+                    composerHint.textContent = '已为课程申请创建新会话，简历 PDF 已载入待发送附件，请确认消息后点击发送。';
                 }
                 setStatus('Ready');
                 renderPendingAttachments();
+                renderSessionHistory();
+                renderThread();
             } catch (error) {
                 console.error('[TA-AI] preload failed', error);
                 setStatus('Error');
@@ -608,12 +1020,78 @@
                 throw new Error(payload?.message || 'AI 附件载入失败');
             }
             state.pendingAttachments = Array.isArray(payload.data?.pendingAttachments) ? payload.data.pendingAttachments : state.pendingAttachments;
+            state.attachmentPanelExpanded = state.pendingAttachments.length > 0;
             if (payload.data?.serviceStatus) {
                 applyServiceStatus(payload.data.serviceStatus);
             }
             renderPendingAttachments();
             return payload.data || {};
         }
+
+        thread?.addEventListener('click', async (event) => {
+            const copyButton = event.target.closest('[data-copy-message]');
+            if (!copyButton) {
+                return;
+            }
+            const messageId = copyButton.getAttribute('data-copy-message') || '';
+            const currentSession = getCurrentSession();
+            const message = currentSession?.messages?.find((item) => String(item?.messageId || '') === messageId);
+            if (!message) {
+                return;
+            }
+            const originalLabel = copyButton.textContent;
+            try {
+                await copyText(message.content || '');
+                copyButton.textContent = '已复制';
+                window.setTimeout(() => {
+                    copyButton.textContent = originalLabel || '复制';
+                }, 1500);
+            } catch (error) {
+                console.error('[TA-AI] copy failed', error);
+                window.alert('复制失败，请手动选择内容后复制。');
+            }
+        });
+
+        pendingList?.addEventListener('click', async (event) => {
+            const removeButton = event.target.closest('[data-remove-pending-attachment]');
+            if (!removeButton) {
+                return;
+            }
+            const attachmentId = removeButton.getAttribute('data-remove-pending-attachment') || '';
+            const originalLabel = removeButton.textContent;
+            try {
+                removeButton.disabled = true;
+                removeButton.textContent = '…';
+                setStatus('Loading');
+                await removePendingAttachment(attachmentId);
+                if (state.serviceStatus.available) {
+                    setStatus('Ready');
+                }
+            } catch (error) {
+                console.error('[TA-AI] remove pending attachment failed', error);
+                setStatus('Error');
+                removeButton.disabled = false;
+                removeButton.textContent = originalLabel || '×';
+                window.alert(error.message || '移除待发送附件失败。');
+            }
+        });
+
+        historyList?.addEventListener('click', (event) => {
+            const sessionButton = event.target.closest('[data-session-id]');
+            if (!sessionButton) {
+                return;
+            }
+            const sessionId = sessionButton.getAttribute('data-session-id') || '';
+            openHistorySession(sessionId);
+        });
+
+        historyToggle?.addEventListener('click', () => {
+            setHistoryExpanded(!state.historyExpanded);
+        });
+
+        pendingToggle?.addEventListener('click', () => {
+            setAttachmentPanelExpanded(!state.attachmentPanelExpanded);
+        });
 
         chipButtons.forEach((button) => {
             button.addEventListener('click', () => {
@@ -648,7 +1126,9 @@
             }
         });
 
-        newSessionBtn?.addEventListener('click', startNewSession);
+        newSessionBtn?.addEventListener('click', () => {
+            startNewSession();
+        });
         sendBtn?.addEventListener('click', sendMessage);
         composerInput?.addEventListener('keydown', (event) => {
             if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
@@ -660,6 +1140,8 @@
         app.openAiAssistantWithAttachment = preloadFromCourseApply;
         app.loadAiConversation = loadConversation;
 
+        setHistoryExpanded(state.historyExpanded);
+        setAttachmentPanelExpanded(state.attachmentPanelExpanded);
         applyServiceStatus(state.serviceStatus);
         loadConversation().catch((error) => {
             console.error('[TA-AI] initial load failed', error);
@@ -671,6 +1153,7 @@
                 defaultProvider: true
             });
             renderPendingAttachments();
+            renderSessionHistory();
             renderThread();
         });
     };
