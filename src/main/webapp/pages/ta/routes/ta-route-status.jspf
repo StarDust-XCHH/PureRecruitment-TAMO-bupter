@@ -3,10 +3,10 @@
 
         <div class="route-card-header status-header">
             <div>
-                <h2>申请状态</h2>
-                <p>实时查看岗位申请进度、下一步提醒和历史时间线。</p>
+                <h2 data-i18n="status.title" data-i18n-zh="申请状态" data-i18n-en="Application Status">申请状态</h2>
+                <p data-i18n="status.desc" data-i18n-zh="实时查看岗位申请进度、下一步提醒和历史时间线。" data-i18n-en="Track application progress, next-step reminders, and timeline history in real time.">实时查看岗位申请进度、下一步提醒和历史时间线。</p>
             </div>
-            <button class="status-refresh-btn" type="button" id="statusRefreshButton">刷新状态</button>
+            <button class="status-refresh-btn" type="button" id="statusRefreshButton" data-i18n="status.refresh" data-i18n-zh="刷新状态" data-i18n-en="Refresh Status">刷新状态</button>
         </div>
 
         <div class="status-grid">
@@ -20,40 +20,40 @@
                 </div>
                 <div class="empty-state" id="statusEmptyState" hidden>
                     <div class="empty-state__icon">📭</div>
-                    <h3>暂无申请记录</h3>
-                    <p>当前还没有可展示的申请状态，请先前往职位大厅投递岗位。</p>
+                    <h3 data-i18n="status.emptyTitle" data-i18n-zh="暂无申请记录" data-i18n-en="No Applications Yet">暂无申请记录</h3>
+                    <p data-i18n="status.emptyDesc" data-i18n-zh="当前还没有可展示的申请状态，请先前往职位大厅投递岗位。" data-i18n-en="There are no application updates to display yet. Please apply for a course from the jobs page first.">当前还没有可展示的申请状态，请先前往职位大厅投递岗位。</p>
                 </div>
             </div>
 
             <aside class="status-side">
                 <div class="status-box is-collapsible is-collapsed" data-collapsible>
                     <button class="status-box-toggle" type="button" aria-expanded="false" aria-controls="statusSummaryPanel">
-                        <span>状态汇总</span>
+                        <span data-i18n="status.summaryTitle" data-i18n-zh="状态汇总" data-i18n-en="Summary">状态汇总</span>
                         <span class="status-box-toggle-icon" aria-hidden="true">⌃</span>
                     </button>
                     <div class="status-box-body" id="statusSummaryPanel">
                         <div class="status-lines" id="statusSummary">
-                            <div class="status-line"><span>当前申请数</span><span class="pill">--</span></div>
-                            <div class="status-line"><span>推进中</span><span class="pill">--</span></div>
-                            <div class="status-line"><span>面试邀约</span><span class="pill">--</span></div>
-                            <div class="status-line"><span>待补充资料</span><span class="pill">--</span></div>
-                            <div class="status-line"><span>已录用</span><span class="pill">--</span></div>
-                            <div class="status-line"><span>预计反馈时间</span><span class="pill">--</span></div>
-                            <div class="status-line"><span>最新状态</span><span class="pill">--</span></div>
+                            <div class="status-line"><span data-i18n="status.summary.total" data-i18n-zh="当前申请数" data-i18n-en="Active Applications">当前申请数</span><span class="pill">--</span></div>
+                            <div class="status-line"><span data-i18n="status.summary.active" data-i18n-zh="推进中" data-i18n-en="In Progress">推进中</span><span class="pill">--</span></div>
+                            <div class="status-line"><span data-i18n="status.summary.interview" data-i18n-zh="面试邀约" data-i18n-en="Interviews">面试邀约</span><span class="pill">--</span></div>
+                            <div class="status-line"><span data-i18n="status.summary.material" data-i18n-zh="待补充资料" data-i18n-en="Need Materials">待补充资料</span><span class="pill">--</span></div>
+                            <div class="status-line"><span data-i18n="status.summary.offer" data-i18n-zh="已录用" data-i18n-en="Offers">已录用</span><span class="pill">--</span></div>
+                            <div class="status-line"><span data-i18n="status.summary.feedback" data-i18n-zh="预计反馈时间" data-i18n-en="Estimated Feedback">预计反馈时间</span><span class="pill">--</span></div>
+                            <div class="status-line"><span data-i18n="status.summary.latest" data-i18n-zh="最新状态" data-i18n-en="Latest Status">最新状态</span><span class="pill">--</span></div>
                         </div>
                     </div>
                 </div>
 
                 <div class="status-box is-collapsible is-collapsed" data-collapsible>
                     <button class="status-box-toggle" type="button" aria-expanded="false" aria-controls="statusNotificationsPanel">
-                        <span>通知中心</span>
+                        <span data-i18n="status.notificationsTitle" data-i18n-zh="通知中心" data-i18n-en="Notifications">通知中心</span>
                         <span class="status-box-toggle-icon" aria-hidden="true">⌃</span>
                     </button>
                     <div class="status-box-body" id="statusNotificationsPanel">
                         <div class="messages-list" id="statusNotifications">
                             <div class="message-item">
-                                <strong>加载中</strong>
-                                <div class="muted">正在同步最新申请状态通知。</div>
+                                <strong data-i18n="status.loadingTitle" data-i18n-zh="加载中" data-i18n-en="Loading">加载中</strong>
+                                <div class="muted" data-i18n="status.loadingDesc" data-i18n-zh="正在同步最新申请状态通知。" data-i18n-en="Syncing your latest application updates.">正在同步最新申请状态通知。</div>
                             </div>
                         </div>
                     </div>

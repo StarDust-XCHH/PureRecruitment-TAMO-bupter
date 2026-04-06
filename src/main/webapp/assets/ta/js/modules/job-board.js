@@ -13,8 +13,6 @@
 
         const JOBS_PER_PAGE = 6;
         const JOBS_SCROLL_OFFSET = 24;
-        const TA_WORK_CONTENT_FALLBACK = '待确定';
-        const RECRUITMENT_STATUS_FALLBACK = '待确定';
         const STATUS_ROUTE_KEY = 'status';
 
         let courseJobCards = [];
@@ -23,6 +21,10 @@
         let currentJobsPage = '1';
         let isJobFetching = false;
         let hasLoadedJobs = false;
+
+        function t(zh, en) {
+            return typeof app.t === 'function' ? app.t(zh, en) : zh;
+        }
 
         function getAppliedCourseCodes() {
             if (typeof app.getAppliedCourseCodes === 'function') {
@@ -57,11 +59,11 @@
         }
 
         function normalizeTaWorkContents(contents) {
-            if (!Array.isArray(contents)) return [TA_WORK_CONTENT_FALLBACK];
+            if (!Array.isArray(contents)) return [t('待确定', 'To be confirmed')];
             const normalizedContents = contents
                 .map((content) => typeof content === 'string' ? content.trim() : '')
                 .filter((content) => content);
-            return normalizedContents.length > 0 ? normalizedContents : [TA_WORK_CONTENT_FALLBACK];
+            return normalizedContents.length > 0 ? normalizedContents : [t('待确定', 'To be confirmed')];
         }
 
         function syncApplyModal(course) {
@@ -83,7 +85,10 @@
             if (applyCourseName) applyCourseName.textContent = course.name;
             if (applyCourseMo) applyCourseMo.textContent = course.mo;
             if (applyCourseSummary) {
-                applyCourseSummary.textContent = '请上传用于申请“' + course.name + '”的最新简历，建议突出与课程标签、答疑支持和课堂管理相关的经历。';
+                applyCourseSummary.textContent = t(
+                    '请上传用于申请“' + course.name + '”的最新简历，建议突出与课程标签、答疑支持和课堂管理相关的经历。',
+                    'Please upload your latest resume for "' + course.name + '" and highlight experience related to course topics, Q&A support, and class management.'
+                );
             }
 
             if (resumeInput) {
@@ -92,15 +97,16 @@
                 resumeInput.dataset.courseName = course.name;
             }
             if (resumeMeta) resumeMeta.hidden = true;
-            if (resumeFileName) resumeFileName.textContent = '未选择';
+            if (resumeFileName) resumeFileName.textContent = t('未选择', 'Not selected');
             if (resumeFileSize) resumeFileSize.textContent = '--';
-            if (resumeTrigger) resumeTrigger.textContent = '选择简历文件';
+            if (resumeTrigger) resumeTrigger.textContent = t('选择简历文件', 'Choose Resume');
             if (submitBtn) {
-                submitBtn.textContent = 'Submit Application';
+                submitBtn.textContent = t('提交课程申请', 'Submit Application');
                 submitBtn.dataset.courseCode = course.code;
                 submitBtn.disabled = false;
             }
             if (aiOptimizeBtn) {
+                aiOptimizeBtn.textContent = t('AI优化后再发送', 'Optimize with AI Before Sending');
                 aiOptimizeBtn.dataset.courseCode = course.code;
                 aiOptimizeBtn.dataset.courseName = course.name;
                 aiOptimizeBtn.disabled = false;
@@ -150,7 +156,7 @@
 
             if (jobDetailApplyBtn) {
                 jobDetailApplyBtn.classList.remove('applied');
-                jobDetailApplyBtn.textContent = jobDetailApplyBtn.dataset.applyLabelDefault || 'Apply';
+                jobDetailApplyBtn.textContent = jobDetailApplyBtn.dataset.applyLabelDefault || t('申请该课程', 'Apply for this course');
                 jobDetailApplyBtn.dataset.courseCode = course.code;
                 jobDetailApplyBtn.disabled = false;
             }
@@ -283,7 +289,7 @@
             if (!courseJobCards.length) {
                 renderJobPagination(0);
                 if (hasLoadedJobs) {
-                    renderJobsBoardState('当前没有可展示的课程卡片。', 'job-board-state-empty');
+                    renderJobsBoardState(t('当前没有可展示的课程卡片。', 'No course cards are currently available.'), 'job-board-state-empty');
                 }
                 return;
             }
@@ -296,7 +302,7 @@
                 if (jobBoard) {
                     const emptyState = document.createElement('div');
                     emptyState.className = 'job-board-state job-board-state-empty';
-                    emptyState.textContent = '没有匹配的课程，请尝试其他关键词。';
+                    emptyState.textContent = t('没有匹配的课程，请尝试其他关键词。', 'No matching courses found. Try other keywords.');
                     jobBoard.appendChild(emptyState);
                 }
                 return;
@@ -384,11 +390,11 @@
 
         async function submitCourseApplication(courseCode, selectedFile) {
             const taId = getCurrentTaId();
-            if (!taId) throw new Error('当前未获取到 TA 身份，请重新登录后再试。');
-            if (!courseCode) throw new Error('缺少课程编号，无法提交申请。');
-            if (!selectedFile) throw new Error('请先选择简历文件。');
-            if (!isAllowedResumeFile(selectedFile)) throw new Error('仅支持上传 PDF / DOC / DOCX 简历文件。');
-            if (selectedFile.size > 10 * 1024 * 1024) throw new Error('简历文件大小不能超过 10MB。');
+            if (!taId) throw new Error(t('当前未获取到 TA 身份，请重新登录后再试。', 'TA identity is missing. Please log in again.'));
+            if (!courseCode) throw new Error(t('缺少课程编号，无法提交申请。', 'Missing course code. Unable to submit the application.'));
+            if (!selectedFile) throw new Error(t('请先选择简历文件。', 'Please choose a resume file first.'));
+            if (!isAllowedResumeFile(selectedFile)) throw new Error(t('仅支持上传 PDF / DOC / DOCX 简历文件。', 'Only PDF / DOC / DOCX resume files are supported.'));
+            if (selectedFile.size > 10 * 1024 * 1024) throw new Error(t('简历文件大小不能超过 10MB。', 'The resume file must be smaller than 10MB.'));
 
             const formData = new FormData();
             formData.append('taId', taId);
@@ -401,7 +407,7 @@
             });
             const payload = await response.json();
             if (!response.ok || !payload?.success) {
-                throw new Error(payload?.message || ('申请提交失败，status=' + response.status));
+                throw new Error(payload?.message || (t('申请提交失败，status=', 'Application submission failed, status=') + response.status));
             }
             return payload.data || {};
         }
@@ -417,11 +423,11 @@
             try {
                 isJobFetching = true;
                 if (!hasLoadedJobs) {
-                    renderJobsBoardState('课程列表加载中...', 'job-board-state-loading');
+                    renderJobsBoardState(t('课程列表加载中...', 'Loading courses...'), 'job-board-state-loading');
                 }
                 if (btn) btn.disabled = true;
                 if (btnIcon) btnIcon.classList.add('spinning');
-                if (btnText) btnText.textContent = '更新中...';
+                if (btnText) btnText.textContent = t('更新中...', 'Refreshing...');
 
                 console.log('[JOB-BOARD][fetch] 请求地址=', requestUrl);
 
@@ -430,7 +436,7 @@
                     headers: { Accept: 'application/json' }
                 });
 
-                if (!response.ok) throw new Error('网络请求失败，status=' + response.status);
+                if (!response.ok) throw new Error(t('网络请求失败，status=', 'Network request failed, status=') + response.status);
 
                 const data = await response.json();
 
@@ -445,7 +451,7 @@
 
                 const countBadge = document.getElementById('openCoursesCount');
                 if (countBadge) {
-                    countBadge.textContent = '开放课程 ' + visibleItems.length;
+                    countBadge.textContent = t('开放课程 ', 'Open Courses ') + visibleItems.length;
                 }
 
                 courseDetailState = {};
@@ -456,14 +462,14 @@
                     const checklist = Array.isArray(item.checklist) ? item.checklist : [];
                     const taWorkContents = normalizeTaWorkContents(item.taWorkContents);
                     const studentCount = Number.isFinite(Number(item.studentCount)) ? Number(item.studentCount) : 0;
-                    const studentCountText = studentCount > 0 ? studentCount + ' 人' : '待确认';
-                    const courseMoName = item.ownerMoName || item.moName || '待分配';
-                    const primaryTagText = keywordTags.length > 0 ? keywordTags[0] : '暂无标签';
-                    const descriptionText = item.recruitmentBrief || item.courseDescription || '暂无课程简介';
-                    const suggestionText = item.suggestion || '建议结合自身技能标签和课程方向进行投递。';
+                    const studentCountText = studentCount > 0 ? studentCount + t(' 人', ' students') : t('待确认', 'To be confirmed');
+                    const courseMoName = item.ownerMoName || item.moName || t('待分配', 'To be assigned');
+                    const primaryTagText = keywordTags.length > 0 ? keywordTags[0] : t('暂无标签', 'No tags');
+                    const descriptionText = item.recruitmentBrief || item.courseDescription || t('暂无课程简介', 'No course description yet');
+                    const suggestionText = item.suggestion || t('建议结合自身技能标签和课程方向进行投递。', 'Consider applying based on your skill tags and course interests.');
                     const recruitmentStatus = typeof item.recruitmentStatus === 'string' && item.recruitmentStatus.trim()
                         ? item.recruitmentStatus.trim().toUpperCase()
-                        : RECRUITMENT_STATUS_FALLBACK;
+                        : t('待确定', 'TBD');
                     const statusPriority = (recruitmentStatus === 'CLOSE' || recruitmentStatus === 'CLOSED') ? 1 : 0;
 
                     courseDetailState[item.courseCode] = {
@@ -485,32 +491,32 @@
                     }).join('');
 
                     newCardsHTML.push(
-                        '<div class="job-card course-job-card" tabindex="0" role="button" aria-label="查看 ' + item.courseName + ' 详情" data-job-detail-card data-course-code="' + item.courseCode + '" data-status-priority="' + statusPriority + '" data-original-order="' + newCardsHTML.length + '">' +
+                        '<div class="job-card course-job-card" tabindex="0" role="button" aria-label="' + t('查看 ', 'View ') + item.courseName + t(' 详情', ' details') + '" data-job-detail-card data-course-code="' + item.courseCode + '" data-status-priority="' + statusPriority + '" data-original-order="' + newCardsHTML.length + '">' +
                         '<div class="course-card-topline">' +
                         '<span class="job-code">' + item.courseCode + '</span>' +
                         '<span class="course-status-badge course-status-badge-' + recruitmentStatus.toLowerCase() + '">' + recruitmentStatus + '</span>' +
                         '</div>' +
                         '<h4>' + item.courseName + '</h4>' +
-                        '<p class="course-card-summary">' + (item.courseDescription || '暂无课程简介') + '</p>' +
+                        '<p class="course-card-summary">' + (item.courseDescription || t('暂无课程简介', 'No course description yet')) + '</p>' +
                         '<div class="job-tags">' +
                         tagHTML +
                         '</div>' +
                         '<div class="course-meta-stack">' +
                         '<div class="course-meta-item">' +
-                        '<span class="course-meta-label">开课MO</span>' +
+                        '<span class="course-meta-label">' + t('开课MO', 'Course MO') + '</span>' +
                         '<strong>' + courseMoName + '</strong>' +
                         '</div>' +
                         '<div class="course-meta-item">' +
-                        '<span class="course-meta-label">课程标签</span>' +
+                        '<span class="course-meta-label">' + t('课程标签', 'Course Tag') + '</span>' +
                         '<strong>' + primaryTagText + '</strong>' +
                         '</div>' +
                         '<div class="course-meta-item">' +
-                        '<span class="course-meta-label">学生人数</span>' +
+                        '<span class="course-meta-label">' + t('学生人数', 'Students') + '</span>' +
                         '<strong>' + studentCountText + '</strong>' +
                         '</div>' +
                         '</div>' +
                         '<div class="course-card-hint">' +
-                        '<span>点击查看详情</span>' +
+                        '<span>' + t('点击查看详情', 'Click to view details') + '</span>' +
                         '<span aria-hidden="true">→</span>' +
                         '</div>' +
                         '</div>'
@@ -528,18 +534,18 @@
                 currentJobsPage = '1';
                 renderJobsBoard();
                 if (!visibleItems.length) {
-                    renderJobsBoardState('当前职位大厅没有可再次申请的课程，已申请课程可在申请状态中查看。', 'job-board-state-empty');
+                    renderJobsBoardState(t('当前职位大厅没有可再次申请的课程，已申请课程可在申请状态中查看。', 'There are no more courses available to apply for. Applied courses can be viewed in Application Status.'), 'job-board-state-empty');
                 }
             } catch (error) {
                 hasLoadedJobs = true;
-                renderJobsBoardState('课程列表加载失败，请点击“刷新列表”重试。', 'job-board-state-error');
+                renderJobsBoardState(t('课程列表加载失败，请点击“刷新列表”重试。', 'Failed to load courses. Please click “Refresh” to try again.'), 'job-board-state-error');
                 renderJobPagination(0);
                 console.error('拉取岗位数据异常:', error);
             } finally {
                 isJobFetching = false;
                 if (btn) btn.disabled = false;
                 if (btnIcon) btnIcon.classList.remove('spinning');
-                if (btnText) btnText.textContent = '刷新列表';
+                if (btnText) btnText.textContent = t('刷新列表', 'Refresh');
             }
         }
 
@@ -576,10 +582,10 @@
 
             if (!file) {
                 if (resumeMeta) resumeMeta.hidden = true;
-                if (resumeFileName) resumeFileName.textContent = '未选择';
+                if (resumeFileName) resumeFileName.textContent = t('未选择', 'Not selected');
                 if (resumeFileSize) resumeFileSize.textContent = '--';
-                if (resumeTrigger) resumeTrigger.textContent = '选择简历文件';
-                if (submitBtn) submitBtn.textContent = 'Submit Application';
+                if (resumeTrigger) resumeTrigger.textContent = t('选择简历文件', 'Choose Resume');
+                if (submitBtn) submitBtn.textContent = t('提交课程申请', 'Submit Application');
                 if (aiOptimizeBtn) aiOptimizeBtn.disabled = false;
                 return;
             }
@@ -587,9 +593,9 @@
             if (resumeMeta) resumeMeta.hidden = false;
             if (resumeFileName) resumeFileName.textContent = file.name;
             if (resumeFileSize) resumeFileSize.textContent = formatFileSize(file.size);
-            if (resumeTrigger) resumeTrigger.textContent = '重新选择';
-            if (submitBtn) submitBtn.textContent = 'Submit Application · Ready';
-            if (aiOptimizeBtn) aiOptimizeBtn.textContent = 'AI优化后再发送';
+            if (resumeTrigger) resumeTrigger.textContent = t('重新选择', 'Choose Again');
+            if (submitBtn) submitBtn.textContent = t('提交课程申请 · 已就绪', 'Submit Application · Ready');
+            if (aiOptimizeBtn) aiOptimizeBtn.textContent = t('AI优化后再发送', 'Optimize with AI Before Sending');
         });
 
         const jobResumeSubmitBtn = document.getElementById('jobResumeSubmitBtn');
@@ -603,22 +609,22 @@
                 return;
             }
 
-            const defaultText = '提交课程申请';
+            const defaultText = t('提交课程申请', 'Submit Application');
             jobResumeSubmitBtn.disabled = true;
-            jobResumeSubmitBtn.textContent = '提交中...';
+            jobResumeSubmitBtn.textContent = t('提交中...', 'Submitting...');
 
             try {
                 const result = await submitCourseApplication(courseCode, selectedFile);
-                jobResumeSubmitBtn.textContent = '已提交';
+                jobResumeSubmitBtn.textContent = t('已提交', 'Submitted');
 
                 if (jobDetailApplyBtn) {
                     jobDetailApplyBtn.classList.add('applied');
-                    jobDetailApplyBtn.textContent = '已申请';
+                    jobDetailApplyBtn.textContent = t('已申请', 'Applied');
                     jobDetailApplyBtn.disabled = true;
                 }
 
                 const resumeTrigger = document.querySelector('.resume-upload-trigger');
-                if (resumeTrigger) resumeTrigger.textContent = '已上传';
+                if (resumeTrigger) resumeTrigger.textContent = t('已上传', 'Uploaded');
                 if (typeof app.setAppliedCourseCodes === 'function') {
                     app.setAppliedCourseCodes(getAppliedCourseCodes().concat([courseCode]));
                 }
@@ -646,7 +652,7 @@
                 console.error('[TA-APPLICATION] submit failed', error);
                 jobResumeSubmitBtn.disabled = false;
                 jobResumeSubmitBtn.textContent = defaultText;
-                window.alert(error.message || '申请提交失败，请稍后重试。');
+                window.alert(error.message || t('申请提交失败，请稍后重试。', 'Application submission failed. Please try again later.'));
             }
         });
 
@@ -662,16 +668,16 @@
                 return;
             }
             if (!isAllowedResumeFile(selectedFile)) {
-                window.alert('仅支持上传 PDF / DOC / DOCX 简历文件。');
+                window.alert(t('仅支持上传 PDF / DOC / DOCX 简历文件。', 'Only PDF / DOC / DOCX resume files are supported.'));
                 return;
             }
             if (typeof app.openAiAssistantWithAttachment !== 'function') {
-                window.alert('AI 助理模块尚未完成初始化，请刷新页面后重试。');
+                window.alert(t('AI 助理模块尚未完成初始化，请刷新页面后重试。', 'The AI assistant is not initialized yet. Please refresh and try again.'));
                 return;
             }
 
             jobResumeAiOptimizeBtn.disabled = true;
-            jobResumeAiOptimizeBtn.textContent = '载入中...';
+            jobResumeAiOptimizeBtn.textContent = t('载入中...', 'Loading...');
             try {
                 await app.openAiAssistantWithAttachment({
                     file: selectedFile,
@@ -682,14 +688,14 @@
                 });
             } catch (error) {
                 console.error('[TA-AI] preload from course apply failed', error);
-                window.alert(error.message || '载入 AI 助理失败，请稍后重试。');
+                window.alert(error.message || t('载入 AI 助理失败，请稍后重试。', 'Failed to load the AI assistant. Please try again later.'));
             } finally {
                 jobResumeAiOptimizeBtn.disabled = false;
-                jobResumeAiOptimizeBtn.textContent = 'AI优化后再发送';
+                jobResumeAiOptimizeBtn.textContent = t('AI优化后再发送', 'Optimize with AI Before Sending');
             }
         });
 
-        renderJobsBoardState('课程列表加载中...', 'job-board-state-loading');
+        renderJobsBoardState(t('课程列表加载中...', 'Loading courses...'), 'job-board-state-loading');
         renderJobPagination(0);
         fetchAndRefreshJobs();
 

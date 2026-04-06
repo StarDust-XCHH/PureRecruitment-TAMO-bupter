@@ -19,14 +19,43 @@
         const userTrigger = document.getElementById('userTrigger');
         const navItems = Array.from(document.querySelectorAll('.nav-item'));
 
-        const guideSteps = [
-            { title: '完善你的档案信息', desc: '先补全个人资料与技能标签，让岗位推荐更精准。', selector: '.nav-item[data-route="profile"]', route: 'profile' },
-            { title: '筛选并申请岗位', desc: '在职位大厅查看匹配度、职位详情与投递入口。', selector: '.nav-item[data-route="jobs"]', route: 'jobs' },
-            { title: '查看申请状态', desc: '随时跟踪各个岗位的申请状态与反馈。', selector: '.nav-item[data-route="status"]', route: 'status' },
-            { title: '打开设置中心', desc: '点击右上角用户入口，随时修改资料、头像、密码与主题。', selector: '#userTrigger', route: 'profile', align: 'left', scrollTarget: 'topbar', overlayMode: 'focus-topbar' }
-        ];
+        function t(zh, en) {
+            return typeof app.t === 'function' ? app.t(zh, en) : zh;
+        }
 
-        const guideRouteLookup = new Map(guideSteps.filter((step) => step.route).map((step, index) => [step.route, index]));
+        function buildGuideSteps() {
+            return [
+                {
+                    title: t('完善你的档案信息', 'Complete your profile'),
+                    desc: t('先补全个人资料与技能标签，让岗位推荐更精准。', 'Start by completing your profile and skill tags to improve recommendation accuracy.'),
+                    selector: '.nav-item[data-route="profile"]',
+                    route: 'profile'
+                },
+                {
+                    title: t('筛选并申请岗位', 'Browse and apply for roles'),
+                    desc: t('在职位大厅查看匹配度、职位详情与投递入口。', 'Use the Jobs page to view matches, role details, and application entry points.'),
+                    selector: '.nav-item[data-route="jobs"]',
+                    route: 'jobs'
+                },
+                {
+                    title: t('查看申请状态', 'Track your applications'),
+                    desc: t('随时跟踪各个岗位的申请状态与反馈。', 'Keep track of status updates and feedback for each application at any time.'),
+                    selector: '.nav-item[data-route="status"]',
+                    route: 'status'
+                },
+                {
+                    title: t('打开设置中心', 'Open the settings center'),
+                    desc: t('点击右上角用户入口，随时修改资料、头像、密码与主题。', 'Use the top-right user entry to update your profile, avatar, password, and theme anytime.'),
+                    selector: '#userTrigger',
+                    route: 'profile',
+                    align: 'left',
+                    scrollTarget: 'topbar',
+                    overlayMode: 'focus-topbar'
+                }
+            ];
+        }
+
+        const guideRouteLookup = new Map();
         const navItemLookup = new Map();
         navItems.forEach((item) => navItemLookup.set(item.dataset.route, item));
 
@@ -36,6 +65,13 @@
         const guideArrowGap = 20;
         const viewportPadding = 24;
 
+        function refreshGuideRouteLookup() {
+            guideRouteLookup.clear();
+            buildGuideSteps().forEach((step, index) => {
+                if (step.route) guideRouteLookup.set(step.route, index);
+            });
+        }
+
         function setGuideActive(active) {
             if (app.state.settings) {
                 app.state.settings.guideActive = active;
@@ -43,7 +79,7 @@
         }
 
         function getCurrentStep() {
-            return guideSteps[guideIndex] || null;
+            return buildGuideSteps()[guideIndex] || null;
         }
 
         function syncOverlayMode() {
@@ -165,7 +201,7 @@
         function positionGuide() {
             const step = getCurrentStep();
             const target = step ? document.querySelector(step.selector) : null;
-            if (!target || !guideHighlight || !guideTitle || !guideDesc || !guideProgress || !guideBack) return;
+            if (!target || !guideHighlight || !guideTitle || !guideDesc || !guideProgress || !guideBack || !guideNext) return;
 
             syncOverlayMode();
             const rect = getSafeRect(target);
@@ -177,11 +213,13 @@
             placeGuideCard(rect);
             setArrow(rect);
 
+            const steps = buildGuideSteps();
             guideTitle.textContent = step.title;
             guideDesc.textContent = step.desc;
-            guideProgress.innerHTML = '引导 ' + (guideIndex + 1) + ' / ' + guideSteps.length;
+            guideProgress.textContent = t('引导 ', 'Guide ') + (guideIndex + 1) + ' / ' + steps.length;
             guideBack.disabled = guideIndex === 0;
             guideBack.style.opacity = guideIndex === 0 ? '0.4' : '1';
+            guideNext.textContent = guideIndex === steps.length - 1 ? t('完成', 'Finish') : t('下一步', 'Next');
 
             if (step.selector === '#userTrigger') applyGuideHighlight('settings');
             else if (step.route) applyGuideHighlight(step.route);
@@ -224,7 +262,8 @@
         }
 
         function goToStep(stepIndex) {
-            if (stepIndex < 0 || stepIndex >= guideSteps.length) return;
+            const steps = buildGuideSteps();
+            if (stepIndex < 0 || stepIndex >= steps.length) return;
             guideIndex = stepIndex;
             const step = getCurrentStep();
 
@@ -265,7 +304,8 @@
         }
 
         guideNext?.addEventListener('click', () => {
-            if (guideIndex < guideSteps.length - 1) goToStep(guideIndex + 1);
+            const steps = buildGuideSteps();
+            if (guideIndex < steps.length - 1) goToStep(guideIndex + 1);
             else closeGuide();
         });
 
@@ -279,6 +319,8 @@
         const welcomeCardEl = document.getElementById('welcomeCard');
         const isFirstLogin = userData ? (userData.isFirstLogin === true || userData.isFirstLogin === 'true') : true;
         app.debugOnboardingLog?.('init-check', { isFirstLogin });
+
+        refreshGuideRouteLookup();
 
         if (welcomeCardEl) {
             if (isFirstLogin) welcomeCardEl.classList.add('show');
@@ -320,7 +362,12 @@
             app.debugOnboardingLog?.('skip-guide', { reason: 'isFirstLogin=false' });
         }
 
-        app.applyGuideHighlight = applyGuideHighlight;
         app.onGuideRouteNav = onGuideRouteNav;
+        app.refreshOnboardingLanguage = function refreshOnboardingLanguage() {
+            refreshGuideRouteLookup();
+            if (app.state.settings?.guideActive) {
+                positionGuide();
+            }
+        };
     };
 })();
