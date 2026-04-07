@@ -1,8 +1,8 @@
-<div class="welcome-card show">
-    <div class="badge">MO</div>
+<div class="welcome-card actionable" id="welcomeCard" role="button" tabindex="0" aria-label="首次登录提示，点击打开设置">
+    <div class="badge">新</div>
     <div>
-        <h3>MO 工作台原型</h3>
-        <p>基于 TA 架构复用模块，当前为中保真设计：支持岗位发布、应聘者浏览与录用状态回写。</p>
-        <span class="hint">遵循 handout：JSON 存储 + Servlet/JSP</span>
+        <h3>首次登录提示</h3>
+        <p>欢迎使用课程负责人工作台。你可以从总览进入各模块，或通过右上角菜单管理账号与主题。</p>
+        <button class="hint hint-link" id="welcomeProfileHint" type="button">建议从右上角用户入口打开设置</button>
     </div>
 </div>

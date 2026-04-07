@@ -3,7 +3,7 @@
         <div class="overview-top">
             <div>
                 <h1>MO 招聘总览</h1>
-                <p class="muted">面向用户故事 7/8/9：发布岗位、查看应聘、完成选择。</p>
+                <p class="muted">在此总览开放岗位、候选规模与录用进度，便于安排后续筛选与决策。</p>
             </div>
             <div class="overview-badges">
                 <span class="pill">角色：Module Organizer</span>

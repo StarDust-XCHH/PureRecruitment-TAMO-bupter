@@ -21,6 +21,7 @@
         'jobBoard',
         'applicants',
         'dashboard',
-        'profile'
+        'profile',
+        'onboarding'
     ].forEach(runModule);
 })();

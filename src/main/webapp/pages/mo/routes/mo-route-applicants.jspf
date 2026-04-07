@@ -3,11 +3,11 @@
         <div class="overview-top">
             <div>
                 <h1>应聘筛选</h1>
-                <p class="muted">支持查看 TA 资料，并将录用/拒绝结果回写到 TA 申请状态数据。</p>
+                <p class="muted">查看申请者资料，并提交录用或拒绝结果，状态将同步至对应申请记录。</p>
             </div>
             <div class="overview-badges">
-                <span class="pill">故事 8：查看应聘者</span>
-                <span class="pill">故事 9：选择应聘者</span>
+                <span class="pill">按岗位筛选</span>
+                <span class="pill">录用结果同步</span>
             </div>
         </div>
 

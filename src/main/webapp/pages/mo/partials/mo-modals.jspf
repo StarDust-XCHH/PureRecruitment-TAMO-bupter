@@ -83,7 +83,7 @@
         <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head">
             <h3 id="modalSummaryTitle">MO 概览说明</h3>
-            <p class="muted">该页面复用了 TA 的布局和组件规范，保持一致的交互与视觉结构。</p>
+            <p class="muted">以下模块协助你完成从发布岗位到录用决策的完整流程。</p>
         </div>
         <div class="modal-body">
             <ul class="resume-checklist">
@@ -98,7 +98,7 @@
         <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head">
             <h3 id="modalSettingsTitle">MO 设置</h3>
-            <p class="muted">当前原型保留最小设置项：主题切换与会话信息。</p>
+            <p class="muted">在此查看当前账号与主题偏好，也可使用顶栏主题按钮快速切换。</p>
         </div>
         <div class="modal-body">
             <div class="status-summary">

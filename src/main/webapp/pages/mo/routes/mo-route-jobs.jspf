@@ -3,7 +3,7 @@
         <div class="overview-top" id="jobsHallHeading">
             <div>
                 <h1>岗位发布与管理</h1>
-                <p class="muted">发布课程岗位后会写入 `mountDataTAMObupter/common/recruitment-courses.json`。</p>
+                <p class="muted">创建或更新课程岗位后，候选人即可在招聘大厅看到最新信息。</p>
             </div>
             <div class="overview-badges">
                 <span class="pill" id="openCoursesCount">开放课程 0</span>

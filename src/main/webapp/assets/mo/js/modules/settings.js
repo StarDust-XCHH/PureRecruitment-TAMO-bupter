@@ -10,8 +10,13 @@
         const logoutBtn = document.getElementById('logoutBtn');
         const welcomeName = document.getElementById('welcomeName');
         const userName = document.getElementById('userName');
+        const userTrigger = document.getElementById('userTrigger');
+        const welcomeCard = document.getElementById('welcomeCard');
+        const welcomeProfileHint = document.getElementById('welcomeProfileHint');
         const settingsUser = document.getElementById('moSettingsUsername');
         const settingsTheme = document.getElementById('moSettingsTheme');
+
+        app.state = app.state || {};
 
         function getMoUser() {
             const raw = sessionStorage.getItem('mo-user') || localStorage.getItem('mo-user');
@@ -25,12 +30,59 @@
 
         app.getMoUser = getMoUser;
 
+        function getUserData() {
+            return app.state.settings ? app.state.settings.userData : null;
+        }
+
+        function setUserData(nextUser) {
+            if (!app.state.settings) return;
+            app.state.settings.userData = nextUser || null;
+            if (nextUser) {
+                const serialized = JSON.stringify(nextUser);
+                sessionStorage.setItem('mo-user', serialized);
+                localStorage.setItem('mo-user', serialized);
+            } else {
+                sessionStorage.removeItem('mo-user');
+                localStorage.removeItem('mo-user');
+            }
+        }
+
+        function debugOnboardingLog(stage, extra) {
+            console.log('[MO-ONBOARD]', stage, {
+                userData: getUserData(),
+                hasOnboarding: !!document.getElementById('onboarding'),
+                extra: extra || {}
+            });
+        }
+
         function ensureLoggedIn() {
             if (!getMoUser()) {
                 window.location.replace('../../index.jsp');
                 return false;
             }
             return true;
+        }
+
+        function openSettingsModal() {
+            if (typeof app.openModal === 'function') app.openModal('settings');
+            if (userTrigger) userTrigger.setAttribute('aria-expanded', 'true');
+        }
+
+        function openSettingsFromHint(event) {
+            if (event) event.preventDefault();
+            openSettingsModal();
+        }
+
+        function openSettingsFromWelcomeCard(event) {
+            if (event) event.preventDefault();
+            openSettingsModal();
+        }
+
+        function shouldIgnoreWelcomeCardTrigger(event) {
+            if (!event) return false;
+            const target = event.target;
+            if (!target || !(target instanceof Element)) return false;
+            return !!target.closest('a, button, input, textarea, select');
         }
 
         function applyTheme(theme) {
@@ -54,6 +106,11 @@
         if (!ensureLoggedIn()) return;
 
         const moUser = getMoUser();
+        app.state.settings = {
+            userData: moUser,
+            guideActive: false
+        };
+
         const displayName = moUser && (moUser.username || moUser.name) ? (moUser.username || moUser.name) : 'MO';
         if (welcomeName) welcomeName.textContent = displayName;
         if (userName) userName.textContent = displayName;
@@ -64,10 +121,35 @@
         if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
         if (logoutBtn) {
             logoutBtn.addEventListener('click', function () {
-                sessionStorage.removeItem('mo-user');
-                localStorage.removeItem('mo-user');
+                if (!window.confirm('确认退出登录吗？')) return;
+                setUserData(null);
                 window.location.replace('../../index.jsp');
             });
         }
+
+        userTrigger && userTrigger.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                openSettingsModal();
+            }
+        });
+
+        welcomeProfileHint && welcomeProfileHint.addEventListener('click', openSettingsFromHint);
+        welcomeProfileHint && welcomeProfileHint.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') openSettingsFromHint(event);
+        });
+
+        welcomeCard && welcomeCard.addEventListener('click', function (event) {
+            if (shouldIgnoreWelcomeCardTrigger(event)) return;
+            openSettingsFromWelcomeCard(event);
+        });
+        welcomeCard && welcomeCard.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') openSettingsFromWelcomeCard(event);
+        });
+
+        app.getUserData = getUserData;
+        app.setUserData = setUserData;
+        app.debugOnboardingLog = debugOnboardingLog;
+        app.openSettingsModal = openSettingsModal;
     };
 })();

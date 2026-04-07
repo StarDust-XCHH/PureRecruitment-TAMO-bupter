@@ -351,15 +351,17 @@
             const data = payload.data || {};
 
             if (role === 'MO') {
+                const moId = data.moId || '';
                 const user = {
-                    moId: data.moId,
+                    moId: moId,
                     name: data.name,
                     username: data.username,
                     email: data.email,
                     phone: data.phone,
                     role: 'MO',
                     loginAt: data.loginAt,
-                    isFirstLogin: data.isFirstLogin
+                    isFirstLogin: data.isFirstLogin,
+                    onboardingKey: moId ? 'mo-onboarding:' + moId : ''
                 };
                 saveMoUser(user);
                 window.location.replace('pages/mo/mo-home.jsp');
@@ -494,8 +496,9 @@
 
             const registered = payload.data || {};
             const finalUserId = selectedRole === 'MO' ? registered.moId : registered.taId;
+            const resolvedId = finalUserId || userId;
             const user = {
-                [selectedRole === 'MO' ? 'moId' : 'taId']: finalUserId || userId,
+                [selectedRole === 'MO' ? 'moId' : 'taId']: resolvedId,
                 name: registered.name || name,
                 username: registered.username || username,
                 email: registered.email || email,
@@ -503,7 +506,8 @@
                 role: selectedRole,
                 loginAt: new Date().toISOString(),
                 isFirstLogin: true,
-                createdAt: registered.createdAt || null
+                createdAt: registered.createdAt || null,
+                onboardingKey: selectedRole === 'MO' && resolvedId ? 'mo-onboarding:' + resolvedId : ''
             };
 
             if (selectedRole === 'MO') {
