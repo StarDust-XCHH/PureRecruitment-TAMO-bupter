@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/ta/css/ta-jobs.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/ta/css/ta-modal.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/mo/css/mo-home.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/ta/css/ta-onboarding.css">
 </head>
 <body>
 <div class="app" id="moApp">
@@ -30,6 +31,7 @@
 </div>
 
 <%@ include file="partials/mo-modals.jspf" %>
+<%@ include file="partials/mo-onboarding.jspf" %>
 
 <script>window.__APP_CONTEXT_PATH__ = '${pageContext.request.contextPath}';</script>
 <script src="${pageContext.request.contextPath}/assets/mo/js/mo-api-prefix.js"></script>
@@ -40,6 +42,7 @@
 <script src="${pageContext.request.contextPath}/assets/mo/js/modules/applicants.js"></script>
 <script src="${pageContext.request.contextPath}/assets/mo/js/modules/dashboard.js"></script>
 <script src="${pageContext.request.contextPath}/assets/mo/js/modules/profile.js"></script>
+<script src="${pageContext.request.contextPath}/assets/mo/js/modules/onboarding.js"></script>
 <script src="${pageContext.request.contextPath}/assets/mo/js/mo-home.js"></script>
 </body>
 </html>

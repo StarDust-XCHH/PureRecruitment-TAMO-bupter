@@ -8,7 +8,7 @@
             <span class="language-toggle__label" data-i18n="topbar.languageButton" data-i18n-zh="中文 / EN" data-i18n-en="EN / 中文">中文 / EN</span>
         </button>
         <button class="user-trigger" id="userTrigger" type="button" aria-haspopup="dialog" aria-expanded="false">
-            <div class="user-avatar" aria-hidden="true">S</div>
+            <span class="user-avatar" aria-hidden="true">S</span>
             <span class="user-name" id="userName">Seele</span>
             <span class="user-caret" aria-hidden="true">▾</span>
         </button>

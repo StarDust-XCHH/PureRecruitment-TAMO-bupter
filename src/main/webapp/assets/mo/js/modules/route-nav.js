@@ -24,6 +24,9 @@
         navItems.forEach(function (item) {
             item.addEventListener('click', function () {
                 const route = item.dataset.route;
+                if (app.state.settings && app.state.settings.guideActive && typeof app.onGuideRouteNav === 'function') {
+                    app.onGuideRouteNav(route);
+                }
                 activateRoute(route);
                 const target = document.getElementById('route-' + route);
                 if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
