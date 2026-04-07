@@ -27,13 +27,13 @@
             return [
                 {
                     title: t('从总览了解招聘态势', 'See recruitment metrics at a glance'),
-                    desc: t('在「岗位概览」查看开放岗位、候选规模与待决策数量。', 'On Dashboard, review open roles, candidate volume, and pending decisions.'),
+                    desc: t('在「招聘总览」查看开放岗位、候选规模与待决策数量。', 'On Dashboard, review open roles, candidate volume, and pending decisions.'),
                     selector: '.nav-item[data-route="dashboard"]',
                     route: 'dashboard'
                 },
                 {
-                    title: t('发布并维护课程岗位', 'Publish and manage course roles'),
-                    desc: t('在「岗位发布」填写课程信息、技能标签，并维护招聘状态。', 'Use Job publishing to enter course details, skills, and recruitment status.'),
+                    title: t('管理课程与发布岗位', 'Manage courses and publish roles'),
+                    desc: t('在「课程管理」中浏览列表，并点击「发布岗位」在弹窗中填写课程信息、技能标签与招聘状态。', 'In Course management, review the list and click Publish opening to enter course details, skills, and recruitment status in a dialog.'),
                     selector: '.nav-item[data-route="jobs"]',
                     route: 'jobs'
                 },

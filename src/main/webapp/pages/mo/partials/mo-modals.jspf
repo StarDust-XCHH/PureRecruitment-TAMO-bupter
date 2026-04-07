@@ -1,3 +1,4 @@
+
 <div class="ta-modal-overlay" id="taModalOverlay" aria-hidden="true">
     <div class="ta-modal-panel wide job-detail-modal" data-modal="course-detail" role="dialog" aria-labelledby="modalCourseDetailTitle">
         <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
@@ -44,31 +45,85 @@
             <div class="job-detail-section" id="courseEditPanel" style="display:none;">
                 <h5>修改课程信息</h5>
                 <p class="muted">课程编号 <strong id="editCourseCodeDisplay"></strong> 不可修改。</p>
-                <div class="mo-form-grid" style="max-width:42rem;">
-                    <label>课程名称<input id="editCourseNameInput" type="text" autocomplete="off"></label>
-                    <label>学期<input id="editSemesterInput" type="text" autocomplete="off"></label>
-                    <label>招聘状态
-                        <select id="editRecruitmentStatusInput">
-                            <option value="OPEN">OPEN</option>
-                            <option value="CLOSED">CLOSED</option>
-                        </select>
+                <div class="mo-publish-form mo-form-grid" style="max-width:42rem;">
+                    <label class="mo-field">
+                        <span class="mo-field-label">课程名称 <span class="mo-req">*</span></span>
+                        <input id="editCourseNameInput" type="text" autocomplete="off">
                     </label>
-                    <label>预计学生人数<input id="editStudentCountInput" type="number" min="0"></label>
-                    <label>TA招聘人数<input id="editTaRecruitCountInput" type="number" min="0"></label>
-                    <label>校区
-                        <select id="editCampusInput">
-                            <option value="">（可选）</option>
+                    <div class="mo-field mo-semester-field">
+                        <span class="mo-field-label">学期 <span class="mo-req">*</span></span>
+                        <div class="mo-semester-combined" role="group" aria-label="学年与学期">
+                            <select id="editSemesterYearInput" class="mo-semester-combined__year" required aria-required="true" aria-label="年份"></select>
+                            <select id="editSemesterTermInput" class="mo-semester-combined__term" required aria-required="true" aria-label="春季或秋季学期">
+                                <option value="">学期</option>
+                                <option value="Spring">春季 Spring</option>
+                                <option value="Fall">秋季 Fall</option>
+                            </select>
+                        </div>
+                        <p class="mo-hint mo-semester-field__hint">先选学年，再选春季或秋季。年份可在下拉列表中调整。</p>
+                    </div>
+                    <fieldset class="mo-field mo-field-fieldset full">
+                        <legend class="mo-field-label">招聘状态 <span class="mo-req">*</span></legend>
+                        <div class="mo-radio-row" role="radiogroup" aria-label="招聘状态">
+                            <label class="mo-radio-pill"><input type="radio" name="editRecruitmentStatus" id="editRecruitmentStatusOpen" value="OPEN" checked> <span>开放 OPEN</span></label>
+                            <label class="mo-radio-pill"><input type="radio" name="editRecruitmentStatus" id="editRecruitmentStatusClosed" value="CLOSED"> <span>关闭 CLOSED</span></label>
+                        </div>
+                    </fieldset>
+                    <label class="mo-field">
+                        <span class="mo-field-label">预计学生人数</span>
+                        <input id="editStudentCountInput" type="number" min="0">
+                    </label>
+                    <label class="mo-field">
+                        <span class="mo-field-label">TA 招聘人数 <span class="mo-req">*</span></span>
+                        <input id="editTaRecruitCountInput" type="number" min="1" step="1" required aria-required="true">
+                    </label>
+                    <label class="mo-field">
+                        <span class="mo-field-label">校区 <span class="mo-req">*</span></span>
+                        <select id="editCampusInput" required aria-label="校区" aria-required="true">
+                            <option value="">（请选择）</option>
                             <option value="Main">Main</option>
                             <option value="Shahe">Shahe</option>
                         </select>
                     </label>
-                    <label>申请截止时间<input id="editApplicationDeadlineInput" type="datetime-local"></label>
-                    <label class="full">自定义教学周（逗号分隔）<input id="editTeachingWeeksInput" type="text" autocomplete="off"></label>
-                    <label class="full">Assessment Events<textarea id="editAssessmentEventsInput" rows="2" placeholder="每行：name|week(s)|description"></textarea></label>
-                    <label class="full">固定技能 Tags（多选）<select id="editFixedSkillsInput" multiple size="6"></select></label>
-                    <label class="full">自定义技能<textarea id="editCustomSkillsInput" rows="2"></textarea></label>
-                    <label class="full">岗位描述<textarea id="editCourseDescInput" rows="3"></textarea></label>
-                    <label class="full">招募说明<textarea id="editRecruitmentBriefInput" rows="4"></textarea></label>
+                    <label class="mo-field">
+                        <span class="mo-field-label">申请截止时间</span>
+                        <input id="editApplicationDeadlineInput" type="datetime-local">
+                    </label>
+                    <div class="mo-publish-section full">
+                        <h4 class="mo-publish-section-title">授课周次 <span class="mo-muted">（可选）</span></h4>
+                        <p class="mo-picker-summary" id="editTeachingWeeksSummary">未选择授课周次。</p>
+                        <div class="mo-picker-actions">
+                            <button type="button" class="pill-btn ghost mo-btn-sm" id="openEditTeachingWeeksBtn">选择授课周次</button>
+                            <button type="button" class="pill-btn ghost mo-btn-sm" id="clearEditTeachingWeeksBtn">清除周次</button>
+                        </div>
+                    </div>
+                    <div class="mo-publish-section full">
+                        <div class="mo-publish-section-head">
+                            <h4 class="mo-publish-section-title">考核与作业节点 <span class="mo-muted">（可选）</span></h4>
+                            <button type="button" class="pill-btn ghost mo-btn-sm" id="openEditAssessmentModalBtn">＋ 添加考核项</button>
+                        </div>
+                        <ul class="mo-composite-list" id="editAssessmentList"></ul>
+                        <p class="mo-empty-hint" id="editAssessmentEmpty">尚未添加考核项。</p>
+                    </div>
+                    <div class="mo-publish-section full" id="edit-required-skills">
+                        <h4 class="mo-publish-section-title">所需技能 <span class="mo-req">*</span></h4>
+                        <p class="mo-hint">请至少选择一项技能标签。若列表中没有合适的，可在选择窗口中点 <strong>Other</strong> 自行填写；需要较长说明时，可用「详细添加」。</p>
+                        <p class="mo-picker-summary" id="editFixedSkillsSummary">尚未选择所需技能。</p>
+                        <div class="mo-picker-actions">
+                            <button type="button" class="pill-btn ghost mo-btn-sm" id="openEditFixedSkillsBtn">选择技能标签</button>
+                            <button type="button" class="pill-btn ghost mo-btn-sm" id="openEditCustomSkillModalBtn">详细添加</button>
+                        </div>
+                        <ul class="mo-composite-list mo-composite-list--skills-extra" id="editCustomSkillList"></ul>
+                        <p class="mo-empty-hint" id="editCustomSkillEmpty">暂无补充说明。需要时可在技能选择里点 Other，或使用「详细添加」。</p>
+                    </div>
+                    <label class="mo-field full">
+                        <span class="mo-field-label">岗位描述 <span class="mo-req">*</span></span>
+                        <textarea id="editCourseDescInput" rows="3"></textarea>
+                    </label>
+                    <label class="mo-field full">
+                        <span class="mo-field-label">招募说明</span>
+                        <textarea id="editRecruitmentBriefInput" rows="4"></textarea>
+                    </label>
                     <div class="full">
                         <button type="button" class="pill-btn" id="saveCourseEditBtn">保存修改</button>
                         <span id="courseEditStatus" class="muted"></span>
@@ -76,6 +131,161 @@
                 </div>
             </div>
             <p style="margin-top:1rem;"><button type="button" class="pill-btn" id="toggleCourseEditBtn">修改课程信息</button></p>
+        </div>
+    </div>
+
+    <div class="ta-modal-panel wide mo-job-publish-modal" data-modal="job-publish" role="dialog" aria-modal="true" aria-labelledby="modalJobPublishTitle">
+        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <div class="modal-head">
+            <h3 id="modalJobPublishTitle">发布课程岗位</h3>
+            <p class="muted">按左侧步骤填写完成后即可发布；新课程会出现在您的课程列表中，学生端也会看到。</p>
+        </div>
+        <div class="modal-body mo-job-publish-modal__body">
+            <div class="mo-publish-layout">
+                <!-- 左侧导航栏 -->
+                <nav class="mo-publish-nav" aria-label="发布岗位导航">
+                    <ul class="mo-publish-nav-list">
+                        <li class="mo-publish-nav-item">
+                            <a href="#basic-info" class="mo-publish-nav-link active" aria-current="true">基本信息<span class="mo-req" aria-hidden="true">*</span></a>
+                        </li>
+                        <li class="mo-publish-nav-item">
+                            <a href="#teaching-weeks" class="mo-publish-nav-link">授课周次</a>
+                        </li>
+                        <li class="mo-publish-nav-item">
+                            <a href="#assessment" class="mo-publish-nav-link">考核与作业</a>
+                        </li>
+                        <li class="mo-publish-nav-item">
+                            <a href="#required-skills" class="mo-publish-nav-link">所需技能<span class="mo-req" aria-hidden="true">*</span></a>
+                        </li>
+                        <li class="mo-publish-nav-item">
+                            <a href="#job-description" class="mo-publish-nav-link">岗位描述<span class="mo-req" aria-hidden="true">*</span></a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <!-- 右侧内容区 -->
+                <div class="mo-publish-content">
+                    <form id="jobPublishForm" class="mo-publish-form mo-form-grid" autocomplete="off">
+                        <!-- 基本信息 section -->
+                        <div class="mo-publish-section full" id="basic-info">
+                            <h4 class="mo-publish-section-title">基本信息</h4>
+                            <div class="mo-form-grid">
+                                <label class="mo-field">
+                                    <span class="mo-field-label">岗位/课程名称 <span class="mo-req" aria-hidden="true">*</span></span>
+                                    <input id="courseNameInput" required type="text" placeholder="如：Software Engineering TA (Semester)" aria-required="true" class="mo-field-input">
+                                </label>
+                                <label class="mo-field">
+                                    <span class="mo-field-label">课程编码 <span class="mo-req" aria-hidden="true">*</span></span>
+                                    <input id="courseCodeInput" required type="text" placeholder="如：SE-TA-2026S" aria-required="true" class="mo-field-input">
+                                </label>
+                                <div class="mo-field mo-semester-field">
+                                    <span class="mo-field-label">学期 <span class="mo-req" aria-hidden="true">*</span></span>
+                                    <div class="mo-semester-combined" role="group" aria-label="学年与学期">
+                                        <select id="semesterYearInput" class="mo-semester-combined__year" required aria-required="true" aria-label="年份"></select>
+                                        <select id="semesterTermInput" class="mo-semester-combined__term" required aria-required="true" aria-label="春季或秋季学期">
+                                            <option value="">学期</option>
+                                            <option value="Spring">春季 Spring</option>
+                                            <option value="Fall">秋季 Fall</option>
+                                        </select>
+                                    </div>
+                                    <p class="mo-hint mo-semester-field__hint">先选学年，再选春季或秋季。年份可在下拉列表中调整。</p>
+                                </div>
+
+                                <fieldset class="mo-field mo-field-fieldset full">
+                                    <legend class="mo-field-label">招聘状态 <span class="mo-req" aria-hidden="true">*</span></legend>
+                                    <div class="mo-radio-row" role="radiogroup" aria-label="招聘状态">
+                                        <label class="mo-radio-pill"><input type="radio" name="recruitmentStatus" id="recruitmentStatusOpen" value="OPEN" checked> <span>开放 OPEN</span></label>
+                                        <label class="mo-radio-pill"><input type="radio" name="recruitmentStatus" id="recruitmentStatusClosed" value="CLOSED"> <span>关闭 CLOSED</span></label>
+                                    </div>
+                                </fieldset>
+
+                                <label class="mo-field">
+                                    <span class="mo-field-label">预计学生人数</span>
+                                    <input id="studentCountInput" type="number" min="0" placeholder="如：180（可选）" class="mo-field-input">
+                                </label>
+                                <label class="mo-field">
+                                    <span class="mo-field-label">TA 招聘人数 <span class="mo-req" aria-hidden="true">*</span></span>
+                                    <input id="taRecruitCountInput" type="number" min="1" step="1" required placeholder="如：6" aria-required="true" class="mo-field-input">
+                                </label>
+
+                                <label class="mo-field">
+                                    <span class="mo-field-label">校区 <span class="mo-req" aria-hidden="true">*</span></span>
+                                    <select id="campusInput" required aria-label="校区" aria-required="true" class="mo-field-input">
+                                        <option value="">（请选择）</option>
+                                        <option value="Main">Main</option>
+                                        <option value="Shahe">Shahe</option>
+                                    </select>
+                                </label>
+                                <label class="mo-field">
+                                    <span class="mo-field-label">申请截止时间</span>
+                                    <input id="applicationDeadlineInput" type="datetime-local" class="mo-field-input">
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 授课周次 section -->
+                        <div class="mo-publish-section full" id="teaching-weeks">
+                            <h4 class="mo-publish-section-title">授课周次 <span class="mo-muted">（可选）</span></h4>
+                            <div class="mo-section-content">
+                                <p class="mo-picker-summary" id="publishTeachingWeeksSummary">尚未选择授课周次（选填）。</p>
+                                <div class="mo-picker-actions">
+                                    <button type="button" class="pill-btn ghost mo-btn-sm" id="openPublishTeachingWeeksBtn">选择授课周次</button>
+                                    <button type="button" class="pill-btn ghost mo-btn-sm" id="clearPublishTeachingWeeksBtn">清除周次</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 考核与作业节点 section -->
+                        <div class="mo-publish-section full" id="assessment">
+                            <div class="mo-publish-section-head">
+                                <h4 class="mo-publish-section-title">考核与作业节点 <span class="mo-muted">（可选）</span></h4>
+                                <button type="button" class="pill-btn ghost mo-btn-sm" id="openPublishAssessmentModalBtn">＋ 添加考核项</button>
+                            </div>
+                            <div class="mo-section-content">
+                                <p class="mo-hint">建议按考核或作业节点逐条填写名称、时间与说明，便于 TA 了解安排。</p>
+                                <ul class="mo-composite-list" id="publishAssessmentList" aria-live="polite"></ul>
+                                <p class="mo-empty-hint" id="publishAssessmentEmpty">尚未添加考核项，可点击上方按钮填写。</p>
+                            </div>
+                        </div>
+
+                        <!-- 所需技能：系统标签 + 其他技能（合并） -->
+                        <div class="mo-publish-section full" id="required-skills">
+                            <h4 class="mo-publish-section-title">所需技能 <span class="mo-req" aria-hidden="true">*</span></h4>
+                            <div class="mo-section-content">
+                                <p class="mo-hint">请至少选择一项技能标签。若列表中没有合适的，可在选择窗口中点 <strong>Other</strong> 自行填写；需要较长说明时，可用「详细添加」。</p>
+                                <p class="mo-picker-summary" id="publishFixedSkillsSummary">请点击「选择技能标签」，至少选择一项技能（可用 Other 补充）。</p>
+                                <div class="mo-picker-actions">
+                                    <button type="button" class="pill-btn ghost mo-btn-sm" id="openPublishFixedSkillsBtn">选择技能标签</button>
+                                    <button type="button" class="pill-btn ghost mo-btn-sm" id="openPublishCustomSkillModalBtn">详细添加</button>
+                                </div>
+                                <ul class="mo-composite-list mo-composite-list--skills-extra" id="publishCustomSkillList" aria-live="polite"></ul>
+                                <p class="mo-empty-hint" id="publishCustomSkillEmpty">暂无补充说明。需要时可在技能选择里点 Other，或使用「详细添加」。</p>
+                            </div>
+                        </div>
+
+                        <!-- 岗位描述 section -->
+                        <div class="mo-publish-section full" id="job-description">
+                            <h4 class="mo-publish-section-title">岗位描述 <span class="mo-req" aria-hidden="true">*</span></h4>
+                            <div class="mo-section-content">
+                                <label class="mo-field full">
+                                    <span class="mo-field-label">岗位短描述 <span class="mo-req" aria-hidden="true">*</span></span>
+                                    <textarea id="courseDescInput" required rows="3" placeholder="简要介绍岗位需求与课程目标" aria-required="true" class="mo-field-input"></textarea>
+                                </label>
+                                <label class="mo-field full">
+                                    <span class="mo-field-label">长文本招募说明</span>
+                                    <textarea id="recruitmentBriefInput" rows="6" placeholder="详细说明职责、投入时间、沟通方式、考核方式等（可选）" class="mo-field-input"></textarea>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 提交按钮 -->
+                        <div class="full mo-form-actions">
+                            <button class="pill-btn" id="publishJobBtn" type="submit">发布岗位</button>
+                            <span id="publishJobStatus" class="muted"></span>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -87,9 +297,9 @@
         </div>
         <div class="modal-body">
             <ul class="resume-checklist">
-                <li><div><strong>岗位发布</strong><p class="muted">MO 可创建课程岗位并实时刷新列表。</p></div></li>
-                <li><div><strong>应聘查看</strong><p class="muted">聚合 TA 账号与档案，显示候选池信息。</p></div></li>
-                <li><div><strong>筛选回写</strong><p class="muted">录用/拒绝会同步到 TA 申请状态文件。</p></div></li>
+                <li><div><strong>课程管理与发布</strong><p class="muted">在课程管理页浏览列表，使用「发布岗位」创建新课程，保存后列表会更新。</p></div></li>
+                <li><div><strong>应聘查看</strong><p class="muted">集中查看申请本课程的 TA 资料与应聘信息。</p></div></li>
+                <li><div><strong>筛选与决策</strong><p class="muted">在此筛选候选人；录用或拒绝后，申请状态会相应更新。</p></div></li>
             </ul>
         </div>
     </div>
@@ -105,6 +315,99 @@
                 <div class="status-line"><span>当前账号</span><span class="pill" id="moSettingsUsername">--</span></div>
                 <div class="status-line"><span>角色</span><span class="pill">MO</span></div>
                 <div class="status-line"><span>主题</span><span class="pill" id="moSettingsTheme">--</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="moCompositeAssessmentModal" class="mo-publish-modal" hidden aria-hidden="true">
+    <div class="mo-publish-modal__backdrop" data-mo-close="assessment"></div>
+    <div class="mo-publish-modal__panel" role="dialog" aria-modal="true" aria-labelledby="moCompositeAssessmentTitle">
+        <div class="mo-publish-modal__head">
+            <h3 id="moCompositeAssessmentTitle">添加考核项</h3>
+            <button type="button" class="mo-publish-modal__close" data-mo-close="assessment" aria-label="关闭">&times;</button>
+        </div>
+        <div class="mo-publish-modal__body">
+            <label class="mo-field">
+                <span class="mo-field-label">名称 <span class="mo-req">*</span></span>
+                <input type="text" id="moAssessmentNameInput" placeholder="如：期中机考" autocomplete="off">
+            </label>
+            <fieldset class="mo-field mo-field-fieldset">
+                <legend class="mo-field-label">涉及周次 <span class="mo-muted">（可选）</span></legend>
+                <div class="mo-week-grid mo-week-grid--compact" id="moAssessmentWeeksGrid" aria-label="考核涉及周次"></div>
+            </fieldset>
+            <label class="mo-field">
+                <span class="mo-field-label">说明</span>
+                <textarea id="moAssessmentDescInput" rows="3" placeholder="考核形式、时长、注意事项等"></textarea>
+            </label>
+            <div class="mo-publish-modal__actions">
+                <button type="button" class="pill-btn ghost" data-mo-close="assessment">取消</button>
+                <button type="button" class="pill-btn" id="moCompositeAssessmentConfirmBtn">加入列表</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="moTeachingWeeksModal" class="mo-publish-modal mo-teaching-weeks-modal" hidden aria-hidden="true">
+    <div class="mo-publish-modal__backdrop" data-mo-close="teaching-weeks"></div>
+    <div class="mo-publish-modal__panel mo-publish-modal__panel--teaching-weeks" role="dialog" aria-modal="true" aria-labelledby="moTeachingWeeksModalTitle">
+        <div class="mo-publish-modal__head mo-publish-modal__head--teaching-weeks">
+            <h3 id="moTeachingWeeksModalTitle">请选择周数</h3>
+            <button type="button" class="mo-publish-modal__close" data-mo-close="teaching-weeks" aria-label="关闭">&times;</button>
+        </div>
+        <div class="mo-publish-modal__body mo-publish-modal__body--teaching-weeks">
+            <p class="mo-hint mo-hint--teaching-weeks">请勾选实际授课的周次（第 1–20 周）。如暂不填写，可直接点「确定」跳过。</p>
+            <div class="mo-week-grid mo-week-grid--picker" id="moTeachingWeeksPickerGrid" aria-label="授课周次"></div>
+            <div class="mo-week-picker-presets" role="group" aria-label="快捷选择周次">
+                <button type="button" class="mo-week-preset" data-week-preset="all">全周</button>
+                <button type="button" class="mo-week-preset" data-week-preset="odd">单周</button>
+                <button type="button" class="mo-week-preset" data-week-preset="even">双周</button>
+            </div>
+            <div class="mo-publish-modal__actions mo-publish-modal__actions--teaching-weeks">
+                <button type="button" class="mo-week-modal-cancel" data-mo-close="teaching-weeks">取消</button>
+                <button type="button" class="pill-btn mo-week-modal-confirm" id="moTeachingWeeksConfirmBtn">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="moFixedSkillsPickerModal" class="mo-publish-modal" hidden aria-hidden="true">
+    <div class="mo-publish-modal__backdrop" data-mo-close="fixed-skills"></div>
+    <div class="mo-publish-modal__panel mo-publish-modal__panel--wide" role="dialog" aria-modal="true" aria-labelledby="moFixedSkillsPickerTitle">
+        <div class="mo-publish-modal__head">
+            <h3 id="moFixedSkillsPickerTitle">选择技能标签</h3>
+            <button type="button" class="mo-publish-modal__close" data-mo-close="fixed-skills" aria-label="关闭">&times;</button>
+        </div>
+        <div class="mo-publish-modal__body">
+            <p class="mo-hint">请至少选择一项技能。需要额外技能时点 <span class="mo-skill-other-hint">Other</span> 填写名称和说明（说明可空）。点紫色标签可取消该项。</p>
+            <div class="mo-skill-chips mo-skill-chips--modal mo-skill-chips--picker-flow" id="moFixedSkillsPickerFlow" role="group" aria-label="技能标签选择"></div>
+            <div class="mo-publish-modal__actions">
+                <button type="button" class="pill-btn ghost" data-mo-close="fixed-skills">取消</button>
+                <button type="button" class="pill-btn" id="moFixedSkillsConfirmBtn">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="moCompositeCustomSkillModal" class="mo-publish-modal" hidden aria-hidden="true">
+    <div class="mo-publish-modal__backdrop" data-mo-close="custom-skill"></div>
+    <div class="mo-publish-modal__panel" role="dialog" aria-modal="true" aria-labelledby="moCompositeCustomSkillTitle">
+        <div class="mo-publish-modal__head">
+            <h3 id="moCompositeCustomSkillTitle">添加自定义技能</h3>
+            <button type="button" class="mo-publish-modal__close" data-mo-close="custom-skill" aria-label="关闭">&times;</button>
+        </div>
+        <div class="mo-publish-modal__body">
+            <label class="mo-field">
+                <span class="mo-field-label">技能名称 <span class="mo-req">*</span></span>
+                <input type="text" id="moCustomSkillNameInput" placeholder="如：代码评审" autocomplete="off">
+            </label>
+            <label class="mo-field">
+                <span class="mo-field-label">说明</span>
+                <textarea id="moCustomSkillDescInput" rows="3" placeholder="简要描述期望与场景"></textarea>
+            </label>
+            <div class="mo-publish-modal__actions">
+                <button type="button" class="pill-btn ghost" data-mo-close="custom-skill">取消</button>
+                <button type="button" class="pill-btn" id="moCompositeCustomSkillConfirmBtn">加入列表</button>
             </div>
         </div>
     </div>

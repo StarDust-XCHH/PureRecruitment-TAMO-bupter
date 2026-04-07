@@ -2,7 +2,7 @@
     <div class="badge">新</div>
     <div>
         <h3>首次登录提示</h3>
-        <p>欢迎使用课程负责人工作台。你可以从总览进入各模块，或通过右上角菜单管理账号与主题。</p>
+        <p>欢迎使用课程负责人工作台。可从招聘总览进入各模块，在课程管理中维护岗位，或通过右上角菜单管理账号与主题。</p>
         <button class="hint hint-link" id="welcomeProfileHint" type="button">建议从右上角用户入口打开设置</button>
     </div>
 </div>

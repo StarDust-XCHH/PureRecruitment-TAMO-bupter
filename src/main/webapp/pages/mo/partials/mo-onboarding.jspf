@@ -4,7 +4,7 @@
     <div class="guide-card" id="guideCard">
         <div class="guide-progress" id="guideProgress">引导 1 / 4</div>
         <h3 id="guideTitle">欢迎使用 MO 工作台</h3>
-        <p class="muted" id="guideDesc">将依次介绍总览、岗位发布、应聘筛选与账号设置。</p>
+        <p class="muted" id="guideDesc">将依次介绍招聘总览、课程管理与发布岗位、应聘筛选与账号设置。</p>
         <div class="guide-actions">
             <button class="guide-btn ghost" id="guideBack" type="button">上一步</button>
             <div style="display:flex; gap:10px;">

@@ -1,80 +1,50 @@
 <div class="route" id="route-jobs" data-route="jobs">
+
     <div class="card jobs-hall-card">
+
         <div class="overview-top" id="jobsHallHeading">
+
             <div>
-                <h1>岗位发布与管理</h1>
-                <p class="muted">创建或更新课程岗位后，候选人即可在招聘大厅看到最新信息。</p>
+
+                <h1>课程管理</h1>
+
+                <p class="muted">浏览与搜索本账号下的课程岗位。需要发布新课程时，请点击「发布岗位」按步骤填写即可。</p>
+
             </div>
-            <div class="overview-badges">
+
+            <div class="overview-badges mo-jobs-toolbar">
+
                 <span class="pill" id="openCoursesCount">开放课程 0</span>
+
+                <button id="openJobPublishModalBtn" class="pill-btn" type="button">发布岗位</button>
+
                 <button id="refreshJobsBtn" class="refresh-btn pill" type="button">
+
                     <span class="refresh-icon">↻</span>
+
                     <span class="refresh-text">刷新列表</span>
+
                 </button>
+
             </div>
+
         </div>
 
-        <form id="jobPublishForm" class="mo-form-grid" autocomplete="off">
-            <label>岗位/课程名称<input id="courseNameInput" required type="text" placeholder="如：Software Engineering TA (Semester)"></label>
-            <label>课程编码<input id="courseCodeInput" required type="text" placeholder="如：SE-TA-2026S"></label>
-            <label>学期（可选）<input id="semesterInput" type="text" placeholder="如：2026-Spring"></label>
-            <label>招聘状态
-                <select id="recruitmentStatusInput" required>
-                    <option value="OPEN">OPEN</option>
-                    <option value="CLOSED">CLOSED</option>
-                </select>
-            </label>
-            <label>预计学生人数<input id="studentCountInput" type="number" min="0" placeholder="如：180"></label>
-            <label>TA招聘人数<input id="taRecruitCountInput" type="number" min="0" placeholder="如：6"></label>
-            <label>校区
-                <select id="campusInput">
-                    <option value="">（可选）</option>
-                    <option value="Main">Main</option>
-                    <option value="Shahe">Shahe</option>
-                </select>
-            </label>
-            <label>申请截止时间（可选）<input id="applicationDeadlineInput" type="datetime-local"></label>
 
-            <label class="full">自定义教学周（逗号分隔，范围 1-20）<input id="teachingWeeksCustomInput" type="text" placeholder="如：1,2,4,6,8"></label>
-
-            <label class="full">Assessment Events（每行：name|week(s)|description）<textarea id="assessmentEventsInput" rows="3" placeholder="ClassTest|8,9|In-class mid test support&#10;CodingDay|12,13|On-site coding assistance"></textarea></label>
-
-            <label class="full">固定技能 Tags（Ctrl/Command 多选）
-                <select id="fixedSkillsInput" required multiple size="6">
-                    <option value="Python">Python</option>
-                    <option value="Java">Java</option>
-                    <option value="C/C++">C/C++</option>
-                    <option value="JavaScript">JavaScript</option>
-                    <option value="TypeScript">TypeScript</option>
-                    <option value="SQL">SQL</option>
-                    <option value="Linux">Linux</option>
-                    <option value="Git">Git</option>
-                    <option value="Data Structures">Data Structures</option>
-                    <option value="Algorithms">Algorithms</option>
-                    <option value="Machine Learning">Machine Learning</option>
-                    <option value="Computer Networks">Computer Networks</option>
-                    <option value="Operating Systems">Operating Systems</option>
-                    <option value="Database">Database</option>
-                    <option value="Software Engineering">Software Engineering</option>
-                    <option value="Web Development">Web Development</option>
-                </select>
-            </label>
-            <label class="full">自定义技能（每行：name|description）<textarea id="customSkillsInput" rows="3" placeholder="Code Review|Can review student code and provide structured feedback"></textarea></label>
-
-            <label class="full">岗位短描述<textarea id="courseDescInput" required rows="3" placeholder="简要介绍岗位需求与课程目标"></textarea></label>
-            <label class="full">长文本招募说明<textarea id="recruitmentBriefInput" rows="6" placeholder="详细说明职责、投入时间、沟通方式、考核方式等（支持多段文本）"></textarea></label>
-
-            <div class="full">
-                <button class="pill-btn" id="publishJobBtn" type="submit">发布岗位</button>
-                <span id="publishJobStatus" class="muted"></span>
-            </div>
-        </form>
 
         <label class="job-search-box" for="jobSearchInput">
+
             <span class="job-search-icon" aria-hidden="true">⌕</span>
+
             <input id="jobSearchInput" type="text" placeholder="搜索课程编号 / 名称 / 标签">
+
         </label>
+
         <div class="job-board course-board" id="jobBoard"></div>
+
         <div class="job-pagination" aria-label="岗位分页" id="jobPagination"></div>
+
     </div>
+
 </div>
+
