@@ -3,6 +3,17 @@
 ## Overview
 This document records bugs and improvement suggestions found during testing of the TA module.
 
+## Testing Strategy
+
+The testing of the TA module was conducted using a combination of functional testing and exploratory testing.
+
+- **Functional Testing** was used to verify whether each core feature works as expected, including registration, login, profile editing, and job-related operations.
+- **Exploratory Testing** was applied to identify unexpected behaviours by interacting with the system using unusual or edge-case inputs (e.g., spaces in usernames, invalid formats).
+- **Boundary Testing** was used for input fields such as phone numbers and passwords to evaluate system validation limits.
+- **Usability Testing** was also considered, especially in UI-related issues such as dark mode visibility.
+
+This approach allowed the identification of both functional defects and usability problems.
+
 ## Passed Functions
 - Registration basic flow works correctly
 - Duplicate username with leading spaces is handled
