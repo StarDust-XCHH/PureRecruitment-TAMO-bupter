@@ -134,3 +134,21 @@ A password containing only spaces, such as six consecutive spaces, should not pa
 
 ### 4. Application intention validation
 The system could validate whether the application intention field contains meaningful input instead of allowing pure numbers.
+
+## Common Patterns of Issues
+
+During testing, several recurring patterns were observed:
+
+- **Lack of Input Validation**
+  - Fields such as phone numbers and passwords do not enforce strict validation rules.
+
+- **Inconsistent Handling of Whitespace**
+  - User inputs containing spaces are treated inconsistently across different features.
+
+- **Navigation Issues**
+  - Links in the resume checklist do not correctly guide users to intended sections.
+
+- **UI/UX Problems**
+  - Dark mode reduces visibility of important interface elements.
+
+These patterns suggest that validation logic and UI consistency need further improvement.
