@@ -24,7 +24,22 @@ Several test scenarios were designed to simulate realistic user behaviour:
    - Register with spaces in username
    - Register with invalid phone number
 
+2. **Login**
+   - Login with correct credentials
+   - Login with incorrect credentials
+   - Login with leading/trailing spaces
 
+3. **Profile Management**
+   - Update profile with valid inputs
+   - Submit empty fields
+   - Input non-standard values (e.g., numbers instead of text)
+
+4. **Resume Checklist**
+   - Click internal navigation links
+   - Open links in new pages
+   - Verify navigation correctness
+
+These scenarios helped ensure coverage of both normal and edge cases.
 
 ## Bug 1: Registration allows spaced numeric username as new account
 **Module:** Registration
