@@ -14,11 +14,17 @@ The testing of the TA module was conducted using a combination of functional tes
 
 This approach allowed the identification of both functional defects and usability problems.
 
-## Passed Functions
-- Registration basic flow works correctly
-- Duplicate username with leading spaces is handled
-- Login works correctly
-- Profile editing works correctly
+## Test Scenarios
+
+Several test scenarios were designed to simulate realistic user behaviour:
+
+1. **User Registration**
+   - Register with valid input
+   - Register with duplicate username
+   - Register with spaces in username
+   - Register with invalid phone number
+
+
 
 ## Bug 1: Registration allows spaced numeric username as new account
 **Module:** Registration
