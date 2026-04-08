@@ -152,3 +152,15 @@ During testing, several recurring patterns were observed:
   - Dark mode reduces visibility of important interface elements.
 
 These patterns suggest that validation logic and UI consistency need further improvement.
+
+## Future Testing Work
+
+Due to time constraints, several areas require further testing:
+
+- Job application workflow testing (e.g., applying, status updates)
+- Multi-role interaction (TA vs MO vs Admin)
+- File upload robustness (CV upload edge cases)
+- Data persistence after system restart
+- Performance testing under multiple users
+
+Future iterations should focus on improving coverage in these areas.
