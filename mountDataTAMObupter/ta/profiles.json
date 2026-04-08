@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "profiles",
     "version": "1.0",
-    "updatedAt": "2026-04-06T05:09:06.402182500Z"
+    "updatedAt": "2026-04-07T08:11:16.485154300Z"
   },
   "items": [
     {
@@ -114,6 +114,21 @@
       "semester": "",
       "title": "TA",
       "lastUpdatedAt": "2026-03-21T13:12:54.282282500Z"
+    },
+    {
+      "id": "PROFILE-TA-49416",
+      "taId": "TA-49416",
+      "avatar": "",
+      "realName": "monkeydluffy",
+      "applicationIntent": "",
+      "studentId": "TA-49416",
+      "contactEmail": "shvdkibb@qmul.com",
+      "bio": "",
+      "skills": [],
+      "availabilityHoursPerWeek": 0.0,
+      "semester": "",
+      "title": "TA",
+      "lastUpdatedAt": "2026-04-06T15:07:22.544492200Z"
     }
   ]
 }

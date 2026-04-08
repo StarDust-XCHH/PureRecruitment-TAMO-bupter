@@ -14,8 +14,10 @@
             </div>
         </div>
         <label class="job-search-box" for="jobSearchInput">
+            <input type="text" style="width:0; height:0; position:absolute; opacity:0; z-index:-1;" tabindex="-1" autocomplete="username">
+
             <span class="job-search-icon" aria-hidden="true">⌕</span>
-            <input id="jobSearchInput" type="text" placeholder="搜索课程编号 / 名称 / 标签 / MO" data-i18n-placeholder="jobs.searchPlaceholder" data-i18n-placeholder-zh="搜索课程编号 / 名称 / 标签 / MO" data-i18n-placeholder-en="Search course code / name / tag / MO">
+            <input id="jobSearchInput" type="text" placeholder="搜索课程编号 / 名称 / 标签 / MO" autocomplete="off" name="jobSearchKeyword">
         </label>
         <div class="job-board course-board" id="jobBoard" aria-live="polite"></div>
         <div class="job-pagination" aria-label="职位大厅分页" data-i18n-aria-label="jobs.paginationAria" data-i18n-aria-label-zh="职位大厅分页" data-i18n-aria-label-en="Jobs pagination" id="jobPagination"></div>
