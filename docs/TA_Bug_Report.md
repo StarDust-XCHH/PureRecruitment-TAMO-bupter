@@ -3,6 +3,11 @@
 ## Overview
 This document records bugs and improvement suggestions found during testing of the TA module.
 
+## Testing Environment
+- Browser: Chrome
+- OS: Windows
+- Test type: Manual testing
+
 ## Testing Strategy
 
 The testing of the TA module was conducted using a combination of functional testing and exploratory testing.
