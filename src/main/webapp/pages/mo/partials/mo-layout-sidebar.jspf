@@ -19,8 +19,4 @@
         <span class="mo-nav-label">应聘筛选</span>
         <span class="mo-nav-badge" id="navApplicantsBadge" hidden aria-label="未读申请">●</span>
     </button>
-    <button class="nav-item" type="button" data-route="profile" aria-current="false">
-        <span>⚙️</span>
-        <span>个人资料</span>
-    </button>
 </nav>
