@@ -15,6 +15,10 @@
         const welcomeProfileHint = document.getElementById('welcomeProfileHint');
         const settingsUser = document.getElementById('moSettingsUsername');
         const settingsTheme = document.getElementById('moSettingsTheme');
+        const settingsTabs = Array.from(document.querySelectorAll('.settings-tab'));
+        const settingsPanels = Array.from(document.querySelectorAll('.settings-panel'));
+        const profileAvatarBox = document.getElementById('profileAvatarBox');
+        const avatarFileInput = document.getElementById('avatarFile');
 
         app.state = app.state || {};
 
@@ -103,6 +107,19 @@
             applyTheme(current === 'light' ? 'dark' : 'light');
         }
 
+        function activateSettingsTab(target) {
+            const safeTarget = String(target || 'profile').trim() || 'profile';
+            settingsTabs.forEach((tab) => {
+                const isActive = tab.dataset.settingsTab === safeTarget;
+                tab.classList.toggle('active', isActive);
+                tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+            settingsPanels.forEach((panel) => {
+                panel.classList.toggle('active', panel.dataset.settingsPanel === safeTarget);
+                panel.hidden = panel.dataset.settingsPanel !== safeTarget;
+            });
+        }
+
         if (!ensureLoggedIn()) return;
 
         const moUser = getMoUser();
@@ -127,10 +144,26 @@
             });
         }
 
+        settingsTabs.forEach((tab) => {
+            tab.addEventListener('click', () => activateSettingsTab(tab.dataset.settingsTab));
+        });
+        activateSettingsTab('profile');
+
+        userTrigger && userTrigger.addEventListener('click', openSettingsModal);
         userTrigger && userTrigger.addEventListener('keydown', function (event) {
             if (event.key === 'Enter' || event.key === ' ') {
                 event.preventDefault();
                 openSettingsModal();
+            }
+        });
+
+        profileAvatarBox && profileAvatarBox.addEventListener('click', () => {
+            avatarFileInput && avatarFileInput.click();
+        });
+        profileAvatarBox && profileAvatarBox.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                avatarFileInput && avatarFileInput.click();
             }
         });
 
@@ -151,5 +184,6 @@
         app.setUserData = setUserData;
         app.debugOnboardingLog = debugOnboardingLog;
         app.openSettingsModal = openSettingsModal;
+        app.activateSettingsTab = activateSettingsTab;
     };
 })();

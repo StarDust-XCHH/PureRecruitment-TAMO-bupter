@@ -1,8 +1,8 @@
 {
   "schema": "mo-ta-job-board",
   "version": "2.0",
-  "generatedAt": "2026-04-06T00:40:45.117524400Z",
-  "count": 17,
+  "generatedAt": "2026-04-08T10:56:12.807969900Z",
+  "count": 18,
   "items": [
     {
       "publishStatus": "PENDING_REVIEW",
@@ -1019,12 +1019,48 @@
       },
       "recruitmentBrief": "Applications are open for TA positions in Data Science Fundamentals 686.\nFlexible hours; details to be discussed.",
       "workload": "Approx. 6 hours per week"
+    },
+    {
+      "jobId": "MOJOB-B9261B30",
+      "courseCode": "xz",
+      "courseName": "123",
+      "ownerMoId": "MO-635L1K",
+      "ownerMoName": "Ptest Two",
+      "semester": "2026-Spring",
+      "status": "OPEN",
+      "recruitmentStatus": "OPEN",
+      "publishStatus": "PENDING_REVIEW",
+      "visibility": "INTERNAL",
+      "isArchived": false,
+      "auditStatus": "PENDING",
+      "auditComment": "",
+      "priority": "NORMAL",
+      "dataVersion": 1,
+      "lastSyncedAt": "2026-04-08T10:56:12.806741100Z",
+      "studentCount": -1,
+      "recruitedCount": 0,
+      "applicationsTotal": 0,
+      "applicationsPending": 0,
+      "applicationsAccepted": 0,
+      "applicationsRejected": 0,
+      "taRecruitCount": 10,
+      "campus": "Main",
+      "requiredSkills": {
+        "fixedTags": [
+          "C/C++"
+        ],
+        "customSkills": []
+      },
+      "courseDescription": "12",
+      "createdAt": "2026-04-08T10:55:57.981243400Z",
+      "updatedAt": "2026-04-08T10:56:12.807969900Z",
+      "source": "mo-manual-v2"
     }
   ],
   "meta": {
     "schema": "mo-ta-job-board",
     "entity": "jobs",
     "version": "2.0",
-    "updatedAt": "2026-04-06T00:40:45.117524400Z"
+    "updatedAt": "2026-04-08T10:56:12.807969900Z"
   }
 }

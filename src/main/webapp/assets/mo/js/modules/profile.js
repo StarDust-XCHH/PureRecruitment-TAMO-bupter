@@ -20,6 +20,7 @@
 
     let currentMoId = null;
     let selectedAvatarFile = null;
+    let avatarChanged = false;
 
     console.log('[MO-PROFILE] 模块加载完成，API地址:', PROFILE_API);
 
@@ -42,27 +43,25 @@
      * 绑定事件监听器
      */
     function bindEvents() {
-        const profileForm = document.getElementById('moProfileForm');
-        const passwordForm = document.getElementById('moPasswordForm');
-        const uploadAvatarBtn = document.getElementById('uploadAvatarBtn');
-        const avatarFileInput = document.getElementById('avatarFileInput');
+        const saveProfileBtn = document.getElementById('saveProfileBtn');
+        const changePasswordBtn = document.getElementById('changePasswordBtn');
+        const avatarFileInput = document.getElementById('avatarFile');
 
-        if (profileForm) {
-            console.log('[MO-PROFILE] 找到 moProfileForm，绑定 submit 事件');
-            profileForm.addEventListener('submit', handleProfileSubmit);
+        if (saveProfileBtn) {
+            console.log('[MO-PROFILE] 找到 saveProfileBtn，绑定 click 事件');
+            saveProfileBtn.addEventListener('click', handleProfileSubmit);
         } else {
-            console.warn('[MO-PROFILE] 未找到 moProfileForm');
+            console.warn('[MO-PROFILE] 未找到 saveProfileBtn');
         }
 
-        if (passwordForm) {
-            console.log('[MO-PROFILE] 找到 moPasswordForm，绑定 submit 事件');
-            passwordForm.addEventListener('submit', handlePasswordSubmit);
+        if (changePasswordBtn) {
+            console.log('[MO-PROFILE] 找到 changePasswordBtn，绑定 click 事件');
+            changePasswordBtn.addEventListener('click', handlePasswordSubmit);
         } else {
-            console.warn('[MO-PROFILE] 未找到 moPasswordForm - 这会导致密码修改功能失效！');
+            console.warn('[MO-PROFILE] 未找到 changePasswordBtn');
         }
 
-        if (uploadAvatarBtn && avatarFileInput) {
-            uploadAvatarBtn.addEventListener('click', () => avatarFileInput.click());
+        if (avatarFileInput) {
             avatarFileInput.addEventListener('change', handleAvatarSelect);
         }
     }
@@ -82,11 +81,6 @@
                 console.log('[MO-PROFILE] 解析用户数据:', user);
                 currentMoId = user.moId || user.id;
                 console.log('[MO-PROFILE] 提取的 MO ID:', currentMoId);
-
-                const moIdField = document.getElementById('moIdField');
-                const moIdPasswordField = document.getElementById('moIdPasswordField');
-                if (moIdField) moIdField.value = currentMoId;
-                if (moIdPasswordField) moIdPasswordField.value = currentMoId;
             } else {
                 console.error('[MO-PROFILE] sessionStorage / localStorage 中未找到 MO 用户数据');
                 console.log('[MO-PROFILE] 可用的 localStorage 键:', Object.keys(localStorage));
@@ -147,10 +141,26 @@
         });
 
         if (data.avatar) {
-            showAvatarPreview(`${ASSETS_BASE}/${data.avatar}`);
+            updateAvatarPreview(data.avatar);
         }
 
         updateSaveStatus('已加载');
+    }
+
+    /**
+     * 更新头像预览
+     */
+    function updateAvatarPreview(avatarPath) {
+        const profileAvatarBox = document.getElementById('profileAvatarBox');
+        if (!profileAvatarBox) return;
+
+        const avatarUrl = avatarPath.startsWith('http') ? avatarPath : `${ASSETS_BASE}/${avatarPath}`;
+        profileAvatarBox.style.backgroundImage = `url('${avatarUrl}')`;
+        profileAvatarBox.style.backgroundSize = 'cover';
+        profileAvatarBox.style.backgroundPosition = 'center';
+        profileAvatarBox.style.backgroundRepeat = 'no-repeat';
+        profileAvatarBox.classList.add('has-image');
+        profileAvatarBox.textContent = '';
     }
 
     /**
@@ -167,32 +177,28 @@
         }
 
         selectedAvatarFile = file;
+        avatarChanged = true;
+
         const reader = new FileReader();
         reader.onload = (e) => {
-            showAvatarPreview(e.target.result);
+            const profileAvatarBox = document.getElementById('profileAvatarBox');
+            if (profileAvatarBox) {
+                profileAvatarBox.style.backgroundImage = `url('${e.target.result}')`;
+                profileAvatarBox.style.backgroundSize = 'cover';
+                profileAvatarBox.style.backgroundPosition = 'center';
+                profileAvatarBox.style.backgroundRepeat = 'no-repeat';
+                profileAvatarBox.classList.add('has-image');
+                profileAvatarBox.textContent = '';
+            }
         };
         reader.readAsDataURL(file);
-    }
-
-    /**
-     * 显示头像预览
-     */
-    function showAvatarPreview(src) {
-        const preview = document.getElementById('avatarPreview');
-        const placeholder = document.getElementById('avatarPlaceholder');
-
-        if (preview && placeholder) {
-            preview.src = src;
-            preview.style.display = 'block';
-            placeholder.style.display = 'none';
-        }
     }
 
     /**
      * 处理资料提交
      */
     async function handleProfileSubmit(event) {
-        event.preventDefault();
+        if (event) event.preventDefault();
 
         if (!currentMoId) {
             alert('请先登录');
@@ -211,11 +217,11 @@
             skills.forEach(skill => formData.append('skills[]', skill));
         }
 
-        if (selectedAvatarFile) {
+        if (selectedAvatarFile && avatarChanged) {
             formData.append('avatarFile', selectedAvatarFile);
         }
 
-        const statusEl = document.getElementById('saveProfileStatus');
+        const statusEl = document.getElementById('profileSaveStatus');
         if (statusEl) statusEl.textContent = '保存中...';
 
         try {
@@ -226,11 +232,11 @@
             const result = await response.json();
 
             if (result.success) {
-                if (statusEl) statusEl.textContent = '✓ 保存成功';
-                updateSaveStatus('已保存');
+                if (statusEl) statusEl.textContent = '✓ 已保存';
                 selectedAvatarFile = null;
+                avatarChanged = false;
                 setTimeout(() => {
-                    if (statusEl) statusEl.textContent = '';
+                    if (statusEl) statusEl.textContent = '已加载';
                 }, 3000);
             } else {
                 if (statusEl) statusEl.textContent = `✗ ${result.message}`;
@@ -247,7 +253,7 @@
      * 处理密码修改提交
      */
     async function handlePasswordSubmit(event) {
-        event.preventDefault();
+        if (event) event.preventDefault();
 
         if (!currentMoId) {
             console.error('[MO-PROFILE] 密码修改失败：currentMoId 为空');
@@ -276,7 +282,7 @@
             return;
         }
 
-        const statusEl = document.getElementById('changePasswordStatus');
+        const statusEl = document.getElementById('passwordSaveStatus');
         if (statusEl) statusEl.textContent = '更新中...';
 
         const formData = new FormData();
@@ -295,9 +301,11 @@
 
             if (result.success) {
                 if (statusEl) statusEl.textContent = '✓ 密码已更新';
-                document.getElementById('moPasswordForm').reset();
+                document.getElementById('currentPasswordInput').value = '';
+                document.getElementById('newPasswordInput').value = '';
+                document.getElementById('confirmPasswordInput').value = '';
                 setTimeout(() => {
-                    if (statusEl) statusEl.textContent = '';
+                    if (statusEl) statusEl.textContent = '尚未保存';
                 }, 3000);
             } else {
                 if (statusEl) statusEl.textContent = `✗ ${result.message}`;

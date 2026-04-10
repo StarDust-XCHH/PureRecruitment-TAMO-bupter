@@ -1,4 +1,3 @@
-
 <div class="ta-modal-overlay" id="taModalOverlay" aria-hidden="true">
     <div class="ta-modal-panel wide job-detail-modal" data-modal="course-detail" role="dialog" aria-labelledby="modalCourseDetailTitle">
         <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
@@ -37,7 +36,7 @@
                 <aside class="job-detail-side">
                     <div class="job-detail-side-card">
                         <h5>下一步</h5>
-                        <p>点击“进入应聘筛选”后将自动切换到应聘筛选路由，并按该课程加载候选人。</p>
+                        <p>点击"进入应聘筛选"后将自动切换到应聘筛选路由，并按该课程加载候选人。</p>
                         <button class="pill-btn" type="button" id="jumpToApplicantsBtn">进入应聘筛选</button>
                     </div>
                 </aside>
@@ -142,7 +141,6 @@
         </div>
         <div class="modal-body mo-job-publish-modal__body">
             <div class="mo-publish-layout">
-                <!-- 左侧导航栏 -->
                 <nav class="mo-publish-nav" aria-label="发布岗位导航">
                     <ul class="mo-publish-nav-list">
                         <li class="mo-publish-nav-item">
@@ -163,10 +161,8 @@
                     </ul>
                 </nav>
 
-                <!-- 右侧内容区 -->
                 <div class="mo-publish-content">
                     <form id="jobPublishForm" class="mo-publish-form mo-form-grid" autocomplete="off">
-                        <!-- 基本信息 section -->
                         <div class="mo-publish-section full" id="basic-info">
                             <h4 class="mo-publish-section-title">基本信息</h4>
                             <div class="mo-form-grid">
@@ -223,7 +219,6 @@
                             </div>
                         </div>
 
-                        <!-- 授课周次 section -->
                         <div class="mo-publish-section full" id="teaching-weeks">
                             <h4 class="mo-publish-section-title">授课周次 <span class="mo-muted">（可选）</span></h4>
                             <div class="mo-section-content">
@@ -235,7 +230,6 @@
                             </div>
                         </div>
 
-                        <!-- 考核与作业节点 section -->
                         <div class="mo-publish-section full" id="assessment">
                             <div class="mo-publish-section-head">
                                 <h4 class="mo-publish-section-title">考核与作业节点 <span class="mo-muted">（可选）</span></h4>
@@ -248,7 +242,6 @@
                             </div>
                         </div>
 
-                        <!-- 所需技能：系统标签 + 其他技能（合并） -->
                         <div class="mo-publish-section full" id="required-skills">
                             <h4 class="mo-publish-section-title">所需技能 <span class="mo-req" aria-hidden="true">*</span></h4>
                             <div class="mo-section-content">
@@ -263,7 +256,6 @@
                             </div>
                         </div>
 
-                        <!-- 岗位描述 section -->
                         <div class="mo-publish-section full" id="job-description">
                             <h4 class="mo-publish-section-title">岗位描述 <span class="mo-req" aria-hidden="true">*</span></h4>
                             <div class="mo-section-content">
@@ -278,7 +270,6 @@
                             </div>
                         </div>
 
-                        <!-- 提交按钮 -->
                         <div class="full mo-form-actions">
                             <button class="pill-btn" id="publishJobBtn" type="submit">发布岗位</button>
                             <span id="publishJobStatus" class="muted"></span>
@@ -304,18 +295,89 @@
         </div>
     </div>
 
-    <div class="ta-modal-panel" data-modal="settings" role="dialog" aria-labelledby="modalSettingsTitle">
+    <div class="ta-modal-panel ta-settings-modal" data-modal="settings" role="dialog" aria-labelledby="modalSettingsTitle">
         <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head">
-            <h3 id="modalSettingsTitle">MO 设置</h3>
-            <p class="muted">在此查看当前账号与主题偏好，也可使用顶栏主题按钮快速切换。</p>
+            <h3 id="modalSettingsTitle">个人资料管理</h3>
+            <p class="muted">完善您的个人信息，便于 TA 了解课程背景与教学风格。</p>
         </div>
-        <div class="modal-body">
-            <div class="status-summary">
-                <div class="status-line"><span>当前账号</span><span class="pill" id="moSettingsUsername">--</span></div>
-                <div class="status-line"><span>角色</span><span class="pill">MO</span></div>
-                <div class="status-line"><span>主题</span><span class="pill" id="moSettingsTheme">--</span></div>
+        <div class="modal-body settings-body">
+            <div class="settings-tabs" role="tablist" aria-label="个人资料菜单">
+                <button class="settings-tab active" type="button" data-settings-tab="profile" role="tab" aria-selected="true" aria-controls="panel-profile">
+                    <span>👤</span>
+                    <span>基础资料</span>
+                </button>
+                <button class="settings-tab" type="button" data-settings-tab="security" role="tab" aria-selected="false" aria-controls="panel-security">
+                    <span>🔒</span>
+                    <span>账号与安全</span>
+                </button>
             </div>
+
+            <section class="settings-content">
+                <div class="settings-panel active" id="panel-profile" data-settings-panel="profile" role="tabpanel">
+                    <div class="settings-section">
+                        <div class="settings-profile-toolbar">
+                            <div class="settings-status-group">
+                                <span class="settings-status-badge" id="profileSaveStatus">已加载</span>
+                            </div>
+                            <div class="settings-action-group">
+                                <button class="pill-btn" type="button" id="saveProfileBtn">保存</button>
+                            </div>
+                        </div>
+                        <div class="settings-avatar" role="button" tabindex="0" id="profileAvatarBox" aria-label="更换头像">M
+                            <span class="settings-avatar-ring" aria-hidden="true"></span>
+                        </div>
+                        <label class="settings-field full settings-avatar-upload-field" for="avatarFile">
+                            <span>头像上传</span>
+                            <input id="avatarFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+                            <small class="muted" id="avatarUploadHint">支持 PNG / JPG / WEBP / GIF，大小限制 10MB。点击头像即可更换。</small>
+                        </label>
+                        <div class="settings-grid two-column">
+                            <label class="settings-field">
+                                <span>姓名</span>
+                                <input id="moNameInput" type="text" placeholder="如：张教授" autocomplete="name">
+                            </label>
+                            <label class="settings-field">
+                                <span>联系邮箱</span>
+                                <input id="contactEmailInput" type="email" placeholder="如：professor@example.com">
+                            </label>
+                        </div>
+                        <label class="settings-field full">
+                            <span>个人简介</span>
+                            <textarea id="bioInput" rows="4" placeholder="简要介绍您的教学背景、研究方向等信息..."></textarea>
+                        </label>
+                        <div class="settings-field full">
+                            <span>专业技能</span>
+                            <textarea id="skillsInput" rows="3" placeholder="如：软件工程&#10;数据结构&#10;机器学习"></textarea>
+                            <small class="muted">每行一个技能或使用逗号分隔</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-panel" id="panel-security" data-settings-panel="security" role="tabpanel" hidden>
+                    <div class="settings-section">
+                        <div class="settings-subtitle">修改密码</div>
+                        <div class="settings-grid stack">
+                            <label class="settings-field">
+                                <span>当前密码</span>
+                                <input id="currentPasswordInput" type="password" autocomplete="current-password" placeholder="请输入当前密码">
+                            </label>
+                            <label class="settings-field">
+                                <span>新密码</span>
+                                <input id="newPasswordInput" type="password" autocomplete="new-password" placeholder="至少 6 位字符">
+                            </label>
+                            <label class="settings-field">
+                                <span>确认新密码</span>
+                                <input id="confirmPasswordInput" type="password" autocomplete="new-password" placeholder="再次输入新密码">
+                            </label>
+                        </div>
+                        <div class="settings-action-row">
+                            <span class="muted" id="passwordSaveStatus">尚未保存</span>
+                            <button class="pill-btn" type="button" id="changePasswordBtn">更新密码</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 </div>
