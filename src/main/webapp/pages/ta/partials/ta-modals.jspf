@@ -1,0 +1,302 @@
+<div class="ta-modal-overlay" id="taModalOverlay" aria-hidden="true">
+    <%@ include file="modals/ta-modals-overview.jspf" %>
+    <%@ include file="modals/ta-modal-ai-assistant.jspf" %>
+    <%@ include file="modals/ta-modal-course-application.jspf" %>
+    <div class="ta-modal-panel ta-settings-modal" data-modal="settings" role="dialog" aria-labelledby="modalSettingsTitle">
+        <button class="modal-close" type="button" aria-label="关闭"
+                data-i18n-aria-label="modal.close"
+                data-i18n-zh="关闭"
+                data-i18n-en="Close" data-modal-close>&times;</button>
+        <div class="modal-head">
+            <h3 id="modalSettingsTitle"
+                data-i18n="modal.settings.title"
+                data-i18n-zh="个人设置中心"
+                data-i18n-en="Personal settings center">个人设置中心</h3>
+            <p class="muted"
+               data-i18n="modal.settings.desc"
+               data-i18n-zh="快速更新档案、账号安全与偏好设置，资料修改需点击保存后才会写入。"
+               data-i18n-en="Quickly update your profile, account security, and preferences. Changes are only saved after clicking Save.">快速更新档案、账号安全与偏好设置，资料修改需点击保存后才会写入。</p>
+        </div>
+        <div class="modal-body settings-body">
+            <div class="settings-tabs" role="tablist" aria-label="设置菜单"
+                 data-i18n-aria-label="modal.settings.tabsAria"
+                 data-i18n-zh="设置菜单"
+                 data-i18n-en="Settings menu">
+                <button class="settings-tab active" type="button" data-settings-tab="profile" role="tab" aria-selected="true" aria-controls="panel-profile">
+                    <span>👤</span>
+                    <span data-i18n="modal.settings.tab.profile"
+                          data-i18n-zh="基础资料"
+                          data-i18n-en="Profile">基础资料</span>
+                </button>
+                <button class="settings-tab" type="button" data-settings-tab="security" role="tab" aria-selected="false" aria-controls="panel-security">
+                    <span>🔒</span>
+                    <span data-i18n="modal.settings.tab.security"
+                          data-i18n-zh="账号与安全"
+                          data-i18n-en="Security">账号与安全</span>
+                </button>
+                <button class="settings-tab" type="button" data-settings-tab="preferences" role="tab" aria-selected="false" aria-controls="panel-preferences">
+                    <span>⚙️</span>
+                    <span data-i18n="modal.settings.tab.preferences"
+                          data-i18n-zh="系统偏好"
+                          data-i18n-en="Preferences">系统偏好</span>
+                </button>
+            </div>
+
+            <section class="settings-content">
+                <div class="settings-panel active" id="panel-profile" data-settings-panel="profile" role="tabpanel">
+                    <div class="settings-section">
+                        <div class="settings-profile-toolbar">
+                            <div class="settings-status-group">
+                                <span class="settings-status-badge" id="profileSyncStatus"
+                                      data-i18n="modal.settings.profile.loaded"
+                                      data-i18n-zh="已加载"
+                                      data-i18n-en="Loaded">已加载</span>
+                                <small class="muted" id="profileLastUpdated"
+                                       data-i18n-html="最近更新：--|Last updated: --">最近更新：--</small>
+                            </div>
+                            <div class="settings-action-group">
+                                <button class="pill-btn" type="button" id="saveProfileBtn"
+                                        data-i18n="modal.settings.profile.save"
+                                        data-i18n-zh="保存"
+                                        data-i18n-en="Save">保存</button>
+                            </div>
+                        </div>
+                        <div class="settings-avatar" role="button" tabindex="0" id="profileAvatarBox"
+                             aria-label="更换头像"
+                             data-i18n-aria-label="modal.settings.profile.avatarAria"
+                             data-i18n-aria-label-zh="更换头像"
+                             data-i18n-aria-label-en="Change avatar">S
+                            <span class="settings-avatar-ring" aria-hidden="true"></span>
+                        </div>
+                        <label class="settings-field full settings-avatar-upload-field" for="avatarFile">
+                            <span data-i18n="modal.settings.profile.avatarUpload"
+                                  data-i18n-zh="头像上传"
+                                  data-i18n-en="Avatar upload">头像上传</span>
+                            <input id="avatarFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
+                            <small class="muted" id="avatarUploadHint"
+                                   data-i18n="modal.settings.profile.avatarHint"
+                                   data-i18n-zh="支持 PNG / JPG / WEBP / GIF，大小限制 10MB。点击头像即可更换。"
+                                   data-i18n-en="Supports PNG / JPG / WEBP / GIF up to 10MB. Click the avatar to replace it.">支持 PNG / JPG / WEBP / GIF，大小限制 10MB。点击头像即可更换。</small>
+                        </label>
+                        <div class="settings-grid two-column">
+                            <label class="settings-field">
+                                <span data-i18n="modal.settings.profile.fullName"
+                                      data-i18n-zh="真实姓名"
+                                      data-i18n-en="Full name">真实姓名</span>
+                                <input id="fullName" type="text" placeholder="请输入真实姓名"
+                                       data-i18n-placeholder="modal.settings.profile.fullNamePlaceholder"
+                                       data-i18n-placeholder-zh="请输入真实姓名"
+                                       data-i18n-placeholder-en="Enter your full name">
+                            </label>
+                            <label class="settings-field">
+                                <span data-i18n="modal.settings.profile.intent"
+                                      data-i18n-zh="申请方向"
+                                      data-i18n-en="Application focus">申请方向</span>
+                                <input id="applicationIntent" type="text" placeholder="如：软件工程、数据分析 TA"
+                                       data-i18n-placeholder="modal.settings.profile.intentPlaceholder"
+                                       data-i18n-placeholder-zh="如：软件工程、数据分析 TA"
+                                       data-i18n-placeholder-en="e.g. Software Engineering, Data Analysis TA">
+                            </label>
+                            <label class="settings-field">
+                                <span data-i18n="modal.settings.profile.studentId"
+                                      data-i18n-zh="学号"
+                                      data-i18n-en="Student ID">学号</span>
+                                <input id="studentId" type="text" placeholder="系统自动带出或手动补充" readonly disabled
+                                       data-i18n-placeholder="modal.settings.profile.studentIdPlaceholder"
+                                       data-i18n-placeholder-zh="系统自动带出或手动补充"
+                                       data-i18n-placeholder-en="Auto-filled by the system or entered manually">
+                            </label>
+                            <label class="settings-field">
+                                <span data-i18n="modal.settings.profile.email"
+                                      data-i18n-zh="联系邮箱"
+                                      data-i18n-en="Contact email">联系邮箱</span>
+                                <input id="contactEmail" type="email" placeholder="请输入常用邮箱"
+                                       data-i18n-placeholder="modal.settings.profile.emailPlaceholder"
+                                       data-i18n-placeholder-zh="请输入常用邮箱"
+                                       data-i18n-placeholder-en="Enter your commonly used email">
+                            </label>
+                        </div>
+                        <label class="settings-field full">
+                            <span data-i18n="modal.settings.profile.bio"
+                                  data-i18n-zh="个人简介"
+                                  data-i18n-en="Bio">个人简介</span>
+                            <textarea id="bio" rows="5" placeholder="简要介绍你的课程经历、助教经历或擅长方向"
+                                      data-i18n-placeholder="modal.settings.profile.bioPlaceholder"
+                                      data-i18n-placeholder-zh="简要介绍你的课程经历、助教经历或擅长方向"
+                                      data-i18n-placeholder-en="Briefly describe your course experience, TA experience, or strengths"></textarea>
+                        </label>
+                        <div class="settings-field full">
+                            <span data-i18n="modal.settings.profile.skills"
+                                  data-i18n-zh="技能标签"
+                                  data-i18n-en="Skill tags">技能标签</span>
+                            <div class="skills-input" id="skillsInput" data-readonly="false">
+                                <input id="skillEntry" type="text" placeholder="输入技能后回车"
+                                       data-i18n-placeholder="modal.settings.profile.skillEntryPlaceholder"
+                                       data-i18n-placeholder-zh="输入技能后回车"
+                                       data-i18n-placeholder-en="Type a skill and press Enter">
+                            </div>
+                            <small class="muted"
+                                   data-i18n="modal.settings.profile.skillsHint"
+                                   data-i18n-zh="回车可新增标签，点击标签右侧 × 可删除。"
+                                   data-i18n-en="Press Enter to add a tag, and click × on a tag to remove it.">回车可新增标签，点击标签右侧 × 可删除。</small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-panel" id="panel-security" data-settings-panel="security" role="tabpanel" hidden>
+                    <div class="settings-section">
+                        <div class="settings-subtitle" data-i18n="modal.settings.security.title"
+                             data-i18n-zh="修改密码"
+                             data-i18n-en="Change password">修改密码</div>
+                        <div class="settings-grid stack">
+                            <label class="settings-field">
+                                <span data-i18n="modal.settings.security.current"
+                                      data-i18n-zh="当前密码"
+                                      data-i18n-en="Current password">当前密码</span>
+                                <input id="currentPassword" type="password" autocomplete="current-password"
+                                       placeholder="请输入当前密码"
+                                       data-i18n-placeholder="modal.settings.security.currentPlaceholder"
+                                       data-i18n-placeholder-zh="请输入当前密码"
+                                       data-i18n-placeholder-en="Please enter your current password">
+                            </label>
+                            <label class="settings-field">
+                                <span data-i18n="modal.settings.security.new"
+                                      data-i18n-zh="新密码"
+                                      data-i18n-en="New password">新密码</span>
+                                <input id="newPassword" type="password" autocomplete="new-password"
+                                       placeholder="至少 6 位"
+                                       data-i18n-placeholder="modal.settings.security.newPlaceholder"
+                                       data-i18n-placeholder-zh="至少 6 位"
+                                       data-i18n-placeholder-en="At least 6 characters">
+                            </label>
+                            <label class="settings-field">
+                                <span data-i18n="modal.settings.security.confirm"
+                                      data-i18n-zh="确认新密码"
+                                      data-i18n-en="Confirm new password">确认新密码</span>
+                                <input id="confirmPassword" type="password" autocomplete="new-password"
+                                       placeholder="再次输入新密码"
+                                       data-i18n-placeholder="modal.settings.security.confirmPlaceholder"
+                                       data-i18n-placeholder-zh="再次输入新密码"
+                                       data-i18n-placeholder-en="Enter the new password again">
+                            </label>
+                        </div>
+                        <div class="settings-action-row">
+                            <span class="muted" id="passwordSaveStatus"
+                                  data-i18n="modal.settings.security.notSaved"
+                                  data-i18n-zh="尚未保存"
+                                  data-i18n-en="Not saved yet">尚未保存</span>
+                            <button class="pill-btn" type="button" id="savePasswordBtn"
+                                    data-i18n="modal.settings.security.update"
+                                    data-i18n-zh="保存"
+                                    data-i18n-en="Save">保存</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-panel" id="panel-preferences" data-settings-panel="preferences" role="tabpanel" hidden>
+                    <div class="settings-section">
+                        <label class="settings-field full">
+                            <span data-i18n="modal.settings.preferences.theme"
+                                  data-i18n-zh="界面主题"
+                                  data-i18n-en="Theme">界面主题</span>
+                            <select id="themeSelect">
+                                <option value="system" data-i18n="modal.settings.preferences.theme.system" data-i18n-zh="跟随系统" data-i18n-en="Follow system">跟随系统</option>
+                                <option value="light" data-i18n="modal.settings.preferences.theme.light" data-i18n-zh="浅色模式" data-i18n-en="Light mode">浅色模式</option>
+                                <option value="dark" data-i18n="modal.settings.preferences.theme.dark" data-i18n-zh="深色模式" data-i18n-en="Dark mode">深色模式</option>
+                            </select>
+                        </label>
+                        <div class="settings-preferences-group">
+                            <h4 data-i18n="modal.settings.preferences.notifications"
+                                data-i18n-zh="通知与偏好"
+                                data-i18n-en="Notifications and preferences">通知与偏好</h4>
+                            <label class="settings-toggle">
+                                <input id="notifyApplication" type="checkbox" checked>
+                                <span data-i18n="modal.settings.preferences.application"
+                                      data-i18n-zh="接收投递状态更新提醒"
+                                      data-i18n-en="Receive application status update reminders">接收投递状态更新提醒</span>
+                            </label>
+                            <label class="settings-toggle">
+                                <input id="notifyRecommendation" type="checkbox" checked>
+                                <span data-i18n="modal.settings.preferences.recommendation"
+                                      data-i18n-zh="接收推荐岗位提醒"
+                                      data-i18n-en="Receive recommended role reminders">接收推荐岗位提醒</span>
+                            </label>
+                            <label class="settings-toggle">
+                                <input id="notifyInterview" type="checkbox" checked>
+                                <span data-i18n="modal.settings.preferences.interview"
+                                      data-i18n-zh="接收面试与沟通日程提醒"
+                                      data-i18n-en="Receive interview and communication schedule reminders">接收面试与沟通日程提醒</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div class="ta-modal-panel wide ta-avatar-crop-modal" data-modal="avatar-crop" role="dialog" aria-labelledby="avatarCropTitle" aria-modal="true">
+        <button class="modal-close" type="button" aria-label="关闭头像裁切窗口"
+                data-i18n-aria-label="modal.settings.avatarCrop.close"
+                data-i18n-aria-label-zh="关闭头像裁切窗口"
+                data-i18n-aria-label-en="Close avatar crop dialog"
+                data-avatar-crop-close>&times;</button>
+        <div class="modal-head">
+            <h3 id="avatarCropTitle"
+                data-i18n="modal.settings.avatarCrop.title"
+                data-i18n-zh="裁切头像"
+                data-i18n-en="Crop avatar">裁切头像</h3>
+            <p class="muted"
+               data-i18n="modal.settings.avatarCrop.desc"
+               data-i18n-zh="请先将头像裁切为 1:1 正方形，确认后系统才会继续上传。"
+               data-i18n-en="Please crop the avatar to a 1:1 square before uploading.">请先将头像裁切为 1:1 正方形，确认后系统才会继续上传。</p>
+        </div>
+        <div class="modal-body avatar-crop-body">
+            <div class="avatar-crop-layout">
+                <div class="avatar-crop-stage-wrap">
+                    <div class="avatar-crop-stage" id="avatarCropStage" aria-label="头像裁切区域"
+                         data-i18n-aria-label="modal.settings.avatarCrop.stageAria"
+                         data-i18n-aria-label-zh="头像裁切区域"
+                         data-i18n-aria-label-en="Avatar crop area">
+                        <img id="avatarCropImage" class="avatar-crop-image" alt="头像裁切预览" hidden>
+                        <div class="avatar-crop-mask" aria-hidden="true"></div>
+                        <div class="avatar-crop-frame" aria-hidden="true"></div>
+                    </div>
+                </div>
+                <aside class="avatar-crop-side">
+                    <div class="avatar-crop-preview-card">
+                        <span class="avatar-crop-side-title"
+                              data-i18n="modal.settings.avatarCrop.preview"
+                              data-i18n-zh="裁切结果预览"
+                              data-i18n-en="Preview">裁切结果预览</span>
+                        <div class="avatar-crop-preview-box">
+                            <canvas id="avatarCropPreviewCanvas" width="160" height="160" aria-label="裁切结果预览"
+                                    data-i18n-aria-label="modal.settings.avatarCrop.previewAria"
+                                    data-i18n-aria-label-zh="裁切结果预览"
+                                    data-i18n-aria-label-en="Cropped avatar preview"></canvas>
+                        </div>
+                    </div>
+                    <label class="settings-field full avatar-crop-zoom-field" for="avatarCropZoomRange">
+                        <span data-i18n="modal.settings.avatarCrop.zoom"
+                              data-i18n-zh="缩放"
+                              data-i18n-en="Zoom">缩放</span>
+                        <input id="avatarCropZoomRange" type="range" min="1" max="3" step="0.01" value="1">
+                    </label>
+                    <small class="muted" id="avatarCropHint"
+                           data-i18n="modal.settings.avatarCrop.hint"
+                           data-i18n-zh="拖动图片调整取景，滑动缩放条可放大或缩小。"
+                           data-i18n-en="Drag the image to frame it and use the zoom slider to scale it.">拖动图片调整取景，滑动缩放条可放大或缩小。</small>
+                    <div class="avatar-crop-actions">
+                        <button class="pill-btn ghost" type="button" id="avatarCropCancelBtn"
+                                data-i18n="modal.settings.avatarCrop.cancel"
+                                data-i18n-zh="取消"
+                                data-i18n-en="Cancel">取消</button>
+                        <button class="pill-btn" type="button" id="avatarCropConfirmBtn"
+                                data-i18n="modal.settings.avatarCrop.confirm"
+                                data-i18n-zh="确认裁切"
+                                data-i18n-en="Confirm crop">确认裁切</button>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </div>
+</div>

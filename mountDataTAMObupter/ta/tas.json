@@ -3,23 +3,142 @@
     "schema": "ta",
     "entity": "tas",
     "version": "1.0",
-    "updatedAt": "2026-03-16T12:07:52.546899300Z"
+    "updatedAt": "2026-04-07T04:43:27.011353800Z"
   },
   "items": [
     {
-      "id": "TA-57411",
+      "id": "TA-45935",
+      "name": "AAA",
+      "username": "AAA",
+      "email": "AAA@qa.c",
+      "phone": "12312312",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-03-16T13:19:06.884221300Z",
+      "updatedAt": "2026-03-16T13:19:06.884221300Z",
+      "auth": {
+        "passwordHash": "c9aeea9499f161f9e307d8f4a8cb4c0d5a1393dcd466b49b630fb060f281defe",
+        "passwordSalt": "fecc6463-14f5-4e25-a015-bfd2eb448afb",
+        "lastLoginAt": "2026-03-16T13:19:06.884221300Z",
+        "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "TA-10258",
       "name": "Seele Vollerei",
       "username": "Seele",
       "email": "Seele520@honkai.com",
       "phone": "520520520",
       "department": "",
       "status": "active",
-      "createdAt": "2026-03-16T12:07:52.538876300Z",
-      "updatedAt": "2026-03-16T12:07:52.538876300Z",
+      "createdAt": "2026-03-16T13:28:45.257077Z",
+      "updatedAt": "2026-04-06T05:09:06.400655200Z",
       "auth": {
-        "passwordHash": "6c697fed40b0cd234d9de38e17c24a8f4fd283a76bf231e74accf44812377876",
-        "passwordSalt": "e1e24b0d-898d-4a88-acd7-648928395bbe",
-        "lastLoginAt": "2026-03-16T12:07:52.538876300Z",
+        "passwordHash": "8b5361414eb8fa038ca9279a55be8b3b44791939d89475d1618d50230c01d65f",
+        "passwordSalt": "cebb50b5-9797-4732-a22a-df78ae1c88da",
+        "lastLoginAt": "2026-04-06T05:08:39.827267500Z",
+        "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "TA-93749",
+      "name": "Aiaa",
+      "username": "Aiaa",
+      "email": "Aiaa@a.com",
+      "phone": "123112312",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-03-16T19:20:24.983252300Z",
+      "updatedAt": "2026-03-16T19:20:24.983252300Z",
+      "auth": {
+        "passwordHash": "0f20dea3ed76b2e1ed5eeb240b41e300267a962fd4f48a2b32237ba1aa4fcd42",
+        "passwordSalt": "5f6ffe56-2f50-4b86-9bc3-a317fbe9cd0f",
+        "lastLoginAt": "",
+        "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "TA-62567",
+      "name": "ert",
+      "username": "ert",
+      "email": "123@ert.3",
+      "phone": "2563675232",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-03-17T05:53:14.276304900Z",
+      "updatedAt": "2026-03-17T05:53:14.276304900Z",
+      "auth": {
+        "passwordHash": "62e613594825c0458391341df8bd0577d9a4538450388df5ce7779340f5a405f",
+        "passwordSalt": "67e81587-1065-4bf8-b838-da9f178f7ed8",
+        "lastLoginAt": "",
+        "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "TA-14071",
+      "name": "zxc",
+      "username": "zxc",
+      "email": "zxc@ws.s",
+      "phone": "45326254",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-03-17T05:56:37.349630200Z",
+      "updatedAt": "2026-03-17T05:56:37.349630200Z",
+      "auth": {
+        "passwordHash": "dfcac071b6652e42a1d7ae52ec7a3ec6d28520b11146b1adf927cd98c4ae2232",
+        "passwordSalt": "c8cbb751-9eb7-40a8-9b9b-c5a860ef44d8",
+        "lastLoginAt": "",
+        "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "TA-70803",
+      "name": "Aqq",
+      "username": "Aqq",
+      "email": "Aqq@11.1",
+      "phone": "124352456",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-03-17T12:23:50.090144200Z",
+      "updatedAt": "2026-03-17T12:23:50.090144200Z",
+      "auth": {
+        "passwordHash": "e78d03a59ba53965a7022e5ebc8c3e4b8b8de01a29a29b08a9faf594452ae89f",
+        "passwordSalt": "1ebe6ef2-4c62-40d8-a2f4-4f24dd59a321",
+        "lastLoginAt": "",
+        "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "TA-24341",
+      "name": "Ton",
+      "username": "12345",
+      "email": "12334@a.com",
+      "phone": "12339989999",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-03-21T13:12:54.282282500Z",
+      "updatedAt": "2026-04-01T18:18:41.187369500Z",
+      "auth": {
+        "passwordHash": "5ffe2b47aa70ecc089b7d9311ef3ff2fb72195411b1b98d210d2b686afaf5ee9",
+        "passwordSalt": "08a2d292-32bc-46e7-936a-45a132381204",
+        "lastLoginAt": "2026-04-01T18:18:41.187369500Z",
+        "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "TA-61198",
+      "name": "Jei",
+      "username": "6A6",
+      "email": "3171506351@qq.com",
+      "phone": "1212121",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-04-07T04:43:27.007845800Z",
+      "updatedAt": "2026-04-07T04:43:27.007845800Z",
+      "auth": {
+        "passwordHash": "67bf939178e12d68f72535235c9df21dc331f31b985ecc0eef8135ffd51084d2",
+        "passwordSalt": "3a62a090-b27a-47c6-a304-f66367c7013a",
+        "lastLoginAt": "",
         "failedAttempts": 0
       }
     }

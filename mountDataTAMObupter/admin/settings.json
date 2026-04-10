@@ -1,0 +1,23 @@
+{
+  "meta": {
+    "schema": "admin",
+    "entity": "settings",
+    "version": "1.0",
+    "updatedAt": "2026-04-07T06:57:47.995801100Z"
+  },
+  "items": [
+    {
+      "id": "SETTING-ADMIN-00001",
+      "adminId": "ADMIN-00001",
+      "theme": "dark",
+      "notifications": {
+        "userRegistered": true,
+        "coursePublished": true,
+        "systemAlert": true
+      },
+      "dashboardLayout": "default",
+      "createdAt": "2026-04-07T06:00:40.877154700Z",
+      "updatedAt": "2026-04-07T06:00:40.877154700Z"
+    }
+  ]
+}

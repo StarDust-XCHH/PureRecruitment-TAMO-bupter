@@ -1,16 +1,30 @@
 # PureRecruitment-TAMO-bupter
 
-# Group-16 成员
+# Group-16 Members 成员
+|Github UserName|Chinese Name|Name in English|BUPT ID|QM ID|Email|
+|---|---|---|---|---|---|
+|StarDust-XCHH|管宇涵|Yuhan Guan|2023213116|231220725|lmtgyh@163.com|
+|zfh53|张峰豪|Fenghao Zhang|2023213136|231221216|zhang.fenghao@qq.com|
+|6a696c6c|李玉峰|Yufeng Li|2023213131|231222556|3171506351@qq.com|
+|StellaWang309|汪以琳|Yilin Wang|2023213143|231222305|1938508113@qq.com|
+|TTslmy|刘慧颖|Huiying Liu|2023213172|231221788|2497604794@qq.com|
+|Au2789|庞博文|Bowen Pang|2023213124|231220998|pbw3319@163.com|
 
-- StarDust-XCHH: 管宇涵-Yuhan Guan
+
+- Yuxuan:yuxuanwwang@outlook.com    (Support TA)
 
 
 
 # 资源文件服务端部署挂载
 
-```txt
-见目录 mountDataTAMObupter/README.md
-```
+部署与目录结构说明见 [`mountDataTAMObupter/README.md`](mountDataTAMObupter/README.md)（环境变量 `mountDataTAMObupter`、子目录索引）。
+
+# 文档与岗位数据（开发说明）
+
+- **本地 Tomcat / GitHub**：[`docs/Github操作指南+Tomcat配置.docx`](docs/Github操作指南+Tomcat配置.docx)。
+- **MO 模块开发日志**：按时间条目记录 MO 界面与后端进展，持续追加，见 [`docs/log/MO-module-development-log.md`](docs/log/MO-module-development-log.md)。
+- **招聘岗位 API 与契约**：[`docs/api/mo-job-board-api-v2.md`](docs/api/mo-job-board-api-v2.md)；MO/TA 数据交互说明见 [`docs/backend/mo-ta-interaction-log.md`](docs/backend/mo-ta-interaction-log.md)（含 MO 申请人列表、详情、已读/未读、评论、简历下载、录用/拒绝等接口与 JSON 路径）。
+- **岗位主数据文件**：[`mountDataTAMObupter/common/recruitment-courses.json`](mountDataTAMObupter/common/recruitment-courses.json)，由 `com.bupt.tarecruit.common.dao.RecruitmentCoursesDao` 集中管理路径、锁与读写（MO 与 TA 岗位列表同源读取）；公共包与 `common.dao` 说明见 [`src/main/java/com/bupt/tarecruit/common/README.md`](src/main/java/com/bupt/tarecruit/common/README.md) 与 [`src/main/java/com/bupt/tarecruit/common/dao/README.md`](src/main/java/com/bupt/tarecruit/common/dao/README.md)。挂载目录旁补充说明见 [`mountDataTAMObupter/common/recruitment-courses-dao-notes.md`](mountDataTAMObupter/common/recruitment-courses-dao-notes.md)。
 
 # 一阶段任务要求
 
@@ -29,6 +43,14 @@
 
 
 文案内容请上传到独属于个人分支的https://github.com/StarDust-XCHH/PureRecruitment-TAMO-bupter/blob/e68036ff47aa010577c8fe5cc642046171900416/peojectFile文件夹（推荐新建子文件夹）
+
+
+## 一阶段完成内容
+
+- TA+LogOn=story+prototype<——StarDust——>`projectFile/StarDustXCHH/imgStage1Prototype`
+
+
+
 
 
 # 项目架构

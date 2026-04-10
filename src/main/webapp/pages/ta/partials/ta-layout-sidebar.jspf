@@ -1,0 +1,21 @@
+<div class="brand">
+    <div class="logo">TA</div>
+    <div>
+        <div>Teaching Assistant</div>
+        <small class="brand-subtitle">Recruitment Suite</small>
+    </div>
+</div>
+<nav class="nav" aria-label="TA 工作台导航" data-i18n-aria-label="sidebar.navAria" data-i18n-aria-label-zh="TA 工作台导航" data-i18n-aria-label-en="TA workspace navigation">
+    <button class="nav-item active" type="button" data-route="profile" aria-current="page">
+        <span>👤</span>
+        <span data-i18n="sidebar.profile" data-i18n-zh="个人档案" data-i18n-en="Profile">个人档案</span>
+    </button>
+    <button class="nav-item" type="button" data-route="jobs" aria-current="false">
+        <span>🛰️</span>
+        <span data-i18n="sidebar.jobs" data-i18n-zh="职位大厅" data-i18n-en="Jobs">职位大厅</span>
+    </button>
+    <button class="nav-item" type="button" data-route="status" aria-current="false">
+        <span>🧭</span>
+        <span data-i18n="sidebar.status" data-i18n-zh="申请状态" data-i18n-en="Application Status">申请状态</span>
+    </button>
+</nav>

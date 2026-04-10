@@ -34,6 +34,6 @@ public final class AuthUtils {
     }
 
     public static String hashPassword(String password, String salt) {
-        return sha256(salt + ":" + password);
+        return sha256(salt + password);
     }
 }

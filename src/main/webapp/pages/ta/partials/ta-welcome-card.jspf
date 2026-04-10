@@ -1,0 +1,8 @@
+<div class="welcome-card actionable" id="welcomeCard" role="button" tabindex="0" aria-label="首次登录提示，点击打开个人信息设置" data-i18n-aria-label="welcome.cardAria" data-i18n-aria-label-zh="首次登录提示，点击打开个人信息设置" data-i18n-aria-label-en="First-login tip, click to open profile settings">
+    <div class="badge" data-i18n="welcome.badge" data-i18n-zh="新" data-i18n-en="NEW">新</div>
+    <div>
+        <h3 data-i18n="welcome.title" data-i18n-zh="首次登录提示" data-i18n-en="First-login tip">首次登录提示</h3>
+        <p data-i18n="welcome.desc" data-i18n-zh="欢迎加入 TA 招聘系统！本阶段先完成工作台骨架、设置中心入口与核心弹窗容器铺设。" data-i18n-en="Welcome to the TA Recruitment System! Start by exploring the workspace shell, settings center entry, and the core modal areas.">欢迎加入 TA 招聘系统！本阶段先完成工作台骨架、设置中心入口与核心弹窗容器铺设。</p>
+        <button class="hint hint-link" id="welcomeProfileHint" type="button" data-i18n="welcome.hint" data-i18n-zh="建议从右上角个人信息与设置中心开始" data-i18n-en="Start with the profile and settings entry in the top-right corner">建议从右上角个人信息与设置中心开始</button>
+    </div>
+</div>

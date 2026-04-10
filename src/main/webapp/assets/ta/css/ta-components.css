@@ -1,0 +1,187 @@
+@charset "UTF-8";
+
+.overview {
+    display: grid;
+    gap: 18px;
+}
+
+.overview-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.overview-badges {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.stat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.insight-grid-spaced {
+    margin-top: 16px;
+}
+
+.overview-grid,
+.grid-2 {
+    display: grid;
+    gap: 16px;
+}
+
+.overview-grid {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.grid-2 {
+    grid-template-columns: 1fr 1fr;
+    gap: 22px;
+}
+
+.progress {
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+}
+
+[data-theme="light"] .progress {
+    background: rgba(15, 23, 42, 0.1);
+}
+
+.progress span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, var(--primary), #8b5cf6);
+    box-shadow: 0 0 12px var(--primary-glow);
+}
+
+.quick-actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.ghost-btn {
+    border: 1px solid var(--card-border);
+    background: transparent;
+    color: var(--text);
+    padding: 8px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.ghost-btn:hover {
+    box-shadow: 0 0 12px var(--primary-glow);
+}
+
+.tag-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.mini-card {
+    padding: 14px;
+    border-radius: 14px;
+    border: 1px solid var(--card-border);
+    background: rgba(0, 0, 0, 0.2);
+    display: grid;
+    gap: 6px;
+}
+
+[data-theme="light"] .mini-card {
+    background: rgba(255, 255, 255, 0.7);
+}
+
+.mini-list h4 {
+    margin: 0 0 8px;
+}
+
+.mini-list ul {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--muted);
+    display: grid;
+    gap: 6px;
+}
+
+.cv-history,
+.job-extra,
+.status-summary,
+.message-list,
+.modal-list,
+.resume-checklist,
+.avatar-crop-actions {
+    display: grid;
+    gap: 10px;
+}
+
+.history-item,
+.task-row,
+.status-line,
+.message-item,
+.modal-list-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.task-row,
+.message-item {
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+}
+
+.status-line {
+    font-size: 13px;
+}
+
+.message-item {
+    display: grid;
+}
+
+.history-item {
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+}
+
+.micro-particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.85);
+    animation: micro 0.6s ease-out forwards;
+    pointer-events: none;
+}
+
+@keyframes micro {
+    to {
+        transform: translate(var(--dx, 0px), var(--dy, 0px)) scale(0);
+        opacity: 0;
+    }
+}
+
+@keyframes ripple {
+    to {
+        transform: scale(4);
+        opacity: 0;
+    }
+}
+
+@media (max-width: 960px) {
+    .grid-2 {
+        grid-template-columns: 1fr;
+    }
+}
