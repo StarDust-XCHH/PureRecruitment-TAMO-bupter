@@ -23,7 +23,7 @@
 
 - **本地 Tomcat / GitHub**：[`docs/Github操作指南+Tomcat配置.docx`](docs/Github操作指南+Tomcat配置.docx)。
 - **MO 模块开发日志**：按时间条目记录 MO 界面与后端进展，持续追加，见 [`docs/log/MO-module-development-log.md`](docs/log/MO-module-development-log.md)。
-- **招聘岗位 API 与契约**：[`docs/api/mo-job-board-api-v2.md`](docs/api/mo-job-board-api-v2.md)；MO/TA 数据交互说明见 [`docs/backend/mo-ta-interaction-log.md`](docs/backend/mo-ta-interaction-log.md)。
+- **招聘岗位 API 与契约**：[`docs/api/mo-job-board-api-v2.md`](docs/api/mo-job-board-api-v2.md)；MO/TA 数据交互说明见 [`docs/backend/mo-ta-interaction-log.md`](docs/backend/mo-ta-interaction-log.md)（含 MO 申请人列表、详情、已读/未读、评论、简历下载、录用/拒绝等接口与 JSON 路径）。
 - **岗位主数据文件**：[`mountDataTAMObupter/common/recruitment-courses.json`](mountDataTAMObupter/common/recruitment-courses.json)，由 `com.bupt.tarecruit.common.dao.RecruitmentCoursesDao` 集中管理路径、锁与读写（MO 与 TA 岗位列表同源读取）；公共包与 `common.dao` 说明见 [`src/main/java/com/bupt/tarecruit/common/README.md`](src/main/java/com/bupt/tarecruit/common/README.md) 与 [`src/main/java/com/bupt/tarecruit/common/dao/README.md`](src/main/java/com/bupt/tarecruit/common/dao/README.md)。挂载目录旁补充说明见 [`mountDataTAMObupter/common/recruitment-courses-dao-notes.md`](mountDataTAMObupter/common/recruitment-courses-dao-notes.md)。
 
 # 一阶段任务要求

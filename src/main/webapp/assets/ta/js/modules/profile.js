@@ -270,17 +270,18 @@
         }
 
         function readProfileFromForm() {
-            return normalizeProfileData({
+            const data = {
                 taId: profileState.taId,
                 realName: fullNameInput?.value,
                 applicationIntent: applicationIntentInput?.value,
                 studentId: profileState.original?.studentId || profileState.current?.studentId || studentIdInput?.value || profileState.taId,
                 contactEmail: contactEmailInput?.value,
                 bio: bioInput?.value,
-                avatar: profileState.current?.avatar || profileState.original?.avatar || '',
+                // 移除了这里的 avatar 默认赋值，交给 saveProfileSettings 处理
                 skills: Array.from(skillsInput?.querySelectorAll('.skill-tag') || []).map((node) => node.dataset.skill || node.textContent),
                 lastUpdatedAt: profileState.current?.lastUpdatedAt || profileState.original?.lastUpdatedAt || ''
-            });
+            };
+            return normalizeProfileData(data);
         }
 
         function fillProfileForm(data) {
@@ -563,10 +564,22 @@
 
         async function saveProfileSettings() {
             if (!profileState.editable || profileState.saving) return;
+
+            // 1. 获取基础表单数据
             const payload = readProfileFromForm();
-            payload.avatarFile = profileState.pendingAvatarFile;
+
+            // 2. 只有明确发生了头像变化，才添加头像字段
+            if (profileState.avatarChanged && profileState.pendingAvatarFile instanceof Blob) {
+                payload.avatarFile = profileState.pendingAvatarFile;
+            } else {
+                // 如果头像没变，确保 payload 里不要有 avatar 字段，
+                // 这样后端就不会执行头像更新逻辑
+                delete payload.avatar;
+            }
+
             profileState.saving = true;
             setProfileStatus('保存中...', null);
+
             try {
                 const saved = await requestProfileSettings('POST', payload);
                 const normalized = normalizeProfileData(saved);
@@ -579,7 +592,7 @@
                 fillProfileForm(normalized);
                 setProfileEditable(true);
                 setProfileStatus('保存成功', 'is-success');
-                setAvatarHint('头像已同步到服务器。', 'is-success');
+                setAvatarHint(profileState.original?.avatar ? '头像已同步到服务器。' : '资料已保存。', 'is-success');
                 const mergedUser = {
                     ...(refreshUserData() || {}),
                     taId: normalized.taId || profileState.taId,

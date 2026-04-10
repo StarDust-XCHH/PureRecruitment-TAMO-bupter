@@ -11,9 +11,12 @@
 (function () {
     'use strict';
 
-    const API_BASE = window.CONTEXT_PATH || '';
-    const PROFILE_API = `${API_BASE}/api/mo/profile-settings`;
-    const ASSETS_BASE = `${API_BASE}/mo-assets`;
+    const PROFILE_API = (typeof window.moApiPath === 'function')
+        ? window.moApiPath('/api/mo/profile-settings')
+        : '../../api/mo/profile-settings';
+    const ASSETS_BASE = (typeof window.moApiPath === 'function')
+        ? window.moApiPath('/mo-assets')
+        : '../../mo-assets';
 
     let currentMoId = null;
     let selectedAvatarFile = null;
@@ -69,11 +72,9 @@
      */
     function loadMoIdFromStorage() {
         try {
-            console.log('[MO-PROFILE] 尝试从 localStorage 读取用户信息...');
-            const userData = localStorage.getItem('mo-user');
-            if (!userData) {
-                console.warn('[MO-PROFILE] localStorage 中没有 mo-user，尝试读取 moUser...');
-            }
+            const userData =
+                sessionStorage.getItem('mo-user') ||
+                localStorage.getItem('mo-user');
             const finalData = userData || localStorage.getItem('moUser');
 
             if (finalData) {
@@ -87,7 +88,7 @@
                 if (moIdField) moIdField.value = currentMoId;
                 if (moIdPasswordField) moIdPasswordField.value = currentMoId;
             } else {
-                console.error('[MO-PROFILE] localStorage 中没有任何 MO 用户数据！');
+                console.error('[MO-PROFILE] sessionStorage / localStorage 中未找到 MO 用户数据');
                 console.log('[MO-PROFILE] 可用的 localStorage 键:', Object.keys(localStorage));
             }
         } catch (e) {
@@ -131,7 +132,7 @@
         console.log('[MO-PROFILE] 填充表单数据:', data);
 
         const fields = {
-            realNameInput: data.realName || data.name || '',
+            moNameInput: data.name || '',
             contactEmailInput: data.contactEmail || data.email || '',
             bioInput: data.bio || '',
             skillsInput: Array.isArray(data.skills) ? data.skills.join('\n') : ''
@@ -200,7 +201,7 @@
 
         const formData = new FormData();
         formData.append('moId', currentMoId);
-        formData.append('realName', document.getElementById('realNameInput').value);
+        formData.append('name', document.getElementById('moNameInput').value);
         formData.append('contactEmail', document.getElementById('contactEmailInput').value);
         formData.append('bio', document.getElementById('bioInput').value);
 
@@ -246,7 +247,6 @@
      * 处理密码修改提交
      */
     async function handlePasswordSubmit(event) {
-        console.log('[MO-PROFILE] ========== 密码修改表单提交 ==========');
         event.preventDefault();
 
         if (!currentMoId) {
@@ -258,22 +258,20 @@
         const currentPassword = document.getElementById('currentPasswordInput').value;
         const newPassword = document.getElementById('newPasswordInput').value;
         const confirmPassword = document.getElementById('confirmPasswordInput').value;
+        const newTrimmed = newPassword.trim();
+        const confirmTrimmed = confirmPassword.trim();
 
-        console.log('[MO-PROFILE] 当前 MO ID:', currentMoId);
-        console.log('[MO-PROFILE] 当前密码长度:', currentPassword ? currentPassword.length : 0);
-        console.log('[MO-PROFILE] 新密码长度:', newPassword ? newPassword.length : 0);
-
-        if (!currentPassword || !newPassword || !confirmPassword) {
+        if (!currentPassword || !newTrimmed || !confirmTrimmed) {
             alert('请填写所有密码字段');
             return;
         }
 
-        if (newPassword !== confirmPassword) {
+        if (newTrimmed !== confirmTrimmed) {
             alert('两次输入的新密码不一致');
             return;
         }
 
-        if (newPassword.length < 6) {
+        if (newTrimmed.length < 6) {
             alert('新密码至少需要 6 位字符');
             return;
         }
@@ -285,13 +283,7 @@
         formData.append('moId', currentMoId);
         formData.append('action', 'password');
         formData.append('currentPassword', currentPassword);
-        formData.append('newPassword', newPassword);
-
-        console.log('[MO-PROFILE] 准备发送密码修改请求到:', PROFILE_API);
-        console.log('[MO-PROFILE] FormData 内容:');
-        for (let pair of formData.entries()) {
-            console.log(`  ${pair[0]}: ${pair[1]}`);
-        }
+        formData.append('newPassword', newTrimmed);
 
         try {
             const response = await fetch(PROFILE_API, {
@@ -299,9 +291,7 @@
                 body: formData
             });
 
-            console.log('[MO-PROFILE] 响应状态码:', response.status);
             const result = await response.json();
-            console.log('[MO-PROFILE] 响应数据:', result);
 
             if (result.success) {
                 if (statusEl) statusEl.textContent = '✓ 密码已更新';

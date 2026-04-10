@@ -1,18 +1,10 @@
 {
   "schema": "mo-ta-job-board",
   "version": "2.0",
-  "generatedAt": "2026-04-04T12:42:09.854Z",
-  "count": 42,
+  "generatedAt": "2026-04-06T00:40:45.117524400Z",
+  "count": 17,
   "items": [
     {
-      "jobId": "MOJOB-8A577FB7",
-      "courseCode": "EBU9900",
-      "courseName": "SampleTest",
-      "ownerMoId": "MO-0402-T2",
-      "ownerMoName": "MO-0402-T2",
-      "semester": "2026-Spring",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
       "publishStatus": "PENDING_REVIEW",
       "visibility": "INTERNAL",
       "isArchived": false,
@@ -20,129 +12,32 @@
       "auditComment": "",
       "priority": "NORMAL",
       "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 250,
+      "lastSyncedAt": "2026-04-06T00:40:44.816352400Z",
       "recruitedCount": 0,
       "applicationsTotal": 0,
       "applicationsPending": 0,
       "applicationsAccepted": 0,
       "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 9,
+      "createdAt": "2026-04-05T16:15:48.212Z",
+      "updatedAt": "2026-04-06T00:40:44.818360300Z",
+      "source": "tools-genMoCourses",
+      "jobId": "MOJOB-3BBD4A30",
+      "courseCode": "EBT0001",
+      "courseName": "Computer Security Overview 950",
+      "ownerMoId": "MO-195RR4",
+      "ownerMoName": "TestName",
+      "semester": "2025-Fall",
+      "status": "CLOSED",
+      "recruitmentStatus": "CLOSED",
+      "studentCount": 67,
+      "taRecruitCount": 4,
       "campus": "Main",
-      "applicationDeadline": "2026-04-30T22:15:00.000Z",
-      "teachingWeeks": {
-        "weeks": [
-          3,
-          5,
-          7,
-          9
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "ClassTestl8",
-          "weeks": [],
-          "description": ""
-        },
-        {
-          "name": "CodingDay12,130n-site coding assistance",
-          "weeks": [],
-          "description": ""
-        }
-      ],
+      "applicationDeadline": "2026-06-20T18:15:00.000Z",
       "requiredSkills": {
         "fixedTags": [
+          "Databases",
           "Python",
-          "TypeScript",
-          "Operating Systems",
-          "Software Engineering"
-        ],
-        "customSkills": [
-          {
-            "name": "Sleep",
-            "description": "I need sleep now."
-          }
-        ]
-      },
-      "courseDescription": "This is a sample discription.",
-      "recruitmentBrief": "This is a sample.\nA sample.",
-      "createdAt": "2026-04-01T22:17:39.505268800Z",
-      "updatedAt": "2026-04-01T22:17:39.505268800Z",
-      "source": "mo-manual-v2"
-    },
-    {
-      "jobId": "MOJOB-5DC8868D",
-      "courseCode": "EBU9901",
-      "courseName": "Test2",
-      "ownerMoId": "MO-0402-T2",
-      "ownerMoName": "MO-0402-T2",
-      "semester": "2026-Spring",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": -1,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 18,
-      "campus": "Shahe",
-      "requiredSkills": {
-        "fixedTags": [
-          "Machine Learning",
-          "Software Engineering"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "This is a sample of a minimum-data course.",
-      "createdAt": "2026-04-01T22:19:28.081093400Z",
-      "updatedAt": "2026-04-01T22:19:28.081093400Z",
-      "source": "mo-manual-v2"
-    },
-    {
-      "jobId": "MOJOB-60D7DE68",
-      "courseCode": "AUTO-6438D7",
-      "courseName": "Compiler Construction Workshop 624",
-      "ownerMoId": "MO-GEN-440E",
-      "ownerMoName": "MO-GEN-440E",
-      "semester": "2026-Spring",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 48,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 2,
-      "campus": "Shahe",
-      "applicationDeadline": "2026-06-07T19:15:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Computer Networks",
-          "Software Engineering"
+          "Java"
         ],
         "customSkills": [
           {
@@ -151,234 +46,28 @@
           }
         ]
       },
-      "courseDescription": "Compiler Construction Workshop 624: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Spring.",
-      "createdAt": "2026-04-04T12:24:12.457Z",
-      "updatedAt": "2026-04-04T12:24:12.457Z",
-      "source": "tools-genMoCourses",
+      "courseDescription": "Computer Security Overview 950: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2025-Fall.",
+      "jobSlug": "ebt0001",
       "teachingWeeks": {
         "weeks": [
-          2,
-          11,
-          14,
-          15,
-          16,
-          18,
-          20
-        ]
-      },
-      "recruitmentBrief": "Applications are open for TA positions in Compiler Construction Workshop 624.\nFlexible hours; details to be discussed.",
-      "workload": "Lab sections plus office hours, approx. 8 hours per week"
-    },
-    {
-      "jobId": "MOJOB-8A5FD2BB",
-      "courseCode": "AUTO-90A6F1",
-      "courseName": "Advanced Programming Studio 126",
-      "ownerMoId": "MO-GEN-71F7",
-      "ownerMoName": "MO-GEN-71F7",
-      "semester": "2025-Fall",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": -1,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 6,
-      "campus": "Main",
-      "applicationDeadline": "2026-05-31T19:30:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "TypeScript",
-          "C++"
-        ],
-        "customSkills": [
-          {
-            "name": "Communication",
-            "description": ""
-          }
-        ]
-      },
-      "courseDescription": "Advanced Programming Studio 126: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2025-Fall.",
-      "createdAt": "2026-04-04T12:24:12.457Z",
-      "updatedAt": "2026-04-04T12:24:12.457Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          1,
-          2,
-          6,
-          8,
-          17,
-          20
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Lab",
-          "weeks": [
-            3,
-            10,
-            16
-          ],
-          "description": "In-class"
-        },
-        {
-          "name": "Assessment 2 - Final",
-          "weeks": [
-            3,
-            8
-          ],
-          "description": "In-class"
-        }
-      ],
-      "recruitmentBrief": "Applications are open for TA positions in Advanced Programming Studio 126.\nFlexible hours; details to be discussed.",
-      "workload": "Approx. 10 hours per week including grading"
-    },
-    {
-      "jobId": "MOJOB-932D26CE",
-      "courseCode": "AUTO-D78AEF",
-      "courseName": "Natural Language Processing 701",
-      "ownerMoId": "MO-GEN-E9BE",
-      "ownerMoName": "MO-GEN-E9BE",
-      "semester": "2025-Fall",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": -1,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 13,
-      "campus": "Shahe",
-      "applicationDeadline": "2026-04-26T22:15:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Python"
-        ],
-        "customSkills": [
-          {
-            "name": "Communication",
-            "description": ""
-          }
-        ]
-      },
-      "courseDescription": "Natural Language Processing 701: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2025-Fall.",
-      "createdAt": "2026-04-04T12:24:12.457Z",
-      "updatedAt": "2026-04-04T12:24:12.457Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          1,
           2,
           3,
-          9,
-          12,
           14,
-          15,
           16
         ]
       },
       "assessmentEvents": [
         {
           "name": "Assessment 1 - Midterm",
-          "weeks": [],
-          "description": "In-class"
-        },
-        {
-          "name": "Assessment 2 - Final",
           "weeks": [
-            6,
-            9,
-            11
+            7
           ],
           "description": "Online submission"
         }
-      ]
-    },
-    {
-      "jobId": "MOJOB-EE7E29F3",
-      "courseCode": "AUTO-6A7E3D",
-      "courseName": "Cloud Computing Architecture 837",
-      "ownerMoId": "MO-GEN-8E1C",
-      "ownerMoName": "MO-GEN-8E1C",
-      "semester": "2025-Fall",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": -1,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 8,
-      "campus": "Shahe",
-      "applicationDeadline": "2026-07-14T19:30:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Machine Learning"
-        ],
-        "customSkills": [
-          {
-            "name": "Prior TA experience",
-            "description": "Prior coursework in the subject is preferred"
-          }
-        ]
-      },
-      "courseDescription": "Cloud Computing Architecture 837: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2025-Fall.",
-      "createdAt": "2026-04-04T12:24:12.457Z",
-      "updatedAt": "2026-04-04T12:24:12.457Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          9,
-          10,
-          17
-        ]
-      },
-      "recruitmentBrief": "Applications are open for TA positions in Cloud Computing Architecture 837.\nFlexible hours; details to be discussed.",
+      ],
       "workload": "Approx. 10 hours per week including grading"
     },
     {
-      "jobId": "MOJOB-ACBDB87C",
-      "courseCode": "AUTO-7A37D1",
-      "courseName": "Introduction to Machine Learning 633",
-      "ownerMoId": "MO-GEN-EA93",
-      "ownerMoName": "MO-GEN-EA93",
-      "semester": "2026-Spring",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
       "publishStatus": "PENDING_REVIEW",
       "visibility": "INTERNAL",
       "isArchived": false,
@@ -386,204 +75,39 @@
       "auditComment": "",
       "priority": "NORMAL",
       "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 100,
+      "lastSyncedAt": "2026-04-06T00:40:44.830771500Z",
       "recruitedCount": 0,
       "applicationsTotal": 0,
       "applicationsPending": 0,
       "applicationsAccepted": 0,
       "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 12,
-      "campus": "Shahe",
-      "applicationDeadline": "2026-04-25T18:15:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Java",
-          "Machine Learning"
-        ],
-        "customSkills": [
-          {
-            "name": "Prior TA experience",
-            "description": "Prior coursework in the subject is preferred"
-          }
-        ]
-      },
-      "courseDescription": "Introduction to Machine Learning 633: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Spring.",
-      "createdAt": "2026-04-04T12:24:12.457Z",
-      "updatedAt": "2026-04-04T12:24:12.457Z",
+      "createdAt": "2026-04-05T16:15:48.212Z",
+      "updatedAt": "2026-04-06T00:40:44.857311Z",
       "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          5,
-          9,
-          12,
-          16,
-          20
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Final",
-          "weeks": [
-            3,
-            13,
-            17
-          ],
-          "description": "In-class"
-        },
-        {
-          "name": "Assessment 2 - Final",
-          "weeks": [
-            3,
-            17,
-            20
-          ],
-          "description": "In-class"
-        },
-        {
-          "name": "Assessment 3 - Lab",
-          "weeks": [
-            10,
-            11
-          ],
-          "description": "Online submission"
-        }
-      ],
-      "recruitmentBrief": "Applications are open for TA positions in Introduction to Machine Learning 633.\nFlexible hours; details to be discussed.",
-      "workload": "Lab sections plus office hours, approx. 8 hours per week"
-    },
-    {
-      "jobId": "MOJOB-DD8BE2D2",
-      "courseCode": "AUTO-CCD805",
-      "courseName": "Advanced Programming Studio 614",
-      "ownerMoId": "MO-GEN-7078",
-      "ownerMoName": "MO-GEN-7078",
-      "semester": "2026-Spring",
+      "jobId": "MOJOB-FDA34AA9",
+      "courseCode": "EBT0002",
+      "courseName": "Cloud Computing Architecture 330",
+      "ownerMoId": "MO-137J3E",
+      "ownerMoName": "TestName2",
+      "semester": "2026-Fall",
       "status": "OPEN",
       "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 49,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 4,
-      "campus": "Shahe",
-      "applicationDeadline": "2026-05-27T20:15:00.000Z",
+      "studentCount": -1,
+      "taRecruitCount": 3,
+      "campus": "Main",
+      "applicationDeadline": "2026-06-26T21:00:00.000Z",
       "requiredSkills": {
         "fixedTags": [
-          "C++",
-          "Databases",
-          "Operating Systems",
-          "TypeScript"
+          "Computer Networks"
         ],
         "customSkills": []
       },
-      "courseDescription": "Advanced Programming Studio 614: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Spring.",
-      "createdAt": "2026-04-04T12:24:12.457Z",
-      "updatedAt": "2026-04-04T12:24:12.457Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          5,
-          9,
-          10
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Project",
-          "weeks": [
-            6,
-            9,
-            20
-          ],
-          "description": ""
-        },
-        {
-          "name": "Assessment 2 - Final",
-          "weeks": [],
-          "description": ""
-        },
-        {
-          "name": "Assessment 3 - Final",
-          "weeks": [
-            9
-          ],
-          "description": ""
-        }
-      ],
-      "workload": "Lab sections plus office hours, approx. 8 hours per week"
-    },
-    {
-      "jobId": "MOJOB-E991EA4C",
-      "courseCode": "AUTO-90156C",
-      "courseName": "Computer Vision Applications 432",
-      "ownerMoId": "MO-GEN-DDEB",
-      "ownerMoName": "MO-GEN-DDEB",
-      "semester": "2025-Fall",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 91,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 6,
-      "campus": "Shahe",
-      "applicationDeadline": "2026-07-24T18:15:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Data Structures",
-          "Software Engineering"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Computer Vision Applications 432: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2025-Fall.",
-      "createdAt": "2026-04-04T12:24:12.457Z",
-      "updatedAt": "2026-04-04T12:24:12.457Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          10,
-          15
-        ]
-      },
-      "recruitmentBrief": "Applications are open for TA positions in Computer Vision Applications 432.\nFlexible hours; details to be discussed.",
+      "courseDescription": "Cloud Computing Architecture 330: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
+      "jobSlug": "ebt0002",
+      "recruitmentBrief": "Applications are open for TA positions in Cloud Computing Architecture 330.\nFlexible hours; details to be discussed.",
       "workload": "Approx. 6 hours per week"
     },
     {
-      "jobId": "MOJOB-71B0AB1B",
-      "courseCode": "AUTO-17A318",
-      "courseName": "Distributed Systems Seminar 438",
-      "ownerMoId": "MO-GEN-44B7",
-      "ownerMoName": "MO-GEN-44B7",
-      "semester": "2026-Fall",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
       "publishStatus": "PENDING_REVIEW",
       "visibility": "INTERNAL",
       "isArchived": false,
@@ -591,259 +115,118 @@
       "auditComment": "",
       "priority": "NORMAL",
       "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 271,
+      "lastSyncedAt": "2026-04-06T00:40:44.862311500Z",
       "recruitedCount": 0,
       "applicationsTotal": 0,
       "applicationsPending": 0,
       "applicationsAccepted": 0,
       "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 9,
-      "campus": "Main",
-      "applicationDeadline": "2026-05-04T21:00:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Operating Systems",
-          "TypeScript",
-          "Machine Learning",
-          "Databases"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Distributed Systems Seminar 438: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
-      "createdAt": "2026-04-04T12:24:12.457Z",
-      "updatedAt": "2026-04-04T12:24:12.457Z",
+      "createdAt": "2026-04-05T16:15:48.212Z",
+      "updatedAt": "2026-04-06T00:40:44.877310600Z",
       "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          2,
-          4,
-          8,
-          10,
-          11,
-          13,
-          17,
-          19
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Final",
-          "weeks": [
-            11,
-            20
-          ],
-          "description": "Online submission"
-        },
-        {
-          "name": "Assessment 2 - Final",
-          "weeks": [
-            1,
-            4
-          ],
-          "description": ""
-        },
-        {
-          "name": "Assessment 3 - Lab",
-          "weeks": [],
-          "description": ""
-        }
-      ],
-      "recruitmentBrief": "Applications are open for TA positions in Distributed Systems Seminar 438.\nFlexible hours; details to be discussed.",
-      "workload": "Lab sections plus office hours, approx. 8 hours per week"
-    },
-    {
-      "jobId": "MOJOB-6F6D95F8",
-      "courseCode": "AUTO-FDC4D8",
-      "courseName": "Computer Vision Applications 579",
-      "ownerMoId": "MO-GEN-A457",
-      "ownerMoName": "MO-GEN-A457",
+      "jobId": "MOJOB-387A60CC",
+      "courseCode": "EBT0003",
+      "courseName": "Software Engineering Capstone 979",
+      "ownerMoId": "MO-6601L9",
+      "ownerMoName": "testName3",
       "semester": "2026-Fall",
       "status": "OPEN",
       "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 57,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
+      "studentCount": 238,
       "taRecruitCount": 9,
       "campus": "Shahe",
-      "applicationDeadline": "2026-05-16T18:00:00.000Z",
+      "applicationDeadline": "2026-06-15T22:15:00.000Z",
       "requiredSkills": {
         "fixedTags": [
-          "Data Structures",
+          "C++",
           "Software Engineering",
-          "Python",
-          "C++"
+          "Operating Systems"
         ],
         "customSkills": []
       },
-      "courseDescription": "Computer Vision Applications 579: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
-      "createdAt": "2026-04-04T12:24:12.457Z",
-      "updatedAt": "2026-04-04T12:24:12.457Z",
-      "source": "tools-genMoCourses",
+      "courseDescription": "Software Engineering Capstone 979: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
+      "jobSlug": "ebt0003",
       "teachingWeeks": {
         "weeks": [
           2,
-          3,
-          9,
-          14,
-          15,
+          13,
           19,
           20
         ]
       },
       "assessmentEvents": [
         {
-          "name": "Assessment 1 - Final",
+          "name": "Assessment 1 - Lab",
           "weeks": [
-            7,
-            20
+            10
           ],
-          "description": ""
+          "description": "Online submission"
         }
       ],
-      "recruitmentBrief": "Applications are open for TA positions in Computer Vision Applications 579.\nFlexible hours; details to be discussed.",
-      "workload": "Approx. 6 hours per week"
+      "recruitmentBrief": "Applications are open for TA positions in Software Engineering Capstone 979.\nFlexible hours; details to be discussed.",
+      "workload": "Lab sections plus office hours, approx. 8 hours per week"
     },
     {
-      "jobId": "MOJOB-8E3E083F",
-      "courseCode": "AUTO-73A29D",
-      "courseName": "Distributed Systems Seminar 437",
-      "ownerMoId": "MO-GEN-A22A",
-      "ownerMoName": "MO-GEN-A22A",
+      "publishStatus": "PENDING_REVIEW",
+      "visibility": "INTERNAL",
+      "isArchived": false,
+      "auditStatus": "PENDING",
+      "auditComment": "",
+      "priority": "NORMAL",
+      "dataVersion": 1,
+      "lastSyncedAt": "2026-04-06T00:40:44.880310700Z",
+      "recruitedCount": 0,
+      "applicationsTotal": 0,
+      "applicationsPending": 0,
+      "applicationsAccepted": 0,
+      "applicationsRejected": 0,
+      "createdAt": "2026-04-05T16:15:48.212Z",
+      "updatedAt": "2026-04-06T00:40:44.895311700Z",
+      "source": "tools-genMoCourses",
+      "jobId": "MOJOB-7BEE5ED4",
+      "courseCode": "EBT0004",
+      "courseName": "Introduction to Machine Learning 778",
+      "ownerMoId": "MO-195RR4",
+      "ownerMoName": "TestName",
       "semester": "2025-Fall",
       "status": "OPEN",
       "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": -1,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 15,
-      "campus": "Main",
-      "applicationDeadline": "2026-05-02T22:00:00.000Z",
+      "studentCount": 148,
+      "taRecruitCount": 11,
+      "campus": "Shahe",
+      "applicationDeadline": "2026-06-23T18:30:00.000Z",
       "requiredSkills": {
         "fixedTags": [
           "Data Structures",
-          "Computer Networks",
-          "Python"
+          "Machine Learning",
+          "C++"
         ],
         "customSkills": []
       },
-      "courseDescription": "Distributed Systems Seminar 437: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2025-Fall.",
-      "createdAt": "2026-04-04T12:24:12.457Z",
-      "updatedAt": "2026-04-04T12:24:12.457Z",
-      "source": "tools-genMoCourses",
+      "courseDescription": "Introduction to Machine Learning 778: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2025-Fall.",
+      "jobSlug": "ebt0004",
       "teachingWeeks": {
         "weeks": [
-          1,
-          4,
-          5,
-          10,
+          7,
+          9,
           12,
-          16,
-          20
-        ]
-      }
-    },
-    {
-      "jobId": "MOJOB-2381A698",
-      "courseCode": "AUTO-CA0423",
-      "courseName": "Computer Security Overview 939",
-      "ownerMoId": "MO-GEN-B83E",
-      "ownerMoName": "MO-GEN-B83E",
-      "semester": "2026-Fall",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 45,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 8,
-      "campus": "Main",
-      "applicationDeadline": "2026-05-01T21:30:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Software Engineering",
-          "Operating Systems",
-          "Java",
-          "Machine Learning"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Computer Security Overview 939: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
-      "createdAt": "2026-04-04T12:24:12.457Z",
-      "updatedAt": "2026-04-04T12:24:12.457Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          2,
-          5,
-          11,
-          12,
-          17,
-          18,
-          20
+          13,
+          14,
+          19
         ]
       },
       "assessmentEvents": [
         {
           "name": "Assessment 1 - Lab",
           "weeks": [
-            7
+            1,
+            18
           ],
-          "description": ""
+          "description": "Online submission"
         }
-      ],
-      "recruitmentBrief": "Applications are open for TA positions in Computer Security Overview 939.\nFlexible hours; details to be discussed.",
-      "workload": "Approx. 6 hours per week"
+      ]
     },
     {
-      "jobId": "MOJOB-C8AB560D",
-      "courseCode": "AUTO-C85621",
-      "courseName": "Cloud Computing Architecture 376",
-      "ownerMoId": "MO-GEN-A664",
-      "ownerMoName": "MO-GEN-A664",
-      "semester": "2026-Spring",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
       "publishStatus": "PENDING_REVIEW",
       "visibility": "INTERNAL",
       "isArchived": false,
@@ -851,493 +234,93 @@
       "auditComment": "",
       "priority": "NORMAL",
       "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 95,
+      "lastSyncedAt": "2026-04-06T00:40:44.898311500Z",
       "recruitedCount": 0,
       "applicationsTotal": 0,
       "applicationsPending": 0,
       "applicationsAccepted": 0,
       "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
+      "createdAt": "2026-04-05T16:15:48.212Z",
+      "updatedAt": "2026-04-06T00:40:44.914311600Z",
+      "source": "tools-genMoCourses",
+      "jobId": "MOJOB-867C727C",
+      "courseCode": "EBT0005",
+      "courseName": "Compiler Construction Workshop 879",
+      "ownerMoId": "MO-137J3E",
+      "ownerMoName": "TestName2",
+      "semester": "2025-Fall",
+      "status": "OPEN",
+      "recruitmentStatus": "OPEN",
+      "studentCount": 136,
+      "taRecruitCount": 11,
+      "campus": "Shahe",
+      "applicationDeadline": "2026-04-25T18:15:00.000Z",
+      "requiredSkills": {
+        "fixedTags": [
+          "TypeScript"
+        ],
+        "customSkills": []
+      },
+      "courseDescription": "Compiler Construction Workshop 879: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2025-Fall.",
+      "jobSlug": "ebt0005",
+      "teachingWeeks": {
+        "weeks": [
+          1,
+          4,
+          6,
+          12,
+          13,
+          15,
+          17,
+          20
+        ]
+      },
+      "recruitmentBrief": "Applications are open for TA positions in Compiler Construction Workshop 879.\nFlexible hours; details to be discussed.",
+      "workload": "Approx. 10 hours per week including grading"
+    },
+    {
+      "publishStatus": "PENDING_REVIEW",
+      "visibility": "INTERNAL",
+      "isArchived": false,
+      "auditStatus": "PENDING",
+      "auditComment": "",
+      "priority": "NORMAL",
+      "dataVersion": 1,
+      "lastSyncedAt": "2026-04-06T00:40:44.918318400Z",
+      "recruitedCount": 0,
+      "applicationsTotal": 0,
+      "applicationsPending": 0,
+      "applicationsAccepted": 0,
+      "applicationsRejected": 0,
+      "createdAt": "2026-04-05T16:15:48.212Z",
+      "updatedAt": "2026-04-06T00:40:44.935834600Z",
+      "source": "tools-genMoCourses",
+      "jobId": "MOJOB-8C9B5320",
+      "courseCode": "EBT0006",
+      "courseName": "Advanced Programming Studio 314",
+      "ownerMoId": "MO-6601L9",
+      "ownerMoName": "testName3",
+      "semester": "2026-Spring",
+      "status": "OPEN",
+      "recruitmentStatus": "OPEN",
+      "studentCount": 200,
       "taRecruitCount": 6,
-      "campus": "Main",
-      "applicationDeadline": "2026-05-03T18:30:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Operating Systems",
-          "TypeScript",
-          "C++"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Cloud Computing Architecture 376: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Spring.",
-      "createdAt": "2026-04-04T12:24:12.457Z",
-      "updatedAt": "2026-04-04T12:24:12.457Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          7,
-          14,
-          16,
-          18,
-          20
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Lab",
-          "weeks": [
-            1
-          ],
-          "description": "In-class"
-        },
-        {
-          "name": "Assessment 2 - Lab",
-          "weeks": [
-            6,
-            17
-          ],
-          "description": ""
-        }
-      ],
-      "recruitmentBrief": "Applications are open for TA positions in Cloud Computing Architecture 376.\nFlexible hours; details to be discussed."
-    },
-    {
-      "jobId": "MOJOB-9771CA75",
-      "courseCode": "AUTO-4265B9",
-      "courseName": "Distributed Systems Seminar 733",
-      "ownerMoId": "MO-GEN-1551",
-      "ownerMoName": "MO-GEN-1551",
-      "semester": "2026-Spring",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 51,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 8,
-      "campus": "Main",
-      "applicationDeadline": "2026-05-13T22:00:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Python"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Distributed Systems Seminar 733: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Spring.",
-      "createdAt": "2026-04-04T12:24:12.457Z",
-      "updatedAt": "2026-04-04T12:24:12.457Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          2,
-          4,
-          10,
-          12,
-          14,
-          19
-        ]
-      },
-      "workload": "Approx. 6 hours per week"
-    },
-    {
-      "jobId": "MOJOB-4AF4E182",
-      "courseCode": "AUTO-6865C3",
-      "courseName": "Computer Vision Applications 291",
-      "ownerMoId": "MO-GEN-3160",
-      "ownerMoName": "MO-GEN-3160",
-      "semester": "2026-Fall",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 137,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 4,
-      "campus": "Main",
-      "applicationDeadline": "2026-04-19T22:00:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Data Structures"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Computer Vision Applications 291: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
-      "createdAt": "2026-04-04T12:24:12.457Z",
-      "updatedAt": "2026-04-04T12:24:12.457Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          2,
-          3,
-          5,
-          6,
-          12,
-          16,
-          20
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Lab",
-          "weeks": [
-            6
-          ],
-          "description": ""
-        },
-        {
-          "name": "Assessment 2 - Final",
-          "weeks": [],
-          "description": ""
-        }
-      ],
-      "workload": "Approx. 10 hours per week including grading"
-    },
-    {
-      "jobId": "MOJOB-A8FB9965",
-      "courseCode": "AUTO-9935AE",
-      "courseName": "Advanced Programming Studio 295",
-      "ownerMoId": "MO-GEN-BF76",
-      "ownerMoName": "MO-GEN-BF76",
-      "semester": "2025-Fall",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 208,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 2,
-      "campus": "Main",
-      "applicationDeadline": "2026-04-28T20:00:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Computer Networks",
-          "Data Structures",
-          "Machine Learning"
-        ],
-        "customSkills": [
-          {
-            "name": "Prior TA experience",
-            "description": ""
-          }
-        ]
-      },
-      "courseDescription": "Advanced Programming Studio 295: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2025-Fall.",
-      "createdAt": "2026-04-04T12:24:12.457Z",
-      "updatedAt": "2026-04-04T12:24:12.457Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          3,
-          5,
-          6,
-          14,
-          15,
-          16,
-          20
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Final",
-          "weeks": [
-            2
-          ],
-          "description": "In-class"
-        },
-        {
-          "name": "Assessment 2 - Midterm",
-          "weeks": [
-            9,
-            12
-          ],
-          "description": "Online submission"
-        }
-      ],
-      "workload": "Approx. 6 hours per week"
-    },
-    {
-      "jobId": "MOJOB-1EC7AF0B",
-      "courseCode": "AUTO-3472C8",
-      "courseName": "Natural Language Processing 459",
-      "ownerMoId": "MO-GEN-4684",
-      "ownerMoName": "MO-GEN-4684",
-      "semester": "2026-Fall",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 243,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 2,
       "campus": "Shahe",
-      "applicationDeadline": "2026-07-25T22:00:00.000Z",
+      "applicationDeadline": "2026-06-01T21:30:00.000Z",
       "requiredSkills": {
         "fixedTags": [
-          "Computer Networks",
-          "Operating Systems",
-          "Java"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Natural Language Processing 459: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
-      "createdAt": "2026-04-04T12:24:12.457Z",
-      "updatedAt": "2026-04-04T12:24:12.457Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          1,
-          5,
-          7,
-          8,
-          10,
-          13,
-          17
-        ]
-      },
-      "workload": "Approx. 10 hours per week including grading"
-    },
-    {
-      "jobId": "MOJOB-FC9EF674",
-      "courseCode": "AUTO-01104F",
-      "courseName": "Data Science Fundamentals 103",
-      "ownerMoId": "MO-GEN-2654",
-      "ownerMoName": "MO-GEN-2654",
-      "semester": "2026-Spring",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 108,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 2,
-      "campus": "Main",
-      "applicationDeadline": "2026-08-01T21:30:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "TypeScript",
-          "Machine Learning"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Data Science Fundamentals 103: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Spring.",
-      "createdAt": "2026-04-04T12:24:12.457Z",
-      "updatedAt": "2026-04-04T12:24:12.457Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          2,
-          18
-        ]
-      },
-      "recruitmentBrief": "Applications are open for TA positions in Data Science Fundamentals 103.\nFlexible hours; details to be discussed."
-    },
-    {
-      "jobId": "MOJOB-D6EA8BEF",
-      "courseCode": "AUTO-3947C9",
-      "courseName": "Computer Security Overview 267",
-      "ownerMoId": "MO-GEN-002C",
-      "ownerMoName": "MO-GEN-002C",
-      "semester": "2026-Spring",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": -1,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 3,
-      "campus": "Shahe",
-      "applicationDeadline": "2026-07-08T21:30:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Databases",
-          "Java"
-        ],
-        "customSkills": [
-          {
-            "name": "Prior TA experience",
-            "description": ""
-          }
-        ]
-      },
-      "courseDescription": "Computer Security Overview 267: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Spring.",
-      "createdAt": "2026-04-04T12:24:12.457Z",
-      "updatedAt": "2026-04-04T12:24:12.457Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          2,
-          6,
-          17
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Final",
-          "weeks": [
-            1
-          ],
-          "description": ""
-        }
-      ],
-      "recruitmentBrief": "Applications are open for TA positions in Computer Security Overview 267.\nFlexible hours; details to be discussed."
-    },
-    {
-      "jobId": "MOJOB-117BF516",
-      "courseCode": "AUTO-1A3143",
-      "courseName": "Data Science Fundamentals 844",
-      "ownerMoId": "MO-GEN-C4C6",
-      "ownerMoName": "MO-GEN-C4C6",
-      "semester": "2026-Fall",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 107,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 5,
-      "campus": "Main",
-      "applicationDeadline": "2026-06-22T18:00:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Machine Learning",
-          "C++",
-          "Data Structures",
+          "Java",
+          "Software Engineering",
+          "Python",
           "TypeScript"
         ],
         "customSkills": []
       },
-      "courseDescription": "Data Science Fundamentals 844: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
-      "createdAt": "2026-04-04T12:24:12.457Z",
-      "updatedAt": "2026-04-04T12:24:12.457Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          6,
-          19
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Project",
-          "weeks": [
-            8
-          ],
-          "description": "In-class"
-        },
-        {
-          "name": "Assessment 2 - Lab",
-          "weeks": [
-            12,
-            19
-          ],
-          "description": "In-class"
-        },
-        {
-          "name": "Assessment 3 - Project",
-          "weeks": [
-            2,
-            12
-          ],
-          "description": "In-class"
-        }
-      ],
-      "workload": "Lab sections plus office hours, approx. 8 hours per week"
+      "courseDescription": "Advanced Programming Studio 314: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Spring.",
+      "jobSlug": "ebt0006",
+      "workload": "Approx. 6 hours per week"
     },
     {
-      "jobId": "MOJOB-CE3F98BC",
-      "courseCode": "AUTO-EB3C30",
-      "courseName": "Introduction to Machine Learning 224",
-      "ownerMoId": "MO-GEN-0AB0",
-      "ownerMoName": "MO-GEN-0AB0",
-      "semester": "2025-Fall",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
       "publishStatus": "PENDING_REVIEW",
       "visibility": "INTERNAL",
       "isArchived": false,
@@ -1345,103 +328,51 @@
       "auditComment": "",
       "priority": "NORMAL",
       "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 120,
+      "lastSyncedAt": "2026-04-06T00:40:44.938836900Z",
       "recruitedCount": 0,
       "applicationsTotal": 0,
       "applicationsPending": 0,
       "applicationsAccepted": 0,
       "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 3,
+      "createdAt": "2026-04-05T16:15:48.212Z",
+      "updatedAt": "2026-04-06T00:40:44.955181800Z",
+      "source": "tools-genMoCourses",
+      "jobId": "MOJOB-EEB0FF6D",
+      "courseCode": "EBT0007",
+      "courseName": "Introduction to Machine Learning 511",
+      "ownerMoId": "MO-195RR4",
+      "ownerMoName": "TestName",
+      "semester": "2025-Fall",
+      "status": "CLOSED",
+      "recruitmentStatus": "CLOSED",
+      "studentCount": -1,
+      "taRecruitCount": 4,
       "campus": "Shahe",
-      "applicationDeadline": "2026-07-18T19:30:00.000Z",
+      "applicationDeadline": "2026-07-04T20:30:00.000Z",
       "requiredSkills": {
         "fixedTags": [
-          "Data Structures",
+          "Machine Learning",
           "Python",
-          "Databases"
+          "Data Structures"
         ],
-        "customSkills": [
-          {
-            "name": "Prior TA experience",
-            "description": "Prior coursework in the subject is preferred"
-          }
-        ]
+        "customSkills": []
       },
-      "courseDescription": "Introduction to Machine Learning 224: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2025-Fall.",
-      "createdAt": "2026-04-04T12:24:12.457Z",
-      "updatedAt": "2026-04-04T12:24:12.457Z",
-      "source": "tools-genMoCourses",
+      "courseDescription": "Introduction to Machine Learning 511: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2025-Fall.",
+      "jobSlug": "ebt0007",
       "teachingWeeks": {
         "weeks": [
-          7,
-          11
+          1,
+          3,
+          9,
+          13,
+          14,
+          15,
+          17
         ]
       },
       "assessmentEvents": [
         {
           "name": "Assessment 1 - Final",
-          "weeks": [],
-          "description": "Online submission"
-        }
-      ]
-    },
-    {
-      "jobId": "MOJOB-C6242524",
-      "courseCode": "AUTO-27A3DE",
-      "courseName": "Compiler Construction Workshop 465",
-      "ownerMoId": "MO-GEN-59E9",
-      "ownerMoName": "MO-GEN-59E9",
-      "semester": "2025-Fall",
-      "status": "CLOSED",
-      "recruitmentStatus": "CLOSED",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 162,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 12,
-      "campus": "Main",
-      "applicationDeadline": "2026-04-29T20:00:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Java",
-          "C++"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Compiler Construction Workshop 465: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2025-Fall.",
-      "createdAt": "2026-04-04T12:42:09.852Z",
-      "updatedAt": "2026-04-04T12:42:09.852Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          2,
-          3,
-          5,
-          6,
-          9,
-          12,
-          17,
-          19
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Project",
           "weeks": [],
           "description": ""
         }
@@ -1449,14 +380,6 @@
       "workload": "Approx. 6 hours per week"
     },
     {
-      "jobId": "MOJOB-791D0B7C",
-      "courseCode": "AUTO-8B20D4",
-      "courseName": "Computer Vision Applications 304",
-      "ownerMoId": "MO-GEN-6727",
-      "ownerMoName": "MO-GEN-6727",
-      "semester": "2026-Fall",
-      "status": "CLOSED",
-      "recruitmentStatus": "CLOSED",
       "publishStatus": "PENDING_REVIEW",
       "visibility": "INTERNAL",
       "isArchived": false,
@@ -1464,527 +387,30 @@
       "auditComment": "",
       "priority": "NORMAL",
       "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 52,
+      "lastSyncedAt": "2026-04-06T00:40:44.957179900Z",
       "recruitedCount": 0,
       "applicationsTotal": 0,
       "applicationsPending": 0,
       "applicationsAccepted": 0,
       "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 12,
-      "campus": "Main",
-      "applicationDeadline": "2026-05-26T20:00:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Operating Systems"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Computer Vision Applications 304: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
-      "createdAt": "2026-04-04T12:42:09.852Z",
-      "updatedAt": "2026-04-04T12:42:09.852Z",
+      "createdAt": "2026-04-05T16:15:48.212Z",
+      "updatedAt": "2026-04-06T00:40:44.973284500Z",
       "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          16,
-          17
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Final",
-          "weeks": [
-            1
-          ],
-          "description": "In-class"
-        }
-      ]
-    },
-    {
-      "jobId": "MOJOB-E9511AA7",
-      "courseCode": "AUTO-8555E6",
-      "courseName": "Data Science Fundamentals 389",
-      "ownerMoId": "MO-GEN-0177",
-      "ownerMoName": "MO-GEN-0177",
-      "semester": "2025-Fall",
-      "status": "CLOSED",
-      "recruitmentStatus": "CLOSED",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 147,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 3,
-      "campus": "Shahe",
-      "applicationDeadline": "2026-07-06T20:15:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Data Structures",
-          "Machine Learning",
-          "Computer Networks"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Data Science Fundamentals 389: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2025-Fall.",
-      "createdAt": "2026-04-04T12:42:09.852Z",
-      "updatedAt": "2026-04-04T12:42:09.852Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          2,
-          8,
-          9,
-          16,
-          17,
-          20
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Lab",
-          "weeks": [
-            12,
-            20
-          ],
-          "description": ""
-        },
-        {
-          "name": "Assessment 2 - Midterm",
-          "weeks": [
-            7,
-            14
-          ],
-          "description": "In-class"
-        },
-        {
-          "name": "Assessment 3 - Final",
-          "weeks": [
-            4,
-            5,
-            9
-          ],
-          "description": "Online submission"
-        }
-      ],
-      "recruitmentBrief": "Applications are open for TA positions in Data Science Fundamentals 389.\nFlexible hours; details to be discussed."
-    },
-    {
-      "jobId": "MOJOB-E8583B55",
-      "courseCode": "AUTO-A9EE11",
-      "courseName": "Advanced Programming Studio 359",
-      "ownerMoId": "MO-GEN-8046",
-      "ownerMoName": "MO-GEN-8046",
+      "jobId": "MOJOB-7F4FC941",
+      "courseCode": "EBT0008",
+      "courseName": "Introduction to Machine Learning 290",
+      "ownerMoId": "MO-137J3E",
+      "ownerMoName": "TestName2",
       "semester": "2026-Spring",
       "status": "CLOSED",
       "recruitmentStatus": "CLOSED",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 197,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
+      "studentCount": 240,
       "taRecruitCount": 15,
-      "campus": "Main",
-      "applicationDeadline": "2026-05-08T20:00:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Machine Learning",
-          "TypeScript"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Advanced Programming Studio 359: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Spring.",
-      "createdAt": "2026-04-04T12:42:09.852Z",
-      "updatedAt": "2026-04-04T12:42:09.852Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          2,
-          8,
-          9,
-          10,
-          13,
-          15
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Lab",
-          "weeks": [
-            12,
-            15,
-            17
-          ],
-          "description": ""
-        },
-        {
-          "name": "Assessment 2 - Lab",
-          "weeks": [],
-          "description": ""
-        },
-        {
-          "name": "Assessment 3 - Midterm",
-          "weeks": [
-            10,
-            18
-          ],
-          "description": "Online submission"
-        }
-      ],
-      "recruitmentBrief": "Applications are open for TA positions in Advanced Programming Studio 359.\nFlexible hours; details to be discussed.",
-      "workload": "Approx. 10 hours per week including grading"
-    },
-    {
-      "jobId": "MOJOB-44700DD3",
-      "courseCode": "AUTO-AB3523",
-      "courseName": "Natural Language Processing 548",
-      "ownerMoId": "MO-GEN-4BAF",
-      "ownerMoName": "MO-GEN-4BAF",
-      "semester": "2025-Fall",
-      "status": "CLOSED",
-      "recruitmentStatus": "CLOSED",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": -1,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 7,
-      "campus": "Main",
-      "applicationDeadline": "2026-06-02T22:15:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Operating Systems"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Natural Language Processing 548: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2025-Fall.",
-      "createdAt": "2026-04-04T12:42:09.852Z",
-      "updatedAt": "2026-04-04T12:42:09.852Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          4,
-          6,
-          7,
-          9,
-          13,
-          17
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Midterm",
-          "weeks": [
-            20
-          ],
-          "description": "In-class"
-        },
-        {
-          "name": "Assessment 2 - Midterm",
-          "weeks": [
-            14
-          ],
-          "description": "In-class"
-        }
-      ],
-      "recruitmentBrief": "Applications are open for TA positions in Natural Language Processing 548.\nFlexible hours; details to be discussed."
-    },
-    {
-      "jobId": "MOJOB-4178B790",
-      "courseCode": "AUTO-D45F48",
-      "courseName": "Data Science Fundamentals 506",
-      "ownerMoId": "MO-GEN-1064",
-      "ownerMoName": "MO-GEN-1064",
-      "semester": "2026-Fall",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 185,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 3,
-      "campus": "Main",
-      "applicationDeadline": "2026-07-19T19:15:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Python"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Data Science Fundamentals 506: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
-      "createdAt": "2026-04-04T12:42:09.852Z",
-      "updatedAt": "2026-04-04T12:42:09.852Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          1,
-          4,
-          5,
-          10,
-          11,
-          12,
-          13,
-          17
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Midterm",
-          "weeks": [
-            9,
-            12,
-            15
-          ],
-          "description": "In-class"
-        }
-      ],
-      "workload": "Lab sections plus office hours, approx. 8 hours per week"
-    },
-    {
-      "jobId": "MOJOB-B5015F83",
-      "courseCode": "AUTO-928C99",
-      "courseName": "Natural Language Processing 321",
-      "ownerMoId": "MO-GEN-FCF5",
-      "ownerMoName": "MO-GEN-FCF5",
-      "semester": "2026-Fall",
-      "status": "CLOSED",
-      "recruitmentStatus": "CLOSED",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 199,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 4,
       "campus": "Shahe",
-      "applicationDeadline": "2026-05-26T20:15:00.000Z",
+      "applicationDeadline": "2026-05-17T20:00:00.000Z",
       "requiredSkills": {
         "fixedTags": [
-          "Computer Networks",
-          "C++",
-          "TypeScript",
-          "Java"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Natural Language Processing 321: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
-      "createdAt": "2026-04-04T12:42:09.852Z",
-      "updatedAt": "2026-04-04T12:42:09.852Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          7,
-          8,
-          10,
-          11
-        ]
-      },
-      "workload": "Approx. 10 hours per week including grading"
-    },
-    {
-      "jobId": "MOJOB-CC40FF77",
-      "courseCode": "AUTO-56C412",
-      "courseName": "Software Engineering Capstone 807",
-      "ownerMoId": "MO-GEN-4D68",
-      "ownerMoName": "MO-GEN-4D68",
-      "semester": "2026-Spring",
-      "status": "CLOSED",
-      "recruitmentStatus": "CLOSED",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 185,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 12,
-      "campus": "Main",
-      "applicationDeadline": "2026-07-15T19:00:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Databases",
-          "Machine Learning",
-          "TypeScript"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Software Engineering Capstone 807: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Spring.",
-      "createdAt": "2026-04-04T12:42:09.852Z",
-      "updatedAt": "2026-04-04T12:42:09.852Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          1,
-          2,
-          4,
-          5,
-          16,
-          17,
-          20
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Lab",
-          "weeks": [
-            3,
-            12
-          ],
-          "description": "Online submission"
-        }
-      ],
-      "recruitmentBrief": "Applications are open for TA positions in Software Engineering Capstone 807.\nFlexible hours; details to be discussed.",
-      "workload": "Lab sections plus office hours, approx. 8 hours per week"
-    },
-    {
-      "jobId": "MOJOB-20E5A3CC",
-      "courseCode": "AUTO-8DF2E2",
-      "courseName": "Cloud Computing Architecture 629",
-      "ownerMoId": "MO-GEN-67FE",
-      "ownerMoName": "MO-GEN-67FE",
-      "semester": "2026-Fall",
-      "status": "CLOSED",
-      "recruitmentStatus": "CLOSED",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 102,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 5,
-      "campus": "Shahe",
-      "applicationDeadline": "2026-07-17T20:30:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Python",
-          "Operating Systems",
-          "Java"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Cloud Computing Architecture 629: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
-      "createdAt": "2026-04-04T12:42:09.852Z",
-      "updatedAt": "2026-04-04T12:42:09.852Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          1,
-          3,
-          5,
-          15,
-          16
-        ]
-      }
-    },
-    {
-      "jobId": "MOJOB-4BF4DFE6",
-      "courseCode": "AUTO-46A62F",
-      "courseName": "Advanced Programming Studio 290",
-      "ownerMoId": "MO-GEN-7387",
-      "ownerMoName": "MO-GEN-7387",
-      "semester": "2026-Fall",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": -1,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 2,
-      "campus": "Main",
-      "applicationDeadline": "2026-05-17T22:15:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Computer Networks",
-          "TypeScript",
-          "Operating Systems",
-          "Databases"
+          "C++"
         ],
         "customSkills": [
           {
@@ -1993,52 +419,31 @@
           }
         ]
       },
-      "courseDescription": "Advanced Programming Studio 290: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
-      "createdAt": "2026-04-04T12:42:09.852Z",
-      "updatedAt": "2026-04-04T12:42:09.852Z",
-      "source": "tools-genMoCourses",
+      "courseDescription": "Introduction to Machine Learning 290: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Spring.",
+      "jobSlug": "ebt0008",
       "teachingWeeks": {
         "weeks": [
-          1,
-          3,
           4,
-          6,
-          13,
-          14,
-          18
+          5,
+          9,
+          16,
+          19,
+          20
         ]
       },
       "assessmentEvents": [
         {
-          "name": "Assessment 1 - Final",
+          "name": "Assessment 1 - Project",
           "weeks": [
-            2,
-            10,
-            20
+            10
           ],
-          "description": ""
-        },
-        {
-          "name": "Assessment 2 - Final",
-          "weeks": [
-            13,
-            15,
-            18
-          ],
-          "description": "In-class"
+          "description": "Online submission"
         }
       ],
-      "recruitmentBrief": "Applications are open for TA positions in Advanced Programming Studio 290.\nFlexible hours; details to be discussed."
+      "recruitmentBrief": "Applications are open for TA positions in Introduction to Machine Learning 290.\nFlexible hours; details to be discussed.",
+      "workload": "Approx. 10 hours per week including grading"
     },
     {
-      "jobId": "MOJOB-73FDCBB6",
-      "courseCode": "AUTO-6E1B3F",
-      "courseName": "Introduction to Machine Learning 956",
-      "ownerMoId": "MO-GEN-2D91",
-      "ownerMoName": "MO-GEN-2D91",
-      "semester": "2026-Fall",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
       "publishStatus": "PENDING_REVIEW",
       "visibility": "INTERNAL",
       "isArchived": false,
@@ -2046,319 +451,263 @@
       "auditComment": "",
       "priority": "NORMAL",
       "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 119,
+      "lastSyncedAt": "2026-04-06T00:40:44.976287Z",
       "recruitedCount": 0,
       "applicationsTotal": 0,
       "applicationsPending": 0,
       "applicationsAccepted": 0,
       "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 2,
-      "campus": "Main",
-      "applicationDeadline": "2026-05-21T19:00:00.000Z",
+      "createdAt": "2026-04-05T16:15:48.212Z",
+      "updatedAt": "2026-04-06T00:40:44.995286300Z",
+      "source": "tools-genMoCourses",
+      "jobId": "MOJOB-C9B8B945",
+      "courseCode": "EBT0009",
+      "courseName": "Introduction to Machine Learning 340",
+      "ownerMoId": "MO-6601L9",
+      "ownerMoName": "testName3",
+      "semester": "2025-Fall",
+      "status": "OPEN",
+      "recruitmentStatus": "OPEN",
+      "studentCount": -1,
+      "taRecruitCount": 14,
+      "campus": "Shahe",
+      "applicationDeadline": "2026-07-30T22:15:00.000Z",
       "requiredSkills": {
         "fixedTags": [
-          "Java",
-          "Databases",
-          "Data Structures"
+          "TypeScript",
+          "Software Engineering",
+          "Computer Networks",
+          "Databases"
         ],
         "customSkills": [
           {
             "name": "Communication",
-            "description": "Prior coursework in the subject is preferred"
+            "description": ""
           }
         ]
       },
-      "courseDescription": "Introduction to Machine Learning 956: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
-      "createdAt": "2026-04-04T12:42:09.852Z",
-      "updatedAt": "2026-04-04T12:42:09.852Z",
-      "source": "tools-genMoCourses",
+      "courseDescription": "Introduction to Machine Learning 340: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2025-Fall.",
+      "jobSlug": "ebt0009",
       "teachingWeeks": {
         "weeks": [
           2,
-          5,
+          3,
+          4,
           9,
-          10,
           11,
-          16,
+          14,
+          17,
+          19
+        ]
+      },
+      "assessmentEvents": [
+        {
+          "name": "Assessment 1 - Lab",
+          "weeks": [
+            9
+          ],
+          "description": "In-class"
+        },
+        {
+          "name": "Assessment 2 - Lab",
+          "weeks": [],
+          "description": ""
+        },
+        {
+          "name": "Assessment 3 - Project",
+          "weeks": [
+            9,
+            12,
+            17
+          ],
+          "description": "In-class"
+        }
+      ],
+      "recruitmentBrief": "Applications are open for TA positions in Introduction to Machine Learning 340.\nFlexible hours; details to be discussed.",
+      "workload": "Approx. 6 hours per week"
+    },
+    {
+      "publishStatus": "PENDING_REVIEW",
+      "visibility": "INTERNAL",
+      "isArchived": false,
+      "auditStatus": "PENDING",
+      "auditComment": "",
+      "priority": "NORMAL",
+      "dataVersion": 1,
+      "lastSyncedAt": "2026-04-06T00:40:44.997285Z",
+      "recruitedCount": 0,
+      "applicationsTotal": 0,
+      "applicationsPending": 0,
+      "applicationsAccepted": 0,
+      "applicationsRejected": 0,
+      "createdAt": "2026-04-05T16:15:48.212Z",
+      "updatedAt": "2026-04-06T00:40:45.012286200Z",
+      "source": "tools-genMoCourses",
+      "jobId": "MOJOB-1CBA1777",
+      "courseCode": "EBT0010",
+      "courseName": "Data Science Fundamentals 958",
+      "ownerMoId": "MO-195RR4",
+      "ownerMoName": "TestName",
+      "semester": "2026-Fall",
+      "status": "OPEN",
+      "recruitmentStatus": "OPEN",
+      "studentCount": 83,
+      "taRecruitCount": 9,
+      "campus": "Shahe",
+      "applicationDeadline": "2026-07-23T21:15:00.000Z",
+      "requiredSkills": {
+        "fixedTags": [
+          "Databases",
+          "Machine Learning",
+          "Data Structures"
+        ],
+        "customSkills": []
+      },
+      "courseDescription": "Data Science Fundamentals 958: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
+      "jobSlug": "ebt0010"
+    },
+    {
+      "publishStatus": "PENDING_REVIEW",
+      "visibility": "INTERNAL",
+      "isArchived": false,
+      "auditStatus": "PENDING",
+      "auditComment": "",
+      "priority": "NORMAL",
+      "dataVersion": 1,
+      "lastSyncedAt": "2026-04-06T00:40:45.015285700Z",
+      "recruitedCount": 0,
+      "applicationsTotal": 0,
+      "applicationsPending": 0,
+      "applicationsAccepted": 0,
+      "applicationsRejected": 0,
+      "createdAt": "2026-04-05T16:15:48.212Z",
+      "updatedAt": "2026-04-06T00:40:45.031291Z",
+      "source": "tools-genMoCourses",
+      "jobId": "MOJOB-74D7B1E2",
+      "courseCode": "EBT0011",
+      "courseName": "Introduction to Machine Learning 614",
+      "ownerMoId": "MO-137J3E",
+      "ownerMoName": "TestName2",
+      "semester": "2026-Fall",
+      "status": "OPEN",
+      "recruitmentStatus": "OPEN",
+      "studentCount": -1,
+      "taRecruitCount": 14,
+      "campus": "Main",
+      "applicationDeadline": "2026-06-02T20:15:00.000Z",
+      "requiredSkills": {
+        "fixedTags": [
+          "TypeScript",
+          "C++",
+          "Java",
+          "Machine Learning"
+        ],
+        "customSkills": []
+      },
+      "courseDescription": "Introduction to Machine Learning 614: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
+      "jobSlug": "ebt0011",
+      "teachingWeeks": {
+        "weeks": [
+          5,
+          6,
+          7,
+          8,
+          13,
+          16
+        ]
+      },
+      "assessmentEvents": [
+        {
+          "name": "Assessment 1 - Project",
+          "weeks": [
+            18
+          ],
+          "description": "Online submission"
+        }
+      ],
+      "recruitmentBrief": "Applications are open for TA positions in Introduction to Machine Learning 614.\nFlexible hours; details to be discussed.",
+      "workload": "Approx. 6 hours per week"
+    },
+    {
+      "publishStatus": "PENDING_REVIEW",
+      "visibility": "INTERNAL",
+      "isArchived": false,
+      "auditStatus": "PENDING",
+      "auditComment": "",
+      "priority": "NORMAL",
+      "dataVersion": 1,
+      "lastSyncedAt": "2026-04-06T00:40:45.033805300Z",
+      "recruitedCount": 0,
+      "applicationsTotal": 0,
+      "applicationsPending": 0,
+      "applicationsAccepted": 0,
+      "applicationsRejected": 0,
+      "createdAt": "2026-04-05T16:15:48.212Z",
+      "updatedAt": "2026-04-06T00:40:45.046803700Z",
+      "source": "tools-genMoCourses",
+      "jobId": "MOJOB-E21F865E",
+      "courseCode": "EBT0012",
+      "courseName": "Computer Vision Applications 190",
+      "ownerMoId": "MO-6601L9",
+      "ownerMoName": "testName3",
+      "semester": "2026-Fall",
+      "status": "CLOSED",
+      "recruitmentStatus": "CLOSED",
+      "studentCount": -1,
+      "taRecruitCount": 3,
+      "campus": "Shahe",
+      "applicationDeadline": "2026-04-25T21:15:00.000Z",
+      "requiredSkills": {
+        "fixedTags": [
+          "Machine Learning",
+          "Data Structures",
+          "Python"
+        ],
+        "customSkills": []
+      },
+      "courseDescription": "Computer Vision Applications 190: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
+      "jobSlug": "ebt0012",
+      "teachingWeeks": {
+        "weeks": [
+          1,
+          2,
+          5,
+          8,
+          10,
+          14,
           17,
           18
         ]
       },
       "assessmentEvents": [
         {
-          "name": "Assessment 1 - Final",
+          "name": "Assessment 1 - Lab",
           "weeks": [
-            4
+            1,
+            14
           ],
           "description": ""
         },
         {
           "name": "Assessment 2 - Midterm",
           "weeks": [
-            8,
-            13,
-            16
-          ],
-          "description": ""
-        }
-      ]
-    },
-    {
-      "jobId": "MOJOB-266DEA6F",
-      "courseCode": "AUTO-5C6ECE",
-      "courseName": "Computer Security Overview 125",
-      "ownerMoId": "MO-GEN-3D35",
-      "ownerMoName": "MO-GEN-3D35",
-      "semester": "2026-Spring",
-      "status": "CLOSED",
-      "recruitmentStatus": "CLOSED",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 236,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 14,
-      "campus": "Shahe",
-      "applicationDeadline": "2026-07-06T18:15:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Computer Networks",
-          "C++"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Computer Security Overview 125: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Spring.",
-      "createdAt": "2026-04-04T12:42:09.852Z",
-      "updatedAt": "2026-04-04T12:42:09.852Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          1,
-          7,
-          8,
-          15,
-          20
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Midterm",
-          "weeks": [],
-          "description": ""
-        }
-      ],
-      "workload": "Approx. 10 hours per week including grading"
-    },
-    {
-      "jobId": "MOJOB-CCB0FEF4",
-      "courseCode": "AUTO-619915",
-      "courseName": "Data Science Fundamentals 420",
-      "ownerMoId": "MO-GEN-C356",
-      "ownerMoName": "MO-GEN-C356",
-      "semester": "2026-Spring",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 249,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 14,
-      "campus": "Main",
-      "applicationDeadline": "2026-07-15T20:30:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "C++",
-          "Java"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Data Science Fundamentals 420: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Spring.",
-      "createdAt": "2026-04-04T12:42:09.854Z",
-      "updatedAt": "2026-04-04T12:42:09.854Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          4,
-          20
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Lab",
-          "weeks": [
-            13,
-            18
-          ],
-          "description": ""
-        },
-        {
-          "name": "Assessment 2 - Lab",
-          "weeks": [
-            1,
-            16,
-            17
-          ],
-          "description": "In-class"
-        }
-      ],
-      "workload": "Approx. 10 hours per week including grading"
-    },
-    {
-      "jobId": "MOJOB-91CF469B",
-      "courseCode": "AUTO-C3FED9",
-      "courseName": "Data Science Fundamentals 286",
-      "ownerMoId": "MO-GEN-E315",
-      "ownerMoName": "MO-GEN-E315",
-      "semester": "2026-Spring",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 153,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 7,
-      "campus": "Shahe",
-      "applicationDeadline": "2026-07-24T19:30:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Python",
-          "Software Engineering"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Data Science Fundamentals 286: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Spring.",
-      "createdAt": "2026-04-04T12:42:09.854Z",
-      "updatedAt": "2026-04-04T12:42:09.854Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          3,
-          8,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18
-        ]
-      },
-      "workload": "Approx. 10 hours per week including grading"
-    },
-    {
-      "jobId": "MOJOB-6131D0C6",
-      "courseCode": "AUTO-54DF8D",
-      "courseName": "Software Engineering Capstone 294",
-      "ownerMoId": "MO-GEN-6FB7",
-      "ownerMoName": "MO-GEN-6FB7",
-      "semester": "2026-Fall",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": -1,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 11,
-      "campus": "Shahe",
-      "applicationDeadline": "2026-07-07T21:30:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Databases",
-          "Java",
-          "C++"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Software Engineering Capstone 294: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
-      "createdAt": "2026-04-04T12:42:09.854Z",
-      "updatedAt": "2026-04-04T12:42:09.854Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          2,
-          4,
-          11,
-          14,
-          16,
-          17,
-          20
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Lab",
-          "weeks": [
-            7,
-            17
+            9
           ],
           "description": "Online submission"
         },
         {
-          "name": "Assessment 2 - Lab",
-          "weeks": [],
+          "name": "Assessment 3 - Project",
+          "weeks": [
+            11,
+            12,
+            16
+          ],
           "description": ""
         }
       ],
-      "workload": "Approx. 10 hours per week including grading"
+      "workload": "Approx. 6 hours per week"
     },
     {
-      "jobId": "MOJOB-5E353C89",
-      "courseCode": "AUTO-A8DFA7",
-      "courseName": "Computer Security Overview 996",
-      "ownerMoId": "MO-GEN-E4DA",
-      "ownerMoName": "MO-GEN-E4DA",
-      "semester": "2025-Fall",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
       "publishStatus": "PENDING_REVIEW",
       "visibility": "INTERNAL",
       "isArchived": false,
@@ -2366,22 +715,32 @@
       "auditComment": "",
       "priority": "NORMAL",
       "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": -1,
+      "lastSyncedAt": "2026-04-06T00:40:45.049805500Z",
       "recruitedCount": 0,
       "applicationsTotal": 0,
       "applicationsPending": 0,
       "applicationsAccepted": 0,
       "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 7,
-      "campus": "Main",
-      "applicationDeadline": "2026-05-11T22:00:00.000Z",
+      "createdAt": "2026-04-05T16:15:48.212Z",
+      "updatedAt": "2026-04-06T00:40:45.063019400Z",
+      "source": "tools-genMoCourses",
+      "jobId": "MOJOB-A8C111E5",
+      "courseCode": "EBT0013",
+      "courseName": "Advanced Programming Studio 958",
+      "ownerMoId": "MO-195RR4",
+      "ownerMoName": "TestName",
+      "semester": "2025-Fall",
+      "status": "OPEN",
+      "recruitmentStatus": "OPEN",
+      "studentCount": 189,
+      "taRecruitCount": 2,
+      "campus": "Shahe",
+      "applicationDeadline": "2026-08-02T18:00:00.000Z",
       "requiredSkills": {
         "fixedTags": [
-          "Java",
-          "Software Engineering"
+          "Computer Networks",
+          "Python",
+          "Java"
         ],
         "customSkills": [
           {
@@ -2390,118 +749,33 @@
           }
         ]
       },
-      "courseDescription": "Computer Security Overview 996: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2025-Fall.",
-      "createdAt": "2026-04-04T12:42:09.854Z",
-      "updatedAt": "2026-04-04T12:42:09.854Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          1,
-          3,
-          6,
-          13,
-          14,
-          15,
-          16,
-          20
-        ]
-      },
+      "courseDescription": "Advanced Programming Studio 958: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2025-Fall.",
+      "jobSlug": "ebt0013",
       "assessmentEvents": [
         {
-          "name": "Assessment 1 - Midterm",
+          "name": "Assessment 1 - Final",
           "weeks": [
-            16,
-            18
+            16
           ],
-          "description": ""
-        },
-        {
-          "name": "Assessment 2 - Midterm",
-          "weeks": [
-            12
-          ],
-          "description": "In-class"
-        },
-        {
-          "name": "Assessment 3 - Midterm",
-          "weeks": [
-            9
-          ],
-          "description": ""
-        }
-      ],
-      "workload": "Lab sections plus office hours, approx. 8 hours per week"
-    },
-    {
-      "jobId": "MOJOB-5724F9BD",
-      "courseCode": "AUTO-8D3742",
-      "courseName": "Software Engineering Capstone 356",
-      "ownerMoId": "MO-GEN-5462",
-      "ownerMoName": "MO-GEN-5462",
-      "semester": "2025-Fall",
-      "status": "CLOSED",
-      "recruitmentStatus": "CLOSED",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 115,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 4,
-      "campus": "Main",
-      "applicationDeadline": "2026-07-07T21:15:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "Machine Learning",
-          "Data Structures",
-          "Python"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Software Engineering Capstone 356: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2025-Fall.",
-      "createdAt": "2026-04-04T12:42:09.854Z",
-      "updatedAt": "2026-04-04T12:42:09.854Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          4,
-          5,
-          7,
-          13
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Project",
-          "weeks": [],
           "description": "Online submission"
         },
         {
           "name": "Assessment 2 - Midterm",
           "weeks": [],
           "description": ""
+        },
+        {
+          "name": "Assessment 3 - Lab",
+          "weeks": [
+            12,
+            13
+          ],
+          "description": ""
         }
-      ]
+      ],
+      "recruitmentBrief": "Applications are open for TA positions in Advanced Programming Studio 958.\nFlexible hours; details to be discussed."
     },
     {
-      "jobId": "MOJOB-8C14000C",
-      "courseCode": "AUTO-2B42FF",
-      "courseName": "Software Engineering Capstone 793",
-      "ownerMoId": "MO-GEN-F0BF",
-      "ownerMoName": "MO-GEN-F0BF",
-      "semester": "2026-Spring",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
       "publishStatus": "PENDING_REVIEW",
       "visibility": "INTERNAL",
       "isArchived": false,
@@ -2509,36 +783,40 @@
       "auditComment": "",
       "priority": "NORMAL",
       "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 188,
+      "lastSyncedAt": "2026-04-06T00:40:45.065998400Z",
       "recruitedCount": 0,
       "applicationsTotal": 0,
       "applicationsPending": 0,
       "applicationsAccepted": 0,
       "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 2,
+      "createdAt": "2026-04-05T16:15:48.212Z",
+      "updatedAt": "2026-04-06T00:40:45.078997400Z",
+      "source": "tools-genMoCourses",
+      "jobId": "MOJOB-6F314942",
+      "courseCode": "EBT0014",
+      "courseName": "Compiler Construction Workshop 375",
+      "ownerMoId": "MO-137J3E",
+      "ownerMoName": "TestName2",
+      "semester": "2026-Fall",
+      "status": "CLOSED",
+      "recruitmentStatus": "CLOSED",
+      "studentCount": 74,
+      "taRecruitCount": 6,
       "campus": "Main",
-      "applicationDeadline": "2026-05-09T20:00:00.000Z",
+      "applicationDeadline": "2026-06-18T20:15:00.000Z",
       "requiredSkills": {
         "fixedTags": [
           "Operating Systems",
-          "Software Engineering",
-          "Python",
-          "Computer Networks"
+          "TypeScript"
         ],
         "customSkills": []
       },
-      "courseDescription": "Software Engineering Capstone 793: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Spring.",
-      "createdAt": "2026-04-04T12:42:09.854Z",
-      "updatedAt": "2026-04-04T12:42:09.854Z",
-      "source": "tools-genMoCourses",
+      "courseDescription": "Compiler Construction Workshop 375: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
+      "jobSlug": "ebt0014",
       "teachingWeeks": {
         "weeks": [
-          9,
-          17,
-          18,
+          4,
+          10,
           19
         ]
       },
@@ -2546,99 +824,13 @@
         {
           "name": "Assessment 1 - Final",
           "weeks": [
-            1
-          ],
-          "description": "Online submission"
-        },
-        {
-          "name": "Assessment 2 - Final",
-          "weeks": [],
-          "description": "Online submission"
-        },
-        {
-          "name": "Assessment 3 - Final",
-          "weeks": [
-            5,
-            11,
-            17
-          ],
-          "description": "In-class"
-        }
-      ],
-      "workload": "Approx. 10 hours per week including grading"
-    },
-    {
-      "jobId": "MOJOB-F3DF2F51",
-      "courseCode": "AUTO-07820F",
-      "courseName": "Data Science Fundamentals 379",
-      "ownerMoId": "MO-GEN-878D",
-      "ownerMoName": "MO-GEN-878D",
-      "semester": "2025-Fall",
-      "status": "OPEN",
-      "recruitmentStatus": "OPEN",
-      "publishStatus": "PENDING_REVIEW",
-      "visibility": "INTERNAL",
-      "isArchived": false,
-      "auditStatus": "PENDING",
-      "auditComment": "",
-      "priority": "NORMAL",
-      "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 279,
-      "recruitedCount": 0,
-      "applicationsTotal": 0,
-      "applicationsPending": 0,
-      "applicationsAccepted": 0,
-      "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 9,
-      "campus": "Main",
-      "applicationDeadline": "2026-06-02T22:00:00.000Z",
-      "requiredSkills": {
-        "fixedTags": [
-          "C++",
-          "Databases",
-          "Data Structures"
-        ],
-        "customSkills": []
-      },
-      "courseDescription": "Data Science Fundamentals 379: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2025-Fall.",
-      "createdAt": "2026-04-04T12:42:09.854Z",
-      "updatedAt": "2026-04-04T12:42:09.854Z",
-      "source": "tools-genMoCourses",
-      "teachingWeeks": {
-        "weeks": [
-          2,
-          4,
-          5,
-          6,
-          8,
-          9,
-          13,
-          17
-        ]
-      },
-      "assessmentEvents": [
-        {
-          "name": "Assessment 1 - Lab",
-          "weeks": [
-            1,
-            13
+            15
           ],
           "description": ""
         }
       ]
     },
     {
-      "jobId": "MOJOB-5FF0BA56",
-      "courseCode": "AUTO-FC6456",
-      "courseName": "Introduction to Machine Learning 285",
-      "ownerMoId": "MO-GEN-FC93",
-      "ownerMoName": "MO-GEN-FC93",
-      "semester": "2025-Fall",
-      "status": "CLOSED",
-      "recruitmentStatus": "CLOSED",
       "publishStatus": "PENDING_REVIEW",
       "visibility": "INTERNAL",
       "isArchived": false,
@@ -2646,53 +838,193 @@
       "auditComment": "",
       "priority": "NORMAL",
       "dataVersion": 1,
-      "lastSyncedAt": "",
-      "studentCount": 195,
+      "lastSyncedAt": "2026-04-06T00:40:45.080997Z",
       "recruitedCount": 0,
       "applicationsTotal": 0,
       "applicationsPending": 0,
       "applicationsAccepted": 0,
       "applicationsRejected": 0,
-      "lastApplicationAt": "",
-      "lastSelectionAt": "",
-      "taRecruitCount": 6,
-      "campus": "Shahe",
-      "applicationDeadline": "2026-07-20T18:30:00.000Z",
+      "createdAt": "2026-04-05T16:15:48.212Z",
+      "updatedAt": "2026-04-06T00:40:45.091033800Z",
+      "source": "tools-genMoCourses",
+      "jobId": "MOJOB-2B19A13C",
+      "courseCode": "EBT0015",
+      "courseName": "Data Science Fundamentals 984",
+      "ownerMoId": "MO-6601L9",
+      "ownerMoName": "testName3",
+      "semester": "2026-Fall",
+      "status": "OPEN",
+      "recruitmentStatus": "OPEN",
+      "studentCount": 220,
+      "taRecruitCount": 7,
+      "campus": "Main",
+      "applicationDeadline": "2026-06-09T18:00:00.000Z",
       "requiredSkills": {
         "fixedTags": [
-          "Operating Systems",
-          "Computer Networks",
+          "C++",
+          "Databases",
+          "Java",
           "Data Structures"
         ],
         "customSkills": []
       },
-      "courseDescription": "Introduction to Machine Learning 285: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2025-Fall.",
-      "createdAt": "2026-04-04T12:42:09.854Z",
-      "updatedAt": "2026-04-04T12:42:09.854Z",
-      "source": "tools-genMoCourses",
+      "courseDescription": "Data Science Fundamentals 984: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
+      "jobSlug": "ebt0015",
       "teachingWeeks": {
         "weeks": [
-          9,
           12,
-          14
+          19,
+          20
         ]
       },
       "assessmentEvents": [
         {
-          "name": "Assessment 1 - Lab",
+          "name": "Assessment 1 - Midterm",
           "weeks": [
-            7,
+            6,
+            19
+          ],
+          "description": "In-class"
+        },
+        {
+          "name": "Assessment 2 - Midterm",
+          "weeks": [
+            1,
+            10,
             15
+          ],
+          "description": "Online submission"
+        },
+        {
+          "name": "Assessment 3 - Midterm",
+          "weeks": [
+            3
           ],
           "description": "In-class"
         }
-      ]
+      ],
+      "workload": "Lab sections plus office hours, approx. 8 hours per week"
+    },
+    {
+      "publishStatus": "PENDING_REVIEW",
+      "visibility": "INTERNAL",
+      "isArchived": false,
+      "auditStatus": "PENDING",
+      "auditComment": "",
+      "priority": "NORMAL",
+      "dataVersion": 1,
+      "lastSyncedAt": "2026-04-06T00:40:45.094002500Z",
+      "recruitedCount": 0,
+      "applicationsTotal": 0,
+      "applicationsPending": 0,
+      "applicationsAccepted": 0,
+      "applicationsRejected": 0,
+      "createdAt": "2026-04-05T16:15:48.212Z",
+      "updatedAt": "2026-04-06T00:40:45.104518Z",
+      "source": "tools-genMoCourses",
+      "jobId": "MOJOB-6E8EC309",
+      "courseCode": "EBT0016",
+      "courseName": "Software Engineering Capstone 595",
+      "ownerMoId": "MO-195RR4",
+      "ownerMoName": "TestName",
+      "semester": "2026-Fall",
+      "status": "CLOSED",
+      "recruitmentStatus": "CLOSED",
+      "studentCount": -1,
+      "taRecruitCount": 13,
+      "campus": "Shahe",
+      "applicationDeadline": "2026-08-02T21:30:00.000Z",
+      "requiredSkills": {
+        "fixedTags": [
+          "Software Engineering",
+          "C++",
+          "Operating Systems"
+        ],
+        "customSkills": []
+      },
+      "courseDescription": "Software Engineering Capstone 595: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
+      "jobSlug": "ebt0016",
+      "assessmentEvents": [
+        {
+          "name": "Assessment 1 - Lab",
+          "weeks": [
+            10,
+            14,
+            17
+          ],
+          "description": ""
+        },
+        {
+          "name": "Assessment 2 - Project",
+          "weeks": [],
+          "description": ""
+        },
+        {
+          "name": "Assessment 3 - Final",
+          "weeks": [],
+          "description": ""
+        }
+      ],
+      "recruitmentBrief": "Applications are open for TA positions in Software Engineering Capstone 595.\nFlexible hours; details to be discussed.",
+      "workload": "Approx. 10 hours per week including grading"
+    },
+    {
+      "publishStatus": "PENDING_REVIEW",
+      "visibility": "INTERNAL",
+      "isArchived": false,
+      "auditStatus": "PENDING",
+      "auditComment": "",
+      "priority": "NORMAL",
+      "dataVersion": 1,
+      "lastSyncedAt": "2026-04-06T00:40:45.107516200Z",
+      "recruitedCount": 0,
+      "applicationsTotal": 0,
+      "applicationsPending": 0,
+      "applicationsAccepted": 0,
+      "applicationsRejected": 0,
+      "createdAt": "2026-04-05T16:15:48.214Z",
+      "updatedAt": "2026-04-06T00:40:45.117524400Z",
+      "source": "tools-genMoCourses",
+      "jobId": "MOJOB-3C7A4D28",
+      "courseCode": "EBT0017",
+      "courseName": "Data Science Fundamentals 686",
+      "ownerMoId": "MO-137J3E",
+      "ownerMoName": "TestName2",
+      "semester": "2026-Fall",
+      "status": "OPEN",
+      "recruitmentStatus": "OPEN",
+      "studentCount": 256,
+      "taRecruitCount": 8,
+      "campus": "Main",
+      "applicationDeadline": "2026-07-18T19:00:00.000Z",
+      "requiredSkills": {
+        "fixedTags": [
+          "Data Structures"
+        ],
+        "customSkills": []
+      },
+      "courseDescription": "Data Science Fundamentals 686: core concepts and hands-on work. TAs support office hours and assignment grading. Semester: 2026-Fall.",
+      "jobSlug": "ebt0017",
+      "teachingWeeks": {
+        "weeks": [
+          1,
+          2,
+          5,
+          8,
+          10,
+          11,
+          14,
+          15
+        ]
+      },
+      "recruitmentBrief": "Applications are open for TA positions in Data Science Fundamentals 686.\nFlexible hours; details to be discussed.",
+      "workload": "Approx. 6 hours per week"
     }
   ],
   "meta": {
     "schema": "mo-ta-job-board",
     "entity": "jobs",
     "version": "2.0",
-    "updatedAt": "2026-04-04T12:42:09.854Z"
+    "updatedAt": "2026-04-06T00:40:45.117524400Z"
   }
 }

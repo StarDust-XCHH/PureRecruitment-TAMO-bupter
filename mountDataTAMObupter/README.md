@@ -15,7 +15,7 @@
 | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `[common/](common/README.md)` | MO–TA **共享** 岗位主数据 `[recruitment-courses.json](common/recruitment-courses.json)`；字段与契约见该目录 README，DAO 旁注见 `[recruitment-courses-dao-notes.md](common/recruitment-courses-dao-notes.md)`。 |
 | `[ta/](ta/README.md)`         | TA 账号、档案、设置、申请状态等 JSON；读写由 `TaAccountDao` 等负责。                                                                                                                                           |
-| `mo/`                         | 预留 MO 专属文件子树；当前部分 MO 数据经 `common` 与 TA 侧 JSON 协作，见仓库 `[docs/backend/mo-ta-interaction-log.md](../docs/backend/mo-ta-interaction-log.md)`。                                                |
+| `mo/`                         | MO 账号/资料/设置（`mos.json` 等）及申请人辅助数据：`mo-application-read-state.json`（已读）、`mo-application-comments.json`（评论线程）。与 TA 侧 `applications.json` / `application-status.json` 的协作见 `[docs/backend/mo-ta-interaction-log.md](../docs/backend/mo-ta-interaction-log.md)`。                                                |
 
 
 ## 部署（当前：本地 Tomcat）

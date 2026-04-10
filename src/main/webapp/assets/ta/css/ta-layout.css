@@ -314,19 +314,44 @@ button {
     transform: translateY(0);
 }
 
-.theme-toggle {
-    width: 44px;
+.theme-toggle,
+.language-toggle {
+    min-width: 44px;
     height: 44px;
-    border-radius: 50%;
+    border-radius: 999px;
     border: 1px solid var(--card-border);
     background: var(--card);
-    display: grid;
-    place-items: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    color: var(--text);
+    transition: transform 0.3s ease, box-shadow 0.3s ease, background 0.35s ease;
 }
 
-.theme-toggle:hover {
+.theme-toggle {
+    width: 44px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+}
+
+.language-toggle {
+    padding: 0 14px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.language-toggle__label {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+}
+
+.theme-toggle:hover,
+.language-toggle:hover {
     transform: translateY(-2px);
     box-shadow: 0 0 12px var(--primary-glow);
 }

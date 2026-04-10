@@ -1,15 +1,18 @@
 <div class="topbar">
     <div class="greeting">
-        <h1 id="welcomeTitle">欢迎回来，<span id="welcomeName">TA</span></h1>
-        <p>在这里管理你的档案、申请与工作台设置入口。</p>
+        <h1 id="welcomeTitle" data-i18n="topbar.welcomeTitle" data-i18n-html="欢迎回来，<span id='welcomeName'>TA</span>|Welcome back, <span id='welcomeName'>TA</span>">欢迎回来，<span id="welcomeName">TA</span></h1>
+        <p id="topbarGreetingDesc" data-i18n="topbar.greetingDesc" data-i18n-zh="在这里管理你的档案、申请与工作台设置入口。" data-i18n-en="Manage your profile, applications, and workspace settings here.">在这里管理你的档案、申请与工作台设置入口。</p>
     </div>
     <div class="topbar-actions">
+        <button class="language-toggle" id="languageToggle" type="button" aria-label="切换语言" data-i18n-aria-label="topbar.languageToggleAria" data-i18n-aria-label-zh="切换语言" data-i18n-aria-label-en="Switch language">
+            <span class="language-toggle__label" data-i18n="topbar.languageButton" data-i18n-zh="中文 / EN" data-i18n-en="EN / 中文">中文 / EN</span>
+        </button>
         <button class="user-trigger" id="userTrigger" type="button" aria-haspopup="dialog" aria-expanded="false">
-            <div class="user-avatar" aria-hidden="true">S</div>
+            <span class="user-avatar" aria-hidden="true">S</span>
             <span class="user-name" id="userName">Seele</span>
             <span class="user-caret" aria-hidden="true">▾</span>
         </button>
-        <button class="logout-btn" id="logoutBtn" type="button">退出登录</button>
-        <button class="theme-toggle" id="themeToggle" aria-label="切换主题" type="button">🌙</button>
+        <button class="logout-btn" id="logoutBtn" type="button" data-i18n="topbar.logout" data-i18n-zh="退出登录" data-i18n-en="Log out">退出登录</button>
+        <button class="theme-toggle" id="themeToggle" aria-label="切换主题" data-i18n-aria-label="topbar.themeToggleAria" data-i18n-aria-label-zh="切换主题" data-i18n-aria-label-en="Toggle theme" type="button">🌙</button>
     </div>
 </div>

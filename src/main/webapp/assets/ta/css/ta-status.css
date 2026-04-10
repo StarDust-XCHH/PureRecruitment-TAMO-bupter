@@ -1,30 +1,71 @@
-@charset "UTF-8";
+@keyframes submission-focus-breathe {
+    0% {
+        transform: translateY(0) scale(1);
+        box-shadow: 0 0 0 rgba(99, 102, 241, 0);
+        border-color: var(--card-border);
+    }
+    35% {
+        transform: translateY(-3px) scale(1.01);
+        box-shadow: 0 0 0 8px rgba(99, 102, 241, 0.14), 0 18px 36px rgba(99, 102, 241, 0.18);
+        border-color: rgba(99, 102, 241, 0.75);
+    }
+    100% {
+        transform: translateY(0) scale(1);
+        box-shadow: 0 0 0 rgba(99, 102, 241, 0);
+        border-color: var(--card-border);
+    }
+}
 
-/* =========================================
-   1. 核心布局：动态坐标对齐 (重点修改区)
-========================================= */
+.status-header {
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.status-refresh-btn {
+    min-width: 104px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--card-border);
+    background: var(--card);
+    color: var(--text);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+
+.status-refresh-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--lift-shadow-soft);
+}
+
+.status-refresh-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
 
 .status-grid {
     display: grid;
-    /* 定义两列比例，以及两行 */
-    /* 第一行(auto)高度由 Banner 文字决定，第二行(1fr)承载主体内容 */
     grid-template-columns: minmax(0, 1.9fr) minmax(280px, 0.95fr);
     grid-template-rows: auto 1fr;
     column-gap: 24px;
     align-items: start;
 }
 
-/* Banner 定位在第 1 列，第 1 行 */
 .status-banner {
     grid-column: 1;
     grid-row: 1;
-    margin-bottom: 20px; /* 这里的间距决定了 Banner 与下方第一个卡片的距离 */
+    margin-bottom: 20px;
     font-size: 14px;
     color: var(--muted);
     line-height: 1.6;
 }
 
-/* 左侧主体定位在第 1 列，第 2 行 */
 .route-main {
     grid-column: 1;
     grid-row: 2;
@@ -33,8 +74,6 @@
     min-width: 0;
 }
 
-/* 右侧侧边栏定位在第 2 列，第 2 行 */
-/* 核心：显式指定从第 2 行开始，它就会自动跳过 Banner 高度，与左侧卡片对齐 */
 .status-side {
     grid-column: 2;
     grid-row: 2;
@@ -42,12 +81,8 @@
     flex-direction: column;
     gap: 16px;
     position: sticky;
-    top: 24px; /* 吸顶间距 */
+    top: 24px;
 }
-
-/* =========================================
-   2. 基础容器与时间线样式 (保留)
-========================================= */
 
 .route-card {
     padding: 24px;
@@ -87,6 +122,28 @@
     transition: transform 0.2s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
+
+/* 在全局样式表或当前文件顶部定义 */
+:root {
+    --submission-pulse-count: 3;
+}
+.timeline-item.is-submission-focus {
+    /* 1. 先声明固定的简写部分（动画名、时长、缓动函数） */
+    animation: submission-focus-breathe 1.1s ease-in-out;
+
+    /* 2. 单独声明带变量的播放次数（明确告知浏览器这是一个数值类型） */
+    animation-iteration-count: var(--submission-pulse-count, 3);
+}
+
+.timeline-item.is-submission-focus .timeline-node {
+    box-shadow: 0 0 0 10px rgba(99, 102, 241, 0.16), 0 0 18px rgba(99, 102, 241, 0.42);
+}
+
+.timeline-item.is-submission-focus .accordion-content {
+    max-height: 420px;
+    padding-top: 12px;
+}
+
 .timeline-item:hover,
 .timeline-item.open {
     transform: translateY(-2px);
@@ -95,26 +152,45 @@
 }
 
 .timeline-node {
-    position: absolute; left: -2px; top: 20px;
-    width: 14px; height: 14px; border-radius: 50%;
+    position: absolute;
+    left: -2px;
+    top: 20px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
     background: var(--primary);
     box-shadow: 0 0 12px var(--primary-glow);
 }
 
-.timeline-node.warn { background: var(--warn); box-shadow: 0 0 10px rgba(251, 191, 36, 0.5); }
-.timeline-node.danger { background: var(--danger); box-shadow: 0 0 10px rgba(148, 163, 184, 0.35); }
-.timeline-node.success { background: var(--success); box-shadow: 0 0 10px rgba(34, 197, 94, 0.45); }
+.timeline-node.warn {
+    background: var(--warn);
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+}
 
-.timeline-title { font-weight: 700; }
+.timeline-node.danger {
+    background: var(--danger);
+    box-shadow: 0 0 10px rgba(148, 163, 184, 0.35);
+}
+
+.timeline-node.success {
+    background: var(--success);
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.45);
+}
+
+.timeline-title {
+    font-weight: 700;
+}
+
 .accordion-content {
-    max-height: 0; overflow: hidden;
+    max-height: 0;
+    overflow: hidden;
     transition: max-height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), padding 0.4s ease;
 }
-.timeline-item.open .accordion-content { max-height: 300px; padding-top: 12px; }
 
-/* =========================================
-   3. 右侧卡片组件细节 (保留)
-========================================= */
+.timeline-item.open .accordion-content {
+    max-height: 420px;
+    padding-top: 12px;
+}
 
 .status-box {
     display: flex;
@@ -126,8 +202,14 @@
     overflow: hidden;
 }
 
-.status-box.is-collapsed { box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02); }
-[data-theme="light"] .status-box.is-collapsed { background: #f8fafc; border-color: #e2e8f0; }
+.status-box.is-collapsed {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+}
+
+[data-theme="light"] .status-box.is-collapsed {
+    background: #f8fafc;
+    border-color: #e2e8f0;
+}
 
 .status-box:not(.is-collapsed) {
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
@@ -135,55 +217,131 @@
 }
 
 .status-box-toggle {
-    width: 100%; display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 20px; border: none; background: transparent;
-    color: var(--text); cursor: pointer; font-size: 15px; font-weight: 600;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 600;
 }
 
-.status-box-toggle:hover { background: rgba(0, 0, 0, 0.02); }
+.status-box-toggle:hover {
+    background: rgba(0, 0, 0, 0.02);
+}
 
 .status-box:not(.is-collapsed) .status-box-toggle {
     border-bottom: 1px solid var(--card-border);
-    padding-bottom: 14px; margin-bottom: 14px;
+    padding-bottom: 14px;
+    margin-bottom: 14px;
 }
 
 .status-box-toggle-icon {
-    font-size: 12px; color: var(--muted);
+    font-size: 12px;
+    color: var(--muted);
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.status-box-toggle[aria-expanded="false"] .status-box-toggle-icon { transform: rotate(180deg); }
-.status-box-body { display: grid; gap: 16px; padding: 0 20px 20px; }
-.status-box.is-collapsed .status-box-body { display: none; }
+.status-box-toggle[aria-expanded="false"] .status-box-toggle-icon {
+    transform: rotate(180deg);
+}
 
-/* =========================================
-   4. 内容详情样式 (保留)
-========================================= */
+.status-box-body {
+    display: grid;
+    gap: 16px;
+    padding: 0 20px 20px;
+}
 
-.status-lines { display: grid; gap: 14px; }
-.status-line { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
-.status-line span:first-child { color: var(--muted); }
+.status-box.is-collapsed .status-box-body {
+    display: none;
+}
 
-.messages-list { display: grid; gap: 10px; }
+.status-lines {
+    display: grid;
+    gap: 14px;
+}
+
+.status-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+}
+
+.status-line span:first-child {
+    color: var(--muted);
+}
+
+.messages-list {
+    display: grid;
+    gap: 10px;
+}
+
 .message-item {
-    padding: 12px; border-radius: 12px; border: 1px solid var(--card-border);
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
     background: rgba(255, 255, 255, 0.04);
 }
 
-.status-detail-row, .status-step {
-    padding: 12px 14px; border-radius: 12px; border: 1px solid var(--card-border);
+.status-detail-row,
+.status-step {
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
     background: rgba(255, 255, 255, 0.03);
 }
 
 [data-theme="light"] .message-item,
 [data-theme="light"] .status-detail-row,
-[data-theme="light"] .status-step { background: rgba(15, 23, 42, 0.03); }
+[data-theme="light"] .status-step {
+    background: rgba(15, 23, 42, 0.03);
+}
 
-/* =========================================
-   5. 响应式布局调整
-========================================= */
+.status-resume-action {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 12px 0;
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px dashed var(--card-border);
+    background: rgba(59, 130, 246, 0.06);
+}
+
+.status-resume-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 88px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--primary);
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.status-resume-link:hover {
+    filter: brightness(1.05);
+}
 
 @media (max-width: 1080px) {
+    .status-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .status-refresh-btn {
+        width: 100%;
+    }
+
     .status-grid {
         display: flex;
         flex-direction: column;
@@ -196,5 +354,10 @@
     .status-side {
         position: static;
         margin-top: 24px;
+    }
+
+    .status-resume-action {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }

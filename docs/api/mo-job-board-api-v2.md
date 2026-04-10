@@ -165,8 +165,8 @@ Recommended optional / 建议选填:
 Implementation notes / 实现备注:
 - `status` is currently kept as compatibility mirror of `recruitmentStatus`.  
   当前实现中 `status` 作为 `recruitmentStatus` 的兼容镜像字段保留。
-- `moName` is **not** part of the contract; use `ownerMoId` and `ownerMoName` only. Legacy `moName` on disk is not written on new publishes; MO `GET` normalization removes it from the response and, when present, uses it once to backfill `ownerMoName` if missing.  
-  契约中**不再**包含 `moName`，仅使用 `ownerMoId` 与 `ownerMoName`。新发布不再写入 `moName`；若磁盘上仍有历史 `moName`，`GET /api/mo/jobs` 归一化时会从响应中去掉该键，并在缺省 `ownerMoName` 时用其回填一次。
+- `moName` is **not** part of the contract; use `ownerMoId` and `ownerMoName` only. Legacy `moName` on disk is not written on new publishes; MO `GET` (after `moId` scoping) normalization removes it from the response and, when present, uses it once to backfill `ownerMoName` if missing.  
+  契约中**不再**包含 `moName`，仅使用 `ownerMoId` 与 `ownerMoName`。新发布不再写入 `moName`；若磁盘上仍有历史 `moName`，`GET /api/mo/jobs?moId=…` 归一化时会从响应中去掉该键，并在缺省 `ownerMoName` 时用其回填一次。
 - `publishStatus` belongs to Admin governance lifecycle (Option A), but MO publish currently initializes it with default placeholder value only.  
   按方案 A，`publishStatus` 归属 Admin 治理生命周期；MO 发布当前仅做默认占位初始化。
 
@@ -253,11 +253,30 @@ Draft limits / 草案建议范围:
 
 ## 5. API Contract / 接口契约
 
-## 5.1 POST `/api/mo/jobs`
+## 5.1 GET `/api/mo/jobs`
+
+Purpose / 目的:
+- MO 拉取**本人**发布的岗位列表（服务端按 `items[].ownerMoId` 与当前 MO 的 `moId` **忽略大小写**匹配过滤）。  
+- TA 全量列表仍使用 `GET /api/ta/jobs`；本接口不返回其他 MO 的课程。
+
+Query / 查询参数:
+- **`moId`**（必填）：当前登录 MO 的账号 ID（与 `mos.json` 中 `id`、登录返回的 `moId` 一致）。
+
+Behavior / 行为:
+- 在内存中对**过滤后的**每条 `item` 做与全量读相同的 v2 归一化；**不写回** `recruitment-courses.json`。  
+- 缺少 `moId` 时返回 `400`，响应体仍为 v2 错误信封（`success: false`，`items: []`）。
+
+---
+
+## 5.2 POST `/api/mo/jobs`
 
 Purpose / 目的:
 - MO creates one semester-scale recruitment job.  
   MO 创建一个学期级岗位。
+
+Identity / 身份（必填其一）:
+- 查询参数 **`moId`**，或 JSON 根字段 **`moId`**（查询参数优先）。  
+- 服务端将持久化字段 **`ownerMoId`** 设为该 `moId`（账号 `id`，**不得**存用户名）；**`ownerMoName`** 由服务端从 **`mos.json` 的 `name`** 写入，**不使用** profile 里的 `realName` / `username`。请求体中的 **`ownerMoId`（若存在）会被忽略**；`ownerMoName` 可选，仅当查不到账号 `name` 时作为回退。
 
 Request body / 请求体:
 - JSON object matching `items[]` schema (server can auto-fill `createdAt`, `updatedAt`).  
@@ -267,10 +286,9 @@ Example request (MO publish) / 请求示例（MO 发布）:
 
 ```json
 {
+  "moId": "MO-10001",
   "courseCode": "SE-TA-2026S",
   "courseName": "Software Engineering TA (Semester)",
-  "ownerMoId": "MO-10001",
-  "ownerMoName": "Dr. Zhang",
   "semester": "2026-Spring",
   "recruitmentStatus": "OPEN",
   "status": "OPEN",
@@ -312,7 +330,7 @@ Success response (`201`) / 成功响应:
 
 ---
 
-## 5.2 GET `/api/ta/jobs`
+## 5.3 GET `/api/ta/jobs`
 
 Purpose / 目的:
 - TA retrieves the current job board list.  
@@ -356,7 +374,7 @@ Success response (`200`) / 成功响应:
 
 ---
 
-## 5.3 GET `/api/common/skill-tags` (recommended)
+## 5.4 GET `/api/common/skill-tags` (recommended)
 
 Purpose / 目的:
 - Return the fixed skill tag dictionary for MO form rendering and TA filtering consistency.  
@@ -398,7 +416,7 @@ All other fields are optional in this revision.
 
 Current MO publish implementation writes these proposal fields now:  
 当前 MO 发布实现已写入以下提案字段：
-- `ownerMoId`, `ownerMoName`, `semester`, `recruitmentStatus`, `applicationDeadline`
+- `ownerMoId`（来自请求的 `moId`）、`ownerMoName`, `semester`, `recruitmentStatus`, `applicationDeadline`
 - compatibility `status` (mirrors `recruitmentStatus` for existing readers)
 - placeholder/governance fields with defaults:
   - `publishStatus`, `visibility`, `isArchived`, `auditStatus`, `auditComment`, `priority`, `dataVersion`, `lastSyncedAt`
@@ -406,7 +424,8 @@ Current MO publish implementation writes these proposal fields now:
 
 Implementation snapshot by responsibility / 按职责划分的当前实现快照:
 - **MO input-driven fields**: entered by MO form or derived from MO identity/context.  
-  `courseCode`, `courseName`, `recruitmentStatus`(+`status` mirror), `courseDescription`, `requiredSkills`, `teachingWeeks`, `assessmentEvents`, `studentCount`, `taRecruitCount`, `campus`, `semester`, `applicationDeadline`, `recruitmentBrief`, `workload`, `ownerMoId`, `ownerMoName`.
+  `courseCode`, `courseName`, `recruitmentStatus`(+`status` mirror), `courseDescription`, `requiredSkills`, `teachingWeeks`, `assessmentEvents`, `studentCount`, `taRecruitCount`, `campus`, `semester`, `applicationDeadline`, `recruitmentBrief`, `workload`, `ownerMoName`.  
+  **`ownerMoId` 仅保存账号 `id`；`ownerMoName` 来自 `mos.json` 的 `name`（不用 `realName` / `username`）。**
 - **MO generated fields**: generated at publish time.  
   `jobId`, `createdAt`, `updatedAt`, `source`.
 - **Placeholder-only fields (initialized, logic not implemented here)**: for downstream TA/Admin workflows.  
@@ -415,9 +434,8 @@ Implementation snapshot by responsibility / 按职责划分的当前实现快照
 Request/response boundary note / 请求与响应边界说明:
 - `POST /api/mo/jobs` focuses on MO input-driven fields; placeholder/governance fields are initialized by server if omitted.  
   `POST /api/mo/jobs` 以 MO 输入字段为主；占位/治理字段如未提供由服务端初始化。
-- `GET /api/mo/jobs` returns each item **normalized in memory** (v2 shape, defaults for missing governance/process fields). It **does not** write `recruitment-courses.json`, so refreshing the MO job list does not change on-disk rows for other courses.  
-  `GET /api/mo/jobs` 在**内存中**对每条 `item` 做 v2 归一化（缺失的治理/流程字段在响应中补默认）；**不会**写回 `recruitment-courses.json`，避免拉列表时连带改写磁盘上其它课程。
-- `GET /api/ta/jobs` uses the same backend path as MO list: `RecruitmentCoursesDao.readJobBoard()` applies in-memory v2 normalization per item; no extra write.  
+- `GET /api/mo/jobs` **先按 `moId` 过滤**（仅 `item.ownerMoId` 与登录账号 `id` 一致，忽略大小写），再对每条 `item` 做 v2 归一化；**不会**写回 `recruitment-courses.json`。  
+- `GET /api/ta/jobs` reads the full board via `RecruitmentCoursesDao.readJobBoard()` with in-memory v2 normalization per item; no extra write.  
   `GET /api/ta/jobs` 与 MO 列表共用 **`readJobBoard()`**，对每条 `item` 做与 MO `GET` 一致的内存 v2 归一化，**不写盘**。
 
 ---
@@ -489,3 +507,8 @@ This section describes **who should own lifecycle semantics** (long-term target)
 - Prefer event-driven updates for counters and timestamps once workflow code exists.  
   流程代码就绪后，计数与时间戳建议事件驱动更新。
 
+---
+
+## 10. Related: applicant & selection HTTP APIs / 相关：申请人与筛选接口
+
+岗位发布与列表由本文档覆盖；**按课程查看投递、详情、已读、评论、简历下载、录用/拒绝**等 MO 侧 HTTP 行为与数据文件路径见 **[`docs/backend/mo-ta-interaction-log.md`](../backend/mo-ta-interaction-log.md)**（与 `ownerMoId` / `moId` 校验一致）。

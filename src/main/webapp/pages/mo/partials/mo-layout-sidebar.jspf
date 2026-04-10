@@ -8,15 +8,16 @@
 <nav class="nav" aria-label="MO 工作台导航">
     <button class="nav-item active" type="button" data-route="dashboard" aria-current="page">
         <span>📊</span>
-        <span>岗位概览</span>
+        <span>招聘总览</span>
     </button>
     <button class="nav-item" type="button" data-route="jobs" aria-current="false">
         <span>🧩</span>
-        <span>岗位发布</span>
+        <span>课程管理</span>
     </button>
     <button class="nav-item" type="button" data-route="applicants" aria-current="false">
         <span>🧑‍🎓</span>
-        <span>应聘筛选</span>
+        <span class="mo-nav-label">应聘筛选</span>
+        <span class="mo-nav-badge" id="navApplicantsBadge" hidden aria-label="未读申请">●</span>
     </button>
     <button class="nav-item" type="button" data-route="profile" aria-current="false">
         <span>⚙️</span>

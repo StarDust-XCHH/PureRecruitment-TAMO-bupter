@@ -154,6 +154,23 @@
         app.debugRouteLog = debugRouteLog;
         app.setActiveNav = setActiveNav;
         app.activateRoute = activateRoute;
+        app.navigateToRoute = function navigateToRoute(route, options) {
+            const safeRoute = String(route || '').trim() || 'profile';
+            const panel = document.getElementById('route-' + safeRoute);
+            activateRoute(safeRoute);
+            const shouldSmoothScroll = options?.smooth !== false;
+            const onAfterNavigate = typeof options?.afterNavigate === 'function' ? options.afterNavigate : null;
+            if (panel) {
+                panel.scrollIntoView({
+                    behavior: shouldSmoothScroll ? 'smooth' : 'auto',
+                    block: 'start'
+                });
+            }
+            if (onAfterNavigate) {
+                const delay = shouldSmoothScroll ? 380 : 0;
+                window.setTimeout(() => onAfterNavigate(panel), delay);
+            }
+        };
         app.syncNavByScroll = syncNavByScroll;
         app.bindFlowScrollWatcher = bindFlowScrollWatcher;
     };

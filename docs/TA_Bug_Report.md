@@ -3,11 +3,48 @@
 ## Overview
 This document records bugs and improvement suggestions found during testing of the TA module.
 
-## Passed Functions
-- Registration basic flow works correctly
-- Duplicate username with leading spaces is handled
-- Login works correctly
-- Profile editing works correctly
+## Testing Environment
+- Browser: Chrome
+- OS: Windows
+- Test type: Manual testing
+
+## Testing Strategy
+
+The testing of the TA module was conducted using a combination of functional testing and exploratory testing.
+
+- **Functional Testing** was used to verify whether each core feature works as expected, including registration, login, profile editing, and job-related operations.
+- **Exploratory Testing** was applied to identify unexpected behaviours by interacting with the system using unusual or edge-case inputs (e.g., spaces in usernames, invalid formats).
+- **Boundary Testing** was used for input fields such as phone numbers and passwords to evaluate system validation limits.
+- **Usability Testing** was also considered, especially in UI-related issues such as dark mode visibility.
+
+This approach allowed the identification of both functional defects and usability problems.
+
+## Test Scenarios
+
+Several test scenarios were designed to simulate realistic user behaviour:
+
+1. **User Registration**
+   - Register with valid input
+   - Register with duplicate username
+   - Register with spaces in username
+   - Register with invalid phone number
+
+2. **Login**
+   - Login with correct credentials
+   - Login with incorrect credentials
+   - Login with leading/trailing spaces
+
+3. **Profile Management**
+   - Update profile with valid inputs
+   - Submit empty fields
+   - Input non-standard values (e.g., numbers instead of text)
+
+4. **Resume Checklist**
+   - Click internal navigation links
+   - Open links in new pages
+   - Verify navigation correctness
+
+These scenarios helped ensure coverage of both normal and edge cases.
 
 ## Bug 1: Registration allows spaced numeric username as new account
 **Module:** Registration
@@ -102,3 +139,33 @@ A password containing only spaces, such as six consecutive spaces, should not pa
 
 ### 4. Application intention validation
 The system could validate whether the application intention field contains meaningful input instead of allowing pure numbers.
+
+## Common Patterns of Issues
+
+During testing, several recurring patterns were observed:
+
+- **Lack of Input Validation**
+  - Fields such as phone numbers and passwords do not enforce strict validation rules.
+
+- **Inconsistent Handling of Whitespace**
+  - User inputs containing spaces are treated inconsistently across different features.
+
+- **Navigation Issues**
+  - Links in the resume checklist do not correctly guide users to intended sections.
+
+- **UI/UX Problems**
+  - Dark mode reduces visibility of important interface elements.
+
+These patterns suggest that validation logic and UI consistency need further improvement.
+
+## Future Testing Work
+
+Due to time constraints, several areas require further testing:
+
+- Job application workflow testing (e.g., applying, status updates)
+- Multi-role interaction (TA vs MO vs Admin)
+- File upload robustness (CV upload edge cases)
+- Data persistence after system restart
+- Performance testing under multiple users
+
+Future iterations should focus on improving coverage in these areas.

@@ -37,6 +37,7 @@ public final class DataMountPaths {
     public static Path moDir() {
         return root().resolve("mo");
     }
+
     /** Returns path to MO accounts file ({@code mos.json}). */
     public static Path moAccounts() {
         return moDir().resolve("mos.json");
@@ -51,6 +52,16 @@ public final class DataMountPaths {
     @SuppressWarnings("unused")
     public static Path moSettings() {
         return moDir().resolve("settings.json");
+    }
+
+    /** MO 端「已读」记录：按 moId + applicationId 记录最后查看时间，用于未读红点。 */
+    public static Path moApplicationReadState() {
+        return moDir().resolve("mo-application-read-state.json");
+    }
+
+    /** MO 端对 TA 申请的评论线程（仅存 MO 侧，按 applicationId 聚合）。 */
+    public static Path moApplicationComments() {
+        return moDir().resolve("mo-application-comments.json");
     }
 
     public static Path taDir() {
@@ -73,6 +84,66 @@ public final class DataMountPaths {
         return taDir().resolve("application-status.json");
     }
 
+    public static Path taApplications() {
+        return taDir().resolve("applications.json");
+    }
+
+    public static Path taApplicationEvents() {
+        return taDir().resolve("application-events.json");
+    }
+
+    public static Path taResumeRoot() {
+        return taDir().resolve("resume");
+    }
+
+    public static Path taResumeDir(String taId) {
+        return taResumeRoot().resolve(safePathSegment(taId));
+    }
+
+    public static Path taResumeCourseDir(String taId, String courseCode) {
+        return taResumeDir(taId).resolve(safePathSegment(courseCode));
+    }
+
+    public static Path taAiRoot() {
+        return taDir().resolve("ai");
+    }
+
+    public static Path taAiConversationRoot() {
+        return taAiRoot().resolve("conversations");
+    }
+
+    public static Path taAiConversationFile(String taId) {
+        return taAiConversationRoot().resolve(safePathSegment(taId) + ".json");
+    }
+
+    public static Path taAiAttachmentRoot(String taId) {
+        return taAiRoot().resolve("attachments").resolve(safePathSegment(taId));
+    }
+
+    public static Path taAiAttachmentTempRoot(String taId) {
+        return taAiAttachmentRoot(taId).resolve("temp");
+    }
+
+    public static Path taAiAttachmentUploadedRoot(String taId) {
+        return taAiAttachmentRoot(taId).resolve("uploaded");
+    }
+
+    public static Path taAiAttachmentGeneratedRoot(String taId) {
+        return taAiAttachmentRoot(taId).resolve("generated");
+    }
+
+    public static Path taAiExportRoot(String taId) {
+        return taAiRoot().resolve("exports").resolve(safePathSegment(taId));
+    }
+
+    private static String safePathSegment(String value) {
+        String normalized = value == null ? "unknown" : value.trim();
+        if (normalized.isEmpty()) {
+            normalized = "unknown";
+        }
+        return normalized.replaceAll("[^a-zA-Z0-9._-]", "_");
+    }
+
     private static ResolvedDataRoot resolveDataRoot() {
         String envValue = System.getenv(DATA_MOUNT_ENV);
         if (envValue == null || envValue.trim().isEmpty()) {
@@ -84,4 +155,3 @@ public final class DataMountPaths {
     private record ResolvedDataRoot(boolean fromEnvironment, Path rootPath) {
     }
 }
-

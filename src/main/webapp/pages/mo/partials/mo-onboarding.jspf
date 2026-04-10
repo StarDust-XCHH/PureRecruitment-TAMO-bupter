@@ -1,0 +1,16 @@
+<div class="onboarding" id="onboarding">
+    <div class="guide-highlight" id="guideHighlight"></div>
+    <div class="guide-arrow" id="guideArrow"></div>
+    <div class="guide-card" id="guideCard">
+        <div class="guide-progress" id="guideProgress">引导 1 / 4</div>
+        <h3 id="guideTitle">欢迎使用 MO 工作台</h3>
+        <p class="muted" id="guideDesc">将依次介绍招聘总览、课程管理与发布岗位、应聘筛选与账号设置。</p>
+        <div class="guide-actions">
+            <button class="guide-btn ghost" id="guideBack" type="button">上一步</button>
+            <div style="display:flex; gap:10px;">
+                <button class="guide-btn ghost" id="skipBtn" type="button">跳过指引</button>
+                <button class="guide-btn primary" id="guideNext" type="button">下一步</button>
+            </div>
+        </div>
+    </div>
+</div>

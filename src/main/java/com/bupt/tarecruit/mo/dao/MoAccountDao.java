@@ -236,6 +236,28 @@ public class MoAccountDao {
     }
 
     /**
+     * 将前端传入的 MO 标识规范为 {@code mos.json} 中的账号 {@code id}：
+     * 若已是合法 id 则原样返回；否则按 {@code username}（忽略大小写）解析为对应 id；再否则返回去空白后的原串。
+     */
+    public synchronized String resolveCanonicalMoId(String identifier) throws IOException {
+        String key = trim(identifier);
+        if (key.isEmpty()) {
+            return "";
+        }
+        List<Map<String, Object>> accounts = loadRecords(MO_DATA_PATH, MO_SCHEMA, MO_ENTITY);
+        Map<String, Object> byId = findAccountByMoId(accounts, key);
+        if (byId != null) {
+            return asString(byId.get("id"));
+        }
+        for (Map<String, Object> account : accounts) {
+            if (asString(account.get("username")).equalsIgnoreCase(key)) {
+                return asString(account.get("id"));
+            }
+        }
+        return key;
+    }
+
+    /**
      * 保存 MO 个人资料与设置。
      *
      * @param input 资料更新输入
@@ -260,13 +282,13 @@ public class MoAccountDao {
         Map<String, Object> profile = ensureProfileRecord(profiles, account, now);
         Map<String, Object> setting = ensureSettingsRecord(settings, trim(input.moId()), now);
 
-        String normalizedRealName = trimToNull(input.realName());
+        String normalizedName = trimToNull(input.name());
         String normalizedEmail = trimToEmpty(input.contactEmail());
         String normalizedBio = trimToEmpty(input.bio());
         String normalizedAvatar = trimToEmpty(input.avatar());
         List<String> normalizedSkills = normalizeSkills(input.skills());
 
-        profile.put("realName", normalizedRealName == null ? asString(account.get("name")) : normalizedRealName);
+        profile.remove("realName");
         profile.put("contactEmail", normalizedEmail.isBlank() ? asString(account.get("email")) : normalizedEmail);
         profile.put("bio", normalizedBio);
         profile.put("avatar", normalizedAvatar);
@@ -274,8 +296,8 @@ public class MoAccountDao {
         profile.put("skills", normalizedSkills);
         profile.put("lastUpdatedAt", now);
 
-        if (normalizedRealName != null) {
-            account.put("name", normalizedRealName);
+        if (normalizedName != null) {
+            account.put("name", normalizedName);
         }
         if (!normalizedEmail.isBlank()) {
             account.put("email", normalizedEmail);
@@ -400,7 +422,6 @@ public class MoAccountDao {
         data.put("phone", asString(account.get("phone")));
         data.put("department", asString(account.get("department")));
         data.put("status", asString(account.get("status")));
-        data.put("realName", asString(profile.get("realName")));
         data.put("contactEmail", asString(profile.get("contactEmail")));
         data.put("bio", asString(profile.get("bio")));
         data.put("avatar", asString(profile.get("avatar")));
@@ -479,7 +500,6 @@ public class MoAccountDao {
         profile.put("id", "PROFILE-" + moId);
         profile.put("moId", moId);
         profile.put("avatar", "");
-        profile.put("realName", name == null ? "" : name);
         profile.put("title", "MO");
         profile.put("contactEmail", email == null ? "" : email);
         profile.put("bio", "");
@@ -639,16 +659,17 @@ public class MoAccountDao {
      */
     public static class ProfileUpdateInput {
         private final String moId;
-        private final String realName;
+        /** 与 {@code mos.json} 账号 {@code name} 一致，唯一展示姓名 */
+        private final String name;
         private final String contactEmail;
         private final String bio;
         private final List<String> skills;
         private final String avatar;
 
-        public ProfileUpdateInput(String moId, String realName, String contactEmail,
+        public ProfileUpdateInput(String moId, String name, String contactEmail,
                                   String bio, List<String> skills, String avatar) {
             this.moId = moId;
-            this.realName = realName;
+            this.name = name;
             this.contactEmail = contactEmail;
             this.bio = bio;
             this.skills = skills;
@@ -656,7 +677,7 @@ public class MoAccountDao {
         }
 
         public String moId() { return moId; }
-        public String realName() { return realName; }
+        public String name() { return name; }
         public String contactEmail() { return contactEmail; }
         public String bio() { return bio; }
         public List<String> skills() { return skills; }

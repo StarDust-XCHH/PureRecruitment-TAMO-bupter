@@ -3,7 +3,6 @@ package com.bupt.tarecruit.mo.controller;
 import com.bupt.tarecruit.common.model.ApiResponse;
 import com.bupt.tarecruit.mo.dao.MoRecruitmentDao;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -21,19 +20,21 @@ public class MoApplicantsServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String courseCode = req.getParameter("courseCode");
+        String moId = req.getParameter("moId") == null ? "" : req.getParameter("moId").trim();
         if (courseCode == null || courseCode.trim().isBlank()) {
             writeJson(resp, 400, gson.toJsonTree(ApiResponse.failure("缺少 courseCode 参数")).getAsJsonObject());
             return;
         }
+        if (moId.isBlank()) {
+            writeJson(resp, 400, gson.toJsonTree(ApiResponse.failure("缺少 moId 参数")).getAsJsonObject());
+            return;
+        }
 
         try {
-            JsonArray items = recruitmentDao.getApplicantsForCourse(courseCode);
-            JsonObject payload = new JsonObject();
-            payload.addProperty("success", true);
-            payload.addProperty("courseCode", courseCode);
-            payload.addProperty("count", items.size());
-            payload.add("items", items);
+            JsonObject payload = recruitmentDao.getApplicantsForCourse(courseCode.trim(), moId);
             writeJson(resp, 200, payload);
+        } catch (IllegalArgumentException ex) {
+            writeJson(resp, 403, gson.toJsonTree(ApiResponse.failure(ex.getMessage())).getAsJsonObject());
         } catch (Exception ex) {
             writeJson(resp, 500, gson.toJsonTree(ApiResponse.failure("读取应聘者数据失败: " + ex.getMessage())).getAsJsonObject());
         }

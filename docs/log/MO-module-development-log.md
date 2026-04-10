@@ -106,15 +106,15 @@
   - `**readJobBoard()`**：对磁盘 `items` 做内存归一化并组装响应（含 `schema`、`version`、`generatedAt`、`count`），供 MO 与 TA **同源读取**岗位大厅列表；读路径不写回磁盘。
   - `**appendPublishedJob`**：MO 发布岗位时在文件末尾追加一条，并同步 `meta` 与顶层信封字段后落盘。
   - 提供发布与展示所需的领域归一化与校验（教学周、考核事件、技能标签、校区、`normalizeJobItem` 等），保证列表与详情字段形状一致。
-  - `**findNormalizedJobByCourseCode**`：按课程编码查询单条归一化岗位，供 MO 在录用/拒绝决策时展示课程名称等信息。
+  - `**findNormalizedJobByCourseCode`**：按课程编码查询单条归一化岗位，供 MO 在录用/拒绝决策时展示课程名称等信息。
   - 提供按 `jobId`、治理字段、`ownerMoId` 等筛选/查询的静态方法，便于后续管理端或列表能力直接复用。
-2. `**MoRecruitmentDao**`
-  - 岗位待办列表、发布落盘、选人决策中的课程信息查询均通过 `**RecruitmentCoursesDao**` 完成，与 TA 侧读取同一套规范化结果。
-  - TA 账户、档案、申请状态等 JSON 仍由本类负责；结构化文件的创建与 `**meta**` 维护通过 `**ensureStructuredFile(Path, entity)**`（`ta` schema、`1.0` 版本）统一处理。
+2. `**MoRecruitmentDao`**
+  - 岗位待办列表、发布落盘、选人决策中的课程信息查询均通过 `**RecruitmentCoursesDao`** 完成，与 TA 侧读取同一套规范化结果。
+  - TA 账户、档案、申请状态等 JSON 仍由本类负责；结构化文件的创建与 `**meta`** 维护通过 `**ensureStructuredFile(Path, entity)**`（`ta` schema、`1.0` 版本）统一处理。
 3. **TA 岗位数据入口**
-  - `**TaAccountDao.getPendingJobBoardData`** 使用 `**readJobBoard()**`，与 MO 岗位列表数据来源与展示形状一致。
+  - `**TaAccountDao.getPendingJobBoardData`** 使用 `**readJobBoard()`**，与 MO 岗位列表数据来源与展示形状一致。
 4. **文档与挂载说明**
-  - 更新 `**common/dao/README`**、`**mo/dao/README**` 等包内说明；`**mountDataTAMObupter/common/recruitment-courses-dao-notes.md**` 记录 Admin/TA 对岗位库的专有写操作尚未在本包实现等事项。
+  - 更新 `**common/dao/README`**、`**mo/dao/README`** 等包内说明；`**mountDataTAMObupter/common/recruitment-courses-dao-notes.md**` 记录 Admin/TA 对岗位库的专有写操作尚未在本包实现等事项。
 
 ### 需要解决的问题
 
@@ -185,7 +185,7 @@
 
 ### 新增/修改内容
 
-1. **`assets/mo/js/modules/profile.js`**
+1. `**assets/mo/js/modules/profile.js`**
   - **接口与静态资源路径**：`PROFILE_API`、`ASSETS_BASE` 改为相对 `pages/mo/mo-home.jsp` 的 `../../api/mo/profile-settings` 与 `../../mo-assets`，与 `job-board.js`、`applicants.js` 一致，避免非根 context 部署时请求落到站点根路径导致 404。
   - **改密安全与体验**：移除遍历 `FormData` 及敏感调试输出，避免在浏览器控制台泄露当前密码/新密码明文；新密码与确认密码以 **trim 后** 校验长度（≥6）与一致性，提交 `newPassword` 为 trim 后内容，与后端 `MoAccountDao.updatePassword` 中对 `trim().length()` 的规则一致；当前密码仍原样提交以匹配登录哈希。
   - **登录态读取**：`loadMoIdFromStorage` 与 `settings.js` 对齐，优先 `sessionStorage` 的 `mo-user`，其次 `localStorage` 的 `mo-user`，再兜底 `localStorage` 的 `moUser`，减少仅一侧存储有数据时资料/改密不可用的问题。
@@ -206,9 +206,202 @@
 
 ---
 
+## Entry 06 - Git 误操作与分支以谁为准
+
+**At 2026-04-05 00:33 (UTC+8), by Fenghao.**
+
+### 说明
+
+- 合并 / 切换分支等 **Git 误操作导致本地状态混乱**，与 Entry 05 相关的 MO 个人资料、改密前端及 README 曾在工作区出现回退或不同步。
+- **截至本时间点，问题已处理完毕**：已在分支 `**Fenghao/MOPwdEdit_Restart`** 上按 Entry 05 所述范围，将 `profile.js` 与配套 README 等 **文件级修改重新对齐**；开发日志 Entry 05 内容保持不变作为功能说明。
+- **权威版本**：后续以 `**Fenghao/MOPwdEdit_Restart` 分支当前提交与工作区为准**（若再合并入主干或其它分支，应以此分支上的实现为对照，避免重复出现回退）。
+
+### 备注
+
+- 本条目仅记录过程与约定，**不涉及新的产品功能变更**。
+
+---
+
+## Entry 07 - MO 候选人详情、未读/已读、评论与岗位归属收紧
+
+**At 2026-04-06 02:30 (UTC+8), by Fenghao.**
+
+### 新增/修改内容
+
+1. **HTTP API（`mo.controller`）**
+  - 新增 `**MoApplicantDetailServlet`**（`/api/mo/applicants/detail`）：按 `**moId` + `applicationId`** 返回单条申请详情。
+  - 新增 `**MoApplicantResumeServlet**`（`/api/mo/applications/resume`）：校验岗位归属后流式返回简历文件。
+  - 新增 `**MoApplicantsUnreadServlet**`（`/api/mo/applicants/unread-count`）：按 `**moId**` 汇总未读数量，供侧边栏角标。
+  - 新增 `**MoApplicationMarkReadServlet**`（`/api/mo/applications/mark-read`）：`POST` 标记 MO 已读，并经 DAO 将 TA 侧 `**applications.json**` 中对应申请同步为 `**UNDER_REVIEW**`（不修改 TA 模块 Java，由 MO 侧变更 DAO 写入）。
+  - 新增 `**MoApplicationCommentServlet**`（`/api/mo/applications/comment`）：`POST` 追加 MO 端评论线程（仅存 MO 旁路 JSON）。
+  - `**MoApplicantsServlet**`：列表响应补充 `**unreadCount**` 等与未读/筛选相关的字段（与 `MoRecruitmentDao` 对齐）。
+  - `**MoApplicationDecisionServlet**`：请求体增加 `**moId**`，调用 `**decideApplication(courseCode, taId, moId, decision, comment)**` 五参重载，在 DAO 层解析岗位归属后再写 `**application-status.json**`。
+  - `**MoJobBoardServlet**`：`GET` 仅返回 **当前 `moId` 名下** 岗位（`ownerMoId` 过滤）；`POST` 发布时 `**ownerMoId` 以 query/body 的 `moId` 为准**，不信任客户端随意提交的 `ownerMoId`。
+  - `**MoProfileSettingsServlet`**：小幅调整（与资料/静态资源路径一致化）。
+  - 更新 `**mo/controller/README.md`**：登记上述 URL、契约与 `**mo-application-read-state.json` / `mo-application-comments.json`** 数据说明。
+2. **DAO 与挂载路径**
+  - `**DataMountPaths`**：增加 MO 申请旁路文件路径解析（已读状态、评论 JSON）。
+  - 新增 `**MoApplicationReadStateDao`**：维护 `**mo-application-read-state.json`**，按 `**(moId, applicationId)**` 记录已读时间，支撑未读红点与列表统计。
+  - 新增 `**MoApplicationCommentsDao**`：维护 `**mo-application-comments.json**`，按 `**applicationId**` 追加/读取 MO 评论。
+  - 新增 `**MoTaApplicationsMutationDao**`：对 `**mountDataTAMObupter/ta/applications.json**` 做受控写入（例如已读联动状态），与 TA 只读/状态服务解耦边界清晰。
+  - `**MoRecruitmentDao**` 大幅扩展：课程维度申请人列表、详情、未读统计、已读、评论、录用/拒绝决策等与 `**MoTaApplicationReadService**`、`**application-status.json**`、`**RecruitmentCoursesDao**` 的组合调用；`**ownerMoId` 仅与账号 `id` 比对**；发布岗位时 `**ownerMoName` 取自 `mos.json` 的 `name`**，`**profiles.json` 不再依赖 `realName` 字段**（与账户展示名合并策略一致）。
+  - `**MoAccountDao`**：配合上述资料/姓名字段策略的调整（与提交说明中「`realName` 合并到 `name`」方向一致）。
+  - 更新 `**mo/dao/README.md`**、`**common/config/README.md`**（`DataMountPaths` 与 MO 旁路路径说明）、`**mo/service/README.md**` 等包内文档。
+3. **MO 前端（`assets/mo`、`pages/mo`）**
+  - 新增 `**mo-api-prefix.js`**：统一 API 根路径前缀，与其它模块一致，避免非根 context 下 404。
+  - `**applicants.js`**：对接详情、未读、已读、评论、简历下载等接口；与岗位列表跳转、弹窗交互联动。
+  - `**job-board.js`**、`**mo-home.css`**：岗位列表与候选人流程相关的展示与样式补充。
+  - `**mo-layout-sidebar.jspf**`：侧边栏 **未读角标**（拉取 unread-count）。
+  - `**mo-route-applicants.jspf`**、`**mo-home.jsp`**：路由与脚本挂载调整。
+  - `**profile.js**`、`**settings.js**`：小幅度与存储键/API 前缀对齐。
+  - 更新 `**assets/mo/js/modules/README.md**`、`**pages/mo/README.md**`、`**pages/mo/routes/README.md**`。
+4. **开发辅助（与 MO 测试数据一致）**
+  - `**com.bupt.tarecruit.tools.DevApplicationDataCleanupTool`**（及 `**tools/ta-mo-submission-cleanup/`** 下 README、`**run-dev-application-data-cleanup.ps1**`）：一键对齐 TA 申请/AI 清理与 **MO 已读/评论旁路 JSON** 空状态，便于联调后重置（主类名避免与 `TaSubmissionCleanupTool` 混淆）。
+
+### 需要解决的问题
+
+- MO 已读与 TA `**applications.json` / `application-status.json`** 的时序与并发下是否仍需更强事务语义，需在高压联调中观察。
+- 评论仅存在 MO 侧 JSON，若未来需 TA 可见或审计，需单独产品设计与同步策略。可更新为公用评论，即TA和MO均可发布评论至公用磁盘数据。
+- Entry 01～03 中已列的岗位编辑、校验体系、仪表盘增强等 backlog 仍适用。
+
+### 备注
+
+- 本条依据 **当前分支相对 `master` 的 diff**（MO 相关包、`DataMountPaths`、`assets/mo`、`pages/mo` 及 MO 旁路数据说明）整理；**挂载目录下示例 JSON**（如 `mo-application-*.json`、`mos.json` 等）若随 diff 变更，以工作区与数据治理文档为准。
+
+---
+
+## Entry 08 - 岗位编辑、申请/名额统计同步与 jobId 治理
+
+**At 2026-04-06 05:02 (UTC+8), by Fenghao.**
+
+### 新增/修改内容
+
+1. **已发布课程的编辑能力**
+  MO 可在岗位大厅流程中对已有课程/岗位信息发起编辑并保存，与列表与详情展示保持一致，补全此前「仅能发布与浏览」的缺口。
+2. **课程维度申请数量统计与数据同步**
+  在岗位库侧维护与课程相关的申请统计，并在 MO 岗位界面侧同步展示；实现上当前以课程编码为关联维度，需在数据唯一性与边界场景上持续关注（见下节）。
+3. **TA 招聘人数校验与统计联动**
+  发布或变更岗位时对计划招收 TA 人数做约束校验，并与上述统计信息一并更新，避免名额字段与实际情况长期脱节。
+4. **岗位 `jobId` 的唯一性生成与校验**
+  为岗位条目提供稳定、唯一的业务标识生成与冲突检测，降低列表、筛选与后续决策链路中因标识重复或缺失导致的不一致风险。
+5. **分支集成与配套调整**
+  合并 `Fenghao/MO-Applicants` 相关能力时的冲突已处理；样例挂载数据、课程生成脚本及开发用申请数据清理说明随岗位字段与流程做了对齐，便于联调与重置环境。
+
+### 需要解决的问题
+
+- **按 `courseCode` 维度的统计与查询** 在多课号、历史数据或重名场景下存在潜在歧义，后续宜结合 `jobId` 或文件内稳定主键收紧关联策略。
+- Entry 01～07 中已列的通用 backlog（岗位关闭/归档、服务端校验与错误码体系、仪表盘增强等）仍然适用。
+
+### 备注
+
+- 本条依据当前分支相对 `**master`** 的提交记录与变更范围整理，**不涉及逐文件清单**；契约与字段细节仍以 `docs/api/mo-job-board-api-v2.md` 及包内 README 为准。
+
+---
+
+## MO 模块待解决问题小结（本时间点汇总）
+
+**At 2026-04-06 05:14 (UTC+8).**
+
+> 由 Entry 01～08 各条「需要解决的问题 / 新增问题」合并、去重后整理；**已在后续条目中落地的能力不再重复列出**（例如：岗位大厅 v2 API 与落盘、共用岗位库 DAO、MO 个人资料与改密、候选人详情/简历/未读与评论与录用决策后端、岗位归属过滤、**岗位编辑**、申请与名额统计及 `jobId` **治理** 等）。后续，在问题陆续解决和落地后，应定期重新撰写新的小结。
+
+### 岗位与主数据
+
+- **岗位生命周期仍不完整**：关闭、下架或归档等管理能力尚未在 MO 端形成闭环（Entry 01、02）。
+- **服务端校验与错误码偏轻量**：需按契约系统化收紧，并与前端错误展示对齐（Entry 02、07、08）。
+- **按 `courseCode` 的统计与关联存在歧义风险**：多课号、历史数据或重名场景下可能与真实岗位条目错位，宜结合 `**jobId` 或文件内稳定主键** 收紧策略（Entry 08）。
+- **TA 侧对 v2 新字段的生命周期**：与 MO 规范化路径是否始终一致，需持续联调确认（Entry 02、03）。
+- **DAO 层预留能力尚未产品化**：按 `jobId`、治理字段、`ownerMoId` 等的筛选/查询能力未在 HTTP 层统一暴露，待有管理端或列表需求时再接线（Entry 03）。
+
+### 候选人、状态与协作
+
+- **已读 / 状态多数据源**：MO 已读与 TA `applications.json`、`application-status.json` 等在时序与并发下是否需更强一致性语义，需在高压联调中验证（Entry 07）。
+- **评论范围**：当前评论仅存 MO 旁路数据；若需 TA 可见、对账或审计，需单独设计与同步策略（例如公用评论线程）（Entry 07）。
+- **候选人信息仍可加深**：除已有详情与简历外，可用时间等更完整画像与展示仍可加强（Entry 01）。
+- **录用/拒绝交互**：确认弹窗、防误触与明确成功/失败反馈仍可加强（Entry 01）。
+
+### 仪表盘、导航与体验
+
+- **仪表盘偏静态**：总览指标之外，趋势、逾期或待办提醒等管理向能力仍不足（Entry 01）。
+- **主界面信息密度**：单页过长时，可考虑将发布岗位、筛选候选人等拆为二级页或更清晰的导航结构（Entry 01）。
+- **导览与动画**：步骤高亮、跳转与过渡动画等与原型一致的体验仍不完整（Entry 01）。
+- **首次登录与新手引导**：尚未按 MO 设计方向补全（Entry 01）。
+- **视觉与可用性**：深色模式对比度、卡片排版等细节需持续打磨（Entry 01）。
+
+### 账户、安全与工程约定
+
+- **MO 注册、登录与工作台总览**：Entry 01 中「核心后端未完成」里，岗位发布与候选人决策等已后续落地；若注册/登录或仪表盘指标仍依赖临时方案、或与挂载数据/API 未完全对齐，需收尾并写入契约与运维说明（Entry 01）。
+- **个人资料与改密接口的安全模型**：若仍以显式 `moId` 等与前端存储为主，需评估升级为与服务端会话强绑定；新密码是否在 DAO 层统一 `trim` 等与前端规则完全一致，可按需要收紧（Entry 05）。
+- **分支与回退约定**：历史 Git 误操作教训见 Entry 06；合并功能时仍以约定分支上的实现为对照，避免重复回退。
+
+---
+
+## Entry 09 - TA 投递与 MO 改岗后的课程快照、岗位统计同步
+
+**At 2026-04-06 07:05 (UTC+8), by Fenghao.**
+
+### 新增/修改内容
+
+1. `**courseSnapshot` 与岗位板规范化对齐**
+  TA 申请里嵌入的课程快照改为与「岗位 JSON 经规范化后的单条」同源规则生成（含人数等字段的展示口径），避免两处手写结构长期不一致。
+2. **TA 单笔投递成功后刷新该课岗位统计**
+  申请与事件落盘成功后，按当前 TA 侧数据重算并写回对应课程在岗位库上的申请/录用等聚合指标；同步失败只打日志，不阻断投递主流程。
+3. **MO 保存课程正文后批量刷新历史申请的 `courseSnapshot`**
+  某门课在岗位大厅侧被编辑合并后，凡 `courseCode` 匹配的已存申请会重写快照，使 MO/联调里看到的课程信息与岗位板一致。
+4. **MO 进入某课候选人列表前同步该课统计**
+  在拉取该课申请人数据之前，先按 TA 数据对该课程条目做一次统计写回，缩小「申请状态已变、岗位数字未跟上」的时间窗。
+5. **双端开发清理结束时的操作提示**
+  清理流程完成后在控制台增加简短说明：若需从 Excel 复原岗位库，可使用 `genMoCourses.py` 的 import 模式；不改变清理行为本身。
+
+### 需要解决的问题
+
+- 与 Entry 08 一致：**按 `courseCode` 关联** 在多课号、历史或重名场景下仍有歧义风险，快照与统计刷新均以课号为键，需与 `jobId` 等稳定主键策略长期对齐。
+- Entry 01～08 中已列的通用 backlog（岗位生命周期、校验与错误码、仪表盘等）仍然适用。
+
+### 备注
+
+- 本条依据**当前分支相对 `master` 的差异**概括整理，**不涉及逐文件路径或变更清单**；挂载目录下样例数据若随联调变动，以工作区与数据治理说明为准。
+
+---
+
+## Entry 10 - 发布岗位文案与可用性、样式兜底与 DAO 小重构
+
+**At 2026-04-08 07:24 (UTC+8), by Fenghao.**
+
+### 新增/修改内容
+
+1. **发布岗位流程文案（用户向）**
+  - 主弹窗、授课周次子窗、技能选择子窗及课程管理页引导等处，弱化「弹窗 / 写入 / 系统词库」等实现向表述，改为可操作、可理解的说明。  
+  - `job-board.js` 中授课周次、技能摘要默认文案与发布表单初始提示对齐；校验提示中「系统技能标签」改为「技能标签」。技能已选摘要用「已选标签」表述。  
+  - MO 概览说明中「课程管理与发布」「应聘查看」「筛选与决策」等条目用语与上述方向一致。
+2. **必填字段视觉强调**
+  - 在 `mo-home.css` 中通过 `:has(.mo-req)` 为含必填星号的字段标签、图例、发布区块标题及侧栏导航链接统一加粗（`font-weight: 700`），与选填项区分。
+3. **顶栏 HTML 与样式校验**
+  - MO（及 TA）顶栏用户按钮内头像由 `div` 改为 `span`，符合 `button` 内容模型，消除 IDE/HTML 校验告警。  
+  - `mo-styles.css` 补充 `--border` 在 `:root` 与 `[data-theme="light"]` 下的默认值，避免单独打开该表时 CSS 变量无法解析。  
+  - 发布类弹窗通用关闭钮悬停背景去掉未定义的 `--danger-dark`，改为基于 `var(--danger, #ef4444)` 的 `color-mix` 加深。
+4. `**job-board.js` 清理**
+  - 移除未使用的 `getDisplayTime`；周次圆形按钮初始化时去掉冗余局部变量，逻辑不变。
+5. `**MoRecruitmentDao`**
+  - `assertMoOwnsCourse` 在校验通过后返回规范化 `moId`，供更新课程、申请人列表、已读标记、详情、评论、录用/拒绝等路径复用，减少重复解析。  
+  - TA 申请状态结构化文件仅有一种落盘路径时，将原 `ensureStructuredFile(Path, entity)` / `updateMeta(...)` 收拢为 `ensureTaApplicationStatusRoot()` 与 `touchTaApplicationStatusMeta(...)`，语义不变、调用更集中。
+
+### 需要解决的问题
+
+- Entry 01～09 中已列的通用 backlog（岗位全生命周期、错误码体系、仪表盘深化、导览动画与新手引导等）仍适用。  
+- 若需兼容不支持 CSS `:has()` 的浏览器，必填加粗可改为显式 class 标记。  
+- `mo-styles.css` 若与 TA 布局表分开展示校验，其余变量（如 `--text-primary`）是否需同样兜底，可按团队 IDE 规则再统一。
+- MO侧UI界面仍待进一步优化，如进一步增强发布课程功能UI，完善个人信息管理、修改课程等UI。
+
+### 备注
+
+- 本条对应工作区中 MO 前端（`pages/mo`、`assets/mo`）与 `MoRecruitmentDao` 等近期提交方向；数据挂载与 API 契约仍以 `docs/api/mo-job-board-api-v2.md` 及数据治理说明为准。  
+- Entry 03 正文中对 `ensureStructuredFile(Path, entity)` 的描述已被本条目中的方法名替代，读旧条目时请以此为准。
+
+---
+
 ## 模板
 
-### Entry 06 - [本次开发主题]
+### Entry 11 - [本次开发主题]
 
 **At [YYYY-MM-DD HH:MM (UTC+8)], by [Name].**
 

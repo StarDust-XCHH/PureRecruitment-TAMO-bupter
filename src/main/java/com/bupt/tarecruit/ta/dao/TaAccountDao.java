@@ -3,6 +3,7 @@ package com.bupt.tarecruit.ta.dao;
 import com.bupt.tarecruit.common.config.DataMountPaths;
 import com.bupt.tarecruit.common.dao.RecruitmentCoursesDao;
 import com.bupt.tarecruit.common.util.AuthUtils;
+import com.bupt.tarecruit.mo.dao.MoRecruitmentDao;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -12,15 +13,22 @@ import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
@@ -28,15 +36,14 @@ import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.getAsString;
 import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.trim;
 
 /**
- * 助教账户数据访问对象。
+ * 助教账户与申请数据访问对象。
  *
- * <p>本阶段在既有注册/登录能力基础上，补齐：</p>
+ * <p>在既有账号/资料能力基础上，扩展 TA 职位申请上传链路：</p>
  * <ul>
- *     <li>profile settings 读写</li>
- *     <li>头像路径保存</li>
- *     <li>修改密码</li>
- *     <li>application status 读取</li>
- *     <li>settings 保存反馈字段</li>
+ *     <li>application 主数据维护（applications.json）</li>
+ *     <li>application 事件维护（application-events.json）</li>
+ *     <li>简历目录写入与文件元数据保存</li>
+ *     <li>从新申请主数据派生 TA 状态页数据</li>
  * </ul>
  */
 public class TaAccountDao {
@@ -47,13 +54,16 @@ public class TaAccountDao {
     private static final String SETTINGS_SCHEMA = "ta";
     private static final String SETTINGS_ENTITY = "settings";
     private static final String APPLICATION_SCHEMA = "ta";
-    private static final String APPLICATION_ENTITY = "application-status";
+    private static final String APPLICATION_ENTITY = "applications";
+    private static final String APPLICATION_EVENT_ENTITY = "application-events";
+    private static final DateTimeFormatter APPLICATION_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'").withZone(ZoneOffset.UTC);
 
     private static final Path TA_DIR_PATH = DataMountPaths.taDir();
     private static final Path TA_DATA_PATH = TA_DIR_PATH.resolve("tas.json");
     private static final Path PROFILE_DATA_PATH = TA_DIR_PATH.resolve("profiles.json");
     private static final Path SETTINGS_DATA_PATH = TA_DIR_PATH.resolve("settings.json");
-    private static final Path APPLICATION_STATUS_PATH = TA_DIR_PATH.resolve("application-status.json");
+    private static final Path APPLICATION_DATA_PATH = DataMountPaths.taApplications();
+    private static final Path APPLICATION_EVENT_PATH = DataMountPaths.taApplicationEvents();
 
     private static final Gson GSON = new GsonBuilder()
             .setPrettyPrinting()
@@ -305,9 +315,14 @@ public class TaAccountDao {
             return ApplicationStatusResult.failure(404, "未找到对应 TA 账号");
         }
 
-        ensureApplicationStatusFile(normalizedTaId);
-        JsonObject root = loadStructuredJson(APPLICATION_STATUS_PATH, APPLICATION_SCHEMA, APPLICATION_ENTITY);
-        JsonArray items = root.getAsJsonArray("items");
+        ensureStructuredJsonFile(APPLICATION_DATA_PATH, APPLICATION_SCHEMA, APPLICATION_ENTITY, buildDefaultApplicationsRoot());
+        ensureStructuredJsonFile(APPLICATION_EVENT_PATH, APPLICATION_SCHEMA, APPLICATION_EVENT_ENTITY, buildDefaultApplicationEventsRoot());
+        JsonObject applicationRoot = loadStructuredJson(APPLICATION_DATA_PATH, APPLICATION_SCHEMA, APPLICATION_ENTITY);
+        JsonObject eventRoot = loadStructuredJson(APPLICATION_EVENT_PATH, APPLICATION_SCHEMA, APPLICATION_EVENT_ENTITY);
+        JsonObject moStatusRoot = loadMoStatusRoot();
+        JsonArray items = applicationRoot.getAsJsonArray("items");
+        JsonArray eventItems = eventRoot.getAsJsonArray("items");
+
         JsonArray userItems = new JsonArray();
         JsonObject summary = new JsonObject();
         summary.addProperty("totalCount", 0);
@@ -325,6 +340,7 @@ public class TaAccountDao {
         int closedCount = 0;
         String latestUpdatedAt = "";
         String latestStatusLabel = "暂无申请";
+
         for (JsonElement element : items) {
             if (!element.isJsonObject()) {
                 continue;
@@ -333,19 +349,19 @@ public class TaAccountDao {
             if (!normalizedTaId.equalsIgnoreCase(getAsString(item, "taId"))) {
                 continue;
             }
-            JsonObject normalizedItem = normalizeApplicationStatusItem(item);
+            JsonObject normalizedItem = normalizeApplicationRecord(mergeMoStatusIntoApplication(item, moStatusRoot), eventItems);
             userItems.add(normalizedItem);
             String status = getAsString(normalizedItem, "status");
-            if (containsAny(status, "面试", "interview")) {
+            if (containsAny(status, "面试", "INTERVIEW")) {
                 interviewCount++;
             }
-            if (containsAny(status, "补充资料", "补资料", "material")) {
+            if (containsAny(status, "补充资料", "MATERIAL", "资料")) {
                 needMaterialCount++;
             }
-            if (containsAny(status, "录用", "offer", "accepted")) {
+            if (containsAny(status, "录用", "ACCEPTED", "OFFER")) {
                 offerCount++;
             }
-            if (containsAny(status, "关闭", "淘汰", "未通过", "closed", "reject")) {
+            if (containsAny(status, "关闭", "淘汰", "未通过", "REJECTED", "WITHDRAWN")) {
                 closedCount++;
             }
             String updatedAt = getAsString(normalizedItem, "updatedAt");
@@ -354,6 +370,9 @@ public class TaAccountDao {
                 latestStatusLabel = status.isBlank() ? "处理中" : status;
             }
         }
+
+        sortByUpdatedAtDesc(userItems);
+
         summary.addProperty("totalCount", userItems.size());
         summary.addProperty("interviewCount", interviewCount);
         summary.addProperty("needMaterialCount", needMaterialCount);
@@ -363,28 +382,524 @@ public class TaAccountDao {
         summary.addProperty("latestStatusLabel", latestStatusLabel);
 
         JsonArray messages = new JsonArray();
-        JsonObject moNotice = new JsonObject();
-        moNotice.addProperty("title", "MO 提醒");
-        moNotice.addProperty("content", interviewCount > 0 ? "你有申请进入后续推进环节，请留意站内通知。" : "暂无新的 MO 面试邀约，请继续关注岗位更新。");
-        messages.add(moNotice);
+        JsonObject uploadNotice = new JsonObject();
+        uploadNotice.addProperty("title", "投递提醒");
+        uploadNotice.addProperty("content", userItems.size() > 0 ? "已记录你的课程申请与简历文件，可在本页持续跟踪进度。" : "当前还没有申请记录，可前往职位大厅上传简历并投递。");
+        messages.add(uploadNotice);
 
-        JsonObject systemNotice = new JsonObject();
-        systemNotice.addProperty("title", "系统通知");
-        systemNotice.addProperty("content", needMaterialCount > 0 ? "存在待补充资料的申请，请尽快完善。" : "当前申请状态已同步完成。");
-        messages.add(systemNotice);
+        JsonObject duplicateNotice = new JsonObject();
+        duplicateNotice.addProperty("title", "唯一申请规则");
+        duplicateNotice.addProperty("content", "同一 TA 对同一课程仅允许保留一条有效申请，请确认简历版本后再提交。");
+        messages.add(duplicateNotice);
 
-        JsonObject progressNotice = new JsonObject();
-        progressNotice.addProperty("title", "状态汇总");
-        progressNotice.addProperty("content", userItems.size() > 0
-                ? "当前共有 " + userItems.size() + " 条申请记录，最新进度为“" + latestStatusLabel + "”。"
-                : "当前还没有申请记录，可前往职位大厅投递岗位。");
-        messages.add(progressNotice);
+        JsonObject summaryNotice = new JsonObject();
+        summaryNotice.addProperty("title", "状态汇总");
+        summaryNotice.addProperty("content", userItems.size() > 0 ? "当前共有 " + userItems.size() + " 条申请记录，最新进度为“" + latestStatusLabel + "”。" : "当前暂无申请状态，系统已准备好新的上传体系。"
+        );
+        messages.add(summaryNotice);
 
         return ApplicationStatusResult.success(userItems, summary, messages);
     }
 
+    public synchronized ApplicationSubmitResult createApplication(ApplicationCreateInput input) throws IOException {
+        if (input == null || trim(input.taId()).isEmpty()) {
+            return ApplicationSubmitResult.failure(400, "缺少 TA 标识");
+        }
+        if (trim(input.courseCode()).isEmpty()) {
+            return ApplicationSubmitResult.failure(400, "缺少课程编号");
+        }
+        if (trim(input.originalFileName()).isEmpty()) {
+            return ApplicationSubmitResult.failure(400, "缺少简历文件名");
+        }
+        if (input.resumeStream() == null) {
+            return ApplicationSubmitResult.failure(400, "缺少简历文件内容");
+        }
+
+        List<Map<String, Object>> accounts = loadRecords(TA_DATA_PATH, TA_SCHEMA, TA_ENTITY);
+        List<Map<String, Object>> profiles = loadRecords(PROFILE_DATA_PATH, PROFILE_SCHEMA, PROFILE_ENTITY);
+        Map<String, Object> account = findAccountByTaId(accounts, trim(input.taId()));
+        if (account == null) {
+            return ApplicationSubmitResult.failure(404, "未找到对应 TA 账号");
+        }
+        Map<String, Object> profile = findProfileByTaId(profiles, trim(input.taId()));
+        if (profile == null) {
+            profile = createDefaultProfile(trim(input.taId()), asString(account.get("name")), asString(account.get("email")), AuthUtils.nowIso());
+            profiles.add(profile);
+            saveRecords(PROFILE_DATA_PATH, PROFILE_SCHEMA, PROFILE_ENTITY, profiles);
+        }
+
+        JsonObject course = RecruitmentCoursesDao.findNormalizedJobByCourseCode(trim(input.courseCode()));
+        if (course == null) {
+            return ApplicationSubmitResult.failure(404, "未找到对应课程或课程尚未开放申请");
+        }
+
+        ensureStructuredJsonFile(APPLICATION_DATA_PATH, APPLICATION_SCHEMA, APPLICATION_ENTITY, buildDefaultApplicationsRoot());
+        ensureStructuredJsonFile(APPLICATION_EVENT_PATH, APPLICATION_SCHEMA, APPLICATION_EVENT_ENTITY, buildDefaultApplicationEventsRoot());
+        JsonObject applicationRoot = loadStructuredJson(APPLICATION_DATA_PATH, APPLICATION_SCHEMA, APPLICATION_ENTITY);
+        JsonArray applicationItems = applicationRoot.getAsJsonArray("items");
+
+        String taId = trim(input.taId());
+        String courseCode = trim(input.courseCode()).toUpperCase(Locale.ROOT);
+        String uniqueKey = buildUniqueKey(taId, courseCode);
+        for (JsonElement element : applicationItems) {
+            if (!element.isJsonObject()) {
+                continue;
+            }
+            JsonObject existing = element.getAsJsonObject();
+            if (uniqueKey.equalsIgnoreCase(getAsString(existing, "uniqueKey")) && getAsBoolean(existing, "active", true)) {
+                return ApplicationSubmitResult.failure(409, "你已申请过该课程，请勿重复投递");
+            }
+        }
+
+        String applicationId = buildApplicationId(taId, courseCode);
+        String submittedAt = Instant.now().toString();
+        String extension = normalizeResumeExtension(input.originalFileName(), input.contentType());
+        Path courseDir = DataMountPaths.taResumeCourseDir(taId, courseCode);
+        Files.createDirectories(courseDir);
+        String storedFileName = applicationId + "_resume" + extension;
+        Path storedFile = courseDir.resolve(storedFileName).normalize();
+        Path resumeRoot = DataMountPaths.taResumeRoot().toAbsolutePath().normalize();
+        if (!storedFile.toAbsolutePath().normalize().startsWith(resumeRoot)) {
+            return ApplicationSubmitResult.failure(500, "简历存储路径非法");
+        }
+
+        long size;
+        String sha256;
+        try (InputStream in = input.resumeStream()) {
+            Files.copy(in, storedFile, StandardCopyOption.REPLACE_EXISTING);
+        } catch (Exception ex) {
+            deleteFileQuietly(storedFile);
+            throw ex;
+        }
+
+        try {
+            size = Files.size(storedFile);
+            sha256 = calculateSha256(storedFile);
+        } catch (Exception ex) {
+            deleteFileQuietly(storedFile);
+            throw ex;
+        }
+
+        try {
+            JsonObject applicationRecord = buildApplicationRecord(applicationId, uniqueKey, taId, courseCode, submittedAt, course, account, profile,
+                    input.originalFileName(), storedFileName, DataMountPaths.taDir().relativize(storedFile).toString().replace('\\', '/'),
+                    trimToEmpty(input.contentType()), extension, size, sha256);
+            applicationItems.add(applicationRecord);
+            applicationRoot.getAsJsonObject("meta").addProperty("updatedAt", submittedAt);
+            writeStructuredJson(APPLICATION_DATA_PATH, applicationRoot);
+
+            JsonObject eventRoot = loadStructuredJson(APPLICATION_EVENT_PATH, APPLICATION_SCHEMA, APPLICATION_EVENT_ENTITY);
+            JsonArray eventItems = eventRoot.getAsJsonArray("items");
+            eventItems.add(buildApplicationEvent(applicationId, taId, "SUBMITTED", "已投递申请", "系统已记录你的岗位申请与简历文件。", submittedAt, true));
+            eventRoot.getAsJsonObject("meta").addProperty("updatedAt", submittedAt);
+            writeStructuredJson(APPLICATION_EVENT_PATH, eventRoot);
+
+            try {
+                new MoRecruitmentDao().syncPublishedJobApplicationStatsForCourse(courseCode);
+            } catch (Exception syncEx) {
+                System.err.println("[TA-APPLY] recruitment stats sync skipped: " + syncEx.getMessage());
+            }
+
+            JsonObject payload = new JsonObject();
+            payload.addProperty("applicationId", applicationId);
+            payload.addProperty("courseCode", courseCode);
+            payload.addProperty("courseName", getAsString(course, "courseName"));
+            payload.addProperty("status", "SUBMITTED");
+            payload.addProperty("statusLabel", "已投递");
+            payload.addProperty("submittedAt", submittedAt);
+            payload.addProperty("resumeFileName", storedFileName);
+            payload.addProperty("resumeRelativePath", DataMountPaths.taDir().relativize(storedFile).toString().replace('\\', '/'));
+            return ApplicationSubmitResult.success(payload);
+        } catch (Exception ex) {
+            deleteFileQuietly(storedFile);
+            throw ex;
+        }
+    }
+
     public JsonObject getPendingJobBoardData() throws IOException {
         return RecruitmentCoursesDao.readJobBoard();
+    }
+
+    private JsonObject buildApplicationRecord(String applicationId,
+                                              String uniqueKey,
+                                              String taId,
+                                              String courseCode,
+                                              String submittedAt,
+                                              JsonObject course,
+                                              Map<String, Object> account,
+                                              Map<String, Object> profile,
+                                              String originalFileName,
+                                              String storedFileName,
+                                              String relativePath,
+                                              String contentType,
+                                              String extension,
+                                              long size,
+                                              String sha256) {
+        JsonObject item = new JsonObject();
+        item.addProperty("applicationId", applicationId);
+        item.addProperty("uniqueKey", uniqueKey);
+        item.addProperty("taId", taId);
+        item.addProperty("courseCode", courseCode);
+        item.add("courseSnapshot", buildCourseSnapshot(course));
+        item.add("taSnapshot", buildTaSnapshot(account, profile));
+
+        JsonObject resume = new JsonObject();
+        resume.addProperty("originalFileName", originalFileName);
+        resume.addProperty("storedFileName", storedFileName);
+        resume.addProperty("relativePath", relativePath);
+        resume.addProperty("extension", extension.replaceFirst("^\\.", ""));
+        resume.addProperty("mimeType", contentType);
+        resume.addProperty("size", size);
+        resume.addProperty("sha256", sha256);
+        item.add("resume", resume);
+
+        item.addProperty("status", "SUBMITTED");
+        item.addProperty("statusLabel", "已投递");
+        item.addProperty("statusTone", "warn");
+        item.addProperty("summary", "简历已提交，等待课程负责人查看与初步筛选。");
+        item.addProperty("nextAction", "请保持联系方式畅通，等待后续通知。");
+        item.addProperty("active", true);
+        item.addProperty("submittedAt", submittedAt);
+        item.addProperty("updatedAt", submittedAt);
+        return item;
+    }
+
+    private JsonObject buildCourseSnapshot(JsonObject course) {
+        return RecruitmentCoursesDao.taFacingCourseSnapshotFromNormalizedJob(course);
+    }
+
+    private JsonObject buildTaSnapshot(Map<String, Object> account, Map<String, Object> profile) {
+        JsonObject snapshot = new JsonObject();
+        snapshot.addProperty("taId", asString(account.get("id")));
+        snapshot.addProperty("realName", firstNonBlank(asString(profile.get("realName")), asString(account.get("name"))));
+        snapshot.addProperty("studentId", firstNonBlank(asString(profile.get("studentId")), asString(account.get("id"))));
+        snapshot.addProperty("contactEmail", firstNonBlank(asString(profile.get("contactEmail")), asString(account.get("email"))));
+        snapshot.addProperty("phone", asString(account.get("phone")));
+        snapshot.addProperty("department", asString(account.get("department")));
+        snapshot.addProperty("applicationIntent", asString(profile.get("applicationIntent")));
+        JsonArray skills = new JsonArray();
+        for (String skill : asStringList(profile.get("skills"))) {
+            skills.add(skill);
+        }
+        snapshot.add("skills", skills);
+        snapshot.addProperty("bio", asString(profile.get("bio")));
+        snapshot.addProperty("avatar", asString(profile.get("avatar")));
+        return snapshot;
+    }
+
+    private JsonObject buildApplicationEvent(String applicationId, String taId, String eventType, String label, String content, String time, boolean done) {
+        JsonObject event = new JsonObject();
+        event.addProperty("eventId", applicationId + "-EVT-" + APPLICATION_TIME_FORMATTER.format(Instant.now()));
+        event.addProperty("applicationId", applicationId);
+        event.addProperty("taId", taId);
+        event.addProperty("eventType", eventType);
+        event.addProperty("label", label);
+        event.addProperty("content", content);
+        event.addProperty("time", time);
+        event.addProperty("done", done);
+        return event;
+    }
+
+    private JsonObject normalizeApplicationRecord(JsonObject item, JsonArray eventItems) {
+        JsonObject normalized = new JsonObject();
+        String applicationId = getAsString(item, "applicationId");
+        JsonObject courseSnapshot = item.has("courseSnapshot") && item.get("courseSnapshot").isJsonObject()
+                ? item.getAsJsonObject("courseSnapshot") : new JsonObject();
+
+        String statusCode = firstNonBlank(getAsString(item, "status"), "SUBMITTED");
+        String statusLabel = firstNonBlank(getAsString(item, "statusLabel"), mapStatusLabel(statusCode));
+        String summary = firstNonBlank(getAsString(item, "summary"), "申请已提交，等待查看。");
+        String nextAction = firstNonBlank(getAsString(item, "nextAction"), defaultNextAction(statusCode));
+        String updatedAt = firstNonBlank(getAsString(item, "updatedAt"), getAsString(item, "submittedAt"));
+
+        normalized.addProperty("applicationId", applicationId);
+        normalized.addProperty("taId", getAsString(item, "taId"));
+        normalized.addProperty("courseCode", firstNonBlank(getAsString(item, "courseCode"), getAsString(courseSnapshot, "courseCode")));
+        normalized.addProperty("courseName", firstNonBlank(getAsString(courseSnapshot, "courseName"), "未命名岗位"));
+        normalized.addProperty("status", statusLabel);
+        normalized.addProperty("statusCode", statusCode);
+        normalized.addProperty("statusTone", firstNonBlank(getAsString(item, "statusTone"), mapStatusTone(statusCode)));
+        normalized.addProperty("summary", summary);
+        normalized.addProperty("nextAction", nextAction);
+        normalized.addProperty("updatedAt", updatedAt);
+        normalized.addProperty("category", firstNonBlank(getAsString(courseSnapshot, "semester"), "课程申请"));
+        normalized.addProperty("matchLevel", "--");
+        normalized.add("timeline", collectTimeline(applicationId, eventItems, updatedAt, summary));
+        normalized.add("details", buildApplicationDetails(item, courseSnapshot));
+        normalized.add("notifications", buildApplicationNotifications(item));
+        normalized.add("tags", buildApplicationTags(statusLabel));
+        normalized.addProperty("moComment", summary);
+        normalized.addProperty("nextStep", nextAction);
+        return normalized;
+    }
+
+    private JsonArray collectTimeline(String applicationId, JsonArray eventItems, String fallbackTime, String fallbackSummary) {
+        JsonArray timeline = new JsonArray();
+        for (JsonElement element : eventItems) {
+            if (!element.isJsonObject()) {
+                continue;
+            }
+            JsonObject item = element.getAsJsonObject();
+            if (!applicationId.equalsIgnoreCase(getAsString(item, "applicationId"))) {
+                continue;
+            }
+            JsonObject step = new JsonObject();
+            step.addProperty("label", firstNonBlank(getAsString(item, "label"), "状态节点"));
+            step.addProperty("content", firstNonBlank(getAsString(item, "content"), fallbackSummary));
+            step.addProperty("time", firstNonBlank(getAsString(item, "time"), fallbackTime));
+            step.addProperty("done", getAsBoolean(item, "done", true));
+            timeline.add(step);
+        }
+        if (timeline.isEmpty()) {
+            JsonObject step = new JsonObject();
+            step.addProperty("label", "已投递申请");
+            step.addProperty("content", fallbackSummary);
+            step.addProperty("time", fallbackTime);
+            step.addProperty("done", true);
+            timeline.add(step);
+        }
+        return timeline;
+    }
+
+    private JsonArray buildApplicationDetails(JsonObject item, JsonObject courseSnapshot) {
+        JsonArray details = new JsonArray();
+        details.add(detailRow("岗位编号", firstNonBlank(getAsString(courseSnapshot, "courseCode"), getAsString(item, "courseCode"))));
+        details.add(detailRow("课程名称", firstNonBlank(getAsString(courseSnapshot, "courseName"), "--")));
+        details.add(detailRow("授课教师", firstNonBlank(getAsString(courseSnapshot, "ownerMoName"), "待分配")));
+        details.add(detailRow("校区", firstNonBlank(getAsString(courseSnapshot, "campus"), "待确认")));
+        JsonObject resume = item.has("resume") && item.get("resume").isJsonObject() ? item.getAsJsonObject("resume") : new JsonObject();
+        details.add(detailRow("简历文件", firstNonBlank(getAsString(resume, "originalFileName"), getAsString(resume, "storedFileName"))));
+        details.add(detailRow("提交时间", firstNonBlank(getAsString(item, "submittedAt"), getAsString(item, "updatedAt"))));
+        return details;
+    }
+
+    private JsonObject detailRow(String label, String value) {
+        JsonObject row = new JsonObject();
+        row.addProperty("label", label);
+        row.addProperty("value", value);
+        return row;
+    }
+
+    private JsonArray buildApplicationNotifications(JsonObject item) {
+        JsonArray notifications = new JsonArray();
+        JsonObject notice = new JsonObject();
+        notice.addProperty("title", "申请已记录");
+        notice.addProperty("content", firstNonBlank(getAsString(item, "summary"), "你的简历已进入岗位申请记录。"));
+        notice.addProperty("tone", firstNonBlank(getAsString(item, "statusTone"), "info"));
+        notice.addProperty("createdAt", firstNonBlank(getAsString(item, "updatedAt"), getAsString(item, "submittedAt")));
+        notifications.add(notice);
+        return notifications;
+    }
+
+    private JsonArray buildApplicationTags(String statusLabel) {
+        JsonArray tags = new JsonArray();
+        tags.add("已投递");
+        if (!statusLabel.isBlank() && !"已投递".equals(statusLabel)) {
+            tags.add(statusLabel);
+        }
+        return tags;
+    }
+
+    private String mapStatusLabel(String statusCode) {
+        String code = trimToEmpty(statusCode).toUpperCase(Locale.ROOT);
+        return switch (code) {
+            case "UNDER_REVIEW" -> "审核中";
+            case "NEED_MORE_INFO" -> "待补充资料";
+            case "INTERVIEW" -> "面试中";
+            case "ACCEPTED" -> "已录用";
+            case "REJECTED" -> "未通过";
+            case "WITHDRAWN" -> "已撤回";
+            default -> "已投递";
+        };
+    }
+
+    private String mapStatusTone(String statusCode) {
+        String code = trimToEmpty(statusCode).toUpperCase(Locale.ROOT);
+        return switch (code) {
+            case "ACCEPTED" -> "success";
+            case "REJECTED", "WITHDRAWN" -> "error";
+            case "UNDER_REVIEW", "NEED_MORE_INFO", "INTERVIEW" -> "warn";
+            default -> "warn";
+        };
+    }
+
+    private JsonObject loadMoStatusRoot() throws IOException {
+        Path statusPath = DataMountPaths.taApplicationStatus();
+        if (!Files.exists(statusPath)) {
+            return null;
+        }
+        JsonElement parsed;
+        try (Reader reader = Files.newBufferedReader(statusPath, StandardCharsets.UTF_8)) {
+            parsed = JsonParser.parseReader(reader);
+        }
+        if (parsed == null || !parsed.isJsonObject()) {
+            return null;
+        }
+        JsonObject root = parsed.getAsJsonObject();
+        if (!root.has("items") || !root.get("items").isJsonArray()) {
+            return null;
+        }
+        return root;
+    }
+
+    private JsonObject mergeMoStatusIntoApplication(JsonObject applicationItem, JsonObject moStatusRoot) {
+        if (applicationItem == null || moStatusRoot == null) {
+            return applicationItem;
+        }
+        JsonObject latestMoStatus = findMoStatusForApplication(applicationItem, moStatusRoot.getAsJsonArray("items"));
+        if (latestMoStatus == null) {
+            return applicationItem;
+        }
+
+        JsonObject merged = applicationItem.deepCopy();
+        merged.addProperty("status", mapMoStatusToTaStatusCode(getAsString(latestMoStatus, "status")));
+        merged.addProperty("statusLabel", firstNonBlank(getAsString(latestMoStatus, "status"), getAsString(merged, "statusLabel")));
+        merged.addProperty("statusTone", firstNonBlank(getAsString(latestMoStatus, "statusTone"), getAsString(merged, "statusTone")));
+        merged.addProperty("summary", firstNonBlank(getAsString(latestMoStatus, "summary"), getAsString(merged, "summary")));
+        merged.addProperty("nextAction", firstNonBlank(getAsString(latestMoStatus, "nextAction"), getAsString(merged, "nextAction")));
+        merged.addProperty("updatedAt", firstNonBlank(getAsString(latestMoStatus, "updatedAt"), getAsString(merged, "updatedAt")));
+        if (latestMoStatus.has("matchLevel") && !latestMoStatus.get("matchLevel").isJsonNull()) {
+            merged.add("matchLevel", latestMoStatus.get("matchLevel").deepCopy());
+        }
+        return merged;
+    }
+
+    private JsonObject findMoStatusForApplication(JsonObject applicationItem, JsonArray moStatusItems) {
+        if (applicationItem == null || moStatusItems == null) {
+            return null;
+        }
+        String taId = getAsString(applicationItem, "taId");
+        String courseCode = getAsString(applicationItem, "courseCode");
+        JsonObject courseSnapshot = applicationItem.has("courseSnapshot") && applicationItem.get("courseSnapshot").isJsonObject()
+                ? applicationItem.getAsJsonObject("courseSnapshot") : new JsonObject();
+        String courseName = getAsString(courseSnapshot, "courseName");
+        JsonObject latest = null;
+        for (JsonElement element : moStatusItems) {
+            if (!element.isJsonObject()) {
+                continue;
+            }
+            JsonObject item = element.getAsJsonObject();
+            if (!taId.equalsIgnoreCase(getAsString(item, "taId"))) {
+                continue;
+            }
+            String jobSlug = trimToEmpty(getAsString(item, "jobSlug")).toLowerCase(Locale.ROOT);
+            String courseCodeSlug = trimToEmpty(courseCode).toLowerCase(Locale.ROOT);
+            boolean matched = (!courseCodeSlug.isBlank() && jobSlug.equals(courseCodeSlug))
+                    || (!courseName.isBlank() && courseName.equalsIgnoreCase(getAsString(item, "courseName")));
+            if (!matched) {
+                continue;
+            }
+            if (latest == null || getAsString(item, "updatedAt").compareTo(getAsString(latest, "updatedAt")) > 0) {
+                latest = item;
+            }
+        }
+        return latest;
+    }
+
+    private String mapMoStatusToTaStatusCode(String moStatusLabel) {
+        String label = trimToEmpty(moStatusLabel);
+        if (containsAny(label, "录用", "通过")) {
+            return "ACCEPTED";
+        }
+        if (containsAny(label, "拒绝", "未录用", "未通过")) {
+            return "REJECTED";
+        }
+        return label.isBlank() ? "SUBMITTED" : label;
+    }
+
+    private String defaultNextAction(String statusCode) {
+        String code = trimToEmpty(statusCode).toUpperCase(Locale.ROOT);
+        return switch (code) {
+            case "UNDER_REVIEW" -> "请等待课程负责人查看简历结果。";
+            case "NEED_MORE_INFO" -> "请按通知补充相关材料后重新等待审核。";
+            case "INTERVIEW" -> "请留意面试通知并做好课程相关准备。";
+            case "ACCEPTED" -> "请留意后续签约和排班通知。";
+            case "REJECTED" -> "可继续关注其他开放课程并重新申请。";
+            case "WITHDRAWN" -> "该申请已结束，可投递其他课程。";
+            default -> "请保持联系方式畅通，等待后续通知。";
+        };
+    }
+
+    private void sortByUpdatedAtDesc(JsonArray items) {
+        if (items == null || items.size() <= 1) {
+            return;
+        }
+        List<JsonObject> sorted = new ArrayList<>();
+        for (JsonElement element : items) {
+            if (element != null && element.isJsonObject()) {
+                sorted.add(element.getAsJsonObject());
+            }
+        }
+        sorted.sort((left, right) -> getAsString(right, "updatedAt").compareTo(getAsString(left, "updatedAt")));
+        items.asList().clear();
+        for (JsonObject item : sorted) {
+            items.add(item);
+        }
+    }
+
+    private String buildApplicationId(String taId, String courseCode) {
+        return "APP-" + taId + "-" + courseCode + "-" + APPLICATION_TIME_FORMATTER.format(Instant.now());
+    }
+
+    private String buildUniqueKey(String taId, String courseCode) {
+        return taId.toUpperCase(Locale.ROOT) + "::" + courseCode.toUpperCase(Locale.ROOT);
+    }
+
+    private String normalizeResumeExtension(String fileName, String contentType) {
+        String lower = trimToEmpty(fileName).toLowerCase(Locale.ROOT);
+        if (lower.endsWith(".pdf")) {
+            return ".pdf";
+        }
+        if (lower.endsWith(".docx")) {
+            return ".docx";
+        }
+        if (lower.endsWith(".doc")) {
+            return ".doc";
+        }
+        String mime = trimToEmpty(contentType).toLowerCase(Locale.ROOT);
+        if (mime.contains("pdf")) {
+            return ".pdf";
+        }
+        if (mime.contains("wordprocessingml")) {
+            return ".docx";
+        }
+        if (mime.contains("msword")) {
+            return ".doc";
+        }
+        return ".pdf";
+    }
+
+    private String calculateSha256(Path file) throws IOException {
+        try (InputStream in = Files.newInputStream(file)) {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] buffer = new byte[8192];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                digest.update(buffer, 0, read);
+            }
+            return toHex(digest.digest());
+        } catch (NoSuchAlgorithmException ex) {
+            throw new IOException("SHA-256 不可用", ex);
+        }
+    }
+
+    private String toHex(byte[] bytes) {
+        StringBuilder builder = new StringBuilder();
+        for (byte b : bytes) {
+            builder.append(String.format("%02x", b));
+        }
+        return builder.toString();
+    }
+
+    private void deleteFileQuietly(Path path) {
+        if (path == null) {
+            return;
+        }
+        try {
+            Files.deleteIfExists(path);
+        } catch (IOException ignore) {
+            // ignore cleanup failure
+        }
     }
 
     private List<Map<String, Object>> loadRecords(Path path, String schema, String entity) throws IOException {
@@ -470,34 +985,14 @@ public class TaAccountDao {
         }
     }
 
-    private void ensureApplicationStatusFile(String taId) throws IOException {
-        if (Files.notExists(APPLICATION_STATUS_PATH)) {
-            ensureStructuredJsonFile(APPLICATION_STATUS_PATH, APPLICATION_SCHEMA, APPLICATION_ENTITY, buildDefaultApplicationStatusRoot(taId));
-            return;
-        }
-
-        JsonObject root = loadStructuredJson(APPLICATION_STATUS_PATH, APPLICATION_SCHEMA, APPLICATION_ENTITY);
-        JsonArray items = root.getAsJsonArray("items");
-        boolean exists = false;
-        for (JsonElement element : items) {
-            if (element.isJsonObject() && taId.equalsIgnoreCase(getAsString(element.getAsJsonObject(), "taId"))) {
-                exists = true;
-                break;
-            }
-        }
-        if (!exists) {
-            JsonObject appendRoot = buildDefaultApplicationStatusRoot(taId);
-            for (JsonElement element : appendRoot.getAsJsonArray("items")) {
-                items.add(element);
-            }
-            root.getAsJsonObject("meta").addProperty("updatedAt", Instant.now().toString());
-            try (Writer writer = Files.newBufferedWriter(APPLICATION_STATUS_PATH, StandardCharsets.UTF_8)) {
-                GSON.toJson(root, writer);
-            }
+    private void writeStructuredJson(Path path, JsonObject root) throws IOException {
+        Files.createDirectories(path.getParent());
+        try (Writer writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
+            GSON.toJson(root, writer);
         }
     }
 
-    private JsonObject buildDefaultApplicationStatusRoot(String taId) {
+    private JsonObject buildDefaultApplicationsRoot() {
         JsonObject root = new JsonObject();
         JsonObject meta = new JsonObject();
         meta.addProperty("schema", APPLICATION_SCHEMA);
@@ -505,229 +1000,34 @@ public class TaAccountDao {
         meta.addProperty("version", "1.0");
         meta.addProperty("updatedAt", Instant.now().toString());
         root.add("meta", meta);
-
-        JsonArray items = new JsonArray();
-        items.add(createApplicationStatusItem(
-                taId,
-                "APP-" + taId + "-01",
-                "EBU6304 软件工程助教",
-                "审核中",
-                "warn",
-                "已完成简历初筛，正在安排课程理解面试。",
-                "请保持手机和邮箱畅通，等待面试通知。",
-                "2026-03-16T10:00:00Z",
-                "software-engineering-ta",
-                "教学支持 / 软件工程",
-                "高",
-                arrayOf("已投递", "简历通过", "等待面试"),
-                arrayOf(
-                        createTimelineStep("已投递申请", "系统已记录你的岗位投递信息。", "2026-03-13T09:30:00Z", true),
-                        createTimelineStep("简历初筛通过", "MO 认为课程相关经历匹配度较高。", "2026-03-14T14:00:00Z", true),
-                        createTimelineStep("等待面试安排", "预计 3-5 个工作日内发送面试通知。", "2026-03-16T10:00:00Z", false)
-                ),
-                arrayOf(
-                        createDetailEntry("岗位编号", "EBU6304"),
-                        createDetailEntry("课程方向", "软件工程"),
-                        createDetailEntry("授课地点", "教一楼 A305")
-                ),
-                arrayOf(
-                        createNotificationEntry("MO 提醒", "请提前准备课程项目截图和可讲解案例。", "info", "2026-03-16T10:05:00Z"),
-                        createNotificationEntry("系统通知", "你的申请已进入后续推进阶段。", "success", "2026-03-16T10:06:00Z")
-                )
-        ));
-        items.add(createApplicationStatusItem(
-                taId,
-                "APP-" + taId + "-02",
-                "EBU6301 计算机网络助教",
-                "待补充资料",
-                "warn",
-                "需要补充一份能够体现网络实验经验的材料。",
-                "请在 24 小时内上传课程实验截图或项目链接。",
-                "2026-03-15T09:00:00Z",
-                "computer-network-ta",
-                "网络实验 / 教学答疑",
-                "中",
-                arrayOf("已投递", "待补充资料"),
-                arrayOf(
-                        createTimelineStep("已投递申请", "系统已记录你的岗位投递信息。", "2026-03-12T11:00:00Z", true),
-                        createTimelineStep("待补充资料", "MO 请求补充网络实验相关证明材料。", "2026-03-15T09:00:00Z", false)
-                ),
-                arrayOf(
-                        createDetailEntry("岗位编号", "EBU6301"),
-                        createDetailEntry("课程方向", "计算机网络"),
-                        createDetailEntry("材料要求", "网络实验截图 / 项目仓库链接")
-                ),
-                arrayOf(
-                        createNotificationEntry("材料提醒", "补充材料后将重新进入审核队列。", "warn", "2026-03-15T09:05:00Z")
-                )
-        ));
-        items.add(createApplicationStatusItem(
-                taId,
-                "APP-" + taId + "-03",
-                "EBU6402 数据库助教",
-                "已录用",
-                "success",
-                "教学经验与数据库项目经历匹配度较高。",
-                "请留意后续签约通知和首次排班安排。",
-                "2026-03-14T08:00:00Z",
-                "database-ta",
-                "数据库 / 实验辅导",
-                "高",
-                arrayOf("已投递", "初筛通过", "完成面试", "已录用"),
-                arrayOf(
-                        createTimelineStep("已投递申请", "系统已记录你的岗位投递信息。", "2026-03-10T10:00:00Z", true),
-                        createTimelineStep("初筛通过", "岗位匹配度评估结果良好。", "2026-03-11T15:00:00Z", true),
-                        createTimelineStep("完成面试", "你已完成课程理解与答疑模拟面试。", "2026-03-13T16:00:00Z", true),
-                        createTimelineStep("已录用", "请等待签约与排班通知。", "2026-03-14T08:00:00Z", true)
-                ),
-                arrayOf(
-                        createDetailEntry("岗位编号", "EBU6402"),
-                        createDetailEntry("课程方向", "数据库"),
-                        createDetailEntry("预计到岗", "2026-03-21")
-                ),
-                arrayOf(
-                        createNotificationEntry("录用通知", "恭喜你已通过该岗位全部流程。", "success", "2026-03-14T08:05:00Z")
-                )
-        ));
-        root.add("items", items);
+        root.add("items", new JsonArray());
         return root;
     }
 
-    private JsonObject createApplicationStatusItem(String taId, String applicationId, String courseName, String status,
-                                                   String statusTone, String summary, String nextAction, String updatedAt,
-                                                   String jobSlug, String category, String matchLevel,
-                                                   JsonArray tags, JsonArray timeline, JsonArray details, JsonArray notifications) {
-        JsonObject item = new JsonObject();
-        item.addProperty("applicationId", applicationId);
-        item.addProperty("taId", taId);
-        item.addProperty("courseName", courseName);
-        item.addProperty("status", status);
-        item.addProperty("statusTone", statusTone);
-        item.addProperty("summary", summary);
-        item.addProperty("nextAction", nextAction);
-        item.addProperty("updatedAt", updatedAt);
-        item.addProperty("jobSlug", jobSlug);
-        item.addProperty("category", category);
-        item.addProperty("matchLevel", matchLevel);
-        item.add("tags", tags == null ? new JsonArray() : tags);
-        item.add("timeline", timeline == null ? new JsonArray() : timeline);
-        item.add("details", details == null ? new JsonArray() : details);
-        item.add("notifications", notifications == null ? new JsonArray() : notifications);
-        item.addProperty("moComment", summary);
-        item.addProperty("nextStep", nextAction);
-        return item;
+    private JsonObject buildDefaultApplicationEventsRoot() {
+        JsonObject root = new JsonObject();
+        JsonObject meta = new JsonObject();
+        meta.addProperty("schema", APPLICATION_SCHEMA);
+        meta.addProperty("entity", APPLICATION_EVENT_ENTITY);
+        meta.addProperty("version", "1.0");
+        meta.addProperty("updatedAt", Instant.now().toString());
+        root.add("meta", meta);
+        root.add("items", new JsonArray());
+        return root;
     }
 
-    private JsonObject createTimelineStep(String label, String content, String time, boolean done) {
-        JsonObject item = new JsonObject();
-        item.addProperty("label", label);
-        item.addProperty("content", content);
-        item.addProperty("time", time);
-        item.addProperty("done", done);
-        return item;
+    private void ensureMeta(JsonObject root, String schema, String entity) {
+        JsonObject meta = root.has("meta") && root.get("meta").isJsonObject() ? root.getAsJsonObject("meta") : new JsonObject();
+        meta.addProperty("schema", firstNonBlank(getAsString(meta, "schema"), schema));
+        meta.addProperty("entity", firstNonBlank(getAsString(meta, "entity"), entity));
+        meta.addProperty("version", firstNonBlank(getAsString(meta, "version"), "1.0"));
+        if (!meta.has("updatedAt") || meta.get("updatedAt").isJsonNull()) {
+            meta.addProperty("updatedAt", Instant.now().toString());
+        }
+        root.add("meta", meta);
     }
 
-    private JsonObject createDetailEntry(String label, String value) {
-        JsonObject item = new JsonObject();
-        item.addProperty("label", label);
-        item.addProperty("value", value);
-        return item;
-    }
-
-    private JsonObject createNotificationEntry(String title, String content, String tone, String createdAt) {
-        JsonObject item = new JsonObject();
-        item.addProperty("title", title);
-        item.addProperty("content", content);
-        item.addProperty("tone", tone);
-        item.addProperty("createdAt", createdAt);
-        return item;
-    }
-
-    private JsonArray arrayOf(String... values) {
-        JsonArray array = new JsonArray();
-        if (values == null) {
-            return array;
-        }
-        for (String value : values) {
-            array.add(value == null ? "" : value);
-        }
-        return array;
-    }
-
-    private JsonArray arrayOf(JsonObject... values) {
-        JsonArray array = new JsonArray();
-        if (values == null) {
-            return array;
-        }
-        for (JsonObject value : values) {
-            if (value != null) {
-                array.add(value);
-            }
-        }
-        return array;
-    }
-
-    private JsonObject normalizeApplicationStatusItem(JsonObject source) {
-        JsonObject item = source == null ? new JsonObject() : source.deepCopy();
-        item.addProperty("summary", firstNonBlank(getAsString(item, "summary"), getAsString(item, "moComment")));
-        item.addProperty("nextAction", firstNonBlank(getAsString(item, "nextAction"), getAsString(item, "nextStep")));
-        if (!item.has("timeline") || !item.get("timeline").isJsonArray()) {
-            JsonArray timeline = new JsonArray();
-            timeline.add(createTimelineStep(getAsString(item, "status"), firstNonBlank(getAsString(item, "summary"), getAsString(item, "moComment")), getAsString(item, "updatedAt"), false));
-            item.add("timeline", timeline);
-        }
-        if (!item.has("details") || !item.get("details").isJsonArray()) {
-            JsonArray details = new JsonArray();
-            details.add(createDetailEntry("岗位名称", getAsString(item, "courseName")));
-            details.add(createDetailEntry("当前状态", getAsString(item, "status")));
-            item.add("details", details);
-        }
-        if (!item.has("notifications") || !item.get("notifications").isJsonArray()) {
-            JsonArray notifications = new JsonArray();
-            notifications.add(createNotificationEntry("状态同步", firstNonBlank(getAsString(item, "nextAction"), getAsString(item, "nextStep")), getAsString(item, "statusTone"), getAsString(item, "updatedAt")));
-            item.add("notifications", notifications);
-        }
-        if (!item.has("tags") || !item.get("tags").isJsonArray()) {
-            item.add("tags", new JsonArray());
-        }
-        if (!item.has("jobSlug") || item.get("jobSlug").isJsonNull()) {
-            item.addProperty("jobSlug", "");
-        }
-        if (!item.has("category") || item.get("category").isJsonNull()) {
-            item.addProperty("category", "");
-        }
-        if (!item.has("matchLevel") || item.get("matchLevel").isJsonNull()) {
-            item.addProperty("matchLevel", "");
-        }
-        return item;
-    }
-
-    private Map<String, Object> ensureProfileRecord(List<Map<String, Object>> profiles, Map<String, Object> account, String now) {
-        String taId = asString(account.get("id"));
-        for (Map<String, Object> profile : profiles) {
-            if (asString(profile.get("taId")).equalsIgnoreCase(taId)) {
-                fillProfileDefaults(profile, account, now);
-                return profile;
-            }
-        }
-        Map<String, Object> created = createDefaultProfile(taId, asString(account.get("name")), asString(account.get("email")), now);
-        profiles.add(created);
-        return created;
-    }
-
-    private Map<String, Object> ensureSettingsRecord(List<Map<String, Object>> settings, String taId, String now) {
-        for (Map<String, Object> setting : settings) {
-            if (asString(setting.get("taId")).equalsIgnoreCase(taId)) {
-                fillSettingsDefaults(setting, now);
-                return setting;
-            }
-        }
-        Map<String, Object> created = createDefaultSettings(taId, now);
-        settings.add(created);
-        return created;
-    }
-
-    private Map<String, Object> createDefaultProfile(String taId, String name, String email, String now) {
+    private Map<String, Object> createDefaultProfile(String taId, String name, String email, String currentTime) {
         Map<String, Object> profile = new LinkedHashMap<>();
         profile.put("id", "PROFILE-" + taId);
         profile.put("taId", taId);
@@ -741,61 +1041,45 @@ public class TaAccountDao {
         profile.put("availabilityHoursPerWeek", 0);
         profile.put("semester", "");
         profile.put("title", "TA");
-        profile.put("lastUpdatedAt", now);
+        profile.put("lastUpdatedAt", currentTime);
         return profile;
     }
 
-    private Map<String, Object> createDefaultSettings(String taId, String now) {
-        Map<String, Object> setting = new LinkedHashMap<>();
-        setting.put("id", "SETTING-" + taId);
-        setting.put("taId", taId);
-        setting.put("theme", "dark");
-        setting.put("avatar", "");
-        setting.put("onboardingStep", 0);
-        setting.put("guideCompleted", false);
-        setting.put("onboardingCompletedAt", "");
-        setting.put("onboardingDismissed", false);
-        setting.put("profileSaved", false);
-        setting.put("profileSavedAt", "");
-        setting.put("lastProfileSyncStatus", "idle");
-        setting.put("lastProfileSyncMessage", "");
-        setting.put("createdAt", now);
-        setting.put("updatedAt", now);
-        return setting;
+    private Map<String, Object> createDefaultSettings(String taId, String currentTime) {
+        Map<String, Object> settings = new LinkedHashMap<>();
+        settings.put("id", "SETTING-" + taId);
+        settings.put("taId", taId);
+        settings.put("profileSaved", false);
+        settings.put("profileSavedAt", "");
+        settings.put("lastProfileSyncStatus", "idle");
+        settings.put("lastProfileSyncMessage", "");
+        settings.put("avatar", "");
+        settings.put("notifyApplication", true);
+        settings.put("notifyRecommendation", true);
+        settings.put("notifyInterview", true);
+        settings.put("updatedAt", currentTime);
+        return settings;
     }
 
-    private void fillProfileDefaults(Map<String, Object> profile, Map<String, Object> account, String now) {
-        profile.putIfAbsent("id", "PROFILE-" + asString(account.get("id")));
-        profile.putIfAbsent("taId", asString(account.get("id")));
-        profile.putIfAbsent("avatar", "");
-        profile.putIfAbsent("realName", asString(account.get("name")));
-        profile.putIfAbsent("applicationIntent", "");
-        profile.putIfAbsent("studentId", asString(account.get("id")));
-        profile.putIfAbsent("contactEmail", asString(account.get("email")));
-        profile.putIfAbsent("bio", "");
-        if (!(profile.get("skills") instanceof List<?>)) {
-            profile.put("skills", new ArrayList<>());
-        }
-        profile.putIfAbsent("availabilityHoursPerWeek", 0);
-        profile.putIfAbsent("semester", "");
-        profile.putIfAbsent("title", "TA");
-        profile.putIfAbsent("lastUpdatedAt", now);
+    private ProfileData mapProfileData(Map<String, Object> account, Map<String, Object> profile, Map<String, Object> setting) {
+        Map<String, Object> data = new LinkedHashMap<>();
+        data.put("taId", asString(account.get("id")));
+        data.put("realName", firstNonBlank(asString(profile.get("realName")), asString(account.get("name"))));
+        data.put("applicationIntent", asString(profile.get("applicationIntent")));
+        data.put("studentId", firstNonBlank(asString(profile.get("studentId")), asString(account.get("id"))));
+        data.put("contactEmail", firstNonBlank(asString(profile.get("contactEmail")), asString(account.get("email"))));
+        data.put("bio", asString(profile.get("bio")));
+        data.put("avatar", firstNonBlank(asString(profile.get("avatar")), asString(setting.get("avatar"))));
+        data.put("skills", normalizeSkills(asStringList(profile.get("skills"))));
+        data.put("lastUpdatedAt", firstNonBlank(asString(profile.get("lastUpdatedAt")), asString(setting.get("updatedAt"))));
+        return new ProfileData(data);
     }
 
-    private void fillSettingsDefaults(Map<String, Object> setting, String now) {
-        setting.putIfAbsent("id", "SETTING-" + asString(setting.get("taId")));
-        setting.putIfAbsent("theme", "dark");
-        setting.putIfAbsent("avatar", "");
-        setting.putIfAbsent("onboardingStep", 0);
-        setting.putIfAbsent("guideCompleted", false);
-        setting.putIfAbsent("onboardingCompletedAt", "");
-        setting.putIfAbsent("onboardingDismissed", false);
-        setting.putIfAbsent("profileSaved", false);
-        setting.putIfAbsent("profileSavedAt", "");
-        setting.putIfAbsent("lastProfileSyncStatus", "idle");
-        setting.putIfAbsent("lastProfileSyncMessage", "");
-        setting.putIfAbsent("createdAt", now);
-        setting.putIfAbsent("updatedAt", now);
+    private boolean matchesIdentifier(Map<String, Object> account, String identifier) {
+        return identifier.equalsIgnoreCase(asString(account.get("id")))
+                || identifier.equalsIgnoreCase(asString(account.get("username")))
+                || identifier.equalsIgnoreCase(asString(account.get("email")))
+                || identifier.equals(asString(account.get("phone")));
     }
 
     @SuppressWarnings("unchecked")
@@ -813,87 +1097,50 @@ public class TaAccountDao {
         return auth;
     }
 
-    private ProfileData mapProfileData(Map<String, Object> account, Map<String, Object> profile, Map<String, Object> setting) {
-        Map<String, Object> data = new LinkedHashMap<>();
-        data.put("taId", asString(account.get("id")));
-        data.put("realName", firstNonBlank(asString(profile.get("realName")), asString(account.get("name"))));
-        data.put("applicationIntent", asString(profile.get("applicationIntent")));
-        data.put("studentId", firstNonBlank(asString(profile.get("studentId")), asString(account.get("id"))));
-        data.put("contactEmail", firstNonBlank(asString(profile.get("contactEmail")), asString(account.get("email"))));
-        data.put("bio", asString(profile.get("bio")));
-        String avatar = firstNonBlank(asString(profile.get("avatar")), asString(setting.get("avatar")));
-        data.put("avatar", avatar);
-        data.put("skills", normalizeSkills(asStringList(profile.get("skills"))));
-        data.put("lastUpdatedAt", asString(profile.get("lastUpdatedAt")));
-        data.put("theme", asString(setting.get("theme")));
-        data.put("settingsAvatar", asString(setting.get("avatar")));
-        data.put("onboardingStep", asInt(setting.get("onboardingStep")));
-        data.put("guideCompleted", asBoolean(setting.get("guideCompleted")));
-        data.put("onboardingCompletedAt", asString(setting.get("onboardingCompletedAt")));
-        data.put("onboardingDismissed", asBoolean(setting.get("onboardingDismissed")));
-        data.put("profileSaved", asBoolean(setting.get("profileSaved")));
-        data.put("profileSavedAt", asString(setting.get("profileSavedAt")));
-        data.put("lastProfileSyncStatus", asString(setting.get("lastProfileSyncStatus")));
-        data.put("lastProfileSyncMessage", asString(setting.get("lastProfileSyncMessage")));
-        return new ProfileData(data);
-    }
-
     private Map<String, Object> findAccountByTaId(List<Map<String, Object>> accounts, String taId) {
         for (Map<String, Object> account : accounts) {
-            if (asString(account.get("id")).equalsIgnoreCase(taId)) {
+            if (taId.equalsIgnoreCase(asString(account.get("id")))) {
                 return account;
             }
         }
         return null;
     }
 
-    private boolean matchesIdentifier(Map<String, Object> account, String identifier) {
-        String storedId = asString(account.get("id"));
-        String storedUsername = asString(account.get("username"));
-        String storedEmail = asString(account.get("email"));
-        String storedPhone = asString(account.get("phone"));
-
-        return storedId.equalsIgnoreCase(identifier)
-                || storedId.equalsIgnoreCase("TA-" + identifier)
-                || storedUsername.equalsIgnoreCase(identifier)
-                || storedEmail.equalsIgnoreCase(identifier)
-                || storedPhone.equals(identifier);
+    private Map<String, Object> findProfileByTaId(List<Map<String, Object>> profiles, String taId) {
+        for (Map<String, Object> profile : profiles) {
+            if (taId.equalsIgnoreCase(asString(profile.get("taId")))) {
+                return profile;
+            }
+        }
+        return null;
     }
 
-    public static String getDataMountStatusMessage() {
-        return "[TA-DATA] 环境变量 " + DataMountPaths.DATA_MOUNT_ENV + " "
-                + (DataMountPaths.fromEnvironment() ? "已挂载" : "未挂载，使用默认目录")
-                + "；数据根目录=" + DataMountPaths.root();
+    private Map<String, Object> findSettingByTaId(List<Map<String, Object>> settings, String taId) {
+        for (Map<String, Object> setting : settings) {
+            if (taId.equalsIgnoreCase(asString(setting.get("taId")))) {
+                return setting;
+            }
+        }
+        return null;
     }
 
-    public static Path getResolvedDataRoot() {
-        return DataMountPaths.root();
+    private Map<String, Object> ensureProfileRecord(List<Map<String, Object>> profiles, Map<String, Object> account, String currentTime) {
+        String taId = asString(account.get("id"));
+        Map<String, Object> profile = findProfileByTaId(profiles, taId);
+        if (profile == null) {
+            profile = createDefaultProfile(taId, asString(account.get("name")), asString(account.get("email")), currentTime);
+            profiles.add(profile);
+        }
+        return profile;
     }
 
-    public static Path getResolvedTaDataDir() {
-        return TA_DIR_PATH;
-    }
-
-    private void ensureMeta(JsonObject root, String schema, String entity) {
-        JsonObject meta;
-        if (root.has("meta") && root.get("meta").isJsonObject()) {
-            meta = root.getAsJsonObject("meta");
-        } else {
-            meta = new JsonObject();
-            root.add("meta", meta);
+    private Map<String, Object> ensureSettingsRecord(List<Map<String, Object>> settings, String taId, String currentTime) {
+        Map<String, Object> setting = findSettingByTaId(settings, taId);
+        if (setting == null) {
+            setting = createDefaultSettings(taId, currentTime);
+            settings.add(setting);
         }
-        if (!meta.has("schema")) {
-            meta.addProperty("schema", schema);
-        }
-        if (!meta.has("entity")) {
-            meta.addProperty("entity", entity);
-        }
-        if (!meta.has("version")) {
-            meta.addProperty("version", "1.0");
-        }
-        if (!meta.has("updatedAt")) {
-            meta.addProperty("updatedAt", "");
-        }
+        return setting;
     }
 
     private boolean containsAny(String value, String... candidates) {
@@ -915,6 +1162,17 @@ public class TaAccountDao {
     private boolean asBoolean(Object value) {
         if (value instanceof Boolean bool) return bool;
         return Boolean.parseBoolean(asString(value));
+    }
+
+    private boolean getAsBoolean(JsonObject object, String key, boolean fallback) {
+        if (object == null || key == null || !object.has(key) || object.get(key).isJsonNull()) {
+            return fallback;
+        }
+        try {
+            return object.get(key).getAsBoolean();
+        } catch (Exception ex) {
+            return fallback;
+        }
     }
 
     private int asInt(Object value) {
@@ -957,6 +1215,18 @@ public class TaAccountDao {
     private String firstNonBlank(String primary, String fallback) {
         String first = trim(primary);
         return first.isEmpty() ? trim(fallback) : first;
+    }
+
+    public static Path getResolvedDataRoot() {
+        return DataMountPaths.root();
+    }
+
+    public static Path getResolvedTaDataDir() {
+        return DataMountPaths.taDir();
+    }
+
+    public static String getDataMountStatusMessage() {
+        return "TA data root=" + getResolvedTaDataDir().toAbsolutePath();
     }
 
     public static class ProfileData {
@@ -1007,6 +1277,13 @@ public class TaAccountDao {
                                      String bio, List<String> skills, String avatar) {
     }
 
+    public record ApplicationCreateInput(String taId,
+                                         String courseCode,
+                                         String originalFileName,
+                                         String contentType,
+                                         InputStream resumeStream) {
+    }
+
     public static class ProfileResult {
         private final boolean success;
         private final int status;
@@ -1035,6 +1312,33 @@ public class TaAccountDao {
         public boolean isSuccess() { return success; }
         public int getStatus() { return status; }
         public String getMessage() { return message; }
+    }
+
+    public static class ApplicationSubmitResult {
+        private final boolean success;
+        private final int status;
+        private final String message;
+        private final JsonObject data;
+
+        private ApplicationSubmitResult(boolean success, int status, String message, JsonObject data) {
+            this.success = success;
+            this.status = status;
+            this.message = message;
+            this.data = data;
+        }
+
+        public static ApplicationSubmitResult success(JsonObject data) {
+            return new ApplicationSubmitResult(true, 201, "申请提交成功", data);
+        }
+
+        public static ApplicationSubmitResult failure(int status, String message) {
+            return new ApplicationSubmitResult(false, status, message, new JsonObject());
+        }
+
+        public boolean isSuccess() { return success; }
+        public int getStatus() { return status; }
+        public String getMessage() { return message; }
+        public JsonObject getData() { return data; }
     }
 
     public static class ApplicationStatusResult {

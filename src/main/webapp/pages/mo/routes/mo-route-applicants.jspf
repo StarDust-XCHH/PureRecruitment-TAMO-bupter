@@ -3,11 +3,11 @@
         <div class="overview-top">
             <div>
                 <h1>应聘筛选</h1>
-                <p class="muted">支持查看 TA 资料，并将录用/拒绝结果回写到 TA 申请状态数据。</p>
+                <p class="muted">查看申请者资料，并提交录用或拒绝结果，状态将同步至对应申请记录。</p>
             </div>
             <div class="overview-badges">
-                <span class="pill">故事 8：查看应聘者</span>
-                <span class="pill">故事 9：选择应聘者</span>
+                <span class="pill">按岗位筛选</span>
+                <span class="pill">录用结果同步</span>
             </div>
         </div>
 
@@ -23,6 +23,17 @@
             <div class="empty-state__icon">🗂️</div>
             <h3>暂无候选人</h3>
             <p>请先选择岗位或发布新岗位，系统将聚合 TA 候选池。</p>
+        </div>
+    </div>
+
+    <div id="moApplicantDetailModal" class="mo-detail-modal" hidden aria-hidden="true">
+        <div class="mo-detail-modal__backdrop" data-close-applicant-detail="1"></div>
+        <div class="mo-detail-modal__panel" role="dialog" aria-modal="true" aria-labelledby="moApplicantDetailTitle">
+            <div class="mo-detail-modal__head">
+                <h2 id="moApplicantDetailTitle">申请人详情</h2>
+                <button type="button" class="pill-btn ghost" id="moApplicantDetailClose" aria-label="关闭">关闭</button>
+            </div>
+            <div class="mo-detail-modal__body" id="moApplicantDetailBody"></div>
         </div>
     </div>
 </div>
