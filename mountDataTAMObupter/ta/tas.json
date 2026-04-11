@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "tas",
     "version": "1.0",
-    "updatedAt": "2026-04-07T08:11:15.315262200Z"
+    "updatedAt": "2026-04-11T06:51:23.294829300Z"
   },
   "items": [
     {
@@ -32,11 +32,11 @@
       "department": "",
       "status": "active",
       "createdAt": "2026-03-16T13:28:45.257077Z",
-      "updatedAt": "2026-04-07T08:11:15.313259500Z",
+      "updatedAt": "2026-04-11T06:51:23.293274500Z",
       "auth": {
         "passwordHash": "8b5361414eb8fa038ca9279a55be8b3b44791939d89475d1618d50230c01d65f",
         "passwordSalt": "cebb50b5-9797-4732-a22a-df78ae1c88da",
-        "lastLoginAt": "2026-04-07T08:11:15.313259500Z",
+        "lastLoginAt": "2026-04-11T06:51:23.293274500Z",
         "failedAttempts": 0
       }
     },
@@ -139,6 +139,23 @@
         "passwordHash": "b881cbb11750954af746ff9fe69d09ebc5b702dc4fd254a8f0fda89622d4bceb",
         "passwordSalt": "82d12154-65b6-487c-96d8-dbff5909efd8",
         "lastLoginAt": "2026-04-06T15:07:34.079953600Z",
+        "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "TA-91667",
+      "name": "123qwe",
+      "username": "123qwe",
+      "email": "123@123.com",
+      "phone": "123234423",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-04-08T02:05:51.145318400Z",
+      "updatedAt": "2026-04-08T02:05:51.145318400Z",
+      "auth": {
+        "passwordHash": "1600f104399674a46c5c33343684e3a03988abf297b5d25da1154e486ed22f72",
+        "passwordSalt": "150041c9-e31f-4995-909f-dde38b52ba97",
+        "lastLoginAt": "",
         "failedAttempts": 0.0
       }
     }

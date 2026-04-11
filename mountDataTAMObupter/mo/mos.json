@@ -3,7 +3,7 @@
     "schema": "mo",
     "entity": "mos",
     "version": "1.0",
-    "updatedAt": "2026-04-09T13:28:44.819975500Z"
+    "updatedAt": "2026-04-08T02:20:25.770624600Z"
   },
   "items": [
     {
@@ -75,37 +75,20 @@
       }
     },
     {
-      "id": "MO-635L1K",
-      "name": "Ptest Two",
-      "username": "testtwo",
-      "email": "asdf@qq.com",
-      "phone": "12345678985",
+      "id": "MO-650WCK",
+      "name": "123qwe",
+      "username": "123qwe",
+      "email": "123qwe@123.cp",
+      "phone": "123234543",
       "department": "",
       "status": "active",
-      "createdAt": "2026-04-08T10:53:33.587434500Z",
-      "updatedAt": "2026-04-08T10:53:33.587434500Z",
+      "createdAt": "2026-04-08T02:06:39.843943400Z",
+      "updatedAt": "2026-04-08T02:20:25.768626500Z",
       "auth": {
-        "passwordHash": "a8f365bd82d13bb764d86b0dee482fb5c3281101910127753cc9202b9be08402",
-        "passwordSalt": "d59f0fc8-1e50-4d26-8291-d1a6206302de",
-        "lastLoginAt": "",
-        "failedAttempts": 0.0
-      }
-    },
-    {
-      "id": "MO-354ZUT",
-      "name": "Ptest One",
-      "username": "testone",
-      "email": "awsdf@qq.com",
-      "phone": "12345678987",
-      "department": "",
-      "status": "active",
-      "createdAt": "2026-04-08T10:57:19.070607200Z",
-      "updatedAt": "2026-04-09T13:28:44.819975500Z",
-      "auth": {
-        "passwordHash": "4d009a63ba63a4c5c68296e3314eb7daf2ea49093b3d86f84bb53ea93e37d7d7",
-        "passwordSalt": "9d2c99e8-1fea-4c8c-839c-2198e97ca661",
-        "lastLoginAt": "2026-04-09T13:28:16.173166400Z",
-        "failedAttempts": 0.0
+        "passwordHash": "d039b5324c06343ff34f1403c3f8da02d7744576efa5593415a532dc3f19eb63",
+        "passwordSalt": "f4c1e423-a20b-43ea-98a6-567a9839bda5",
+        "lastLoginAt": "2026-04-08T02:20:25.768626500Z",
+        "failedAttempts": 0
       }
     }
   ]

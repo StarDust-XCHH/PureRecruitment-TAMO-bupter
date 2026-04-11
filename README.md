@@ -1,5 +1,8 @@
 # PureRecruitment-TAMO-bupter
 
+
+[![Version](https://img.shields.io/badge/version-v1.0.0_(Pre--release)-orange.svg)](https://github.com/StarDust-XCHH/PureRecruitment-TAMO-bupter/releases/tag/v1.0.0)
+
 # Group-16 Members 成员
 |Github UserName|Chinese Name|Name in English|BUPT ID|QM ID|Email|
 |---|---|---|---|---|---|
@@ -50,402 +53,84 @@
 - TA+LogOn=story+prototype<——StarDust——>`projectFile/StarDustXCHH/imgStage1Prototype`
 
 
+# 软件发布相关
 
 
+太棒了！选择“猫头鹰与鸟类”作为主题不仅极具学术气息（完美契合高校教务与助教招募的背景），而且自然界中鸟类种类繁多，足够支撑你走完 A 到 Z 的漫长版本迭代。
 
-# 项目架构
+为了符合 ROS 2 **“形容词 (Adjective) + 动物名 (Noun)”** 的极客命名法，并结合 **语义化版本控制 (SemVer)**，我为你制定了这套完整的 A-Z 命名蓝图与发布规范。
 
-```txt
-PureRecruitment-TAMO-bupter/
-├── pom.xml
-├── README.md
-├── .gitignore
-├── data/
-│   ├── README.md                        // 记录本地 JSON 数据存储总规范、命名约定、并发读写原则
-│   ├── users.json
-│   ├── jobs.json
-│   ├── applications.json
-│   ├── schedules.json
-│   ├── interviews.json
-│   ├── notices.json
-│   ├── logs.json
-│   ├── admin/
-│   │   ├── README.md                    // 记录管理员模块专属数据文件说明、字段定义、维护策略
-│   │   ├── permissions.json
-│   │   ├── operation-records.json
-│   │   └── dashboard-cache.json
-│   ├── mo/
-│   │   ├── README.md                    // 记录教师模块专属数据文件说明，如岗位发布、面试安排、录用反馈
-│   │   ├── job-drafts.json
-│   │   ├── interview-feedback.json
-│   │   └── course-assignment.json
-│   ├── ta/
-│   │   ├── README.md                    // 记录助教模块专属数据文件说明，如简历草稿、申请记录、个人排班
-│   │   ├── resume-drafts.json
-│   │   ├── ta-preferences.json
-│   │   └── availability.json
-│   └── common/
-│       ├── README.md                    // 记录跨模块共享 JSON 文件用途、共享字段、锁控制建议
-│       ├── dictionaries.json
-│       ├── enums.json
-│       └── system-config.json
-├── src/
-│   ├── README.md                        // 记录源码目录整体结构、分层规则、开发协作约定
-│   ├── main/
-│   │   ├── README.md                    // 记录主程序目录说明，包括 java/resources/webapp 的职责边界
-│   │   ├── java/
-│   │   │   ├── README.md                // 记录后端 Java 源码组织规范与包命名约束
-│   │   │   └── com/
-│   │   │       ├── README.md            // 记录 com 根包用途与公司/组织命名约定
-│   │   │       └── bupt/
-│   │   │           ├── README.md        // 记录 bupt 包层级说明
-│   │   │           └── tarecruit/
-│   │   │               ├── README.md    // 记录系统总包说明、模块边界、公共规范与编码守则
-│   │   │               ├── common/
-│   │   │               │   ├── README.md                // 记录公共基建模块职责，避免与业务模块耦合
-│   │   │               │   ├── controller/
-│   │   │               │   │   ├── README.md            // 记录公共 Servlet、统一入口、健康检查、错误页跳转规范
-│   │   │               │   │   ├── HealthCheckServlet.java
-│   │   │               │   │   ├── AuthServlet.java
-│   │   │               │   │   └── FileServlet.java
-│   │   │               │   ├── service/
-│   │   │               │   │   ├── README.md            // 记录公共服务逻辑，如认证、鉴权、文件处理、日志封装
-│   │   │               │   │   ├── AuthService.java
-│   │   │               │   │   ├── FileStorageService.java
-│   │   │               │   │   └── LogService.java
-│   │   │               │   ├── dao/
-│   │   │               │   │   ├── README.md            // 记录公共 JSON DAO、读写锁封装、通用文件访问组件
-│   │   │               │   │   ├── JsonFileDao.java
-│   │   │               │   │   ├── UserDao.java
-│   │   │               │   │   ├── NoticeDao.java
-│   │   │               │   │   └── DictionaryDao.java
-│   │   │               │   ├── model/
-│   │   │               │   │   ├── README.md            // 记录跨模块通用实体定义，如 User、Notice、ApiResponse
-│   │   │               │   │   ├── User.java
-│   │   │               │   │   ├── Notice.java
-│   │   │               │   │   ├── ApiResponse.java
-│   │   │               │   │   └── PageResult.java
-│   │   │               │   ├── filter/
-│   │   │               │   │   ├── README.md            // 记录过滤器配置，如登录校验、角色权限、编码处理、CORS
-│   │   │               │   │   ├── AuthFilter.java
-│   │   │               │   │   ├── RoleFilter.java
-│   │   │               │   │   └── EncodingFilter.java
-│   │   │               │   ├── listener/
-│   │   │               │   │   ├── README.md            // 记录监听器，如系统启动初始化、配置加载、资源释放
-│   │   │               │   │   └── AppInitListener.java
-│   │   │               │   ├── util/
-│   │   │               │   │   ├── README.md            // 记录工具类，如 JSON 解析、日期处理、响应输出、路径解析
-│   │   │               │   │   ├── JsonUtil.java
-│   │   │               │   │   ├── ResponseUtil.java
-│   │   │               │   │   ├── FilePathUtil.java
-│   │   │               │   │   ├── DateTimeUtil.java
-│   │   │               │   │   └── ValidationUtil.java
-│   │   │               │   ├── constant/
-│   │   │               │   │   ├── README.md            // 记录公共常量、角色枚举、状态码、文件路径常量
-│   │   │               │   │   ├── RoleConstants.java
-│   │   │               │   │   ├── StatusConstants.java
-│   │   │               │   │   └── FileConstants.java
-│   │   │               │   ├── config/
-│   │   │               │   │   ├── README.md            // 记录全局配置类、初始化参数、Tomcat/Servlet 配置映射
-│   │   │               │   │   └── AppConfig.java
-│   │   │               │   └── exception/
-│   │   │               │       ├── README.md            // 记录系统自定义异常定义与统一异常处理约定
-│   │   │               │       ├── BusinessException.java
-│   │   │               │       └── JsonStorageException.java
-│   │   │               ├── ta/
-│   │   │               │   ├── README.md                // 记录助教模块职责边界、接口清单、前后端协作契约
-│   │   │               │   ├── controller/
-│   │   │               │   │   ├── README.md            // 记录助教端 Servlet 路由：注册、登录、查看岗位、投递、进度查询
-│   │   │               │   │   ├── TaAuthServlet.java
-│   │   │               │   │   ├── TaProfileServlet.java
-│   │   │               │   │   ├── TaJobServlet.java
-│   │   │               │   │   ├── TaApplicationServlet.java
-│   │   │               │   │   └── TaScheduleServlet.java
-│   │   │               │   ├── service/
-│   │   │               │   │   ├── README.md            // 记录助教模块业务逻辑：投递流程、状态流转、个人资料维护
-│   │   │               │   │   ├── TaAuthService.java
-│   │   │               │   │   ├── TaProfileService.java
-│   │   │               │   │   ├── TaJobBrowseService.java
-│   │   │               │   │   ├── TaApplicationService.java
-│   │   │               │   │   └── TaScheduleService.java
-│   │   │               │   ├── dao/
-│   │   │               │   │   ├── README.md            // 记录助教模块 DAO：简历草稿、申请记录、意向时间段 JSON 读写
-│   │   │               │   │   ├── TaProfileDao.java
-│   │   │               │   │   ├── TaResumeDao.java
-│   │   │               │   │   ├── TaApplicationDao.java
-│   │   │               │   │   └── TaAvailabilityDao.java
-│   │   │               │   └── model/
-│   │   │               │       ├── README.md            // 记录助教实体：TAProfile、TAResume、TAApplication、Availability
-│   │   │               │       ├── TaProfile.java
-│   │   │               │       ├── TaResume.java
-│   │   │               │       ├── TaApplication.java
-│   │   │               │       └── Availability.java
-│   │   │               ├── mo/
-│   │   │               │   ├── README.md                // 记录教师模块职责边界、岗位管理流程、筛选与面试业务约束
-│   │   │               │   ├── controller/
-│   │   │               │   │   ├── README.md            // 记录教师端 Servlet 路由：发布岗位、筛选申请、安排面试、反馈结果
-│   │   │               │   │   ├── MoAuthServlet.java
-│   │   │               │   │   ├── MoJobServlet.java
-│   │   │               │   │   ├── MoApplicationReviewServlet.java
-│   │   │               │   │   ├── MoInterviewServlet.java
-│   │   │               │   │   └── MoFeedbackServlet.java
-│   │   │               │   ├── service/
-│   │   │               │   │   ├── README.md            // 记录教师模块业务逻辑：岗位生命周期、筛选决策、面试安排
-│   │   │               │   │   ├── MoAuthService.java
-│   │   │               │   │   ├── MoJobService.java
-│   │   │               │   │   ├── MoApplicationReviewService.java
-│   │   │               │   │   ├── MoInterviewService.java
-│   │   │               │   │   └── MoFeedbackService.java
-│   │   │               │   ├── dao/
-│   │   │               │   │   ├── README.md            // 记录教师模块 DAO：岗位、筛选结果、面试反馈 JSON 读写
-│   │   │               │   │   ├── MoJobDao.java
-│   │   │               │   │   ├── MoJobDraftDao.java
-│   │   │               │   │   ├── MoInterviewDao.java
-│   │   │               │   │   └── MoFeedbackDao.java
-│   │   │               │   └── model/
-│   │   │               │       ├── README.md            // 记录教师实体：Job、Interview、Feedback、CourseAssignment
-│   │   │               │       ├── Job.java
-│   │   │               │       ├── Interview.java
-│   │   │               │       ├── InterviewFeedback.java
-│   │   │               │       └── CourseAssignment.java
-│   │   │               └── admin/
-│   │   │                   ├── README.md                // 记录管理员模块职责边界、系统治理规则、运维/审计接口规范
-│   │   │                   ├── controller/
-│   │   │                   │   ├── README.md            // 记录管理员 Servlet 路由：用户管理、公告管理、统计分析、权限控制
-│   │   │                   │   ├── AdminAuthServlet.java
-│   │   │                   │   ├── AdminUserServlet.java
-│   │   │                   │   ├── AdminNoticeServlet.java
-│   │   │                   │   ├── AdminDashboardServlet.java
-│   │   │                   │   └── AdminPermissionServlet.java
-│   │   │                   ├── service/
-│   │   │                   │   ├── README.md            // 记录管理员业务逻辑：账号审核、公告发布、统计汇总、权限分配
-│   │   │                   │   ├── AdminAuthService.java
-│   │   │                   │   ├── AdminUserService.java
-│   │   │                   │   ├── AdminNoticeService.java
-│   │   │                   │   ├── AdminDashboardService.java
-│   │   │                   │   └── AdminPermissionService.java
-│   │   │                   ├── dao/
-│   │   │                   │   ├── README.md            // 记录管理员模块 DAO：权限、操作日志、看板缓存 JSON 读写
-│   │   │                   │   ├── AdminUserDao.java
-│   │   │                   │   ├── AdminPermissionDao.java
-│   │   │                   │   ├── AdminOperationLogDao.java
-│   │   │                   │   └── AdminDashboardDao.java
-│   │   │                   └── model/
-│   │   │                       ├── README.md            // 记录管理员实体：AdminUser、Permission、OperationLog、DashboardMetrics
-│   │   │                       ├── AdminUser.java
-│   │   │                       ├── Permission.java
-│   │   │                       ├── OperationLog.java
-│   │   │                       └── DashboardMetrics.java
-│   │   ├── resources/
-│   │   │   ├── README.md                // 记录资源目录用途，如配置文件、日志模板、初始化数据模板
-│   │   │   ├── app.properties
-│   │   │   ├── log-config.properties
-│   │   │   └── templates/
-│   │   │       ├── README.md            // 记录初始化 JSON 模板、导入导出模板文件说明
-│   │   │       ├── users.template.json
-│   │   │       ├── jobs.template.json
-│   │   │       └── applications.template.json
-│   │   └── webapp/
-│   │       ├── README.md                // 记录前端资源组织方式、访问路径规划、静态资源协作规范
-│   │       ├── index.html
-│   │       ├── favicon.ico
-│   │       ├── WEB-INF/
-│   │       │   ├── README.md            // 记录 web.xml、Tomcat 部署描述、Servlet 映射与安全配置
-│   │       │   └── web.xml
-│   │       ├── pages/
-│   │       │   ├── README.md            // 记录业务页面总目录规范，要求与后端模块一一镜像对应
-│   │       │   ├── common/
-│   │       │   │   ├── README.md        // 记录公共页面片段，如登录页、错误页、通用弹窗页
-│   │       │   │   ├── login.html
-│   │       │   │   ├── 403.html
-│   │       │   │   ├── 404.html
-│   │       │   │   └── 500.html
-│   │       │   ├── ta/
-│   │       │   │   ├── README.md        // 记录助教端页面：首页、岗位列表、申请记录、个人中心
-│   │       │   │   ├── dashboard.html
-│   │       │   │   ├── jobs.html
-│   │       │   │   ├── application-list.html
-│   │       │   │   ├── profile.html
-│   │       │   │   └── schedule.html
-│   │       │   ├── mo/
-│   │       │   │   ├── README.md        // 记录教师端页面：岗位管理、申请筛选、面试安排、结果反馈
-│   │       │   │   ├── dashboard.html
-│   │       │   │   ├── job-manage.html
-│   │       │   │   ├── application-review.html
-│   │       │   │   ├── interview-manage.html
-│   │       │   │   └── feedback.html
-│   │       │   └── admin/
-│   │       │       ├── README.md        // 记录管理员页面：用户管理、公告管理、数据看板、权限维护
-│   │       │       ├── dashboard.html
-│   │       │       ├── user-manage.html
-│   │       │       ├── notice-manage.html
-│   │       │       ├── permission-manage.html
-│   │       │       └── analytics.html
-│   │       ├── assets/
-│   │       │   ├── README.md            // 记录静态资源总目录说明及公共/私有资源划分原则
-│   │       │   ├── common/
-│   │       │   │   ├── README.md        // 记录所有模块共享静态资源，如全局样式、请求封装、工具函数
-│   │       │   │   ├── css/
-│   │       │   │   │   ├── README.md    // 记录全局 CSS，如 reset、layout、theme、component 规范
-│   │       │   │   │   ├── reset.css
-│   │       │   │   │   ├── global.css
-│   │       │   │   │   ├── layout.css
-│   │       │   │   │   └── components.css
-│   │       │   │   ├── js/
-│   │       │   │   │   ├── README.md    // 记录公共 JS，如 API 请求、鉴权、本地存储、表单校验
-│   │       │   │   │   ├── api-request.js
-│   │       │   │   │   ├── auth.js
-│   │       │   │   │   ├── storage.js
-│   │       │   │   │   ├── validator.js
-│   │       │   │   │   └── date-format.js
-│   │       │   │   └── images/
-│   │       │   │       ├── README.md    // 记录共享图片、logo、图标资源命名规范
-│   │       │   │       ├── logo.png
-│   │       │   │       └── empty-state.svg
-│   │       │   ├── ta/
-│   │       │   │   ├── README.md        // 记录助教端私有静态资源，避免与教师/管理员前端互相干扰
-│   │       │   │   ├── css/
-│   │       │   │   │   ├── README.md    // 记录助教页面私有样式，如 jobs/profile/schedule 页面样式
-│   │       │   │   │   ├── ta-dashboard.css
-│   │       │   │   │   ├── ta-jobs.css
-│   │       │   │   │   ├── ta-profile.css
-│   │       │   │   │   └── ta-schedule.css
-│   │       │   │   ├── js/
-│   │       │   │   │   ├── README.md    // 记录助教页面私有脚本，如岗位浏览、投递操作、状态跟踪
-│   │       │   │   │   ├── ta-dashboard.js
-│   │       │   │   │   ├── ta-jobs.js
-│   │       │   │   │   ├── ta-application.js
-│   │       │   │   │   ├── ta-profile.js
-│   │       │   │   │   └── ta-schedule.js
-│   │       │   │   └── images/
-│   │       │   │       ├── README.md    // 记录助教端私有图片资源与插画
-│   │       │   │       └── ta-banner.png
-│   │       │   ├── mo/
-│   │       │   │   ├── README.md        // 记录教师端私有静态资源，服务于岗位与面试管理页面
-│   │       │   │   ├── css/
-│   │       │   │   │   ├── README.md    // 记录教师页面私有样式
-│   │       │   │   │   ├── mo-dashboard.css
-│   │       │   │   │   ├── mo-job-manage.css
-│   │       │   │   │   ├── mo-review.css
-│   │       │   │   │   └── mo-interview.css
-│   │       │   │   ├── js/
-│   │       │   │   │   ├── README.md    // 记录教师页面私有脚本，如岗位发布、筛选申请、面试反馈
-│   │       │   │   │   ├── mo-dashboard.js
-│   │       │   │   │   ├── mo-job-manage.js
-│   │       │   │   │   ├── mo-review.js
-│   │       │   │   │   ├── mo-interview.js
-│   │       │   │   │   └── mo-feedback.js
-│   │       │   │   └── images/
-│   │       │   │       ├── README.md    // 记录教师端私有图片资源
-│   │       │   │       └── mo-banner.png
-│   │       │   └── admin/
-│   │       │       ├── README.md        // 记录管理员端私有静态资源，服务于治理、统计、公告、权限页面
-│   │       │       ├── css/
-│   │       │       │   ├── README.md    // 记录管理员页面私有样式
-│   │       │       │   ├── admin-dashboard.css
-│   │       │       │   ├── admin-user-manage.css
-│   │       │       │   ├── admin-notice.css
-│   │       │       │   └── admin-analytics.css
-│   │       │       ├── js/
-│   │       │       │   ├── README.md    // 记录管理员页面私有脚本，如用户治理、权限控制、统计看板
-│   │       │       │   ├── admin-dashboard.js
-│   │       │       │   ├── admin-user-manage.js
-│   │       │       │   ├── admin-notice.js
-│   │       │       │   ├── admin-permission.js
-│   │       │       │   └── admin-analytics.js
-│   │       │       └── images/
-│   │       │           ├── README.md    // 记录管理员端私有图片资源
-│   │       │           └── admin-banner.png
-│   │       └── uploads/
-│   │           ├── README.md            // 记录上传文件目录规范，如简历附件、头像、导出报表
-│   │           ├── resumes/
-│   │           │   ├── README.md        // 记录助教上传简历文件的命名规则、大小限制、清理策略
-│   │           │   └── .gitkeep
-│   │           ├── avatars/
-│   │           │   ├── README.md        // 记录用户头像上传规则与默认头像策略
-│   │           │   └── .gitkeep
-│   │           └── exports/
-│   │               ├── README.md        // 记录管理员导出报表文件的格式与生命周期管理
-│   │               └── .gitkeep
-│   └── test/
-│       ├── README.md                    // 记录测试目录整体组织规范、命名规则、覆盖范围
-│       ├── java/
-│       │   ├── README.md                // 记录后端测试代码说明
-│       │   └── com/
-│       │       ├── README.md            // 记录测试代码 com 包说明
-│       │       └── bupt/
-│       │           ├── README.md        // 记录测试代码 bupt 包说明
-│       │           └── tarecruit/
-│       │               ├── README.md    // 记录测试总包说明与测试策略
-│       │               ├── common/
-│       │               │   ├── README.md                // 记录公共模块测试说明
-│       │               │   ├── service/
-│       │               │   │   ├── README.md            // 记录公共服务测试用例说明
-│       │               │   │   └── AuthServiceTest.java
-│       │               │   └── dao/
-│       │               │       ├── README.md            // 记录公共 DAO 测试与 JSON 文件隔离策略
-│       │               │       └── JsonFileDaoTest.java
-│       │               ├── ta/
-│       │               │   ├── README.md                // 记录助教模块测试范围与用例边界
-│       │               │   ├── service/
-│       │               │   │   ├── README.md            // 记录助教业务测试用例
-│       │               │   │   └── TaApplicationServiceTest.java
-│       │               │   └── dao/
-│       │               │       ├── README.md            // 记录助教 DAO 测试说明
-│       │               │       └── TaApplicationDaoTest.java
-│       │               ├── mo/
-│       │               │   ├── README.md                // 记录教师模块测试范围与用例边界
-│       │               │   ├── service/
-│       │               │   │   ├── README.md            // 记录教师业务测试用例
-│       │               │   │   └── MoInterviewServiceTest.java
-│       │               │   └── dao/
-│       │               │       ├── README.md            // 记录教师 DAO 测试说明
-│       │               │       └── MoJobDaoTest.java
-│       │               └── admin/
-│       │                   ├── README.md                // 记录管理员模块测试范围与用例边界
-│       │                   ├── service/
-│       │                   │   ├── README.md            // 记录管理员业务测试用例
-│       │                   │   └── AdminDashboardServiceTest.java
-│       │                   └── dao/
-│       │                       ├── README.md            // 记录管理员 DAO 测试说明
-│       │                       └── AdminPermissionDaoTest.java
-│       └── resources/
-│           ├── README.md                // 记录测试资源目录用途，如测试 JSON 样本、Mock 配置
-│           ├── mock-json/
-│           │   ├── README.md            // 记录测试用 JSON 样本说明，避免污染正式 data 目录
-│           │   ├── users.test.json
-│           │   ├── jobs.test.json
-│           │   └── applications.test.json
-│           └── fixtures/
-│               ├── README.md            // 记录测试夹具、接口响应样本、边界场景输入
-│               └── ta-application-fixture.json
-└── docs/
-    ├── README.md                        // 记录项目文档总入口、迭代文档索引与协作规范
-    ├── api/
-    │   ├── README.md                    // 记录接口文档规范、URL 设计、请求响应示例
-    │   ├── common-api.md
-    │   ├── ta-api.md
-    │   ├── mo-api.md
-    │   └── admin-api.md
-    ├── database/
-    │   ├── README.md                    // 记录 JSON 数据结构设计、字段字典、版本迁移策略
-    │   ├── users-schema.md
-    │   ├── jobs-schema.md
-    │   └── applications-schema.md
-    ├── frontend/
-    │   ├── README.md                    // 记录前端页面结构、资源依赖图、交互规范
-    │   ├── page-routing.md
-    │   └── ui-guideline.md
-    ├── backend/
-    │   ├── README.md                    // 记录后端分层设计、Servlet 路由规范、异常处理约定
-    │   ├── package-convention.md
-    │   └── servlet-mapping.md
-    └── sprint/
-        ├── README.md                    // 记录敏捷迭代安排、任务拆分、里程碑与验收标准
-        ├── sprint-1.md
-        ├── sprint-2.md
-        └── sprint-3.md
+---
 
-```
+### 一、 版本生命周期示例（如何区分测试版与正式版）
 
+在 ROS 2 和标准开源项目中，**代号是不变的，状态是通过版本号后缀来区分的**。我们以首发版本 **A** 为例（代号：Astute Athene 敏锐的小鸮）：
+
+* **内部测试版 (Alpha):** 核心功能刚跑通，给开发组成员自己联调。
+   * 🏷️ 发布名称：`Astute Athene - v1.0.0-alpha.1`
+* **公开测试版 (Beta):** 准备好让少数外部用户（如部分 TA 或 MO）试用，收集 Bug。
+   * 🏷️ 发布名称：`Astute Athene - v1.0.0-beta.1`
+* **候选发布版 (RC):** 代码冻结，如果没有发现致命 Bug，这就是正式版。
+   * 🏷️ 发布名称：`Astute Athene - v1.0.0-rc.1`
+* **正式发布版 (GA):** 稳定版本，面向全员公开。
+   * 🏷️ 发布名称：`Astute Athene - v1.0.0`
+
+---
+
+### 二、 从 A 到 Z 的完整命名蓝图 (The Aviary Roadmap)
+
+在这个列表中，我以**猫头鹰（鸮类）**和**猛禽/智慧鸟类**为主，挑选了寓意好、适合形容软件系统的形容词。
+
+#### **【奠基阶段：A - E】**
+* **A版本 (v1.0.0): Astute Athene** (敏锐的小鸮)
+   * *寓意：像智慧女神雅典娜的爱鸟一样，敏锐地启动整个招募系统。*
+* **B版本 (v2.0.0): Brilliant Bubo** (卓越的雕鸮)
+   * *寓意：雕鸮体型庞大，代表系统承载能力和架构的卓越升级。*
+* **C版本 (v3.0.0): Candid Corvus** (坦诚的渡鸦)
+   * *寓意：渡鸦智商极高，代表系统 AI 助手逻辑变得更加聪明和透明。*
+* **D版本 (v4.0.0): Dashing Diomedea** (潇洒的信天翁)
+   * *寓意：信天翁善于长途飞行，代表项目进入长期支持（LTS）或性能飞跃。*
+* **E版本 (v5.0.0): Eloquent Eagle** (雄辩的雄鹰)
+   * *寓意：系统交互与 AI 表达能力达到炉火纯青的阶段。*
+
+#### **【进阶阶段：F - J】**
+* **F版本 (v6.0.0): Fearless Falcon** (无畏的猎鹰)
+   * *寓意：猎鹰俯冲速度极快，代表系统响应速度和检索能力的突破。*
+* **G版本 (v7.0.0): Graceful Glaucidium** (优雅的鸺鹠 / 一种微型猫头鹰)
+   * *寓意：UI/UX 迎来重大重构，界面变得极其优雅且轻量化。*
+* **H版本 (v8.0.0): Hardy Hawk** (坚韧的苍鹰)
+   * *寓意：系统稳定性极强，能够抵御高并发和复杂错误。*
+* **I版本 (v9.0.0): Insightful Ibis** (洞察的朱鹮)
+   * *寓意：加入深度数据分析功能，能够洞察招募数据的潜在规律。*
+* **J版本 (v10.0.0): Jubilant Jay** (喜悦的松鸦)
+   * *寓意：第十个大版本的里程碑，一个充满成就感和活力的版本。*
+
+#### **【成熟阶段：K - O】**
+* **K版本 (v11.0.0): Keen Kestrel** (敏锐的红隼)
+* **L版本 (v12.0.0): Lucid Lark** (明晰的云雀)
+* **M版本 (v13.0.0): Mighty Megascops** (强大的鸣角鸮)
+* **N版本 (v14.0.0): Noble Nyctea** (高贵的雪鸮) —— *（极其漂亮的猛禽，适合作为重要的 LTS 版本）*
+* **O版本 (v15.0.0): Outstanding Osprey** (杰出的鱼鹰)
+
+#### **【扩展阶段：P - T】**
+* **P版本 (v16.0.0): Proud Ptilopsis** (骄傲的白脸鸮)
+* **Q版本 (v17.0.0): Quick Quetzal** (敏捷的绿咬鹃) —— *（中美洲神鸟，适合引入全新前端框架的版本）*
+* **R版本 (v18.0.0): Resilient Raven** (充满韧性的渡鸦)
+* **S版本 (v19.0.0): Swift Strix** (迅捷的林鸮)
+* **T版本 (v20.0.0): Tenacious Tyto** (顽强的仓鸮 / 猴面鹰)
+
+#### **【终极图鉴：U - Z】**
+* **U版本 (v21.0.0): Unique Upupa** (独特的戴胜)
+* **V版本 (v22.0.0): Valiant Vulture** (英勇的秃鹫) —— *（擅长清理，适合作为深度优化、清理历史债务重构的版本）*
+* **W版本 (v23.0.0): Wise Woodpecker** (智慧的啄木鸟) —— *（精准捕捉代码 Bug 和系统漏洞）*
+* **X版本 (v24.0.0): Xenial Xema** (友好的叉尾鸥) —— *（Xenial 意为好客的，适合强化开放 API 与第三方集成的版本）*
+* **Y版本 (v25.0.0): Youthful Yuhina** (充满活力的凤鹛)
+* **Z版本 (v26.0.0): Zealous Zosterops** (热情的绣眼鸟) —— *（Z 字母的完美收官，一个热情洋溢的终极进化版）*
+
+### 💡 极客建议
+
+当你把你的项目打成 WAR 包时，可以在首页的 Footer（页脚）或者控制台启动日志里，悄悄打出一行字：
+> `System booting... Powered by PureRecruitment v1.0.0 (Astute Athene)`
+
+这会给每一个审阅你代码的老师或使用你系统的同学一种“这不只是个大作业，这是一个正规软件工程产品”的震撼感。第一步，准备好发布你的 **Astute Athene v1.0.0-beta.1** 了吗？
 
