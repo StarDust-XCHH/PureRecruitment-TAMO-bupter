@@ -1,0 +1,29 @@
+{
+  "meta": {
+    "schema": "admin",
+    "entity": "profiles",
+    "version": "1.0",
+    "updatedAt": "2026-04-11T06:54:38.450805300Z"
+  },
+  "items": [
+    {
+      "id": "PROFILE-ADMIN-00001",
+      "adminId": "ADMIN-00001",
+      "realName": "Administrator",
+      "title": "Administrator",
+      "contactEmail": "admin@bupt.edu.cn",
+      "bio": "",
+      "permissions": [
+        "users:read",
+        "users:write",
+        "courses:read",
+        "courses:write",
+        "notices:read",
+        "notices:write",
+        "settings:read",
+        "settings:write"
+      ],
+      "lastUpdatedAt": "2026-04-07T06:00:40.877154700Z"
+    }
+  ]
+}
