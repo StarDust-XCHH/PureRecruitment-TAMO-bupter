@@ -6,7 +6,8 @@
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
     const roleInput = document.getElementById('roleInput');
-    const tabs = Array.from(document.querySelectorAll('.tab'));
+    const loginTabs = Array.from(document.querySelectorAll('#loginCard .tabs .tab'));
+    const registerTabs = Array.from(document.querySelectorAll('#registerCard .tabs .tab'));
     const loginError = document.getElementById('loginError');
     const registerError = document.getElementById('registerError');
     const adminError = document.getElementById('adminError');
@@ -147,6 +148,91 @@
         }
     }
 
+    function syncRegisterRoleTabs(role) {
+        registerTabs.forEach(function (t) {
+            const r = t.getAttribute('data-role') || 'TA';
+            const on = r === role;
+            t.classList.toggle('active', on);
+            t.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+    }
+
+    /**
+     * 切换注册身份：保留已填表单项，按角色重新生成 ID。
+     */
+    function applyRegisterRole(role) {
+        const next = role === 'MO' ? 'MO' : 'TA';
+        if (registerRoleInput.value === next) {
+            return;
+        }
+        registerRoleInput.value = next;
+        registerId.value = next === 'TA' ? generateTaId() : generateMoId();
+        updateRegisterUI(next);
+        syncRegisterRoleTabs(next);
+        setInlineMessage(registerError, '');
+    }
+
+    /**
+     * 注册提交前：与登录页同风格的确认层（非浏览器原生 confirm）。
+     */
+    function showRegisterConfirm(role) {
+        return new Promise(function (resolve) {
+            const modal = document.getElementById('registerConfirmModal');
+            const msg = document.getElementById('registerConfirmMessage');
+            const okBtn = document.getElementById('registerConfirmOk');
+            const cancelBtn = document.getElementById('registerConfirmCancel');
+            if (!modal || !msg || !okBtn || !cancelBtn) {
+                resolve(true);
+                return;
+            }
+
+            msg.textContent =
+                role === 'MO'
+                    ? 'Create a Module Organizer (MO) account?'
+                    : 'Create a Teaching Assistant (TA) account?';
+
+            function finish(result) {
+                modal.classList.add('hidden');
+                modal.setAttribute('aria-hidden', 'true');
+                document.removeEventListener('keydown', onDocKey);
+                modal.removeEventListener('click', onBackdrop);
+                okBtn.removeEventListener('click', onOk);
+                cancelBtn.removeEventListener('click', onCancel);
+                resolve(result);
+                if (!result && registerSubmit && typeof registerSubmit.focus === 'function') {
+                    registerSubmit.focus();
+                }
+            }
+
+            function onOk() {
+                finish(true);
+            }
+            function onCancel() {
+                finish(false);
+            }
+            function onBackdrop(ev) {
+                if (ev.target === modal) {
+                    finish(false);
+                }
+            }
+            function onDocKey(ev) {
+                if (ev.key === 'Escape') {
+                    ev.preventDefault();
+                    finish(false);
+                }
+            }
+
+            okBtn.addEventListener('click', onOk);
+            cancelBtn.addEventListener('click', onCancel);
+            modal.addEventListener('click', onBackdrop);
+            document.addEventListener('keydown', onDocKey);
+
+            modal.classList.remove('hidden');
+            modal.setAttribute('aria-hidden', 'false');
+            okBtn.focus();
+        });
+    }
+
     function saveTaUser(user) {
         const serialized = JSON.stringify(user);
         sessionStorage.setItem('ta-user', serialized);
@@ -185,15 +271,22 @@
     applyTheme(savedTheme === 'light' ? 'light' : 'dark');
     setOverlayState(false);
 
-    tabs.forEach(function (tab) {
+    loginTabs.forEach(function (tab) {
         tab.addEventListener('click', function () {
-            tabs.forEach(function (item) {
+            loginTabs.forEach(function (item) {
                 item.classList.remove('active');
             });
             tab.classList.add('active');
             const selectedRole = tab.getAttribute('data-role') || 'TA';
             roleInput.value = selectedRole;
             updateLoginUI(selectedRole);
+        });
+    });
+
+    registerTabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            const selectedRole = tab.getAttribute('data-role') || 'TA';
+            applyRegisterRole(selectedRole);
         });
     });
 
@@ -308,6 +401,7 @@
         // 更新注册页面 UI
         registerRoleInput.value = selectedRole;
         updateRegisterUI(selectedRole);
+        syncRegisterRoleTabs(selectedRole);
 
         showCard(registerCard, loginCard);
     });
@@ -478,6 +572,11 @@
             markInvalid(registerPassword);
             markInvalid(registerConfirmPassword);
             setInlineMessage(registerError, 'Passwords do not match.');
+            return;
+        }
+
+        const confirmed = await showRegisterConfirm(selectedRole);
+        if (!confirmed) {
             return;
         }
 

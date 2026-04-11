@@ -411,6 +411,100 @@
             color: rgba(0, 0, 0, 0.45);
         }
 
+        .register-role-hint {
+            margin: -8px 0 18px;
+            font-size: 11px;
+            line-height: 1.45;
+            color: var(--muted);
+        }
+
+        /* Sign-up confirmation — matches auth card glass style */
+        .auth-modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 16px;
+            background: var(--overlay-bg);
+            backdrop-filter: blur(14px) saturate(140%);
+            -webkit-backdrop-filter: blur(14px) saturate(140%);
+            border: 1px solid transparent;
+            opacity: 1;
+            transition: opacity 0.25s ease;
+        }
+
+        .auth-modal-overlay.hidden {
+            display: none !important;
+        }
+
+        .auth-modal-panel {
+            width: min(360px, 100%);
+            padding: 24px 22px;
+            background: var(--card);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 18px 40px rgba(3, 6, 20, 0.45);
+            animation: cardFadeIn 0.3s ease;
+        }
+
+        :root[data-theme='light'] .auth-modal-panel {
+            box-shadow: 0 18px 36px rgba(15, 20, 35, 0.12);
+        }
+
+        .auth-modal-title {
+            font-size: 17px;
+            margin: 0 0 10px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .auth-modal-body {
+            margin: 0 0 10px;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--muted);
+        }
+
+        .auth-modal-note {
+            margin: 0 0 22px;
+            font-size: 12px;
+            line-height: 1.45;
+            color: var(--muted);
+            opacity: 0.92;
+        }
+
+        .auth-modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .auth-modal-actions .btn {
+            flex: 0 1 auto;
+            min-width: 100px;
+        }
+
+        .btn-modal-secondary {
+            background: transparent !important;
+            color: var(--text) !important;
+            border: 1px solid var(--card-border) !important;
+            box-shadow: none !important;
+            font-weight: 600;
+        }
+
+        .btn-modal-secondary:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.06) !important;
+            transform: translateY(-1px);
+        }
+
+        :root[data-theme='light'] .btn-modal-secondary:hover:not(:disabled) {
+            background: rgba(15, 20, 35, 0.06) !important;
+        }
+
         @keyframes float {
             0%, 100% {
                 transform: translateY(0) translateX(0);

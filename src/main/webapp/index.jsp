@@ -88,7 +88,13 @@
                 </div>
             </div>
 
-            <form id="registerForm">
+            <div class="tabs" id="registerRoleTabs" role="tablist" aria-label="Registration account type">
+                <button class="tab active" type="button" data-role="TA" role="tab" aria-selected="true">TA</button>
+                <button class="tab" type="button" data-role="MO" role="tab" aria-selected="false">MO</button>
+            </div>
+            <p class="register-role-hint">Switching TA/MO only updates your ID—everything else stays.</p>
+
+            <form id="registerForm" novalidate>
                 <input id="registerRoleInput" name="role" type="hidden" value="TA">
 
                 <div class="field-row">
@@ -137,6 +143,18 @@
                 <div class="error" id="registerError" aria-live="polite"></div>
             </form>
         </section>
+    </div>
+</div>
+
+<div class="auth-modal-overlay hidden" id="registerConfirmModal" role="dialog" aria-modal="true" aria-labelledby="registerConfirmTitle" aria-hidden="true">
+    <div class="auth-modal-panel">
+        <h2 class="auth-modal-title" id="registerConfirmTitle">Confirm registration</h2>
+        <p class="auth-modal-body" id="registerConfirmMessage"></p>
+        <p class="auth-modal-note">Cancel keeps your entries.</p>
+        <div class="auth-modal-actions">
+            <button type="button" class="btn btn-modal-secondary" id="registerConfirmCancel">Cancel</button>
+            <button type="button" class="btn" id="registerConfirmOk">Continue</button>
+        </div>
     </div>
 </div>
 
