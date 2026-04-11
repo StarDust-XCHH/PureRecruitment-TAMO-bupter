@@ -1,0 +1,28 @@
+{
+  "meta": {
+    "schema": "admin",
+    "entity": "admins",
+    "version": "1.0",
+    "updatedAt": "2026-04-07T06:00:40.878154300Z"
+  },
+  "items": [
+    {
+      "id": "ADMIN-00001",
+      "name": "Administrator",
+      "username": "admin",
+      "email": "admin@bupt.edu.cn",
+      "phone": "",
+      "department": "System Administration",
+      "status": "active",
+      "createdAt": "2026-04-07T06:00:40.877154700Z",
+      "updatedAt": "2026-04-07T14:57:47.5624369",
+      "auth": {
+        "passwordHash": "1c351d881970dbe975e92433a36c5c474b9bcf7bb8d90dae86e441b9397c5700",
+        "passwordSalt": "bd8823b2-d726-4d35-9b20-43822093354c",
+        "lastLoginAt": "2026-04-07T14:57:47.5624369",
+        "failedAttempts": 0
+      }
+    }
+  ],
+  "updatedAt": "2026-04-07T14:57:47.5624369Z"
+}
