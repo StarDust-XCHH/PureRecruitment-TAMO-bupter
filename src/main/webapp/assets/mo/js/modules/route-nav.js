@@ -19,6 +19,9 @@
                 const active = panel.dataset.route === safe;
                 panel.classList.toggle('active', active);
             });
+            if (safe === 'applicants' && typeof app.onApplicantsRouteActivate === 'function') {
+                app.onApplicantsRouteActivate();
+            }
         }
 
         navItems.forEach(function (item) {

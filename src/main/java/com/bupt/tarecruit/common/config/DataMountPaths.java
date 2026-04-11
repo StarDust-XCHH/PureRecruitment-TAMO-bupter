@@ -38,6 +38,26 @@ public final class DataMountPaths {
         return root().resolve("mo");
     }
 
+    /** Admin 数据目录 */
+    public static Path adminDir() {
+        return root().resolve("admin");
+    }
+
+    /** Returns path to Admin accounts file ({@code admins.json}). */
+    public static Path adminAccounts() {
+        return adminDir().resolve("admins.json");
+    }
+
+    /** Returns path to Admin profiles file ({@code profiles.json}). */
+    public static Path adminProfiles() {
+        return adminDir().resolve("profiles.json");
+    }
+
+    /** Returns path to Admin settings file ({@code settings.json}). */
+    public static Path adminSettings() {
+        return adminDir().resolve("settings.json");
+    }
+
     /** Returns path to MO accounts file ({@code mos.json}). */
     public static Path moAccounts() {
         return moDir().resolve("mos.json");
