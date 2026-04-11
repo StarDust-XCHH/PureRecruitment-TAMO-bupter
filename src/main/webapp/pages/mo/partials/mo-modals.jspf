@@ -143,9 +143,15 @@
 
     <div class="ta-modal-panel wide mo-job-publish-modal" data-modal="job-publish" role="dialog" aria-modal="true" aria-labelledby="modalJobPublishTitle">
         <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
-        <div class="modal-head">
-            <h3 id="modalJobPublishTitle">发布课程岗位</h3>
-            <p class="muted">按左侧步骤填写完成后即可发布；新课程会出现在您的课程列表中，学生端也会看到。</p>
+        <div class="modal-head mo-job-publish-modal__head">
+            <div class="mo-job-publish-modal__head-main">
+                <h3 id="modalJobPublishTitle">发布课程岗位</h3>
+                <p class="muted">按左侧步骤填写完成后即可发布；新课程会出现在您的课程列表中，学生端也会看到。</p>
+            </div>
+            <div class="mo-job-publish-modal__head-actions">
+                <span id="publishJobStatus" class="muted mo-job-publish-modal__status" role="status" aria-live="polite"></span>
+                <button class="pill-btn" id="publishJobBtn" type="submit" form="jobPublishForm" aria-describedby="publishJobStatus">发布岗位</button>
+            </div>
         </div>
         <div class="modal-body mo-job-publish-modal__body">
             <div class="mo-publish-layout">
@@ -282,11 +288,6 @@
                                     <textarea id="recruitmentBriefInput" rows="6" placeholder="详细说明职责、投入时间、沟通方式、任务与评价方式等（可选）" class="mo-field-input"></textarea>
                                 </label>
                             </div>
-                        </div>
-
-                        <div class="full mo-form-actions">
-                            <button class="pill-btn" id="publishJobBtn" type="submit">发布岗位</button>
-                            <span id="publishJobStatus" class="muted"></span>
                         </div>
                     </form>
                 </div>

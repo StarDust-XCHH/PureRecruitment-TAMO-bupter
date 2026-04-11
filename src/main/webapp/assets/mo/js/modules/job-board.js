@@ -796,16 +796,35 @@
                 );
             }
 
+            /** 左侧导航点击触发程序化滚动时，暂不根据 scroll 更新高亮（避免与目标不一致） */
+            var ignorePublishNavScrollSpy = false;
+
+            function setPublishNavActiveBySectionId(sectionId) {
+                if (!sectionId || !navLinks.length) return;
+                navLinks.forEach(function (l) {
+                    var on = l.getAttribute('href') === '#' + sectionId;
+                    l.classList.toggle('active', on);
+                    if (on) {
+                        l.setAttribute('aria-current', 'true');
+                    } else {
+                        l.removeAttribute('aria-current');
+                    }
+                });
+            }
+
             function updateActiveFromScroll() {
+                if (ignorePublishNavScrollSpy) return;
                 var sections = getSections();
                 if (!publishContent || !sections.length || !navLinks.length) return;
                 var scrollTop = publishContent.scrollTop;
-                var offset = 48;
+                /** 与 CSS scroll-margin-top 大致对齐，避免「短区块」时误判到下一节 */
+                var offset = 56;
                 var activeId = sections[0].id;
                 var i;
                 for (i = 0; i < sections.length; i++) {
                     var sec = sections[i];
-                    if (sectionTopInScroller(sec) - offset <= scrollTop) {
+                    var topIn = sectionTopInScroller(sec);
+                    if (topIn - offset <= scrollTop + 0.5) {
                         activeId = sec.id;
                     }
                 }
@@ -826,19 +845,13 @@
                     var targetId = link.getAttribute('href').substring(1);
                     var targetSection = document.getElementById(targetId);
                     if (!targetSection || !publishContent) return;
-                    var y = sectionTopInScroller(targetSection);
-                    publishContent.scrollTo({
-                        top: Math.max(0, y - 12),
-                        behavior: 'smooth'
-                    });
-                    navLinks.forEach(function (l) {
-                        var on = l === link;
-                        l.classList.toggle('active', on);
-                        if (on) {
-                            l.setAttribute('aria-current', 'true');
-                        } else {
-                            l.removeAttribute('aria-current');
-                        }
+                    ignorePublishNavScrollSpy = true;
+                    setPublishNavActiveBySectionId(targetId);
+                    /** scrollIntoView 由浏览器对齐到滚动容器，比手动 scrollTop 更稳；配合 CSS scroll-margin */
+                    targetSection.scrollIntoView({ block: 'start', behavior: 'auto', inline: 'nearest' });
+                    requestAnimationFrame(function () {
+                        ignorePublishNavScrollSpy = false;
+                        setPublishNavActiveBySectionId(targetId);
                     });
                 });
             });
@@ -853,6 +866,20 @@
             app.syncPublishJobNav = function () {
                 if (publishContent) publishContent.scrollTop = 0;
                 updateActiveFromScroll();
+            };
+
+            /** 校验失败时滚动右侧内容区并同步左侧导航高亮（与导航点击逻辑一致） */
+            app.scrollPublishJobToSection = function (sectionId) {
+                if (!sectionId) return;
+                var targetSection = document.getElementById(sectionId);
+                if (!targetSection || !publishContent) return;
+                ignorePublishNavScrollSpy = true;
+                setPublishNavActiveBySectionId(sectionId);
+                targetSection.scrollIntoView({ block: 'start', behavior: 'auto', inline: 'nearest' });
+                requestAnimationFrame(function () {
+                    ignorePublishNavScrollSpy = false;
+                    setPublishNavActiveBySectionId(sectionId);
+                });
             };
         }
 
@@ -1051,6 +1078,24 @@
             }
         }
 
+        function publishReportValidationError(msg, sectionId, focusEl) {
+            publishStatus.textContent = msg;
+            if (sectionId && typeof app.scrollPublishJobToSection === 'function') {
+                app.scrollPublishJobToSection(sectionId);
+            }
+            if (focusEl && typeof focusEl.focus === 'function') {
+                requestAnimationFrame(function () {
+                    requestAnimationFrame(function () {
+                        try {
+                            focusEl.focus({ preventScroll: true });
+                        } catch (e) {
+                            focusEl.focus();
+                        }
+                    });
+                });
+            }
+        }
+
         async function publishJob(event) {
             event.preventDefault();
             const teachingWeeks = {
@@ -1076,13 +1121,43 @@
             }
 
             const taNum = taRecruitCountRaw === '' ? NaN : Number(taRecruitCountRaw);
-            if (!courseNameInput || !courseCodeInput || !recruitmentStatusInput || !courseDescInput
-                || fixedSkills.length === 0 || !campusRaw || Number.isNaN(taNum) || taNum < 1) {
-                publishStatus.textContent = '请填写必填项：课程名、课程编号、招聘状态、校区（请选择 Main/Shahe）、TA 招聘人数（≥1）、至少一项技能标签、岗位短描述';
+            const deadlineInput = document.getElementById('applicationDeadlineInput');
+            const pubDl = readLocalApplicationDeadline(deadlineInput);
+
+            if (!courseNameInput) {
+                publishReportValidationError('请填写岗位/课程名称。', 'basic-info', document.getElementById('courseNameInput'));
+                return;
+            }
+            if (!courseCodeInput) {
+                publishReportValidationError('请填写课程编号。', 'basic-info', document.getElementById('courseCodeInput'));
+                return;
+            }
+            if (!recruitmentStatusInput) {
+                publishReportValidationError('请选择招聘状态（OPEN 或 CLOSED）。', 'basic-info', document.getElementById('recruitmentStatusOpen'));
                 return;
             }
             if (!semesterInput) {
-                publishStatus.textContent = '请选择学期类型：Spring 或 Fall（不可为「（请选择学期）」）';
+                publishReportValidationError('请选择学期类型：Spring 或 Fall（不可为「学期」占位项）。', 'basic-info', document.getElementById('semesterTermInput'));
+                return;
+            }
+            if (Number.isNaN(taNum) || taNum < 1) {
+                publishReportValidationError('请填写 TA 招聘人数（≥1 的整数）。', 'basic-info', document.getElementById('taRecruitCountInput'));
+                return;
+            }
+            if (!campusRaw) {
+                publishReportValidationError('请选择校区（Main 或 Shahe）。', 'basic-info', document.getElementById('campusInput'));
+                return;
+            }
+            if (!pubDl.ok) {
+                publishReportValidationError(pubDl.msg, 'basic-info', deadlineInput);
+                return;
+            }
+            if (fixedSkills.length === 0) {
+                publishReportValidationError('请至少选择一项技能标签（可点击「＋ 添加技能标签」）。', 'required-skills', document.getElementById('openPublishFixedSkillsBtn'));
+                return;
+            }
+            if (!courseDescInput) {
+                publishReportValidationError('请填写岗位短描述。', 'job-description', document.getElementById('courseDescInput'));
                 return;
             }
 
@@ -1111,11 +1186,6 @@
             };
             if (teachingWeeks.weeks.length) body.teachingWeeks = teachingWeeks;
             body.studentCount = studentCountRaw === '' ? -1 : (Number(studentCountRaw) || 0);
-            const pubDl = readLocalApplicationDeadline(document.getElementById('applicationDeadlineInput'));
-            if (!pubDl.ok) {
-                publishStatus.textContent = pubDl.msg;
-                return;
-            }
             if (pubDl.iso) body.applicationDeadline = pubDl.iso;
             if (recruitmentBriefRaw) body.recruitmentBrief = recruitmentBriefRaw;
 
