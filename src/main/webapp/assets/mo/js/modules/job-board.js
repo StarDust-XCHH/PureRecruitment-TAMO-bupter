@@ -22,7 +22,7 @@
         const state = {
             jobs: [],
             page: 1,
-            pageSize: 6,
+            pageSize: 4,
             filteredJobs: []
         };
 
@@ -91,6 +91,13 @@
 
         const jobBoard = document.getElementById('jobBoard');
         const jobPagination = document.getElementById('jobPagination');
+        const routeJobsEl = document.getElementById('route-jobs');
+
+        function scrollJobsPanelToTop() {
+            if (routeJobsEl && typeof routeJobsEl.scrollIntoView === 'function') {
+                routeJobsEl.scrollIntoView({ block: 'start', behavior: 'smooth' });
+            }
+        }
         const jobSearchInput = document.getElementById('jobSearchInput');
         const openCoursesCount = document.getElementById('openCoursesCount');
         const refreshJobsBtn = document.getElementById('refreshJobsBtn');
@@ -426,10 +433,6 @@
                 return item.requiredSkills.fixedTags.slice(0, 4);
             }
             return [];
-        }
-
-        function moOwnerLabel(item) {
-            return (item && (item.ownerMoName || item.ownerMoId)) || 'MO';
         }
 
         function renderCompositeList(ul, arr, emptyEl, type, target) {
@@ -1040,6 +1043,25 @@
             });
         }
 
+        function formatDetailDeadline(iso) {
+            if (iso == null || typeof iso !== 'string') return '--';
+            var s = iso.trim();
+            if (!s) return '--';
+            try {
+                var d = new Date(s);
+                if (isNaN(d.getTime())) return s;
+                return d.toLocaleString('zh-CN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (e) {
+                return s;
+            }
+        }
+
         function renderDetail(item) {
             currentDetailJob = item;
             if (courseEditStatus) courseEditStatus.textContent = '';
@@ -1049,12 +1071,24 @@
             };
             setText('jobDetailCode', getDisplayCode(item));
             setText('jobDetailName', item.courseName || '未命名岗位');
-            setText('jobDetailMo', moOwnerLabel(item));
             setText('jobDetailDescription', item.recruitmentBrief || item.courseDescription);
-            setText('jobDetailDate', item.teachingWeeks ? ('Week ' + weekText(item.teachingWeeks)) : '--');
-            setText('jobDetailTime', '--');
-            setText('jobDetailLocation', getDisplayLocation(item));
+            setText('jobDetailSemester', item.semester || '--');
+            setText('jobDetailTeachingWeeks', item.teachingWeeks ? ('Week ' + weekText(item.teachingWeeks)) : '--');
+            setText('jobDetailCampus', getDisplayLocation(item));
             setText('jobDetailStatus', item.recruitmentStatus || item.status || 'OPEN');
+            setText(
+                'jobDetailTaRecruit',
+                item.taRecruitCount != null && item.taRecruitCount >= 0 ? String(item.taRecruitCount) + ' 人' : '--'
+            );
+            setText(
+                'jobDetailStudentCount',
+                item.studentCount != null && item.studentCount >= 0 ? String(item.studentCount) + ' 人' : '--'
+            );
+            setText('jobDetailApplyDeadline', formatDetailDeadline(item.applicationDeadline));
+            setText(
+                'jobDetailJobRecordId',
+                item.jobId != null && String(item.jobId).trim() !== '' ? String(item.jobId).trim() : '--'
+            );
 
             const tags = document.getElementById('jobDetailTags');
             if (tags) {
@@ -1075,9 +1109,14 @@
             const jumpBtn = document.getElementById('jumpToApplicantsBtn');
             if (jumpBtn) {
                 jumpBtn.onclick = function () {
+                    var code = item.courseCode || item.jobId;
                     if (typeof app.closeAllModals === 'function') app.closeAllModals();
-                    if (typeof app.activateRoute === 'function') app.activateRoute('applicants');
-                    if (typeof app.setApplicantCourse === 'function') app.setApplicantCourse(item.courseCode || item.jobId);
+                    if (typeof app.navigateToApplicantsWithCourse === 'function') {
+                        app.navigateToApplicantsWithCourse(code);
+                    } else if (typeof app.activateRoute === 'function') {
+                        app.activateRoute('applicants');
+                        if (typeof app.setApplicantCourse === 'function') app.setApplicantCourse(code);
+                    }
                 };
             }
         }
@@ -1116,7 +1155,6 @@
                 card.innerHTML =
                     '<div class="course-card-topline">' +
                         '<span class="job-code">' + getDisplayCode(item) + '</span>' +
-                        '<span class="pill">' + moOwnerLabel(item) + '</span>' +
                         '<span class="course-status ' + statusClass + '">' + status + '</span>' +
                     '</div>' +
                     '<h4 class="course-card-title">' + (item.courseName || '未命名岗位') + '</h4>' +
@@ -1165,6 +1203,7 @@
                 btn.addEventListener('click', function () {
                     state.page = i;
                     renderBoard();
+                    scrollJobsPanelToTop();
                 });
                 jobPagination.appendChild(btn);
             }

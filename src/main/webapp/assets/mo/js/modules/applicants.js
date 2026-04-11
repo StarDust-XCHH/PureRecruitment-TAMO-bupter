@@ -17,13 +17,27 @@
         const refreshBtn = document.getElementById('refreshApplicantsBtn');
         const statusText = document.getElementById('applicantsStatusText');
         const list = document.getElementById('applicantList');
+        const paginationEl = document.getElementById('applicantPagination');
         const emptyState = document.getElementById('applicantEmptyState');
         const detailModal = document.getElementById('moApplicantDetailModal');
         const detailBody = document.getElementById('moApplicantDetailBody');
         const detailClose = document.getElementById('moApplicantDetailClose');
         const navBadge = document.getElementById('navApplicantsBadge');
+        const routeApplicantsEl = document.getElementById('route-applicants');
 
         let currentDetailApplicationId = '';
+
+        function scrollApplicantsPanelToTop() {
+            if (routeApplicantsEl && typeof routeApplicantsEl.scrollIntoView === 'function') {
+                routeApplicantsEl.scrollIntoView({ block: 'start', behavior: 'smooth' });
+            }
+        }
+
+        const APPLICANT_PAGE_SIZE = 6;
+        let applicantListCache = [];
+        let applicantPageIndex = 1;
+        /** 从课程详情「进入应聘筛选」预选的课程编码，在岗位下拉加载后再应用 */
+        let pendingApplicantCourseCode = null;
 
         function getMoId() {
             const u = typeof app.getMoUser === 'function' ? app.getMoUser() : null;
@@ -124,41 +138,100 @@
             return v ? escapeHtml(v) : '--';
         }
 
-        function renderApplicants(items) {
-            list.innerHTML = '';
-            const rows = Array.isArray(items) ? items : [];
-            emptyState.hidden = rows.length > 0;
-            if (rows.length === 0) return;
+        /** 与列表 status 文案对应，用于投递状态色块（与课程管理 OPEN/CLOSED 徽章同类） */
+        function applicantStatusClass(status) {
+            var s = (status == null ? '' : String(status)).trim();
+            if (s === '已录用') return 'mo-applicant-status--hired';
+            if (s === '未录用') return 'mo-applicant-status--rejected';
+            if (s === '审核中') return 'mo-applicant-status--review';
+            if (s === '已投递') return 'mo-applicant-status--submitted';
+            return 'mo-applicant-status--neutral';
+        }
 
-            rows.forEach(function (item) {
+        /**
+         * @param {Array|undefined} items 传入时表示新数据并重置到第 1 页；不传则仅按当前页从缓存重绘（用于翻页）
+         */
+        function renderApplicants(items) {
+            if (items !== undefined) {
+                applicantListCache = Array.isArray(items) ? items : [];
+                applicantPageIndex = 1;
+            }
+
+            list.innerHTML = '';
+            var total = applicantListCache.length;
+            emptyState.hidden = total > 0;
+
+            var totalPages = Math.max(1, Math.ceil(total / APPLICANT_PAGE_SIZE));
+            if (applicantPageIndex > totalPages) {
+                applicantPageIndex = totalPages;
+            }
+            if (applicantPageIndex < 1) {
+                applicantPageIndex = 1;
+            }
+
+            if (paginationEl) {
+                paginationEl.innerHTML = '';
+                if (total === 0) {
+                    paginationEl.hidden = true;
+                } else {
+                    paginationEl.hidden = false;
+                    for (var p = 1; p <= totalPages; p++) {
+                        (function (pageNum) {
+                            var btn = document.createElement('button');
+                            btn.type = 'button';
+                            btn.className = 'job-page-btn' + (pageNum === applicantPageIndex ? ' active' : '');
+                            btn.textContent = String(pageNum);
+                            btn.setAttribute('aria-label', '第 ' + pageNum + ' 页');
+                            if (pageNum === applicantPageIndex) {
+                                btn.setAttribute('aria-current', 'page');
+                            }
+                            btn.addEventListener('click', function () {
+                                applicantPageIndex = pageNum;
+                                renderApplicants();
+                                scrollApplicantsPanelToTop();
+                            });
+                            paginationEl.appendChild(btn);
+                        }(p));
+                    }
+                }
+            }
+
+            if (total === 0) {
+                return;
+            }
+
+            var start = (applicantPageIndex - 1) * APPLICANT_PAGE_SIZE;
+            var pageRows = applicantListCache.slice(start, start + APPLICANT_PAGE_SIZE);
+
+            pageRows.forEach(function (item) {
                 const card = document.createElement('div');
-                card.className = 'mo-applicant-card';
-                const toneClass = item.status === '已录用' ? 'mo-status-ok'
-                    : (item.status === '未录用' ? 'mo-status-warn' : 'mo-status-warn');
+                card.className = 'mo-applicant-board-card job-card course-job-card';
+                card.setAttribute('tabindex', '-1');
                 const unreadDot = item.unread ? '<span class="mo-unread-dot" title="未读"></span>' : '';
 
                 card.innerHTML =
-                    '<div class="mo-applicant-head">' +
-                    '<div><strong>' + escapeHtml(item.name || item.taId) + '</strong>' + unreadDot + '</div>' +
-                    '<div class="' + toneClass + '">' + escapeHtml(item.status || '未知') + '</div>' +
+                    '<div class="course-card-topline">' +
+                    '<span class="job-code">' + escapeHtml(item.courseCode || '--') + '</span>' +
+                    '<span class="pill course-mo-badge">' + escapeHtml(item.taId || '--') + '</span>' +
+                    '<span class="mo-applicant-status-badge ' + applicantStatusClass(item.status) + '">' +
+                    escapeHtml(item.status || '未知') + '</span>' +
                     '</div>' +
-                    '<div class="mo-applicant-card__peek muted">' +
+                    '<h4 class="course-card-title mo-applicant-card__title">' + escapeHtml(item.name || item.taId) + unreadDot + '</h4>' +
+                    '<p class="course-card-description">' +
                     '课程 · ' + escapeHtml(item.courseCode || '--') + ' · ' + escapeHtml(item.courseName || '--') +
+                    '</p>' +
+                    '<div class="course-card-hint mo-applicant-card__hint">' +
+                    '<button type="button" class="pill-btn ghost mo-applicant-view-btn">查看详情</button>' +
                     '</div>';
 
-                const actions = document.createElement('div');
-                actions.className = 'mo-applicant-actions';
+                const viewBtn = card.querySelector('.mo-applicant-view-btn');
+                if (viewBtn) {
+                    viewBtn.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        openDetail(item);
+                    });
+                }
 
-                const viewBtn = document.createElement('button');
-                viewBtn.className = 'pill-btn ghost mo-applicant-view-btn';
-                viewBtn.type = 'button';
-                viewBtn.textContent = '查看详情';
-                viewBtn.addEventListener('click', function () {
-                    openDetail(item);
-                });
-
-                actions.appendChild(viewBtn);
-                card.appendChild(actions);
                 list.appendChild(card);
             });
         }
@@ -408,8 +481,23 @@
         /** 进入「应聘筛选」或需强制同步岗位列表时调用（与课程管理同一数据源） */
         app.onApplicantsRouteActivate = function () {
             refreshCourseOptionsFromApi().then(function () {
-                loadApplicants();
+                if (pendingApplicantCourseCode) {
+                    var preset = pendingApplicantCourseCode;
+                    pendingApplicantCourseCode = null;
+                    app.setApplicantCourse(preset);
+                } else {
+                    loadApplicants();
+                }
             });
+        };
+
+        /** 关闭弹窗后跳转应聘筛选并选中指定课程（先于 activateRoute 写入 pending，避免与异步下拉竞态） */
+        app.navigateToApplicantsWithCourse = function (courseCode) {
+            var c = courseCode == null ? '' : String(courseCode).trim();
+            pendingApplicantCourseCode = c || null;
+            if (typeof app.activateRoute === 'function') {
+                app.activateRoute('applicants');
+            }
         };
 
         app.setApplicantCourse = function (courseCode) {

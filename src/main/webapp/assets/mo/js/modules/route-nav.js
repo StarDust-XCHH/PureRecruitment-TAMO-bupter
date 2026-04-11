@@ -22,6 +22,14 @@
             if (safe === 'applicants' && typeof app.onApplicantsRouteActivate === 'function') {
                 app.onApplicantsRouteActivate();
             }
+            if (safe === 'applicants') {
+                const applicantsPanel = document.getElementById('route-applicants');
+                if (applicantsPanel && typeof applicantsPanel.scrollIntoView === 'function') {
+                    requestAnimationFrame(function () {
+                        applicantsPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    });
+                }
+            }
         }
 
         navItems.forEach(function (item) {
@@ -31,8 +39,10 @@
                     app.onGuideRouteNav(route);
                 }
                 activateRoute(route);
-                const target = document.getElementById('route-' + route);
-                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                if (route !== 'applicants') {
+                    const target = document.getElementById('route-' + route);
+                    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
             });
         });
 

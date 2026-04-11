@@ -1,12 +1,18 @@
 <div class="ta-modal-overlay" id="taModalOverlay" aria-hidden="true">
     <div class="ta-modal-panel wide job-detail-modal" data-modal="course-detail" role="dialog" aria-labelledby="modalCourseDetailTitle">
         <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
-        <div class="modal-head">
-            <h3 id="modalCourseDetailTitle">课程岗位详情</h3>
-            <p class="muted">查看课程安排和招聘重点，快速进入筛选流程。</p>
+        <div class="modal-head job-detail-modal__head">
+            <div class="job-detail-modal__head-main">
+                <h3 id="modalCourseDetailTitle">课程岗位详情</h3>
+                <p class="muted">查看课程安排和招聘重点，快速进入筛选流程。</p>
+            </div>
+            <div class="job-detail-modal__head-actions">
+                <button type="button" class="pill-btn job-detail-modal__edit-btn" id="toggleCourseEditBtn">修改课程信息</button>
+                <button class="pill-btn job-detail-modal__screening-btn" type="button" id="jumpToApplicantsBtn">进入应聘筛选</button>
+            </div>
         </div>
         <div class="modal-body">
-            <div class="job-detail-shell">
+            <div class="job-detail-shell job-detail-shell--mo">
                 <section class="job-detail-main">
                     <div class="job-detail-hero">
                         <div class="job-detail-title-row">
@@ -14,16 +20,21 @@
                                 <div class="job-code" id="jobDetailCode">MO-0000</div>
                                 <h4 id="jobDetailName">课程名称</h4>
                             </div>
-                            <span class="pill" id="jobDetailMo">MO</span>
                         </div>
                         <p class="job-detail-summary" id="jobDetailDescription">课程介绍</p>
-                        <div class="job-detail-meta-grid">
-                            <div class="job-detail-meta"><span>课程日期</span><strong id="jobDetailDate">--</strong></div>
-                            <div class="job-detail-meta"><span>课程时间</span><strong id="jobDetailTime">--</strong></div>
-                            <div class="job-detail-meta"><span>上课地点</span><strong id="jobDetailLocation">--</strong></div>
+                        <div class="job-detail-meta-grid job-detail-meta-grid--mo">
+                            <div class="job-detail-meta"><span>学期</span><strong id="jobDetailSemester">--</strong></div>
+                            <div class="job-detail-meta"><span>授课周次</span><strong id="jobDetailTeachingWeeks">--</strong></div>
+                            <div class="job-detail-meta"><span>校区</span><strong id="jobDetailCampus">--</strong></div>
                             <div class="job-detail-meta"><span>招聘状态</span><strong id="jobDetailStatus">--</strong></div>
+                            <div class="job-detail-meta"><span>TA 招聘人数</span><strong id="jobDetailTaRecruit">--</strong></div>
+                            <div class="job-detail-meta"><span>预计选课人数</span><strong id="jobDetailStudentCount">--</strong></div>
+                            <div class="job-detail-meta"><span>申请截止</span><strong id="jobDetailApplyDeadline">--</strong></div>
+                            <div class="job-detail-meta"><span>岗位记录 ID</span><strong id="jobDetailJobRecordId">--</strong></div>
                         </div>
                     </div>
+                </section>
+                <aside class="job-detail-side job-detail-side--mo-extra">
                     <div class="job-detail-section">
                         <h5>课程标签</h5>
                         <div class="job-detail-tags" id="jobDetailTags"></div>
@@ -32,16 +43,8 @@
                         <h5>TA 工作清单</h5>
                         <ul class="job-detail-checklist" id="jobDetailChecklist"></ul>
                     </div>
-                </section>
-                <aside class="job-detail-side">
-                    <div class="job-detail-side-card">
-                        <h5>下一步</h5>
-                        <p>点击"进入应聘筛选"后将自动切换到应聘筛选路由，并按该课程加载候选人。</p>
-                        <button class="pill-btn" type="button" id="jumpToApplicantsBtn">进入应聘筛选</button>
-                    </div>
                 </aside>
             </div>
-            <p style="margin-top:1rem;"><button type="button" class="pill-btn" id="toggleCourseEditBtn">修改课程信息</button></p>
         </div>
     </div>
 
