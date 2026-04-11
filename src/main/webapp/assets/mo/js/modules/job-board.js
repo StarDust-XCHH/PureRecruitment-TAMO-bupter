@@ -87,6 +87,8 @@
         var skillPickerPendingCustom = [];
         /** 从技能选择弹窗内点 Other，确认后写入 skillPickerPendingCustom */
         var addingOtherForFixedPicker = false;
+        /** 自定义技能弹窗：null 为新增；非负整数为 publishCustomSkills / editCustomSkills 中要修改的下标 */
+        var editingCustomSkillIndex = null;
         var compositeTarget = 'publish';
 
         const jobBoard = document.getElementById('jobBoard');
@@ -428,11 +430,91 @@
             return item && item.campus ? item.campus : '--';
         }
 
-        function toTags(item) {
-            if (item.requiredSkills && Array.isArray(item.requiredSkills.fixedTags)) {
-                return item.requiredSkills.fixedTags.slice(0, 4);
+        /** 岗位技能标签：系统固定标签 + Other 自定义（requiredSkills.customSkills[].name），去重 */
+        function getJobSkillTagsList(item) {
+            const out = [];
+            const seen = new Set();
+            const rs = item && item.requiredSkills;
+            if (!rs) return out;
+            if (Array.isArray(rs.fixedTags)) {
+                rs.fixedTags.forEach(function (t) {
+                    const s = String(t == null ? '' : t).trim();
+                    if (!s) return;
+                    const k = s.toLowerCase();
+                    if (seen.has(k)) return;
+                    seen.add(k);
+                    out.push(s);
+                });
             }
-            return [];
+            if (Array.isArray(rs.customSkills)) {
+                rs.customSkills.forEach(function (c) {
+                    const s = c && c.name != null ? String(c.name).trim() : '';
+                    if (!s) return;
+                    const k = s.toLowerCase();
+                    if (seen.has(k)) return;
+                    seen.add(k);
+                    out.push(s);
+                });
+            }
+            return out;
+        }
+
+        /**
+         * 课程详情侧栏：按顺序输出固定标签与自定义标签（含说明，用于悬停提示）
+         */
+        function getJobDetailSkillTagEntries(item) {
+            const out = [];
+            const seen = new Set();
+            const rs = item && item.requiredSkills;
+            if (!rs) return out;
+            if (Array.isArray(rs.fixedTags)) {
+                rs.fixedTags.forEach(function (t) {
+                    const s = String(t == null ? '' : t).trim();
+                    if (!s) return;
+                    const k = s.toLowerCase();
+                    if (seen.has(k)) return;
+                    seen.add(k);
+                    out.push({ type: 'fixed', label: s });
+                });
+            }
+            if (Array.isArray(rs.customSkills)) {
+                rs.customSkills.forEach(function (c) {
+                    const name = c && c.name != null ? String(c.name).trim() : '';
+                    if (!name) return;
+                    const k = name.toLowerCase();
+                    if (seen.has(k)) return;
+                    seen.add(k);
+                    const desc = c && c.description != null ? String(c.description).trim() : '';
+                    out.push({ type: 'custom', label: name, description: desc });
+                });
+            }
+            return out;
+        }
+
+        /**
+         * @param {number} [maxCount] 传入正数时截断（课程列表卡片）；详情页不传则展示全部
+         */
+        function toTags(item, maxCount) {
+            const list = getJobSkillTagsList(item);
+            if (typeof maxCount === 'number' && maxCount > 0) {
+                return list.slice(0, maxCount);
+            }
+            return list;
+        }
+
+        var JOB_CARD_TAGS_MAX = 4;
+
+        /** MO 课程列表卡片：最多展示若干标签，未展示完时在末尾显示「等，共x个」（x 为标签总数） */
+        function buildCourseCardTagsHtml(item) {
+            var all = getJobSkillTagsList(item);
+            var shown = all.slice(0, JOB_CARD_TAGS_MAX);
+            var html = shown.map(function (tag) {
+                return '<span class="pill">' + tag + '</span>';
+            }).join('');
+            if (all.length > JOB_CARD_TAGS_MAX) {
+                html += '<span class="job-tags-more muted">等，共' + all.length + '个</span>';
+            }
+            return html;
         }
 
         function renderCompositeList(ul, arr, emptyEl, type, target) {
@@ -492,7 +574,23 @@
                     }
                 });
                 li.appendChild(main);
-                li.appendChild(rm);
+                if (type === 'custom') {
+                    const actions = document.createElement('div');
+                    actions.className = 'mo-composite-item__actions';
+                    const editBtn = document.createElement('button');
+                    editBtn.type = 'button';
+                    editBtn.className = 'mo-composite-edit';
+                    editBtn.textContent = '修改';
+                    editBtn.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        openCompositeCustomSkillEdit(target, index);
+                    });
+                    actions.appendChild(editBtn);
+                    actions.appendChild(rm);
+                    li.appendChild(actions);
+                } else {
+                    li.appendChild(rm);
+                }
                 ul.appendChild(li);
             });
             if (emptyEl) {
@@ -512,9 +610,12 @@
             if (!el) return;
             if (el === customSkillModal) {
                 addingOtherForFixedPicker = false;
+                editingCustomSkillIndex = null;
                 el.classList.remove('mo-publish-modal--stack-top');
                 const t = document.getElementById('moCompositeCustomSkillTitle');
                 if (t) t.textContent = '添加自定义技能';
+                const cOk = document.getElementById('moCompositeCustomSkillConfirmBtn');
+                if (cOk) cOk.textContent = '加入列表';
             }
             el.hidden = true;
             el.setAttribute('aria-hidden', 'true');
@@ -533,13 +634,35 @@
 
         function openOtherSkillSubModal() {
             addingOtherForFixedPicker = true;
+            editingCustomSkillIndex = null;
             const nameEl = document.getElementById('moCustomSkillNameInput');
             const descEl = document.getElementById('moCustomSkillDescInput');
             if (nameEl) nameEl.value = '';
             if (descEl) descEl.value = '';
             const titleEl = document.getElementById('moCompositeCustomSkillTitle');
             if (titleEl) titleEl.textContent = '其他技能';
+            const cOk = document.getElementById('moCompositeCustomSkillConfirmBtn');
+            if (cOk) cOk.textContent = '加入列表';
             if (customSkillModal) customSkillModal.classList.add('mo-publish-modal--stack-top');
+            openModal(customSkillModal);
+            if (nameEl) nameEl.focus();
+        }
+
+        function openCompositeCustomSkillEdit(target, index) {
+            addingOtherForFixedPicker = false;
+            compositeTarget = target || 'publish';
+            editingCustomSkillIndex = typeof index === 'number' ? index : null;
+            const arr = compositeTarget === 'edit' ? editCustomSkills : publishCustomSkills;
+            const entry = (arr && arr[editingCustomSkillIndex]) ? arr[editingCustomSkillIndex] : {};
+            const nameEl = document.getElementById('moCustomSkillNameInput');
+            const descEl = document.getElementById('moCustomSkillDescInput');
+            const titleEl = document.getElementById('moCompositeCustomSkillTitle');
+            const cOk = document.getElementById('moCompositeCustomSkillConfirmBtn');
+            if (nameEl) nameEl.value = entry.name || '';
+            if (descEl) descEl.value = entry.description || '';
+            if (titleEl) titleEl.textContent = '修改自定义技能';
+            if (cOk) cOk.textContent = '保存';
+            if (customSkillModal) customSkillModal.classList.remove('mo-publish-modal--stack-top');
             openModal(customSkillModal);
             if (nameEl) nameEl.focus();
         }
@@ -577,6 +700,24 @@
                 skillPickerPendingCustom.push(row);
                 closeModal(customSkillModal);
                 renderFixedSkillsPickerFlow();
+                return;
+            }
+            if (editingCustomSkillIndex !== null && editingCustomSkillIndex >= 0) {
+                if (compositeTarget === 'edit') {
+                    if (editCustomSkills[editingCustomSkillIndex]) {
+                        editCustomSkills[editingCustomSkillIndex] = row;
+                    }
+                    renderCompositeList(editCustomSkillList, editCustomSkills, editCustomSkillEmpty, 'custom', 'edit');
+                    updateEditFixedSkillsSummary();
+                } else {
+                    if (publishCustomSkills[editingCustomSkillIndex]) {
+                        publishCustomSkills[editingCustomSkillIndex] = row;
+                    }
+                    renderCompositeList(publishCustomSkillList, publishCustomSkills, publishCustomSkillEmpty, 'custom', 'publish');
+                    updatePublishFixedSkillsSummary();
+                }
+                editingCustomSkillIndex = null;
+                closeModal(customSkillModal);
                 return;
             }
             if (compositeTarget === 'edit') {
@@ -1071,7 +1212,8 @@
             };
             setText('jobDetailCode', getDisplayCode(item));
             setText('jobDetailName', item.courseName || '未命名岗位');
-            setText('jobDetailDescription', item.recruitmentBrief || item.courseDescription);
+            setText('jobDetailCourseIntro', item.courseDescription);
+            setText('jobDetailRecruitmentBrief', item.recruitmentBrief);
             setText('jobDetailSemester', item.semester || '--');
             setText('jobDetailTeachingWeeks', item.teachingWeeks ? ('Week ' + weekText(item.teachingWeeks)) : '--');
             setText('jobDetailCampus', getDisplayLocation(item));
@@ -1093,10 +1235,18 @@
             const tags = document.getElementById('jobDetailTags');
             if (tags) {
                 tags.innerHTML = '';
-                toTags(item).forEach(function (tag) {
+                getJobDetailSkillTagEntries(item).forEach(function (entry) {
                     const span = document.createElement('span');
-                    span.className = 'pill';
-                    span.textContent = tag;
+                    if (entry.type === 'custom') {
+                        span.className = 'pill pill--mo-custom-skill';
+                        if (entry.description) {
+                            span.classList.add('pill--mo-custom-skill--has-desc');
+                            span.setAttribute('title', entry.description);
+                        }
+                    } else {
+                        span.className = 'pill';
+                    }
+                    span.textContent = entry.label;
                     tags.appendChild(span);
                 });
             }
@@ -1131,7 +1281,12 @@
                     item.ownerMoId || '',
                     item.recruitmentBrief || '',
                     item.courseDescription || '',
-                    (item.requiredSkills && item.requiredSkills.fixedTags || []).join(' ')
+                    (item.requiredSkills && item.requiredSkills.fixedTags || []).join(' '),
+                    (item.requiredSkills && Array.isArray(item.requiredSkills.customSkills)
+                        ? item.requiredSkills.customSkills.map(function (c) {
+                            return c && c.name != null ? String(c.name) : '';
+                        }).join(' ')
+                        : '')
                 ].join(' ').toLowerCase();
                 return !keyword || text.includes(keyword);
             });
@@ -1159,7 +1314,7 @@
                     '</div>' +
                     '<h4 class="course-card-title">' + (item.courseName || '未命名岗位') + '</h4>' +
                     '<p class="course-card-description">' + (item.recruitmentBrief || item.courseDescription || '暂无描述') + '</p>' +
-                    '<div class="job-tags">' + toTags(item).map(function (tag) { return '<span class="pill">' + tag + '</span>'; }).join('') + '</div>' +
+                    '<div class="job-tags">' + buildCourseCardTagsHtml(item) + '</div>' +
                     '<div class="course-meta-stack">' +
                         '<div class="course-meta-item">' +
                             '<span class="course-meta-label">学期</span>' +
@@ -1612,6 +1767,18 @@
 
         app.getJobs = function () { return state.jobs.slice(); };
         app.loadJobs = loadJobs;
+
+        /** 总览弹窗等：关闭摘要类弹窗后打开「课程岗位详情」 */
+        app.showMoCourseJobDetail = function (item) {
+            if (!item) return;
+            if (typeof app.closeAllModals === 'function') {
+                app.closeAllModals();
+            }
+            renderDetail(item);
+            if (typeof app.openModal === 'function') {
+                app.openModal('course-detail');
+            }
+        };
 
         if (toggleCourseEditBtn && typeof app.openModal === 'function') {
             toggleCourseEditBtn.addEventListener('click', function () {

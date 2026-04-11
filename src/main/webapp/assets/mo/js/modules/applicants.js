@@ -100,19 +100,31 @@
 
         async function refreshNavUnreadBadge() {
             const moId = getMoId();
-            if (!navBadge || !moId) return;
+            if (!moId) {
+                if (navBadge) navBadge.hidden = true;
+                if (typeof app.onApplicantUnreadCount === 'function') app.onApplicantUnreadCount(0);
+                return;
+            }
             try {
                 const res = await fetch(apiUrl('/api/mo/applicants/unread-count') + '?moId=' + encodeURIComponent(moId));
                 const payload = await res.json();
                 const n = typeof payload.unreadCount === 'number' ? payload.unreadCount : 0;
-                if (n > 0) {
-                    navBadge.hidden = false;
-                    navBadge.textContent = n > 9 ? '9+' : String(n);
-                } else {
-                    navBadge.hidden = true;
+                if (navBadge) {
+                    if (n > 0) {
+                        navBadge.hidden = false;
+                        navBadge.textContent = n > 9 ? '9+' : String(n);
+                    } else {
+                        navBadge.hidden = true;
+                    }
+                }
+                if (typeof app.onApplicantUnreadCount === 'function') {
+                    app.onApplicantUnreadCount(n);
                 }
             } catch (e) {
-                navBadge.hidden = true;
+                if (navBadge) navBadge.hidden = true;
+                if (typeof app.onApplicantUnreadCount === 'function') {
+                    app.onApplicantUnreadCount(0);
+                }
             }
         }
 
@@ -152,6 +164,7 @@
             var s = (status == null ? '' : String(status)).trim();
             if (s === '已录用') return 'mo-applicant-status--hired';
             if (s === '未录用') return 'mo-applicant-status--rejected';
+            if (s === '待审核') return 'mo-applicant-status--pending';
             if (s === '审核中') return 'mo-applicant-status--review';
             if (s === '已投递') return 'mo-applicant-status--submitted';
             return 'mo-applicant-status--neutral';
@@ -299,11 +312,36 @@
                         + ' · ' + escapeHtml(c.moId || '') + '</span><br>' + escapeHtml(c.text || '') + '</div>';
                 });
 
+                const statusText = (function () {
+                    var fromApi = (d.status != null && String(d.status).trim() !== '') ? String(d.status).trim() : '';
+                    if (fromApi) return fromApi;
+                    if (item && item.status != null && String(item.status).trim() !== '') {
+                        return String(item.status).trim();
+                    }
+                    return '';
+                }());
+                const statusDdHtml = statusText
+                    ? '<span class="mo-applicant-status-badge ' + applicantStatusClass(statusText) + '">'
+                    + escapeHtml(statusText) + '</span>'
+                    : '<span class="muted">—</span>';
+                const detailIsHired = statusText === '已录用';
+                const detailIsRejected = statusText === '未录用';
+                var actionsDetailHtml;
+                if (detailIsHired) {
+                    actionsDetailHtml = '<button type="button" class="pill-btn mo-applicant-withdraw-btn" id="moApplicantWithdrawBtn">撤回录用</button>';
+                } else if (detailIsRejected) {
+                    actionsDetailHtml = '<button type="button" class="pill-btn mo-applicant-withdraw-btn" id="moApplicantWithdrawRejectBtn">撤回拒绝</button>';
+                } else {
+                    actionsDetailHtml = '<button type="button" class="pill-btn" id="moApplicantAcceptBtn">录用</button>'
+                        + '<button type="button" class="pill-btn ghost" id="moApplicantRejectBtn">拒绝</button>';
+                }
+
                 detailBody.innerHTML =
                     '<dl class="mo-detail-kv">' +
                     '<dt>申请 ID</dt><dd>' + escapeHtml(d.applicationId) + '</dd>' +
                     '<dt>TA ID</dt><dd>' + escapeHtml(d.taId) + '</dd>' +
                     '<dt>课程</dt><dd>' + escapeHtml(d.courseCode) + ' ' + escapeHtml(d.courseName) + '</dd>' +
+                    '<dt>状态</dt><dd>' + statusDdHtml + '</dd>' +
                     '<dt>姓名</dt><dd>' + escapeHtml((ts.name || ts.realName || '').trim()) + '</dd>' +
                     '<dt>学号</dt><dd>' + escapeHtml(ts.studentId || '') + '</dd>' +
                     '<dt>邮箱</dt><dd>' + escapeHtml(ts.contactEmail || '') + '</dd>' +
@@ -317,8 +355,7 @@
                     '<div class="mo-detail-resume-row"><a class="pill-btn" href="' + resumeUrl + '" target="_blank" rel="noopener">查看简历</a></div>' +
                     '</div>' +
                     '<div class="mo-applicant-actions mo-applicant-detail-actions mo-applicant-detail-actions--after-resume">' +
-                    '<button type="button" class="pill-btn" id="moApplicantAcceptBtn">录用</button>' +
-                    '<button type="button" class="pill-btn ghost" id="moApplicantRejectBtn">拒绝</button>' +
+                    actionsDetailHtml +
                     '</div>' +
                     '<section class="mo-detail-plate" aria-label="MO 评论">' +
                     '<div class="mo-detail-section-title">MO 评论</div>' +
@@ -364,6 +401,8 @@
 
                 const acceptDetailBtn = document.getElementById('moApplicantAcceptBtn');
                 const rejectDetailBtn = document.getElementById('moApplicantRejectBtn');
+                const withdrawDetailBtn = document.getElementById('moApplicantWithdrawBtn');
+                const withdrawRejectDetailBtn = document.getElementById('moApplicantWithdrawRejectBtn');
                 if (acceptDetailBtn) {
                     acceptDetailBtn.addEventListener('click', function () {
                         decide(item, 'selected');
@@ -372,6 +411,16 @@
                 if (rejectDetailBtn) {
                     rejectDetailBtn.addEventListener('click', function () {
                         decide(item, 'rejected');
+                    });
+                }
+                if (withdrawDetailBtn) {
+                    withdrawDetailBtn.addEventListener('click', function () {
+                        decide(item, 'withdrawn', '撤回录用');
+                    });
+                }
+                if (withdrawRejectDetailBtn) {
+                    withdrawRejectDetailBtn.addEventListener('click', function () {
+                        decide(item, 'withdrawn', '撤回拒绝');
                     });
                 }
                 }
@@ -417,10 +466,13 @@
             }
         }
 
-        async function decide(item, decision) {
+        async function decide(item, decision, promptActionLabel) {
             const code = (item && item.courseCode ? String(item.courseCode) : '').trim() || (courseSelect.value || '').trim();
             const moId = getMoId();
-            const actionText = decision === 'selected' ? '录用' : '拒绝';
+            const actionText = promptActionLabel
+                ? String(promptActionLabel)
+                : (decision === 'selected' ? '录用'
+                    : decision === 'withdrawn' ? '撤回录用' : '拒绝');
             const comment = window.prompt('请输入' + actionText + '备注（可选）', '');
             if (comment === null) return;
             if (!code) {
@@ -485,6 +537,7 @@
         app.onJobsUpdated = function (jobs) {
             renderCourses(jobs);
             loadApplicants();
+            if (typeof app.loadDashboard === 'function') app.loadDashboard();
         };
 
         /** 进入「应聘筛选」或需强制同步岗位列表时调用（与课程管理同一数据源） */
@@ -522,6 +575,18 @@
             loadApplicants();
         };
         app.refreshMoApplicantUnreadBadge = refreshNavUnreadBadge;
+
+        /** 总览弹窗等外部入口：关闭摘要类弹窗 → 应聘筛选路由 → 打开申请人详情 */
+        app.openMoApplicantDetail = function (item) {
+            if (!item || !item.applicationId) return;
+            if (typeof app.closeAllModals === 'function') {
+                app.closeAllModals();
+            }
+            if (typeof app.activateRoute === 'function') {
+                app.activateRoute('applicants');
+            }
+            openDetail(item);
+        };
 
         refreshBtn.addEventListener('click', function () {
             refreshCourseOptionsFromApi().then(function () {

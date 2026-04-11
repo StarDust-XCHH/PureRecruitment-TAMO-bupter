@@ -1,52 +1,57 @@
 <div class="route active" id="route-dashboard" data-route="dashboard">
-    <div class="card">
-        <div class="overview-top">
-            <div>
+    <div class="card mo-dashboard-card">
+        <div class="overview-top mo-dashboard-overview-top">
+            <div class="mo-dashboard-lead">
                 <h1>MO 招聘总览</h1>
-                <p class="muted">在此总览开放岗位、候选规模与录用进度，便于安排后续筛选与决策。</p>
+                <p class="muted">在此总览开放岗位、候选规模与录用进度；侧栏可进入课程管理与应聘筛选。</p>
             </div>
-            <div class="overview-badges">
-                <span class="pill">角色：Module Organizer</span>
-                <span class="pill">学期：2026 Spring</span>
+            <div class="mo-dashboard-meta">
+                <div class="overview-badges mo-dashboard-badges">
+                    <span class="pill mo-dash-meta-pill" id="dashRoleContextPill" title="当前工作台身份">Module Organizer</span>
+                    <span class="pill mo-dash-meta-pill" id="dashSemesterPill" title="来自已发布岗位的学期字段">学期：—</span>
+                </div>
             </div>
         </div>
-        <div class="stat-grid insight-grid insight-grid-spaced">
+
+        <p class="mo-dashboard-hint muted" id="dashWorkflowHint" hidden></p>
+
+        <div class="stat-grid insight-grid insight-grid-spaced mo-dashboard-stat-grid">
             <div class="insight-card" data-modal-target="summary">
                 <div class="insight-card-header">
                     <span class="insight-icon">📌</span>
                     <div>
                         <p class="insight-label">开放岗位</p>
-                        <p class="insight-subtitle">可点击查看摘要</p>
+                        <p class="insight-subtitle">点击查看数据摘要</p>
                     </div>
                 </div>
                 <div class="insight-core-number" id="dashOpenJobs">--</div>
             </div>
-            <div class="insight-card">
+            <div class="insight-card" data-modal-target="candidates-pool">
                 <div class="insight-card-header">
                     <span class="insight-icon">👥</span>
                     <div>
                         <p class="insight-label">候选池规模</p>
-                        <p class="insight-subtitle">按 TA 档案聚合</p>
+                        <p class="insight-subtitle">TA投递总人数，单击查看详情</p>
                     </div>
                 </div>
                 <div class="insight-core-number" id="dashCandidates">--</div>
             </div>
-            <div class="insight-card">
+            <div class="insight-card" data-modal-target="accepted-list">
                 <div class="insight-card-header">
                     <span class="insight-icon">✅</span>
                     <div>
                         <p class="insight-label">已录用</p>
-                        <p class="insight-subtitle">来自 TA 状态文件</p>
+                        <p class="insight-subtitle">点击查看已录用名单</p>
                     </div>
                 </div>
                 <div class="insight-core-number" id="dashAccepted">--</div>
             </div>
-            <div class="insight-card">
+            <div class="insight-card" data-modal-target="pending-list">
                 <div class="insight-card-header">
                     <span class="insight-icon">🕒</span>
                     <div>
                         <p class="insight-label">待决策</p>
-                        <p class="insight-subtitle">建议优先处理</p>
+                        <p class="insight-subtitle">点击查看待处理申请</p>
                     </div>
                 </div>
                 <div class="insight-core-number" id="dashPending">--</div>

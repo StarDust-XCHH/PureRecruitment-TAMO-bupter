@@ -21,7 +21,10 @@
                                 <h4 id="jobDetailName">课程名称</h4>
                             </div>
                         </div>
-                        <p class="job-detail-summary" id="jobDetailDescription">课程介绍</p>
+                        <div class="job-detail-course-intro">
+                            <h5 class="job-detail-block-title">课程介绍 <span class="job-detail-field-hint job-detail-field-hint--required">（必填）</span></h5>
+                            <p class="job-detail-summary job-detail-intro-text" id="jobDetailCourseIntro">--</p>
+                        </div>
                         <div class="job-detail-meta-grid job-detail-meta-grid--mo">
                             <div class="job-detail-meta"><span>学期</span><strong id="jobDetailSemester">--</strong></div>
                             <div class="job-detail-meta"><span>授课周次</span><strong id="jobDetailTeachingWeeks">--</strong></div>
@@ -40,8 +43,12 @@
                         <div class="job-detail-tags" id="jobDetailTags"></div>
                     </div>
                     <div class="job-detail-section">
-                        <h5>TA 工作清单</h5>
+                        <h5>TA 工作清单（可选）</h5>
                         <ul class="job-detail-checklist" id="jobDetailChecklist"></ul>
+                    </div>
+                    <div class="job-detail-section job-detail-section--recruitment-brief">
+                        <h5>招募说明 <span class="job-detail-field-hint job-detail-field-hint--optional">（可选）</span></h5>
+                        <div class="job-detail-summary job-detail-long-desc" id="jobDetailRecruitmentBrief">--</div>
                     </div>
                 </aside>
             </div>
@@ -357,18 +364,94 @@
         </div>
     </div>
 
-    <div class="ta-modal-panel" data-modal="summary" role="dialog" aria-labelledby="modalSummaryTitle">
+    <div class="ta-modal-panel mo-summary-modal wide" data-modal="summary" role="dialog" aria-labelledby="modalSummaryTitle">
         <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head">
-            <h3 id="modalSummaryTitle">MO 概览说明</h3>
-            <p class="muted">以下模块协助你完成从发布岗位到录用决策的完整流程。</p>
+            <h3 id="modalSummaryTitle">招聘数据摘要</h3>
+            <p class="muted">与当前岗位列表、申请数据同步；每次打开时刷新未读数。</p>
         </div>
-        <div class="modal-body">
-            <ul class="resume-checklist">
-                <li><div><strong>课程管理与发布</strong><p class="muted">在课程管理页浏览列表，使用「发布岗位」创建新课程，保存后列表会更新。</p></div></li>
-                <li><div><strong>应聘查看</strong><p class="muted">集中查看申请本课程的 TA 资料与应聘信息。</p></div></li>
-                <li><div><strong>筛选与决策</strong><p class="muted">在此筛选候选人；录用或拒绝后，申请状态会相应更新。</p></div></li>
-            </ul>
+        <div class="modal-body mo-summary-modal__body">
+            <section class="mo-summary-section" aria-labelledby="summarySnapshotHeading">
+                <h4 class="mo-summary-section__title" id="summarySnapshotHeading">关键指标</h4>
+                <div class="mo-summary-snapshot" role="group">
+                    <div class="mo-summary-snapshot__item">
+                        <span class="mo-summary-snapshot__label">开放岗位</span>
+                        <strong class="mo-summary-snapshot__value" id="summarySnapshotOpen">—</strong>
+                    </div>
+                    <div class="mo-summary-snapshot__item">
+                        <span class="mo-summary-snapshot__label">候选 TA（去重）</span>
+                        <strong class="mo-summary-snapshot__value" id="summarySnapshotCandidates">—</strong>
+                    </div>
+                    <div class="mo-summary-snapshot__item">
+                        <span class="mo-summary-snapshot__label">已录用</span>
+                        <strong class="mo-summary-snapshot__value" id="summarySnapshotAccepted">—</strong>
+                    </div>
+                    <div class="mo-summary-snapshot__item">
+                        <span class="mo-summary-snapshot__label">待决策</span>
+                        <strong class="mo-summary-snapshot__value" id="summarySnapshotPending">—</strong>
+                    </div>
+                    <div class="mo-summary-snapshot__item mo-summary-snapshot__item--accent">
+                        <span class="mo-summary-snapshot__label">未读申请</span>
+                        <strong class="mo-summary-snapshot__value" id="summarySnapshotUnread">—</strong>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mo-summary-section" aria-labelledby="summaryJobsHeading">
+                <h4 class="mo-summary-section__title" id="summaryJobsHeading">当前开放岗位</h4>
+                <p class="mo-summary-empty muted" id="summaryJobEmpty" hidden>暂无已发布岗位，请前往侧栏「课程管理」发布。</p>
+                <ul class="mo-summary-job-list" id="summaryJobList"></ul>
+            </section>
+
+            <p class="mo-summary-next muted" id="summaryNextHint"></p>
+
+            <details class="mo-summary-workflow">
+                <summary>工作流程说明</summary>
+                <ol class="mo-summary-workflow__ol">
+                    <li><strong>课程管理与发布</strong> — 在课程管理页使用「发布岗位」维护课程；保存后列表与总览同步。</li>
+                    <li><strong>应聘查看</strong> — 在应聘筛选中按课程查看 TA 资料与投递状态。</li>
+                    <li><strong>筛选与决策</strong> — 录用或拒绝后，申请状态会写回并与 TA 侧一致。</li>
+                </ol>
+            </details>
+        </div>
+    </div>
+
+    <div class="ta-modal-panel mo-summary-modal wide" data-modal="candidates-pool" role="dialog" aria-labelledby="modalCandidatesTitle">
+        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <div class="modal-head">
+            <h3 id="modalCandidatesTitle">候选池明细</h3>
+            <p class="muted">与「应聘筛选」同源；总览「候选池规模」为 <strong>去重后的 TA 人数</strong>，下列按 <strong>课程</strong>分组展示每条投递。</p>
+        </div>
+        <div class="modal-body mo-summary-modal__body">
+            <p class="mo-dash-modal-count" id="candidatesPoolCountLine" aria-live="polite"></p>
+            <p class="mo-summary-empty muted" id="candidatesPoolEmpty" hidden>暂无候选人数据。请确认已在侧栏「应聘筛选」中加载列表，或尚无投递。</p>
+            <div class="mo-dash-cand-grouped" id="candidatesPoolGrouped"></div>
+        </div>
+    </div>
+
+    <div class="ta-modal-panel mo-summary-modal wide" data-modal="accepted-list" role="dialog" aria-labelledby="modalAcceptedTitle">
+        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <div class="modal-head">
+            <h3 id="modalAcceptedTitle">已录用名单</h3>
+            <p class="muted">申请状态为「已录用」的记录。</p>
+        </div>
+        <div class="modal-body mo-summary-modal__body">
+            <p class="mo-dash-modal-count" id="acceptedListCountLine" aria-live="polite"></p>
+            <p class="mo-summary-empty muted" id="acceptedListEmpty" hidden>暂无已录用记录。</p>
+            <ul class="mo-dash-cand-list" id="acceptedListDetail"></ul>
+        </div>
+    </div>
+
+    <div class="ta-modal-panel mo-summary-modal wide" data-modal="pending-list" role="dialog" aria-labelledby="modalPendingTitle">
+        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <div class="modal-head">
+            <h3 id="modalPendingTitle">待决策申请</h3>
+            <p class="muted">状态既非「已录用」也非「未录用」的申请，与总览数字一致；处理请使用侧栏「应聘筛选」。</p>
+        </div>
+        <div class="modal-body mo-summary-modal__body">
+            <p class="mo-dash-modal-count" id="pendingListCountLine" aria-live="polite"></p>
+            <p class="mo-summary-empty muted" id="pendingListEmpty" hidden>暂无待决策申请。</p>
+            <ul class="mo-dash-cand-list" id="pendingListDetail"></ul>
         </div>
     </div>
 
