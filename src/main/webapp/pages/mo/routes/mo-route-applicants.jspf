@@ -3,7 +3,7 @@
         <div class="overview-top">
             <div>
                 <h1>应聘筛选</h1>
-                <p class="muted">查看申请者资料，并提交录用或拒绝结果，状态将同步至对应申请记录。</p>
+                <p class="muted">查看申请者资料并作出录用或拒绝；申请人将看到与您操作一致的最新状态。</p>
             </div>
             <div class="overview-badges mo-jobs-toolbar mo-applicants-header-tools">
                 <button id="refreshApplicantsBtn" class="refresh-btn pill" type="button">

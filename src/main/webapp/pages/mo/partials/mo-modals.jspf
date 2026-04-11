@@ -146,7 +146,7 @@
                                 <div class="mo-field">
                                     <label class="mo-field-label" for="applicationDeadlineInput">截止申请时间</label>
                                     <input id="applicationDeadlineInput" type="datetime-local" class="mo-field-input" aria-describedby="applicationDeadlineHint" aria-label="截止申请时间">
-                                    <p id="applicationDeadlineHint" class="mo-hint">您填写的时间将以当前浏览器所在时区保存；自动与其他用户时区同步。</p>
+                                    <p id="applicationDeadlineHint" class="mo-hint">时间按您当前设备的时区保存；候选人查看时会显示为其本地时间。</p>
                                 </div>
                                 <label class="mo-field full">
                                     <span class="mo-field-label">课程介绍 <span class="mo-req" aria-hidden="true">*</span></span>
@@ -215,7 +215,7 @@
         <div class="modal-head mo-job-publish-modal__head">
             <div class="mo-job-publish-modal__head-main">
                 <h3 id="modalCourseEditTitle">修改课程信息</h3>
-                <p class="muted">课程编号创建后不可修改；其余区块与发布课程岗位一致，保存后返回课程详情。</p>
+                <p class="muted">课程编号创建后不可修改；其余填写项与发布岗位表单相同，保存后返回课程详情。</p>
             </div>
             <div class="mo-job-publish-modal__head-actions">
                 <span id="courseEditStatus" class="muted mo-job-publish-modal__status" role="status" aria-live="polite"></span>
@@ -301,7 +301,7 @@
                                 <div class="mo-field">
                                     <label class="mo-field-label" for="editApplicationDeadlineInput">截止申请时间</label>
                                     <input id="editApplicationDeadlineInput" type="datetime-local" class="mo-field-input" aria-describedby="editApplicationDeadlineHint" aria-label="截止申请时间">
-                                    <p id="editApplicationDeadlineHint" class="mo-hint">您填写的时间将以当前浏览器所在时区保存；自动与其他用户时区同步。</p>
+                                    <p id="editApplicationDeadlineHint" class="mo-hint">时间按您当前设备的时区保存；候选人查看时会显示为其本地时间。</p>
                                 </div>
                                 <label class="mo-field full">
                                     <span class="mo-field-label">课程介绍 <span class="mo-req" aria-hidden="true">*</span></span>
@@ -368,7 +368,7 @@
         <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head">
             <h3 id="modalSummaryTitle">招聘数据摘要</h3>
-            <p class="muted">与当前岗位列表、申请数据同步；每次打开时刷新未读数。</p>
+            <p class="muted">汇总当前岗位与申请情况；每次打开时会更新未读申请条数。</p>
         </div>
         <div class="modal-body mo-summary-modal__body">
             <section class="mo-summary-section" aria-labelledby="summarySnapshotHeading">
@@ -379,7 +379,7 @@
                         <strong class="mo-summary-snapshot__value" id="summarySnapshotOpen">—</strong>
                     </div>
                     <div class="mo-summary-snapshot__item">
-                        <span class="mo-summary-snapshot__label">候选 TA（去重）</span>
+                        <span class="mo-summary-snapshot__label">候选 TA（每人计一次）</span>
                         <strong class="mo-summary-snapshot__value" id="summarySnapshotCandidates">—</strong>
                     </div>
                     <div class="mo-summary-snapshot__item">
@@ -408,9 +408,9 @@
             <details class="mo-summary-workflow">
                 <summary>工作流程说明</summary>
                 <ol class="mo-summary-workflow__ol">
-                    <li><strong>课程管理与发布</strong> — 在课程管理页使用「发布岗位」维护课程；保存后列表与总览同步。</li>
-                    <li><strong>应聘查看</strong> — 在应聘筛选中按课程查看 TA 资料与投递状态。</li>
-                    <li><strong>筛选与决策</strong> — 录用或拒绝后，申请状态会写回并与 TA 侧一致。</li>
+                    <li><strong>课程管理与发布</strong> — 在「课程管理」中使用「发布岗位」维护课程；保存后总览会随之更新。</li>
+                    <li><strong>应聘查看</strong> — 在「应聘筛选」中按课程查看 TA 资料与投递状态。</li>
+                    <li><strong>筛选与决策</strong> — 录用或拒绝后，申请人会看到与您操作一致的最新状态。</li>
                 </ol>
             </details>
         </div>
@@ -420,11 +420,11 @@
         <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head">
             <h3 id="modalCandidatesTitle">候选池明细</h3>
-            <p class="muted">与「应聘筛选」同源；总览「候选池规模」为 <strong>去重后的 TA 人数</strong>，下列按 <strong>课程</strong>分组展示每条投递。</p>
+            <p class="muted">下方按课程列出投递明细。人数与总览「候选池规模」一致：同一位 TA 若投递多门课，在人数上仍只计<strong>一名</strong>候选人。</p>
         </div>
         <div class="modal-body mo-summary-modal__body">
             <p class="mo-dash-modal-count" id="candidatesPoolCountLine" aria-live="polite"></p>
-            <p class="mo-summary-empty muted" id="candidatesPoolEmpty" hidden>暂无候选人数据。请确认已在侧栏「应聘筛选」中加载列表，或尚无投递。</p>
+            <p class="mo-summary-empty muted" id="candidatesPoolEmpty" hidden>暂无候选人数据。请到侧栏「应聘筛选」查看，或等待 TA 投递。</p>
             <div class="mo-dash-cand-grouped" id="candidatesPoolGrouped"></div>
         </div>
     </div>
@@ -446,7 +446,7 @@
         <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head">
             <h3 id="modalPendingTitle">待决策申请</h3>
-            <p class="muted">状态既非「已录用」也非「未录用」的申请，与总览数字一致；处理请使用侧栏「应聘筛选」。</p>
+            <p class="muted">尚未录用或拒绝的申请均在此列出，人数与总览「待决策」一致。请在侧栏「应聘筛选」中处理。</p>
         </div>
         <div class="modal-body mo-summary-modal__body">
             <p class="mo-dash-modal-count" id="pendingListCountLine" aria-live="polite"></p>

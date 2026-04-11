@@ -6,9 +6,11 @@
                 <p class="muted">在此总览开放岗位、候选规模与录用进度；侧栏可进入课程管理与应聘筛选。</p>
             </div>
             <div class="mo-dashboard-meta">
-                <div class="overview-badges mo-dashboard-badges">
-                    <span class="pill mo-dash-meta-pill" id="dashRoleContextPill" title="当前工作台身份">Module Organizer</span>
-                    <span class="pill mo-dash-meta-pill" id="dashSemesterPill" title="来自已发布岗位的学期字段">学期：—</span>
+                <div class="overview-badges mo-jobs-toolbar">
+                    <button id="refreshDashboardBtn" class="refresh-btn pill" type="button">
+                        <span class="refresh-icon">↻</span>
+                        <span class="refresh-text">刷新列表</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -31,7 +33,7 @@
                     <span class="insight-icon">👥</span>
                     <div>
                         <p class="insight-label">候选池规模</p>
-                        <p class="insight-subtitle">TA投递总人数，单击查看详情</p>
+                        <p class="insight-subtitle">TA 投递总人数，单击查看详情</p>
                     </div>
                 </div>
                 <div class="insight-core-number" id="dashCandidates">--</div>

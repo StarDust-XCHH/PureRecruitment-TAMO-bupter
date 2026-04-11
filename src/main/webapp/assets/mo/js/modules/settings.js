@@ -128,7 +128,10 @@
             guideActive: false
         };
 
-        const displayName = moUser && (moUser.username || moUser.name) ? (moUser.username || moUser.name) : 'MO';
+        const displayName =
+            moUser && (moUser.name || moUser.moName || moUser.username)
+                ? String(moUser.name || moUser.moName || moUser.username).trim() || 'MO'
+                : 'MO';
         if (welcomeName) welcomeName.textContent = displayName;
         if (userName) userName.textContent = displayName;
         if (settingsUser) settingsUser.textContent = displayName;

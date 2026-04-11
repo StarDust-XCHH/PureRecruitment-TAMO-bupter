@@ -777,17 +777,6 @@ legend.mo-field-label:has(.mo-req) {
     padding-top: 0.2rem;
 }
 
-.mo-dashboard-badges.overview-badges {
-    justify-content: flex-end;
-}
-
-.mo-dash-meta-pill {
-    max-width: min(100%, 260px);
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
 .mo-dashboard-hint {
     margin: 0 0 10px;
     font-size: 13px;
@@ -1554,10 +1543,24 @@ legend.mo-field-label:has(.mo-req) {
 
 .mo-nav-badge {
     margin-left: 6px;
-    font-size: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.35em;
+    min-height: 1.35em;
+    padding: 0 5px;
+    box-sizing: border-box;
+    font-size: 12px;
     line-height: 1;
-    color: #ef4444;
     font-weight: 700;
+    color: #fff;
+    background: #ef4444;
+    border-radius: 999px;
+}
+
+/* [hidden] 默认 display:none 会被上面的 display:inline-flex 盖掉，未读为 0 时必须彻底隐藏 */
+.mo-nav-badge[hidden] {
+    display: none !important;
 }
 
 .mo-unread-dot {

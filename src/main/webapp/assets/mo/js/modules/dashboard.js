@@ -9,8 +9,7 @@
         const dashCandidates = document.getElementById('dashCandidates');
         const dashAccepted = document.getElementById('dashAccepted');
         const dashPending = document.getElementById('dashPending');
-        const dashSemesterPill = document.getElementById('dashSemesterPill');
-        const dashRoleContextPill = document.getElementById('dashRoleContextPill');
+        const refreshDashboardBtn = document.getElementById('refreshDashboardBtn');
         const dashWorkflowHint = document.getElementById('dashWorkflowHint');
 
         const summaryEls = {
@@ -38,31 +37,6 @@
             const u = typeof app.getMoUser === 'function' ? app.getMoUser() : null;
             if (!u) return '';
             return (u.moId || u.id || '').trim();
-        }
-
-        function semesterSummaryFromJobs(jobs) {
-            const seen = {};
-            (jobs || []).forEach(function (j) {
-                const s = j && j.semester != null ? String(j.semester).trim() : '';
-                if (s) seen[s] = true;
-            });
-            const keys = Object.keys(seen);
-            if (keys.length === 0) return '—';
-            if (keys.length === 1) return keys[0];
-            keys.sort();
-            return keys.slice(0, 2).join('、') + (keys.length > 2 ? '…' : '');
-        }
-
-        function updateContextPills() {
-            const jobs = typeof app.getJobs === 'function' ? app.getJobs() : [];
-            if (dashSemesterPill) {
-                dashSemesterPill.textContent = '学期：' + semesterSummaryFromJobs(jobs);
-            }
-            if (dashRoleContextPill) {
-                const u = typeof app.getMoUser === 'function' ? app.getMoUser() : null;
-                const name = u && (u.name || u.moName || u.username) ? String(u.name || u.moName || u.username).trim() : '';
-                dashRoleContextPill.textContent = name ? 'MO · ' + name : 'Module Organizer';
-            }
         }
 
         function updateWorkflowHint(pendingCount) {
@@ -190,7 +164,7 @@
                         '建议：在「课程管理」中发布岗位以接收 TA 申请。';
                 } else {
                     summaryEls.nextHint.textContent =
-                        '当前暂无待决策队列；可持续关注侧栏未读提示与新投递。';
+                        '当前暂无待决策申请；可关注侧栏未读提醒与新收到的投递。';
                 }
             }
 
@@ -377,7 +351,7 @@
             const groupedEl = document.getElementById('candidatesPoolGrouped');
             if (countEl) {
                 countEl.textContent =
-                    '共 ' + uniq + ' 位候选 TA（去重），' + nApps + ' 条投递；总览卡片数字为去重人数。';
+                    '共 ' + uniq + ' 位候选 TA（每人计一次），' + nApps + ' 条投递；与总览「候选池规模」人数一致。';
             }
             if (groupedEl) {
                 groupedEl.innerHTML = '';
@@ -439,7 +413,7 @@
             const emptyEl = document.getElementById('pendingListEmpty');
             const listEl = document.getElementById('pendingListDetail');
             if (countEl) {
-                countEl.textContent = '共 ' + pending.length + ' 条待决策（与总览「待决策」数字一致）。';
+                countEl.textContent = '共 ' + pending.length + ' 条待决策；人数与总览「待决策」一致。';
             }
             if (listEl) {
                 listEl.innerHTML = '';
@@ -463,8 +437,55 @@
             if (dashAccepted) dashAccepted.textContent = String(accepted);
             if (dashPending) dashPending.textContent = String(pending);
 
-            updateContextPills();
             updateWorkflowHint(pending);
+        }
+
+        async function refreshMoWorkspaceAll() {
+            app.state = app.state || {};
+            const extraBtns = [
+                document.getElementById('refreshJobsBtn'),
+                document.getElementById('refreshApplicantsBtn')
+            ];
+            const btns = [refreshDashboardBtn].concat(extraBtns).filter(Boolean);
+            app.state.moBulkRefreshInProgress = true;
+            btns.forEach(function (b) {
+                b.disabled = true;
+            });
+            try {
+                if (typeof app.loadJobs === 'function') {
+                    await app.loadJobs();
+                }
+                const moId = getMoId();
+                if (!moId) {
+                    render();
+                    return;
+                }
+                const res = await fetch(
+                    apiUrl('/api/mo/applicants') + '?moId=' + encodeURIComponent(moId),
+                    { headers: { Accept: 'application/json' } }
+                );
+                const payload = await res.json();
+                const items = Array.isArray(payload.items) ? payload.items : [];
+                if (typeof app.onApplicantsLoaded === 'function') {
+                    app.onApplicantsLoaded(items);
+                } else {
+                    latestApplicants = items;
+                    render();
+                }
+                if (typeof app.refreshMoApplicantUnreadBadge === 'function') {
+                    await app.refreshMoApplicantUnreadBadge();
+                }
+                if (typeof app.runLoadApplicants === 'function') {
+                    await app.runLoadApplicants();
+                }
+            } catch (e) {
+                render();
+            } finally {
+                app.state.moBulkRefreshInProgress = false;
+                btns.forEach(function (b) {
+                    b.disabled = false;
+                });
+            }
         }
 
         app.onApplicantsLoaded = function (items) {
@@ -512,6 +533,14 @@
                 true
             );
         });
+
+        app.refreshMoWorkspaceAll = refreshMoWorkspaceAll;
+
+        if (refreshDashboardBtn) {
+            refreshDashboardBtn.addEventListener('click', function () {
+                void refreshMoWorkspaceAll();
+            });
+        }
 
         render();
     };

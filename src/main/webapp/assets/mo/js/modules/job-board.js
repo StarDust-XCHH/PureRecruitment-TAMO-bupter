@@ -502,7 +502,7 @@
             return list;
         }
 
-        var JOB_CARD_TAGS_MAX = 4;
+        var JOB_CARD_TAGS_MAX = 3;
 
         /** MO 课程列表卡片：最多展示若干标签，未展示完时在末尾显示「等，共x个」（x 为标签总数） */
         function buildCourseCardTagsHtml(item) {
@@ -1368,7 +1368,9 @@
         }
 
         async function loadJobs() {
-            refreshJobsBtn.disabled = true;
+            if (!(app.state && app.state.moBulkRefreshInProgress)) {
+                refreshJobsBtn.disabled = true;
+            }
             try {
                 const moId = getMoIdForApi();
                 if (!moId) {
@@ -1389,7 +1391,9 @@
             } catch (err) {
                 console.error('[MO-JOBS] load failed', err);
             } finally {
-                refreshJobsBtn.disabled = false;
+                if (!(app.state && app.state.moBulkRefreshInProgress)) {
+                    refreshJobsBtn.disabled = false;
+                }
             }
         }
 
@@ -1452,7 +1456,7 @@
             const recruitmentBriefRaw = document.getElementById('recruitmentBriefInput').value.trim();
             const sessionMoId = getMoIdForApi();
             if (!sessionMoId) {
-                publishStatus.textContent = '未登录或缺少 moId，无法发布';
+                publishStatus.textContent = '未登录或无法验证身份，无法发布';
                 return;
             }
 
@@ -1635,7 +1639,7 @@
             }
             const sessionMoId = getMoIdForApi();
             if (!sessionMoId) {
-                if (courseEditStatus) courseEditStatus.textContent = '未登录或缺少 moId';
+                if (courseEditStatus) courseEditStatus.textContent = '未登录或无法验证身份';
                 return;
             }
             const courseCode = String(currentDetailJob.courseCode || '').trim();
@@ -1822,7 +1826,13 @@
             state.page = 1;
             renderBoard();
         });
-        refreshJobsBtn.addEventListener('click', loadJobs);
+        refreshJobsBtn.addEventListener('click', function () {
+            if (typeof app.refreshMoWorkspaceAll === 'function') {
+                void app.refreshMoWorkspaceAll();
+                return;
+            }
+            loadJobs();
+        });
 
         buildWeekGrid(moTeachingWeeksPickerGrid, 'moTwPick', 'tw', false);
         buildWeekGrid(moAssessmentWeeksGrid, 'moAssessmentWeek', 'aw', true);

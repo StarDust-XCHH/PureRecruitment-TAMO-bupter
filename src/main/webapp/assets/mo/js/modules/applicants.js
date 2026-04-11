@@ -101,7 +101,10 @@
         async function refreshNavUnreadBadge() {
             const moId = getMoId();
             if (!moId) {
-                if (navBadge) navBadge.hidden = true;
+                if (navBadge) {
+                    navBadge.hidden = true;
+                    navBadge.textContent = '';
+                }
                 if (typeof app.onApplicantUnreadCount === 'function') app.onApplicantUnreadCount(0);
                 return;
             }
@@ -115,13 +118,17 @@
                         navBadge.textContent = n > 9 ? '9+' : String(n);
                     } else {
                         navBadge.hidden = true;
+                        navBadge.textContent = '';
                     }
                 }
                 if (typeof app.onApplicantUnreadCount === 'function') {
                     app.onApplicantUnreadCount(n);
                 }
             } catch (e) {
-                if (navBadge) navBadge.hidden = true;
+                if (navBadge) {
+                    navBadge.hidden = true;
+                    navBadge.textContent = '';
+                }
                 if (typeof app.onApplicantUnreadCount === 'function') {
                     app.onApplicantUnreadCount(0);
                 }
@@ -269,11 +276,14 @@
             const moId = getMoId();
             if (!moId || !applicationId) return;
             try {
-                await fetch(apiUrl('/api/mo/applications/mark-read'), {
+                const res = await fetch(apiUrl('/api/mo/applications/mark-read'), {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json;charset=UTF-8' },
                     body: JSON.stringify({ moId: moId, applicationId: applicationId })
                 });
+                if (res.ok) {
+                    await refreshNavUnreadBadge();
+                }
             } catch (e) { /* ignore */ }
         }
 
@@ -423,20 +433,32 @@
                         decide(item, 'withdrawn', '撤回拒绝');
                     });
                 }
+                if (statusText === '审核中') {
+                    await refreshNavUnreadBadge();
+                    setTimeout(function () {
+                        void refreshNavUnreadBadge();
+                    }, 0);
+                    setTimeout(function () {
+                        void refreshNavUnreadBadge();
+                    }, 150);
+                }
                 }
             } catch (err) {
                 detailBody.innerHTML = '<p class="mo-status-warn">' + escapeHtml(err.message || '加载失败') + '</p>';
             }
 
-            await loadApplicants();
-            await refreshNavUnreadBadge();
+            try {
+                await loadApplicants();
+            } finally {
+                await refreshNavUnreadBadge();
+            }
         }
 
         async function loadApplicants() {
             const code = (courseSelect.value || '').trim();
             const moId = getMoId();
             if (!moId) {
-                setStatus('未登录或缺少 moId');
+                setStatus('未登录或会话已失效，请刷新页面后重试');
                 renderApplicants([]);
                 return;
             }
@@ -536,6 +558,7 @@
 
         app.onJobsUpdated = function (jobs) {
             renderCourses(jobs);
+            if (app.state && app.state.moBulkRefreshInProgress) return;
             loadApplicants();
             if (typeof app.loadDashboard === 'function') app.loadDashboard();
         };
@@ -575,6 +598,9 @@
             loadApplicants();
         };
         app.refreshMoApplicantUnreadBadge = refreshNavUnreadBadge;
+        app.runLoadApplicants = function () {
+            return loadApplicants();
+        };
 
         /** 总览弹窗等外部入口：关闭摘要类弹窗 → 应聘筛选路由 → 打开申请人详情 */
         app.openMoApplicantDetail = function (item) {
@@ -589,6 +615,10 @@
         };
 
         refreshBtn.addEventListener('click', function () {
+            if (typeof app.refreshMoWorkspaceAll === 'function') {
+                void app.refreshMoWorkspaceAll();
+                return;
+            }
             refreshCourseOptionsFromApi().then(function () {
                 loadApplicants();
             });
