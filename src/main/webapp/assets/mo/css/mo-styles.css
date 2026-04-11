@@ -195,13 +195,11 @@
 }
 
 .mo-empty-hint {
-    font-size: 0.9rem;
+    margin: 0;
+    font-size: 0.8rem;
     color: var(--muted);
-    text-align: center;
-    padding: 2rem;
-    background: var(--bg-tertiary);
-    border-radius: 0.5rem;
-    border: 2px dashed var(--border);
+    font-style: italic;
+    line-height: 1.45;
 }
 
 .mo-hint {

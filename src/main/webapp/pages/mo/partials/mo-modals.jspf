@@ -103,11 +103,11 @@
                     </div>
                     <div class="mo-publish-section full">
                         <div class="mo-publish-section-head">
-                            <h4 class="mo-publish-section-title">考核与作业节点 <span class="mo-muted">（可选）</span></h4>
-                            <button type="button" class="pill-btn ghost mo-btn-sm" id="openEditAssessmentModalBtn">＋ 添加考核项</button>
+                            <h4 class="mo-publish-section-title">任务安排 <span class="mo-muted">（可选）</span></h4>
+                            <button type="button" class="pill-btn ghost mo-btn-sm" id="openEditAssessmentModalBtn">＋ 添加任务项</button>
                         </div>
                         <ul class="mo-composite-list" id="editAssessmentList"></ul>
-                        <p class="mo-empty-hint" id="editAssessmentEmpty">尚未添加考核项。</p>
+                        <p class="mo-empty-hint" id="editAssessmentEmpty">尚未添加任务项。</p>
                     </div>
                     <div class="mo-publish-section full" id="edit-required-skills">
                         <h4 class="mo-publish-section-title">所需技能 <span class="mo-req">*</span></h4>
@@ -155,7 +155,7 @@
                             <a href="#teaching-weeks" class="mo-publish-nav-link">授课周次</a>
                         </li>
                         <li class="mo-publish-nav-item">
-                            <a href="#assessment" class="mo-publish-nav-link">考核与作业</a>
+                            <a href="#assessment" class="mo-publish-nav-link">任务安排</a>
                         </li>
                         <li class="mo-publish-nav-item">
                             <a href="#required-skills" class="mo-publish-nav-link">所需技能<span class="mo-req" aria-hidden="true">*</span></a>
@@ -242,13 +242,13 @@
 
                         <div class="mo-publish-section full" id="assessment">
                             <div class="mo-publish-section-head">
-                                <h4 class="mo-publish-section-title">考核与作业节点 <span class="mo-muted">（可选）</span></h4>
-                                <button type="button" class="pill-btn ghost mo-btn-sm" id="openPublishAssessmentModalBtn">＋ 添加考核项</button>
+                                <h4 class="mo-publish-section-title">任务安排 <span class="mo-muted">（可选）</span></h4>
+                                <button type="button" class="pill-btn ghost mo-btn-sm" id="openPublishAssessmentModalBtn">＋ 添加任务项</button>
                             </div>
                             <div class="mo-section-content">
-                                <p class="mo-hint">建议按考核或作业节点逐条填写名称、时间与说明，便于 TA 了解安排。</p>
+                                <p class="mo-hint">建议按任务安排逐条填写名称、时间与说明，便于 TA 了解安排。</p>
                                 <ul class="mo-composite-list" id="publishAssessmentList" aria-live="polite"></ul>
-                                <p class="mo-empty-hint" id="publishAssessmentEmpty">尚未添加考核项，可点击上方按钮填写。</p>
+                                <p class="mo-empty-hint" id="publishAssessmentEmpty">尚未添加任务项，可点击上方按钮填写。</p>
                             </div>
                         </div>
 
@@ -275,7 +275,7 @@
                                 </label>
                                 <label class="mo-field full">
                                     <span class="mo-field-label">长文本招募说明</span>
-                                    <textarea id="recruitmentBriefInput" rows="6" placeholder="详细说明职责、投入时间、沟通方式、考核方式等（可选）" class="mo-field-input"></textarea>
+                                    <textarea id="recruitmentBriefInput" rows="6" placeholder="详细说明职责、投入时间、沟通方式、任务与评价方式等（可选）" class="mo-field-input"></textarea>
                                 </label>
                             </div>
                         </div>
@@ -396,7 +396,7 @@
     <div class="mo-publish-modal__backdrop" data-mo-close="assessment"></div>
     <div class="mo-publish-modal__panel" role="dialog" aria-modal="true" aria-labelledby="moCompositeAssessmentTitle">
         <div class="mo-publish-modal__head">
-            <h3 id="moCompositeAssessmentTitle">添加考核项</h3>
+            <h3 id="moCompositeAssessmentTitle">添加任务项</h3>
             <button type="button" class="mo-publish-modal__close" data-mo-close="assessment" aria-label="关闭">&times;</button>
         </div>
         <div class="mo-publish-modal__body">
@@ -406,11 +406,11 @@
             </label>
             <fieldset class="mo-field mo-field-fieldset">
                 <legend class="mo-field-label">涉及周次 <span class="mo-muted">（可选）</span></legend>
-                <div class="mo-week-grid mo-week-grid--compact" id="moAssessmentWeeksGrid" aria-label="考核涉及周次"></div>
+                <div class="mo-week-grid mo-week-grid--compact" id="moAssessmentWeeksGrid" aria-label="任务涉及周次"></div>
             </fieldset>
             <label class="mo-field">
                 <span class="mo-field-label">说明</span>
-                <textarea id="moAssessmentDescInput" rows="3" placeholder="考核形式、时长、注意事项等"></textarea>
+                <textarea id="moAssessmentDescInput" rows="3" placeholder="任务形式、时长、注意事项等"></textarea>
             </label>
             <div class="mo-publish-modal__actions">
                 <button type="button" class="pill-btn ghost" data-mo-close="assessment">取消</button>

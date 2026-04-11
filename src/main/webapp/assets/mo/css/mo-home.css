@@ -1176,20 +1176,6 @@ html:not([data-theme="light"]) .job-detail-modal input[type="datetime-local"]::-
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
 }
 
-.mo-empty-hint {
-  font-size: 0.9rem;
-  color: var(--muted);
-  text-align: center;
-  padding: 2rem;
-  background: rgba(0, 0, 0, 0.15);
-  border-radius: 0.5rem;
-  border: 2px dashed var(--card-border);
-}
-
-[data-theme="light"] .mo-empty-hint {
-  background: rgba(255, 255, 255, 0.75);
-}
-
 .mo-hint {
   font-size: 0.8rem;
   color: var(--muted);
