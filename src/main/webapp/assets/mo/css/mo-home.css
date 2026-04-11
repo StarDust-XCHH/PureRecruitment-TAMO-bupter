@@ -960,7 +960,7 @@ legend.mo-field-label:has(.mo-req) {
 
 #moApplicantDetailBody .mo-applicant-actions {
     gap: 14px;
-    padding: 4px 0 6px;
+    padding: 16px 0 20px;
 }
 
 /* 录用 / 拒绝：拒绝描边；二者悬停反馈 */
@@ -1025,6 +1025,12 @@ legend.mo-field-label:has(.mo-req) {
 
 #moApplicantDetailBody .mo-detail-plate {
     padding: 18px 18px 22px;
+}
+
+/* 两个板块相邻时：略加大与通用分隔线之间的留白 */
+#moApplicantDetailBody .mo-detail-plate + .mo-detail-plate {
+    margin-top: 28px;
+    padding-top: 22px;
 }
 
 #moApplicantDetailBody .mo-detail-plate .mo-detail-section-title {

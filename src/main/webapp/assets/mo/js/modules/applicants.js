@@ -221,10 +221,6 @@
                     '<button type="button" class="pill-btn" id="moApplicantAcceptBtn">录用</button>' +
                     '<button type="button" class="pill-btn ghost" id="moApplicantRejectBtn">拒绝</button>' +
                     '</div>' +
-                    '<section class="mo-detail-plate" aria-label="流程事件">' +
-                    '<div class="mo-detail-section-title">流程事件</div>' +
-                    '<div class="mo-comment-list">' + (eventsHtml || '<span class="muted">暂无</span>') + '</div>' +
-                    '</section>' +
                     '<section class="mo-detail-plate" aria-label="MO 评论">' +
                     '<div class="mo-detail-section-title">MO 评论</div>' +
                     '<div class="mo-comment-list" id="moCommentList">' + (commentsHtml || '<span class="muted">暂无</span>') + '</div>' +
@@ -232,6 +228,10 @@
                     '<label class="full">添加评论<textarea id="moNewCommentText" rows="2" placeholder="输入评论"></textarea></label>' +
                     '</div>' +
                     '<button type="button" class="pill-btn" id="moSubmitCommentBtn">提交评论</button>' +
+                    '</section>' +
+                    '<section class="mo-detail-plate" aria-label="流程事件">' +
+                    '<div class="mo-detail-section-title">流程事件</div>' +
+                    '<div class="mo-comment-list">' + (eventsHtml || '<span class="muted">暂无</span>') + '</div>' +
                     '</section>';
 
                 const submitBtn = document.getElementById('moSubmitCommentBtn');
