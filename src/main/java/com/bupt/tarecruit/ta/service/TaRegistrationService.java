@@ -11,7 +11,7 @@ public class TaRegistrationService {
 
     public ApiResponse<Void> validate(TaRegisterRequest request) {
         if (request == null) {
-            return ApiResponse.failure("注册信息不能为空");
+            return ApiResponse.failure("Registration data is required.");
         }
 
         String taId = trim(request.getTaId());
@@ -23,30 +23,30 @@ public class TaRegistrationService {
         String confirmPassword = request.getConfirmPassword() == null ? "" : request.getConfirmPassword();
 
         if (taId.isEmpty()) {
-            return ApiResponse.failure("TA ID 缺失，请重新打开注册面板后再试");
+            return ApiResponse.failure("TA ID is missing. Open registration again.");
         }
 
         if (name.isEmpty() || username.isEmpty() || email.isEmpty() || phone.isEmpty()) {
-            return ApiResponse.failure("姓名、用户名、邮箱、手机号不能为空");
+            return ApiResponse.failure("Name, username, email, and phone are required.");
         }
 
         if (!EMAIL_PATTERN.matcher(email).matches()) {
-            return ApiResponse.failure("邮箱格式不正确");
+            return ApiResponse.failure("Invalid email format.");
         }
 
         if (!PHONE_PATTERN.matcher(phone).matches()) {
-            return ApiResponse.failure("手机号格式不正确");
+            return ApiResponse.failure("Invalid phone number.");
         }
 
         if (password.length() < 6) {
-            return ApiResponse.failure("密码至少 6 位");
+            return ApiResponse.failure("Password must be at least 6 characters.");
         }
 
         if (!password.equals(confirmPassword)) {
-            return ApiResponse.failure("两次输入的密码不一致");
+            return ApiResponse.failure("Passwords do not match.");
         }
 
-        return ApiResponse.success("校验通过", null);
+        return ApiResponse.success("Validation passed.", null);
     }
 
     public String normalizeTaId(String taId) {

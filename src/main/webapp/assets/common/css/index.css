@@ -140,10 +140,16 @@
             animation: cardFadeIn 0.4s ease forwards;
         }
 
+        /* 主题开关独占一行，与下方标题区上下排列，避免与长标题混叠 */
+        .card-toolbar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 14px;
+        }
+
         .theme-toggle {
-            position: absolute;
-            top: 20px;
-            right: 24px;
+            position: static;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -157,6 +163,7 @@
             cursor: pointer;
             transition: all 0.25s ease;
             min-width: 88px;
+            flex-shrink: 0;
         }
 
         :root[data-theme='light'] .theme-toggle {
@@ -462,9 +469,6 @@
                 align-items: stretch;
             }
 
-            .theme-toggle {
-                right: 20px;
-            }
         }
 
         @media (prefers-reduced-motion: reduce) {

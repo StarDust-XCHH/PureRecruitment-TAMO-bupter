@@ -75,7 +75,7 @@ public class TaAccountDao {
         String rawPassword = password == null ? "" : password;
 
         if (normalizedIdentifier.isEmpty() || rawPassword.isEmpty()) {
-            return TaLoginResult.failure(400, "请输入账号和密码");
+            return TaLoginResult.failure(400, "Enter your username and password.");
         }
 
         List<Map<String, Object>> accounts = loadRecords(TA_DATA_PATH, TA_SCHEMA, TA_ENTITY);
@@ -89,7 +89,7 @@ public class TaAccountDao {
         }
 
         if (matchedAccount == null) {
-            return TaLoginResult.failure(404, "账号不存在");
+            return TaLoginResult.failure(404, "Account not found.");
         }
 
         @SuppressWarnings("unchecked")
@@ -105,7 +105,7 @@ public class TaAccountDao {
             auth.put("failedAttempts", currentFailures + 1);
             matchedAccount.put("updatedAt", currentTime);
             saveRecords(TA_DATA_PATH, TA_SCHEMA, TA_ENTITY, accounts);
-            return TaLoginResult.failure(401, "账号或密码错误");
+            return TaLoginResult.failure(401, "Invalid username or password.");
         }
 
         auth.put("failedAttempts", 0);
@@ -132,10 +132,10 @@ public class TaAccountDao {
         List<Map<String, Object>> settings = loadRecords(SETTINGS_DATA_PATH, SETTINGS_SCHEMA, SETTINGS_ENTITY);
 
         for (Map<String, Object> account : accounts) {
-            if (asString(account.get("id")).equalsIgnoreCase(taId)) return TaRegisterResult.failure(409, "TA ID 已存在");
-            if (asString(account.get("username")).equalsIgnoreCase(username)) return TaRegisterResult.failure(409, "用户名已被占用");
-            if (asString(account.get("email")).equalsIgnoreCase(email)) return TaRegisterResult.failure(409, "邮箱已被注册");
-            if (asString(account.get("phone")).equals(phone)) return TaRegisterResult.failure(409, "手机号已被注册");
+            if (asString(account.get("id")).equalsIgnoreCase(taId)) return TaRegisterResult.failure(409, "TA ID already exists.");
+            if (asString(account.get("username")).equalsIgnoreCase(username)) return TaRegisterResult.failure(409, "Username is already taken.");
+            if (asString(account.get("email")).equalsIgnoreCase(email)) return TaRegisterResult.failure(409, "Email is already registered.");
+            if (asString(account.get("phone")).equals(phone)) return TaRegisterResult.failure(409, "Phone number is already registered.");
         }
 
         String currentTime = AuthUtils.nowIso();
@@ -1249,7 +1249,7 @@ public class TaAccountDao {
         private TaLoginResult(boolean success, int status, String message, Map<String, Object> data) {
             this.success = success; this.status = status; this.message = message; this.data = data;
         }
-        public static TaLoginResult success(Map<String, Object> data) { return new TaLoginResult(true, 200, "登录成功", data); }
+        public static TaLoginResult success(Map<String, Object> data) { return new TaLoginResult(true, 200, "Signed in successfully.", data); }
         public static TaLoginResult failure(int status, String message) { return new TaLoginResult(false, status, message, null); }
         public boolean isSuccess() { return success; }
         public int getStatus() { return status; }
@@ -1265,7 +1265,7 @@ public class TaAccountDao {
         private TaRegisterResult(boolean success, int status, String message, Map<String, Object> data) {
             this.success = success; this.status = status; this.message = message; this.data = data;
         }
-        public static TaRegisterResult success(Map<String, Object> data) { return new TaRegisterResult(true, 201, "注册成功", data); }
+        public static TaRegisterResult success(Map<String, Object> data) { return new TaRegisterResult(true, 201, "Registration successful.", data); }
         public static TaRegisterResult failure(int status, String message) { return new TaRegisterResult(false, status, message, null); }
         public boolean isSuccess() { return success; }
         public int getStatus() { return status; }

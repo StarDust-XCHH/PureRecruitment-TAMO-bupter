@@ -57,7 +57,7 @@ public class MoRegisterServlet extends HttpServlet {
             throws ServletException, IOException {
         ServletJsonResponseWriter.write(resp,
                 HttpServletResponse.SC_METHOD_NOT_ALLOWED,
-                ApiResponse.failure("请使用 POST 请求"));
+                ApiResponse.failure("Use POST for this endpoint."));
     }
 
     @Override
@@ -127,27 +127,27 @@ public class MoRegisterServlet extends HttpServlet {
      */
     private ApiResponse<Void> validate(MoRegisterRequest request) {
         if (request.getMoId() == null || request.getMoId().trim().isEmpty()) {
-            return ApiResponse.failure("MO ID 不能为空");
+            return ApiResponse.failure("Account ID is required.");
         }
         if (request.getName() == null || request.getName().trim().isEmpty()) {
-            return ApiResponse.failure("姓名不能为空");
+            return ApiResponse.failure("Name is required.");
         }
         if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
-            return ApiResponse.failure("用户名不能为空");
+            return ApiResponse.failure("Username is required.");
         }
         if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
-            return ApiResponse.failure("邮箱不能为空");
+            return ApiResponse.failure("Email is required.");
         }
         if (request.getPhone() == null || request.getPhone().trim().isEmpty()) {
-            return ApiResponse.failure("手机号不能为空");
+            return ApiResponse.failure("Phone number is required.");
         }
         if (request.getPassword() == null || request.getPassword().length() < 6) {
-            return ApiResponse.failure("密码至少需要 6 位");
+            return ApiResponse.failure("Password must be at least 6 characters.");
         }
         if (!request.getPassword().equals(request.getConfirmPassword())) {
-            return ApiResponse.failure("两次输入的密码不一致");
+            return ApiResponse.failure("Passwords do not match.");
         }
-        return ApiResponse.success("验证通过", null);
+        return ApiResponse.success("Validation passed.", null);
     }
 }
 

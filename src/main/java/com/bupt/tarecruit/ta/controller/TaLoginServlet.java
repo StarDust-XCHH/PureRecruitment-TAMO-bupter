@@ -38,7 +38,7 @@ public class TaLoginServlet extends HttpServlet {
         } catch (Exception e) {
             System.err.println("[ERROR] 登录逻辑执行异常:");
             e.printStackTrace();
-            ServletJsonResponseWriter.write(resp, 500, ApiResponse.failure("服务器内部错误: " + e.getMessage()));
+            ServletJsonResponseWriter.write(resp, 500, ApiResponse.failure("Internal server error: " + e.getMessage()));
         }
         System.out.println(">>>>>> [DEBUG] 请求处理结束 <<<<<<\n");
     }
@@ -46,6 +46,6 @@ public class TaLoginServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("[DEBUG] 收到 GET 请求，登录接口只允许 POST");
-        ServletJsonResponseWriter.write(resp, 405, ApiResponse.failure("请使用 POST 登录"));
+        ServletJsonResponseWriter.write(resp, 405, ApiResponse.failure("Use POST to sign in."));
     }
 }

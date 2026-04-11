@@ -72,7 +72,7 @@ public class MoLoginServlet extends HttpServlet {
             System.err.println("[ERROR] MO 登录逻辑执行异常:");
             e.printStackTrace();
             ServletJsonResponseWriter.write(resp, 500,
-                    ApiResponse.failure("服务器内部错误：" + e.getMessage()));
+                    ApiResponse.failure("Internal server error: " + e.getMessage()));
         }
         System.out.println(">>>>>> [DEBUG] 请求处理结束 <<<<<<\n");
     }
@@ -81,6 +81,6 @@ public class MoLoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("[DEBUG] MO 登录接口收到 GET 请求，只允许 POST");
         ServletJsonResponseWriter.write(resp, 405,
-                ApiResponse.failure("请使用 POST 登录"));
+                ApiResponse.failure("Use POST to sign in."));
     }
 }

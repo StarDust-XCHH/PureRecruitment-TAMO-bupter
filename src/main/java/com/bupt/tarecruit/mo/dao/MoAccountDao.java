@@ -80,7 +80,7 @@ public class MoAccountDao {
         String rawPassword = password == null ? "" : password;
 
         if (normalizedIdentifier.isEmpty() || rawPassword.isEmpty()) {
-            return MoLoginResult.failure(400, "请输入账号和密码");
+            return MoLoginResult.failure(400, "Enter your username and password.");
         }
 
         List<Map<String, Object>> accounts = loadRecords(MO_DATA_PATH, MO_SCHEMA, MO_ENTITY);
@@ -94,7 +94,7 @@ public class MoAccountDao {
         }
 
         if (matchedAccount == null) {
-            return MoLoginResult.failure(404, "账号不存在");
+            return MoLoginResult.failure(404, "Account not found.");
         }
 
         @SuppressWarnings("unchecked")
@@ -110,7 +110,7 @@ public class MoAccountDao {
             auth.put("failedAttempts", currentFailures + 1);
             matchedAccount.put("updatedAt", currentTime);
             saveRecords(MO_DATA_PATH, MO_SCHEMA, MO_ENTITY, accounts);
-            return MoLoginResult.failure(401, "账号或密码错误");
+            return MoLoginResult.failure(401, "Invalid username or password.");
         }
 
         auth.put("failedAttempts", 0);
@@ -154,13 +154,13 @@ public class MoAccountDao {
         // 唯一性检查
         for (Map<String, Object> account : accounts) {
             if (asString(account.get("id")).equalsIgnoreCase(moId))
-                return MoRegisterResult.failure(409, "MO ID 已存在");
+                return MoRegisterResult.failure(409, "Organizer account ID already exists.");
             if (asString(account.get("username")).equalsIgnoreCase(username))
-                return MoRegisterResult.failure(409, "用户名已被占用");
+                return MoRegisterResult.failure(409, "Username is already taken.");
             if (asString(account.get("email")).equalsIgnoreCase(email))
-                return MoRegisterResult.failure(409, "邮箱已被注册");
+                return MoRegisterResult.failure(409, "Email is already registered.");
             if (asString(account.get("phone")).equals(phone))
-                return MoRegisterResult.failure(409, "手机号已被注册");
+                return MoRegisterResult.failure(409, "Phone number is already registered.");
         }
 
         String currentTime = AuthUtils.nowIso();
@@ -581,7 +581,7 @@ public class MoAccountDao {
         }
 
         public static MoLoginResult success(Map<String, Object> data) {
-            return new MoLoginResult(true, 200, "登录成功", data);
+            return new MoLoginResult(true, 200, "Signed in successfully.", data);
         }
 
         public static MoLoginResult failure(int status, String message) {
@@ -611,7 +611,7 @@ public class MoAccountDao {
         }
 
         public static MoRegisterResult success(Map<String, Object> data) {
-            return new MoRegisterResult(true, 201, "注册成功", data);
+            return new MoRegisterResult(true, 201, "Registration successful.", data);
         }
 
         public static MoRegisterResult failure(int status, String message) {
