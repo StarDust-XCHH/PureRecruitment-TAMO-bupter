@@ -32,10 +32,10 @@ public class AdminNoticeServlet extends HttpServlet {
     private static int nextId = 1;
 
     static {
-        // Initialize sample data
-        addNotice("System Maintenance Notice", "System maintenance will be performed tonight from 22:00-24:00. Please save your work in advance.", "high");
-        addNotice("Spring Semester TA Recruitment Started", "Spring semester TA recruitment has officially started. Please submit course positions promptly.", "medium");
-        addNotice("New Feature Released", "Data statistics feature has been added to the admin dashboard. Welcome to try and provide feedback.", "low");
+        // 初始化示例数据
+        addNotice("System Maintenance Notice", "System will be under maintenance from 22:00-24:00 tonight. Please save your work in advance.", "high");
+        addNotice("Spring Semester TA Recruitment Started", "Spring semester TA recruitment is now officially open. Please post job information promptly.", "medium");
+        addNotice("New Feature Released", "Admin dashboard now includes data statistics feature. Welcome to try and share feedback.", "low");
     }
 
     private static void addNotice(String title, String content, String priority) {
