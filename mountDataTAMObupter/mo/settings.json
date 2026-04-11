@@ -3,7 +3,7 @@
     "schema": "mo",
     "entity": "settings",
     "version": "1.0",
-    "updatedAt": "2026-04-08T02:24:15.860523100Z"
+    "updatedAt": "2026-04-11T08:20:27.963133400Z"
   },
   "items": [
     {
@@ -45,6 +45,30 @@
       "avatar": "",
       "createdAt": "2026-04-08T02:06:39.843943400Z",
       "updatedAt": "2026-04-08T02:06:39.843943400Z"
+    },
+    {
+      "id": "SETTING-MO-347U18",
+      "moId": "MO-347U18",
+      "theme": "dark",
+      "avatar": "",
+      "createdAt": "2026-04-11T08:18:40.983657500Z",
+      "updatedAt": "2026-04-11T08:18:40.983657500Z"
+    },
+    {
+      "id": "SETTING-MO-685X3X",
+      "moId": "MO-685X3X",
+      "theme": "dark",
+      "avatar": "",
+      "createdAt": "2026-04-11T08:19:31.283128200Z",
+      "updatedAt": "2026-04-11T08:19:31.283128200Z"
+    },
+    {
+      "id": "SETTING-MO-868TFS",
+      "moId": "MO-868TFS",
+      "theme": "dark",
+      "avatar": "",
+      "createdAt": "2026-04-11T08:20:06.163257600Z",
+      "updatedAt": "2026-04-11T08:20:06.163257600Z"
     }
   ]
 }

@@ -1,9 +1,9 @@
 {
   "meta": {
     "schema": "ta",
-    "version": "1.0",
     "entity": "tas",
-    "updatedAt": "2026-04-11T08:04:16.054141Z"
+    "version": "1.0",
+    "updatedAt": "2026-04-11T08:23:19.721867300Z"
   },
   "items": [
     {
@@ -15,7 +15,7 @@
       "department": "",
       "status": "active",
       "createdAt": "2026-03-16T13:19:06.884221300Z",
-      "updatedAt": "2026-04-11T08:04:16.054141Z",
+      "updatedAt": "2026-03-16T13:19:06.884221300Z",
       "auth": {
         "passwordHash": "c9aeea9499f161f9e307d8f4a8cb4c0d5a1393dcd466b49b630fb060f281defe",
         "passwordSalt": "fecc6463-14f5-4e25-a015-bfd2eb448afb",
@@ -32,11 +32,11 @@
       "department": "",
       "status": "active",
       "createdAt": "2026-03-16T13:28:45.257077Z",
-      "updatedAt": "2026-04-08T02:24:39.545560600Z",
+      "updatedAt": "2026-04-11T08:20:34.961724800Z",
       "auth": {
         "passwordHash": "8b5361414eb8fa038ca9279a55be8b3b44791939d89475d1618d50230c01d65f",
         "passwordSalt": "cebb50b5-9797-4732-a22a-df78ae1c88da",
-        "lastLoginAt": "2026-04-08T02:24:39.545560600Z",
+        "lastLoginAt": "2026-04-11T08:20:34.961724800Z",
         "failedAttempts": 0.0
       }
     },
@@ -155,6 +155,23 @@
       "auth": {
         "passwordHash": "1600f104399674a46c5c33343684e3a03988abf297b5d25da1154e486ed22f72",
         "passwordSalt": "150041c9-e31f-4995-909f-dde38b52ba97",
+        "lastLoginAt": "",
+        "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "TA-25567",
+      "name": "John",
+      "username": "John Guan",
+      "email": "JohnGuan@q.c",
+      "phone": "1235436789",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-04-11T08:23:01.639438600Z",
+      "updatedAt": "2026-04-11T08:23:19.721867300Z",
+      "auth": {
+        "passwordHash": "6e7080041560089f4aa70a7173e0c55ce5c88fa38cbc6106233a798f51dbd765",
+        "passwordSalt": "92aec3f0-71ad-4643-a31b-673647100736",
         "lastLoginAt": "",
         "failedAttempts": 0.0
       }

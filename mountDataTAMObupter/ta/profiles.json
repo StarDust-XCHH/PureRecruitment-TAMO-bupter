@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "profiles",
     "version": "1.0",
-    "updatedAt": "2026-04-08T02:24:40.157262300Z"
+    "updatedAt": "2026-04-11T08:23:19.724851200Z"
   },
   "items": [
     {
@@ -144,6 +144,21 @@
       "semester": "",
       "title": "TA",
       "lastUpdatedAt": "2026-04-08T02:05:51.145318400Z"
+    },
+    {
+      "id": "PROFILE-TA-25567",
+      "taId": "TA-25567",
+      "avatar": "image/TA-25567_1775895799202_372845cc51c7492bb6ec2c83b2ba34a0.png",
+      "realName": "John",
+      "applicationIntent": "",
+      "studentId": "TA-25567",
+      "contactEmail": "JohnGuan@q.c",
+      "bio": "",
+      "skills": [],
+      "availabilityHoursPerWeek": 0.0,
+      "semester": "",
+      "title": "TA",
+      "lastUpdatedAt": "2026-04-11T08:23:19.721867300Z"
     }
   ]
 }
