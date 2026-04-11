@@ -1,6 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="zh-CN" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -60,6 +60,10 @@
                 <h1 class="page-title" id="pageTitle">Dashboard</h1>
             </div>
             <div class="topbar-right">
+                <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
+                    <span class="toggle-icon">🌙</span>
+                    <span class="toggle-text" id="themeToggleText">Dark</span>
+                </button>
                 <button class="topbar-btn" id="refreshBtn">
                     <span>🔄</span>
                 </button>
@@ -165,7 +169,7 @@
             <!-- Courses Route -->
             <div class="route" id="route-courses">
                 <div class="toolbar">
-                    <input type="text" class="search-input" id="courseSearch" placeholder="Search course name/code...">
+                    <input type="text" class="search-input" id="courseSearch" placeholder="Search course name/ID...">
                     <select class="filter-select" id="courseStatusFilter">
                         <option value="">All Status</option>
                         <option value="OPEN">Open</option>
@@ -176,7 +180,7 @@
                     <table class="data-table">
                         <thead>
                             <tr>
-                                <th>Course Code</th>
+                                <th>Course ID</th>
                                 <th>Course Name</th>
                                 <th>Semester</th>
                                 <th>MO</th>
@@ -207,7 +211,7 @@
             <div class="route" id="route-permissions">
                 <div class="empty-state">
                     <div class="empty-icon">🔐</div>
-                    <div class="empty-text">Permissions coming soon</div>
+                    <div class="empty-text">Permission management coming soon</div>
                 </div>
             </div>
 
@@ -215,7 +219,7 @@
             <div class="route" id="route-settings">
                 <div class="empty-state">
                     <div class="empty-icon">⚙️</div>
-                    <div class="empty-text">Settings coming soon</div>
+                    <div class="empty-text">System settings coming soon</div>
                 </div>
             </div>
         </section>
@@ -257,7 +261,7 @@
                     <label>Status</label>
                     <select id="editStatus">
                         <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
+                        <option value="inactive">Disabled</option>
                     </select>
                 </div>
             </form>

@@ -15,6 +15,8 @@
     const createNoticeBtn = document.getElementById('createNoticeBtn');
     const courseSearch = document.getElementById('courseSearch');
     const courseStatusFilter = document.getElementById('courseStatusFilter');
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const themeToggleText = document.getElementById('themeToggleText');
 
     // Current state
     let allUsers = [];
@@ -22,9 +24,46 @@
     let allNotices = [];
     let currentAdmin = null;
 
+    // Theme Management
+    function getStoredTheme() {
+        return localStorage.getItem('admin-theme') || 'dark';
+    }
+
+    function applyTheme(theme) {
+        const root = document.documentElement;
+        if (theme === 'light') {
+            root.setAttribute('data-theme', 'light');
+        } else {
+            root.removeAttribute('data-theme');
+        }
+        localStorage.setItem('admin-theme', theme);
+        updateThemeButton(theme);
+    }
+
+    function toggleTheme() {
+        const current = getStoredTheme();
+        const next = current === 'light' ? 'dark' : 'light';
+        applyTheme(next);
+    }
+
+    function updateThemeButton(theme) {
+        const icon = themeToggleBtn?.querySelector('.toggle-icon');
+        if (icon) {
+            icon.textContent = theme === 'light' ? '☀️' : '🌙';
+        }
+        if (themeToggleText) {
+            themeToggleText.textContent = theme === 'light' ? 'Light' : 'Dark';
+        }
+    }
+
+    function initTheme() {
+        const storedTheme = getStoredTheme();
+        applyTheme(storedTheme);
+    }
+
     // Initialize
     function init() {
-        // Load current logged-in user info
+        initTheme();
         loadCurrentAdmin();
         setupNavigation();
         setupEventListeners();
@@ -33,10 +72,8 @@
 
     // Load current logged-in admin info
     async function loadCurrentAdmin() {
-        // Try to get login info from localStorage
         const storedUser = localStorage.getItem('admin-user');
         if (!storedUser) {
-            // If no login info, redirect to login page
             window.location.href = API_BASE + '/';
             return;
         }
@@ -45,17 +82,14 @@
             const user = JSON.parse(storedUser);
             currentAdmin = user;
 
-            // Update sidebar display
             updateAdminDisplay(user);
 
-            // Call API to get full info (including profile)
             const response = await fetch(`${API_BASE}/api/admin/auth?action=me&adminId=${user.id}&username=${user.username}`);
             if (response.ok) {
                 const data = await response.json();
                 if (data.success && data.data) {
                     currentAdmin = data.data;
                     updateAdminDisplay(currentAdmin);
-                    // Update localStorage
                     localStorage.setItem('admin-user', JSON.stringify(currentAdmin));
                 }
             }
@@ -68,7 +102,6 @@
     function updateAdminDisplay(user) {
         if (!user) return;
 
-        // Update sidebar admin info
         const adminNameEl = document.getElementById('adminName');
         const adminRoleEl = document.getElementById('adminRole');
         const avatarEl = document.querySelector('.user-info .avatar');
@@ -81,7 +114,6 @@
             adminRoleEl.textContent = title;
         }
         if (avatarEl) {
-            // Display first letter of username
             const displayName = user.name || user.username || 'A';
             avatarEl.textContent = displayName.charAt(0).toUpperCase();
         }
@@ -126,6 +158,7 @@
     function setupEventListeners() {
         logoutBtn.addEventListener('click', handleLogout);
         refreshBtn.addEventListener('click', loadDashboardData);
+        themeToggleBtn.addEventListener('click', toggleTheme);
         userSearch.addEventListener('input', debounce(filterUsers, 300));
         roleFilter.addEventListener('change', filterUsers);
         refreshUsersBtn.addEventListener('click', loadUsers);
@@ -180,7 +213,7 @@
             document.getElementById('moUsers').textContent = data.data.moUsers || 0;
             document.getElementById('activeJobs').textContent = data.data.adminUsers || 0;
 
-            // Show recent login users
+            // Display recent login users
             const usersData = await fetchAPI(`${API_BASE}/api/admin/users`);
             if (usersData && usersData.success) {
                 const recentUsers = usersData.data
@@ -282,7 +315,7 @@
 
     function createUserRow(user) {
         const statusClass = user.status === 'active' ? 'active' : user.status === 'pending' ? 'pending' : 'inactive';
-        const statusText = user.status === 'active' ? 'Active' : user.status === 'pending' ? 'Pending' : 'Inactive';
+        const statusText = user.status === 'active' ? 'Active' : user.status === 'pending' ? 'Pending' : 'Disabled';
         const userId = user.id || user.username || '';
 
         return `
@@ -364,7 +397,7 @@
                 <td><span class="status-badge ${statusClass}">${statusText}</span></td>
                 <td>
                     <div class="action-buttons">
-                        <button class="btn sm secondary" onclick="viewCourse('${course.courseId}')">View</button>
+                        <button class="btn sm secondary" onclick="viewCourse('${course.courseId}')">Details</button>
                     </div>
                 </td>
             </tr>
@@ -379,7 +412,7 @@
         const deadline = course.applicationDeadline ? formatDate(course.applicationDeadline) : '-';
 
         alert(`Course Details:
-Course Code: ${course.courseId}
+Course ID: ${course.courseId}
 Course Name: ${course.courseName}
 Semester: ${course.semester}
 MO: ${course.moName}
@@ -472,10 +505,8 @@ Recruited: ${course.recruitedCount || 0}`);
     // Actions
     function handleLogout() {
         if (confirm('Are you sure you want to logout?')) {
-            // Clear login info
             localStorage.removeItem('admin-user');
             sessionStorage.clear();
-            // Redirect to login page
             window.location.href = API_BASE + '/';
         }
     }
@@ -493,7 +524,7 @@ Recruited: ${course.recruitedCount || 0}`);
     window.deleteUser = deleteUser;
 
     window.editNotice = function(id) {
-        alert(`Edit notice ${id} feature coming soon`);
+        alert(`Edit notice ${id} coming soon`);
     };
 
     window.deleteNotice = async function(id) {
@@ -507,7 +538,7 @@ Recruited: ${course.recruitedCount || 0}`);
             loadNotices();
             loadNoticesBrief();
         } else {
-            alert('Failed to delete');
+            alert('Delete failed');
         }
     };
 
@@ -529,7 +560,7 @@ Recruited: ${course.recruitedCount || 0}`);
         try {
             const date = new Date(dateStr);
             if (isNaN(date.getTime())) return dateStr;
-            return date.toLocaleString('zh-CN', {
+            return date.toLocaleString('en-US', {
                 year: 'numeric',
                 month: '2-digit',
                 day: '2-digit',
@@ -610,7 +641,7 @@ Recruited: ${course.recruitedCount || 0}`);
         }
     };
 
-    // Click outside modal to close
+    // Close modal when clicking outside
     document.getElementById('editUserModal')?.addEventListener('click', function(e) {
         if (e.target === this) {
             closeEditUserModal();
