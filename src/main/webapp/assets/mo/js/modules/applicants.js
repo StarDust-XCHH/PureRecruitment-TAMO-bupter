@@ -31,8 +31,23 @@
             return (u.moId || u.id || '').trim();
         }
 
-        function optionLabel(item) {
-            return item.courseCode + ' · ' + item.courseName;
+        function jobOptionValue(job) {
+            if (!job) return '';
+            var v = job.courseCode != null && String(job.courseCode).trim() !== ''
+                ? String(job.courseCode).trim()
+                : (job.jobId != null ? String(job.jobId).trim() : '');
+            return v;
+        }
+
+        function jobOptionLabel(job) {
+            if (!job) return '';
+            var code = job.courseCode != null && String(job.courseCode).trim() !== ''
+                ? String(job.courseCode).trim()
+                : (job.jobId != null ? String(job.jobId).trim() : '--');
+            var name = job.courseName != null && String(job.courseName).trim() !== ''
+                ? String(job.courseName).trim()
+                : '未命名岗位';
+            return code + ' · ' + name;
         }
 
         function setStatus(text) {
@@ -42,14 +57,22 @@
         function renderCourses(jobs) {
             const prev = courseSelect.value;
             courseSelect.innerHTML = '';
+            const optAll = document.createElement('option');
+            optAll.value = '';
+            optAll.textContent = '全部课程';
+            courseSelect.appendChild(optAll);
             (jobs || []).forEach(function (job) {
+                const val = jobOptionValue(job);
+                if (!val) return;
                 const opt = document.createElement('option');
-                opt.value = job.courseCode;
-                opt.textContent = optionLabel(job);
+                opt.value = val;
+                opt.textContent = jobOptionLabel(job);
                 courseSelect.appendChild(opt);
             });
-            if (prev && Array.from(courseSelect.options).some(function (o) { return o.value === prev; })) {
+            if (Array.from(courseSelect.options).some(function (o) { return o.value === prev; })) {
                 courseSelect.value = prev;
+            } else {
+                courseSelect.value = '';
             }
         }
 
@@ -100,6 +123,7 @@
                     '<div class="' + toneClass + '">' + escapeHtml(item.status || '未知') + '</div>' +
                     '</div>' +
                     '<div class="mo-applicant-meta">' +
+                    '<span>课程：' + escapeHtml(item.courseCode || '--') + ' · ' + escapeHtml(item.courseName || '--') + '</span>' +
                     '<span>邮箱：' + escapeHtml(item.email || '--') + '</span>' +
                     '<span>手机：' + escapeHtml(item.phone || '--') + '</span>' +
                     '<span>学号：' + escapeHtml(item.studentId || '--') + '</span>' +
@@ -252,13 +276,8 @@
         }
 
         async function loadApplicants() {
-            const code = courseSelect.value;
+            const code = (courseSelect.value || '').trim();
             const moId = getMoId();
-            if (!code) {
-                renderApplicants([]);
-                setStatus('请先选择课程');
-                return;
-            }
             if (!moId) {
                 setStatus('未登录或缺少 moId');
                 renderApplicants([]);
@@ -266,14 +285,18 @@
             }
             setStatus('加载中...');
             try {
-                const res = await fetch(apiUrl('/api/mo/applicants') + '?courseCode=' + encodeURIComponent(code)
-                    + '&moId=' + encodeURIComponent(moId));
+                var url = apiUrl('/api/mo/applicants') + '?moId=' + encodeURIComponent(moId);
+                if (code) {
+                    url += '&courseCode=' + encodeURIComponent(code);
+                }
+                const res = await fetch(url);
                 const payload = await res.json();
                 if (!res.ok || payload.success === false) throw new Error(payload.message || '加载失败');
                 const items = Array.isArray(payload.items) ? payload.items : [];
                 renderApplicants(items);
                 const unread = typeof payload.unreadCount === 'number' ? payload.unreadCount : 0;
-                setStatus('已加载 ' + items.length + ' 名申请人' + (unread > 0 ? ' · 未读 ' + unread + ' 条' : ''));
+                var scopeHint = code ? '' : '（全部课程）';
+                setStatus('已加载 ' + items.length + ' 名申请人' + scopeHint + (unread > 0 ? ' · 未读 ' + unread + ' 条' : ''));
                 if (typeof app.onApplicantsLoaded === 'function') app.onApplicantsLoaded(items);
                 await refreshNavUnreadBadge();
             } catch (err) {
@@ -283,11 +306,15 @@
         }
 
         async function decide(item, decision) {
-            const code = courseSelect.value;
+            const code = (item && item.courseCode ? String(item.courseCode) : '').trim() || (courseSelect.value || '').trim();
             const moId = getMoId();
             const actionText = decision === 'selected' ? '录用' : '拒绝';
             const comment = window.prompt('请输入' + actionText + '备注（可选）', '');
             if (comment === null) return;
+            if (!code) {
+                setStatus('缺少课程编号，无法提交');
+                return;
+            }
             try {
                 const res = await fetch(apiUrl('/api/mo/applications/select'), {
                     method: 'POST',
@@ -322,20 +349,57 @@
             });
         }
 
+        async function refreshCourseOptionsFromApi() {
+            if (!courseSelect) return;
+            const moId = getMoId();
+            if (!moId) {
+                renderCourses([]);
+                return;
+            }
+            try {
+                const res = await fetch(apiUrl('/api/mo/jobs') + '?moId=' + encodeURIComponent(moId), {
+                    headers: { Accept: 'application/json' }
+                });
+                const payload = await res.json();
+                renderCourses(Array.isArray(payload.items) ? payload.items : []);
+            } catch (e) {
+                renderCourses([]);
+            }
+        }
+
         app.onJobsUpdated = function (jobs) {
             renderCourses(jobs);
             loadApplicants();
         };
+
+        /** 进入「应聘筛选」或需强制同步岗位列表时调用（与课程管理同一数据源） */
+        app.onApplicantsRouteActivate = function () {
+            refreshCourseOptionsFromApi().then(function () {
+                loadApplicants();
+            });
+        };
+
         app.setApplicantCourse = function (courseCode) {
             if (!courseCode) return;
-            courseSelect.value = courseCode;
+            const raw = String(courseCode).trim();
+            if (!raw) return;
+            if (Array.from(courseSelect.options).some(function (o) { return o.value === raw; })) {
+                courseSelect.value = raw;
+            } else {
+                courseSelect.value = '';
+            }
             loadApplicants();
         };
         app.refreshMoApplicantUnreadBadge = refreshNavUnreadBadge;
 
-        refreshBtn.addEventListener('click', loadApplicants);
+        refreshBtn.addEventListener('click', function () {
+            refreshCourseOptionsFromApi().then(function () {
+                loadApplicants();
+            });
+        });
         courseSelect.addEventListener('change', loadApplicants);
 
         refreshNavUnreadBadge();
+        refreshCourseOptionsFromApi();
     };
 })();

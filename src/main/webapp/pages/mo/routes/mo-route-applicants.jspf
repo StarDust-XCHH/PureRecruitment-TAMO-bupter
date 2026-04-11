@@ -22,7 +22,7 @@
         <div class="empty-state" id="applicantEmptyState" hidden>
             <div class="empty-state__icon">🗂️</div>
             <h3>暂无候选人</h3>
-            <p>请先选择岗位或发布新岗位，系统将聚合 TA 候选池。</p>
+            <p>当前 MO 下暂无投递记录；可切换上方课程筛选或前往课程管理发布岗位。</p>
         </div>
     </div>
 
