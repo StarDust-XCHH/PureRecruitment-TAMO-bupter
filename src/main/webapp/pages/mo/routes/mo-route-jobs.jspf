@@ -16,7 +16,7 @@
 
                 <span class="pill" id="openCoursesCount">开放课程 0</span>
 
-                <button id="openJobPublishModalBtn" class="pill-btn" type="button">发布岗位</button>
+                <button id="openJobPublishModalBtn" class="pill-btn" type="button">发布课程</button>
 
                 <button id="refreshJobsBtn" class="refresh-btn pill" type="button">
 
@@ -34,9 +34,11 @@
 
         <label class="job-search-box" for="jobSearchInput">
 
+            <input type="text" style="width:0; height:0; position:absolute; opacity:0; z-index:-1;" tabindex="-1" autocomplete="username">
+
             <span class="job-search-icon" aria-hidden="true">⌕</span>
 
-            <input id="jobSearchInput" type="text" placeholder="搜索课程编号 / 名称 / 标签">
+            <input id="jobSearchInput" type="text" placeholder="搜索课程编号 / 名称 / 标签" autocomplete="off" name="jobSearchKeyword">
 
         </label>
 
