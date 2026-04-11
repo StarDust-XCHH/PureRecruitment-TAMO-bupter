@@ -931,7 +931,8 @@ legend.mo-field-label:has(.mo-req) {
     display: contents;
 }
 
-.mo-job-publish-modal .modal-head.mo-job-publish-modal__head #modalJobPublishTitle {
+.mo-job-publish-modal .modal-head.mo-job-publish-modal__head #modalJobPublishTitle,
+.mo-job-publish-modal .modal-head.mo-job-publish-modal__head #modalCourseEditTitle {
     grid-column: 1;
     grid-row: 1;
     margin: 0;
@@ -973,7 +974,8 @@ legend.mo-field-label:has(.mo-req) {
         grid-template-rows: auto auto auto;
     }
 
-    .mo-job-publish-modal .modal-head.mo-job-publish-modal__head #modalJobPublishTitle {
+    .mo-job-publish-modal .modal-head.mo-job-publish-modal__head #modalJobPublishTitle,
+    .mo-job-publish-modal .modal-head.mo-job-publish-modal__head #modalCourseEditTitle {
         grid-column: 1;
         grid-row: 1;
     }
@@ -1046,6 +1048,40 @@ legend.mo-field-label:has(.mo-req) {
     max-height: 12rem;
     resize: vertical;
     line-height: 1.45;
+}
+
+/* 编辑课程：课程编码只读展示 */
+.mo-job-publish-modal .mo-field-input--readonly {
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
+    cursor: default;
+    color: var(--text);
+    background: rgba(0, 0, 0, 0.12);
+    border: 1px solid var(--card-border);
+    border-radius: 0.375rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+}
+
+[data-theme="light"] .mo-job-publish-modal .mo-field-input--readonly {
+    background: rgba(15, 23, 42, 0.06);
+}
+
+/* 表单项下方短提示（与「请填写该字段」风格一致），不占用顶栏状态区 */
+.mo-job-publish-modal .mo-inline-field-error {
+    margin: 0 0 0.5rem;
+    font-size: 13px;
+    line-height: 1.4;
+    color: #f87171;
+}
+
+[data-theme="light"] .mo-job-publish-modal .mo-inline-field-error {
+    color: #dc2626;
+}
+
+.mo-job-publish-modal .mo-inline-field-error[hidden] {
+    display: none !important;
 }
 
 /* 发布岗位表单样式 */
