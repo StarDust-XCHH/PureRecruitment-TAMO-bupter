@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "settings",
     "version": "1.0",
-    "updatedAt": "2026-04-07T08:11:16.487152600Z"
+    "updatedAt": "2026-04-08T02:24:40.160261300Z"
   },
   "items": [
     {
@@ -122,6 +122,19 @@
       "notifyRecommendation": true,
       "notifyInterview": true,
       "updatedAt": "2026-04-06T15:07:22.544492200Z"
+    },
+    {
+      "id": "SETTING-TA-91667",
+      "taId": "TA-91667",
+      "profileSaved": false,
+      "profileSavedAt": "",
+      "lastProfileSyncStatus": "idle",
+      "lastProfileSyncMessage": "",
+      "avatar": "",
+      "notifyApplication": true,
+      "notifyRecommendation": true,
+      "notifyInterview": true,
+      "updatedAt": "2026-04-08T02:05:51.145318400Z"
     }
   ]
 }

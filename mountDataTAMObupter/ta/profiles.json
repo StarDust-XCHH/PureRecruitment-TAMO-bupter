@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "profiles",
     "version": "1.0",
-    "updatedAt": "2026-04-07T08:11:16.485154300Z"
+    "updatedAt": "2026-04-08T02:24:40.157262300Z"
   },
   "items": [
     {
@@ -129,6 +129,21 @@
       "semester": "",
       "title": "TA",
       "lastUpdatedAt": "2026-04-06T15:07:22.544492200Z"
+    },
+    {
+      "id": "PROFILE-TA-91667",
+      "taId": "TA-91667",
+      "avatar": "",
+      "realName": "123qwe",
+      "applicationIntent": "",
+      "studentId": "TA-91667",
+      "contactEmail": "123@123.com",
+      "bio": "",
+      "skills": [],
+      "availabilityHoursPerWeek": 0.0,
+      "semester": "",
+      "title": "TA",
+      "lastUpdatedAt": "2026-04-08T02:05:51.145318400Z"
     }
   ]
 }

@@ -3,7 +3,7 @@
     "schema": "mo",
     "entity": "settings",
     "version": "1.0",
-    "updatedAt": "2026-04-06T15:00:58.368304300Z"
+    "updatedAt": "2026-04-08T02:24:15.860523100Z"
   },
   "items": [
     {
@@ -37,6 +37,14 @@
       "avatar": "",
       "createdAt": "2026-04-06T15:00:58.364144400Z",
       "updatedAt": "2026-04-06T15:00:58.364144400Z"
+    },
+    {
+      "id": "SETTING-MO-650WCK",
+      "moId": "MO-650WCK",
+      "theme": "dark",
+      "avatar": "",
+      "createdAt": "2026-04-08T02:06:39.843943400Z",
+      "updatedAt": "2026-04-08T02:06:39.843943400Z"
     }
   ]
 }
