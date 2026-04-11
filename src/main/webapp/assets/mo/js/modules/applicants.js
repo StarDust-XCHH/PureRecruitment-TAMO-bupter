@@ -33,10 +33,9 @@
 
         function jobOptionValue(job) {
             if (!job) return '';
-            var v = job.courseCode != null && String(job.courseCode).trim() !== ''
+            return job.courseCode != null && String(job.courseCode).trim() !== ''
                 ? String(job.courseCode).trim()
                 : (job.jobId != null ? String(job.jobId).trim() : '');
-            return v;
         }
 
         function jobOptionLabel(job) {
@@ -200,8 +199,9 @@
                 const res = await fetch(apiUrl('/api/mo/applicants/detail') + '?moId=' + encodeURIComponent(moId)
                     + '&applicationId=' + encodeURIComponent(item.applicationId));
                 const d = await res.json();
-                if (!res.ok || d.success === false) throw new Error(d.message || '加载失败');
-
+                if (!res.ok || d.success === false) {
+                    detailBody.innerHTML = '<p class="mo-status-warn">' + escapeHtml(d.message || '加载失败') + '</p>';
+                } else {
                 const ts = d.taSnapshot || {};
                 const resume = d.resume || {};
                 const resumeUrl = apiUrl('/api/mo/applications/resume') + '?moId=' + encodeURIComponent(moId)
@@ -259,13 +259,17 @@
                                 })
                             });
                             const cp = await cr.json();
-                            if (!cr.ok || cp.success === false) throw new Error(cp.message || '失败');
+                            if (!cr.ok || cp.success === false) {
+                                window.alert(cp.message || '失败');
+                                return;
+                            }
                             textarea.value = '';
                             openDetail(item);
                         } catch (err) {
                             window.alert(err.message || '评论失败');
                         }
                     });
+                }
                 }
             } catch (err) {
                 detailBody.innerHTML = '<p class="mo-status-warn">' + escapeHtml(err.message || '加载失败') + '</p>';
@@ -291,7 +295,11 @@
                 }
                 const res = await fetch(url);
                 const payload = await res.json();
-                if (!res.ok || payload.success === false) throw new Error(payload.message || '加载失败');
+                if (!res.ok || payload.success === false) {
+                    setStatus(payload.message || '加载失败');
+                    renderApplicants([]);
+                    return;
+                }
                 const items = Array.isArray(payload.items) ? payload.items : [];
                 renderApplicants(items);
                 const unread = typeof payload.unreadCount === 'number' ? payload.unreadCount : 0;
@@ -328,7 +336,10 @@
                     })
                 });
                 const payload = await res.json();
-                if (!res.ok || payload.success === false) throw new Error(payload.message || '操作失败');
+                if (!res.ok || payload.success === false) {
+                    setStatus(payload.message || '操作失败');
+                    return;
+                }
                 setStatus('已完成：' + actionText + ' ' + item.taId);
                 await loadApplicants();
                 if (typeof app.loadDashboard === 'function') app.loadDashboard();
