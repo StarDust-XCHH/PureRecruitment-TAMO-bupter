@@ -1152,12 +1152,12 @@
                 publishReportValidationError(pubDl.msg, 'basic-info', deadlineInput);
                 return;
             }
-            if (fixedSkills.length === 0) {
-                publishReportValidationError('请至少选择一项技能标签（可点击「＋ 添加技能标签」）。', 'required-skills', document.getElementById('openPublishFixedSkillsBtn'));
+            if (!courseDescInput) {
+                publishReportValidationError('请填写课程介绍。', 'basic-info', document.getElementById('courseDescInput'));
                 return;
             }
-            if (!courseDescInput) {
-                publishReportValidationError('请填写岗位短描述。', 'job-description', document.getElementById('courseDescInput'));
+            if (fixedSkills.length === 0) {
+                publishReportValidationError('请至少选择一项技能标签（可点击「＋ 添加技能标签」）。', 'required-skills', document.getElementById('openPublishFixedSkillsBtn'));
                 return;
             }
 
