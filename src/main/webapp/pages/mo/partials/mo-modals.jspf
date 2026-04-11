@@ -84,10 +84,11 @@
                             <option value="Shahe">Shahe</option>
                         </select>
                     </label>
-                    <label class="mo-field">
-                        <span class="mo-field-label">申请截止时间</span>
-                        <input id="editApplicationDeadlineInput" type="datetime-local">
-                    </label>
+                    <div class="mo-field">
+                        <label class="mo-field-label" for="editApplicationDeadlineInput">申请截止时间</label>
+                        <input id="editApplicationDeadlineInput" type="datetime-local" class="mo-field-input" aria-describedby="editApplicationDeadlineHint">
+                        <p id="editApplicationDeadlineHint" class="mo-hint">您填写的时间将以当前浏览器所在时区保存；自动与其他用户时区同步。</p>
+                    </div>
                     <div class="mo-publish-section full">
                         <h4 class="mo-publish-section-title">授课周次 <span class="mo-muted">（可选）</span></h4>
                         <p class="mo-picker-summary" id="editTeachingWeeksSummary">未选择授课周次。</p>
@@ -212,11 +213,13 @@
                                         <option value="Shahe">Shahe</option>
                                     </select>
                                 </label>
-                                <label class="mo-field">
-                                    <span class="mo-field-label">申请截止时间</span>
-                                    <input id="applicationDeadlineInput" type="datetime-local" class="mo-field-input">
-                                </label>
+                                <div class="mo-field">
+                                    <label class="mo-field-label" for="applicationDeadlineInput">申请截止时间</label>
+                                    <input id="applicationDeadlineInput" type="datetime-local" class="mo-field-input" aria-describedby="applicationDeadlineHint">
+                                    <p id="applicationDeadlineHint" class="mo-hint">您填写的时间将以当前浏览器所在时区保存；自动与其他用户时区同步。</p>
+                                </div>
                             </div>
+
                         </div>
 
                         <div class="mo-publish-section full" id="teaching-weeks">
@@ -346,11 +349,11 @@
                             <span>个人简介</span>
                             <textarea id="bioInput" rows="4" placeholder="简要介绍您的教学背景、研究方向等信息..."></textarea>
                         </label>
-                        <div class="settings-field full">
+                        <label class="settings-field full">
                             <span>专业技能</span>
                             <textarea id="skillsInput" rows="3" placeholder="如：软件工程&#10;数据结构&#10;机器学习"></textarea>
                             <small class="muted">每行一个技能或使用逗号分隔</small>
-                        </div>
+                        </label>
                     </div>
                 </div>
 

@@ -221,12 +221,16 @@ legend.mo-field-label:has(.mo-req) {
     line-height: 1.35;
     padding: 10px 12px;
     min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
     cursor: pointer;
 }
 
 .mo-semester-combined__year {
-    flex: 0 0 42%;
-    max-width: 11rem;
+    flex: 1 1 38%;
+    min-width: 0;
+    max-width: none;
     border-right: 1px solid var(--card-border);
 }
 
@@ -235,7 +239,9 @@ legend.mo-field-label:has(.mo-req) {
 }
 
 .mo-semester-combined__term {
-    flex: 1 1 58%;
+    flex: 1 1 62%;
+    min-width: 0;
+    max-width: none;
 }
 
 [data-theme="light"] .mo-semester-combined {
@@ -244,6 +250,49 @@ legend.mo-field-label:has(.mo-req) {
 
 .mo-semester-field__hint {
     margin-top: 6px;
+}
+
+/* 学期（紧凑）与招聘状态同一行 */
+.mo-publish-semester-status-row {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 1rem 1.75rem;
+}
+
+.mo-publish-semester-status-row .mo-semester-field--compact {
+    flex: 1 1 14rem;
+    min-width: 0;
+    max-width: 100%;
+}
+
+.mo-publish-semester-status-row .mo-semester-field--compact .mo-semester-combined {
+    width: 100%;
+    max-width: none;
+    min-width: 0;
+}
+
+/* 与招聘状态同行时：双下拉铺满外框；季节侧略宽以显示「（请选择学期）」 */
+.mo-publish-semester-status-row .mo-semester-combined__year,
+.mo-publish-semester-status-row .mo-semester-combined__term {
+    min-width: 0;
+    max-width: none;
+}
+
+.mo-publish-semester-status-row .mo-semester-combined__year {
+    flex: 4 1 0;
+}
+
+.mo-publish-semester-status-row .mo-semester-combined__term {
+    flex: 5.5 1 0;
+}
+
+.mo-publish-semester-status-row .mo-field-fieldset--inline-status {
+    flex: 1 1 auto;
+    min-width: min(100%, 200px);
+    margin: 0;
+    align-self: center;
 }
 
 .mo-skill-chips--modal {
@@ -867,6 +916,10 @@ legend.mo-field-label:has(.mo-req) {
     gap: 10px;
 }
 
+#openJobPublishModalBtn.pill-btn {
+    color: #fff;
+}
+
 /* 发布岗位表单样式 */
 .mo-publish-form {
   display: grid;
@@ -919,6 +972,39 @@ legend.mo-field-label:has(.mo-req) {
 
 .mo-field-input::placeholder {
   color: var(--muted);
+}
+
+/* 暗色主题：datetime-local 右侧日历按钮 — Edge 等对 filter 常无效，用浅色 SVG 铺满指示区，避免依赖原生位图 */
+[data-theme="dark"] .mo-job-publish-modal input[type="datetime-local"],
+[data-theme="dark"] .job-detail-modal input[type="datetime-local"],
+html:not([data-theme="light"]) .mo-job-publish-modal input[type="datetime-local"],
+html:not([data-theme="light"]) .job-detail-modal input[type="datetime-local"] {
+  forced-color-adjust: none;
+  accent-color: #94a3b8;
+}
+
+[data-theme="dark"] #applicationDeadlineInput::-webkit-calendar-picker-indicator,
+[data-theme="dark"] #editApplicationDeadlineInput::-webkit-calendar-picker-indicator,
+[data-theme="dark"] .mo-job-publish-modal input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+[data-theme="dark"] .job-detail-modal input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+html:not([data-theme="light"]) #applicationDeadlineInput::-webkit-calendar-picker-indicator,
+html:not([data-theme="light"]) #editApplicationDeadlineInput::-webkit-calendar-picker-indicator,
+html:not([data-theme="light"]) .mo-job-publish-modal input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+html:not([data-theme="light"]) .job-detail-modal input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  width: 1.25rem;
+  min-width: 1.25rem;
+  height: 1.25rem;
+  margin-inline-start: 2px;
+  opacity: 1;
+  /* 不依赖 filter，避免 Edge 忽略 */
+  background: center / contain no-repeat
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23e2e8f0'%3E%3Cpath d='M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z'/%3E%3C/svg%3E");
+}
+
+[data-theme="light"] .mo-job-publish-modal input[type="datetime-local"],
+[data-theme="light"] .job-detail-modal input[type="datetime-local"] {
+  color-scheme: light;
 }
 
 .mo-semester-combined {

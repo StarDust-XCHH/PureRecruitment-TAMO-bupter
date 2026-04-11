@@ -26,6 +26,51 @@
             filteredJobs: []
         };
 
+        /** 申请截止：与 datetime-local 一致，按本机本地墙钟解析，提交为 UTC ISO */
+        function padDeadline2(n) {
+            return n < 10 ? '0' + n : String(n);
+        }
+
+        function parseDatetimeLocalToUtcIso(value) {
+            const s = value != null ? String(value).trim() : '';
+            if (!s) return null;
+            const m = s.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})(?::(\d{2}))?$/);
+            if (!m) return null;
+            const y = parseInt(m[1], 10);
+            const mo = parseInt(m[2], 10);
+            const d = parseInt(m[3], 10);
+            const h = parseInt(m[4], 10);
+            const mi = parseInt(m[5], 10);
+            const sec = m[6] != null ? parseInt(m[6], 10) : 0;
+            const dt = new Date(y, mo - 1, d, h, mi, sec, 0);
+            if (Number.isNaN(dt.getTime())) return null;
+            return dt.toISOString();
+        }
+
+        function readLocalApplicationDeadline(inputEl) {
+            if (!inputEl) return { ok: true, iso: null };
+            const raw = inputEl.value != null ? String(inputEl.value).trim() : '';
+            if (!raw) return { ok: true, iso: null };
+            const iso = parseDatetimeLocalToUtcIso(raw);
+            if (!iso) return { ok: false, msg: '申请截止时间无效，请检查日期与时间' };
+            return { ok: true, iso: iso };
+        }
+
+        function applyIsoToDatetimeLocalInput(iso, inputEl) {
+            if (!inputEl) return;
+            if (!iso) {
+                inputEl.value = '';
+                return;
+            }
+            const dt = new Date(iso);
+            if (Number.isNaN(dt.getTime())) {
+                inputEl.value = '';
+                return;
+            }
+            inputEl.value = dt.getFullYear() + '-' + padDeadline2(dt.getMonth() + 1) + '-' + padDeadline2(dt.getDate())
+                + 'T' + padDeadline2(dt.getHours()) + ':' + padDeadline2(dt.getMinutes());
+        }
+
         var skillTagList = FALLBACK_SKILL_TAGS.slice();
         var publishAssessments = [];
         var publishCustomSkills = [];
@@ -115,8 +160,8 @@
         }
 
         /**
-         * 填充年份下拉：范围为锚点年前 1 年～后 3 年（共 5 个）；默认选中 preferredYear，缺省为当年。
-         * 若 preferredYear 不在上述范围内（如编辑旧数据），则追加该年并排序。
+         * 填充年份下拉：锚点年前 1 年～后 3 年；无有效 preferredYear 时默认选中当年。
+         * preferredYear 为有效数字时选中该年（若不在范围内则追加该年并排序）。
          */
         function populateSemesterYearSelect(selectEl, preferredYear) {
             if (!selectEl) return;
@@ -125,12 +170,16 @@
             for (let i = anchor - 1; i <= anchor + 3; i += 1) {
                 years.push(i);
             }
-            let pref = preferredYear != null && preferredYear !== ''
-                ? Number(preferredYear)
-                : anchor;
-            if (Number.isFinite(pref) && years.indexOf(pref) === -1) {
-                years.push(pref);
-                years.sort(function (a, b) { return a - b; });
+            let pref = null;
+            if (preferredYear != null && preferredYear !== '') {
+                const n = Number(preferredYear);
+                if (Number.isFinite(n)) {
+                    pref = n;
+                    if (years.indexOf(pref) === -1) {
+                        years.push(pref);
+                        years.sort(function (a, b) { return a - b; });
+                    }
+                }
             }
             selectEl.innerHTML = '';
             years.forEach(function (y) {
@@ -139,7 +188,7 @@
                 opt.textContent = String(y);
                 selectEl.appendChild(opt);
             });
-            const pick = Number.isFinite(pref) && years.indexOf(pref) >= 0 ? pref : anchor;
+            const pick = pref != null && years.indexOf(pref) >= 0 ? pref : anchor;
             selectEl.value = String(pick);
         }
 
@@ -147,7 +196,7 @@
             const s = String(semesterStr || '').trim();
             const m = s.match(/^(\d{4})-(Spring|Fall)$/i);
             if (!m) {
-                populateSemesterYearSelect(yearEl, getDefaultSemesterYearAnchor());
+                populateSemesterYearSelect(yearEl, null);
                 if (termEl) termEl.value = '';
                 return;
             }
@@ -326,14 +375,6 @@
                 console.warn('[MO-JOBS] load skill tags failed', err);
                 skillTagList = FALLBACK_SKILL_TAGS.slice();
             }
-        }
-
-        function isoToDatetimeLocal(iso) {
-            if (!iso) return '';
-            const d = new Date(iso);
-            if (Number.isNaN(d.getTime())) return '';
-            const pad = function (n) { return String(n).padStart(2, '0'); };
-            return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) + 'T' + pad(d.getHours()) + ':' + pad(d.getMinutes());
         }
 
         function weekText(teachingWeeks) {
@@ -606,6 +647,8 @@
                 document.getElementById('semesterYearInput'),
                 document.getElementById('semesterTermInput')
             );
+            const pubDlEl = document.getElementById('applicationDeadlineInput');
+            if (pubDlEl) pubDlEl.value = '';
         }
 
         function openTeachingWeeksPicker(target) {
@@ -1013,7 +1056,6 @@
             const studentCountRaw = document.getElementById('studentCountInput').value.trim();
             const taRecruitCountRaw = document.getElementById('taRecruitCountInput').value.trim();
             const campusRaw = document.getElementById('campusInput').value.trim();
-            const applicationDeadlineRaw = document.getElementById('applicationDeadlineInput').value.trim();
             const recruitmentBriefRaw = document.getElementById('recruitmentBriefInput').value.trim();
             const sessionMoId = getMoIdForApi();
             if (!sessionMoId) {
@@ -1022,9 +1064,13 @@
             }
 
             const taNum = taRecruitCountRaw === '' ? NaN : Number(taRecruitCountRaw);
-            if (!courseNameInput || !courseCodeInput || !semesterInput || !recruitmentStatusInput || !courseDescInput
+            if (!courseNameInput || !courseCodeInput || !recruitmentStatusInput || !courseDescInput
                 || fixedSkills.length === 0 || !campusRaw || Number.isNaN(taNum) || taNum < 1) {
-                publishStatus.textContent = '请填写必填项：课程名、课程编号、学期、招聘状态、校区（请选择 Main/Shahe）、TA 招聘人数（≥1）、至少一项技能标签、岗位短描述';
+                publishStatus.textContent = '请填写必填项：课程名、课程编号、招聘状态、校区（请选择 Main/Shahe）、TA 招聘人数（≥1）、至少一项技能标签、岗位短描述';
+                return;
+            }
+            if (!semesterInput) {
+                publishStatus.textContent = '请选择学期类型：Spring 或 Fall（不可为「（请选择学期）」）';
                 return;
             }
 
@@ -1053,7 +1099,12 @@
             };
             if (teachingWeeks.weeks.length) body.teachingWeeks = teachingWeeks;
             body.studentCount = studentCountRaw === '' ? -1 : (Number(studentCountRaw) || 0);
-            if (applicationDeadlineRaw) body.applicationDeadline = new Date(applicationDeadlineRaw).toISOString();
+            const pubDl = readLocalApplicationDeadline(document.getElementById('applicationDeadlineInput'));
+            if (!pubDl.ok) {
+                publishStatus.textContent = pubDl.msg;
+                return;
+            }
+            if (pubDl.iso) body.applicationDeadline = pubDl.iso;
             if (recruitmentBriefRaw) body.recruitmentBrief = recruitmentBriefRaw;
 
             publishStatus.textContent = '发布中...';
@@ -1100,7 +1151,7 @@
             setVal('editTaRecruitCountInput', item.taRecruitCount != null && item.taRecruitCount >= 1 ? item.taRecruitCount : '');
             const campusEl = document.getElementById('editCampusInput');
             if (campusEl) campusEl.value = item.campus || '';
-            setVal('editApplicationDeadlineInput', isoToDatetimeLocal(item.applicationDeadline));
+            applyIsoToDatetimeLocalInput(item.applicationDeadline, document.getElementById('editApplicationDeadlineInput'));
             const weeks = item.teachingWeeks && Array.isArray(item.teachingWeeks.weeks) ? item.teachingWeeks.weeks : [];
             editTeachingWeeks = weeks.map(Number).filter(function (n) { return n >= 1 && n <= 20; })
                 .sort(function (a, b) { return a - b; });
@@ -1160,13 +1211,16 @@
             const studentCountRaw = document.getElementById('editStudentCountInput').value.trim();
             const taRecruitCountRaw = document.getElementById('editTaRecruitCountInput').value.trim();
             const campusRaw = document.getElementById('editCampusInput').value.trim();
-            const applicationDeadlineRaw = document.getElementById('editApplicationDeadlineInput').value.trim();
             const recruitmentBriefRaw = document.getElementById('editRecruitmentBriefInput').value.trim();
             const taNum = taRecruitCountRaw === '' ? NaN : Number(taRecruitCountRaw);
 
-            if (!courseNameVal || !semesterVal || !recruitmentStatusVal || !courseDescVal || fixedSkills.length === 0
+            if (!courseNameVal || !recruitmentStatusVal || !courseDescVal || fixedSkills.length === 0
                 || !campusRaw || Number.isNaN(taNum) || taNum < 1) {
-                if (courseEditStatus) courseEditStatus.textContent = '请填写课程名、学期、招聘状态、校区、TA 招聘人数（≥1）、至少一项技能标签、岗位描述';
+                if (courseEditStatus) courseEditStatus.textContent = '请填写课程名、招聘状态、校区、TA 招聘人数（≥1）、至少一项技能标签、岗位描述';
+                return;
+            }
+            if (!semesterVal) {
+                if (courseEditStatus) courseEditStatus.textContent = '请选择学期类型：Spring 或 Fall（不可为「（请选择学期）」）';
                 return;
             }
 
@@ -1195,9 +1249,12 @@
             };
             body.teachingWeeks = teachingWeeks;
             body.studentCount = studentCountRaw === '' ? -1 : (Number(studentCountRaw) || 0);
-            body.applicationDeadline = applicationDeadlineRaw
-                ? new Date(applicationDeadlineRaw).toISOString()
-                : '';
+            const editDl = readLocalApplicationDeadline(document.getElementById('editApplicationDeadlineInput'));
+            if (!editDl.ok) {
+                if (courseEditStatus) courseEditStatus.textContent = editDl.msg;
+                return;
+            }
+            body.applicationDeadline = editDl.iso || '';
             if (recruitmentBriefRaw) body.recruitmentBrief = recruitmentBriefRaw;
 
             if (courseEditStatus) courseEditStatus.textContent = '保存中...';
@@ -1246,6 +1303,13 @@
             openJobPublishModalBtn.addEventListener('click', function () {
                 app.openModal('job-publish');
                 if (publishStatus) publishStatus.textContent = '';
+                applySemesterToPickers(
+                    '',
+                    document.getElementById('semesterYearInput'),
+                    document.getElementById('semesterTermInput')
+                );
+                const oDl = document.getElementById('applicationDeadlineInput');
+                if (oDl) oDl.value = '';
                 requestAnimationFrame(function () {
                     if (typeof app.syncPublishJobNav === 'function') app.syncPublishJobNav();
                     const first = document.getElementById('courseNameInput');
@@ -1267,8 +1331,8 @@
         bindPublishNav();
         initWeekButtons();
 
-        populateSemesterYearSelect(document.getElementById('semesterYearInput'));
-        populateSemesterYearSelect(document.getElementById('editSemesterYearInput'));
+        populateSemesterYearSelect(document.getElementById('semesterYearInput'), null);
+        populateSemesterYearSelect(document.getElementById('editSemesterYearInput'), null);
 
         loadSkillTagsFromApi().then(function () {
             updatePublishTeachingWeeksSummary();
