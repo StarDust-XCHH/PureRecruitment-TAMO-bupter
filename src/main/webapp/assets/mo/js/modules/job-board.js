@@ -285,28 +285,41 @@
                 : '未选择授课周次。';
         }
 
+        function syncFixedSkillsPrimaryButtonLabels() {
+            const pubBtn = document.getElementById('openPublishFixedSkillsBtn');
+            const edBtn = document.getElementById('openEditFixedSkillsBtn');
+            const pubHas = publishFixedTags.size > 0 || publishCustomSkills.length > 0;
+            const edHas = editFixedTags.size > 0 || editCustomSkills.length > 0;
+            if (pubBtn) pubBtn.textContent = pubHas ? '修改技能标签' : '＋ 添加技能标签';
+            if (edBtn) edBtn.textContent = edHas ? '修改技能标签' : '＋ 添加技能标签';
+        }
+
         function updatePublishFixedSkillsSummary() {
-            if (!publishFixedSkillsSummary) return;
             const arr = getFixedTagsArrayFromSet(publishFixedTags);
             const customN = publishCustomSkills.length;
             const parts = [];
             if (arr.length) parts.push('已选标签 ' + arr.length + ' 项：' + arr.join('、'));
             if (customN) parts.push('其他技能 ' + customN + ' 项（详见下方列表）');
-            publishFixedSkillsSummary.textContent = parts.length
-                ? parts.join('；')
-                : '请点击「选择技能标签」，至少选择一项技能（可用 Other 补充）。';
+            if (publishFixedSkillsSummary) {
+                publishFixedSkillsSummary.textContent = parts.length
+                    ? parts.join('；')
+                    : '尚未选择技能，可点击上方「＋ 添加技能标签」按钮。';
+            }
+            syncFixedSkillsPrimaryButtonLabels();
         }
 
         function updateEditFixedSkillsSummary() {
-            if (!editFixedSkillsSummary) return;
             const arr = getFixedTagsArrayFromSet(editFixedTags);
             const customN = editCustomSkills.length;
             const parts = [];
             if (arr.length) parts.push('已选标签 ' + arr.length + ' 项：' + arr.join('、'));
             if (customN) parts.push('其他技能 ' + customN + ' 项（详见下方列表）');
-            editFixedSkillsSummary.textContent = parts.length
-                ? parts.join('；')
-                : '尚未选择所需技能。';
+            if (editFixedSkillsSummary) {
+                editFixedSkillsSummary.textContent = parts.length
+                    ? parts.join('；')
+                    : '尚未选择所需技能，可点击上方「＋ 添加技能标签」按钮。';
+            }
+            syncFixedSkillsPrimaryButtonLabels();
         }
 
         function renderFixedSkillsPickerFlow() {
@@ -498,20 +511,6 @@
             if (nameEl) nameEl.focus();
         }
 
-        function openCustomSkillModal(target) {
-            compositeTarget = target || 'publish';
-            addingOtherForFixedPicker = false;
-            if (customSkillModal) customSkillModal.classList.remove('mo-publish-modal--stack-top');
-            const titleEl = document.getElementById('moCompositeCustomSkillTitle');
-            if (titleEl) titleEl.textContent = '添加自定义技能';
-            const nameEl = document.getElementById('moCustomSkillNameInput');
-            const descEl = document.getElementById('moCustomSkillDescInput');
-            if (nameEl) nameEl.value = '';
-            if (descEl) descEl.value = '';
-            openModal(customSkillModal);
-            if (nameEl) nameEl.focus();
-        }
-
         function openOtherSkillSubModal() {
             addingOtherForFixedPicker = true;
             const nameEl = document.getElementById('moCustomSkillNameInput');
@@ -602,13 +601,9 @@
             if (aBtn) aBtn.addEventListener('click', confirmAssessmentModal);
             if (cBtn) cBtn.addEventListener('click', confirmCustomSkillModal);
             const pubA = document.getElementById('openPublishAssessmentModalBtn');
-            const pubC = document.getElementById('openPublishCustomSkillModalBtn');
             const edA = document.getElementById('openEditAssessmentModalBtn');
-            const edC = document.getElementById('openEditCustomSkillModalBtn');
             if (pubA) pubA.addEventListener('click', function () { openAssessmentModal('publish'); });
-            if (pubC) pubC.addEventListener('click', function () { openCustomSkillModal('publish'); });
             if (edA) edA.addEventListener('click', function () { openAssessmentModal('edit'); });
-            if (edC) edC.addEventListener('click', function () { openCustomSkillModal('edit'); });
         }
 
         function getRecruitmentStatusPublish() {
@@ -736,6 +731,23 @@
             });
             if (pubF) pubF.addEventListener('click', function () { openFixedSkillsPicker('publish'); });
             if (edF) edF.addEventListener('click', function () { openFixedSkillsPicker('edit'); });
+
+            const clrPubSkills = document.getElementById('clearPublishFixedSkillsBtn');
+            const clrEditSkills = document.getElementById('clearEditFixedSkillsBtn');
+            if (clrPubSkills) clrPubSkills.addEventListener('click', function () {
+                if (!window.confirm('确定清除所有已选技能标签及其他补充吗？')) return;
+                publishFixedTags.clear();
+                publishCustomSkills = [];
+                updatePublishFixedSkillsSummary();
+                renderCompositeList(publishCustomSkillList, publishCustomSkills, publishCustomSkillEmpty, 'custom', 'publish');
+            });
+            if (clrEditSkills) clrEditSkills.addEventListener('click', function () {
+                if (!window.confirm('确定清除所有已选技能标签及其他补充吗？')) return;
+                editFixedTags.clear();
+                editCustomSkills = [];
+                updateEditFixedSkillsSummary();
+                renderCompositeList(editCustomSkillList, editCustomSkills, editCustomSkillEmpty, 'custom', 'edit');
+            });
 
             document.querySelectorAll('#moTeachingWeeksModal [data-week-preset]').forEach(function (btn) {
                 btn.addEventListener('click', function () {
