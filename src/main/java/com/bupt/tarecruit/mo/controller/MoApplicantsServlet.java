@@ -21,17 +21,18 @@ public class MoApplicantsServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String courseCode = req.getParameter("courseCode");
         String moId = req.getParameter("moId") == null ? "" : req.getParameter("moId").trim();
-        if (courseCode == null || courseCode.trim().isBlank()) {
-            writeJson(resp, 400, gson.toJsonTree(ApiResponse.failure("缺少 courseCode 参数")).getAsJsonObject());
-            return;
-        }
         if (moId.isBlank()) {
             writeJson(resp, 400, gson.toJsonTree(ApiResponse.failure("缺少 moId 参数")).getAsJsonObject());
             return;
         }
 
         try {
-            JsonObject payload = recruitmentDao.getApplicantsForCourse(courseCode.trim(), moId);
+            JsonObject payload;
+            if (courseCode == null || courseCode.trim().isBlank()) {
+                payload = recruitmentDao.getApplicantsForAllMoCourses(moId);
+            } else {
+                payload = recruitmentDao.getApplicantsForCourse(courseCode.trim(), moId);
+            }
             writeJson(resp, 200, payload);
         } catch (IllegalArgumentException ex) {
             writeJson(resp, 403, gson.toJsonTree(ApiResponse.failure(ex.getMessage())).getAsJsonObject());

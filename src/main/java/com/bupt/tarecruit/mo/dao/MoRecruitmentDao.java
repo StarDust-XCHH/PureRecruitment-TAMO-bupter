@@ -411,6 +411,48 @@ public class MoRecruitmentDao {
         return payload;
     }
 
+    /**
+     * 当前 MO 名下全部岗位下的申请人列表（合并多门课程），用于「不筛选课程」视图。
+     */
+    public synchronized JsonObject getApplicantsForAllMoCourses(String moId) throws IOException {
+        String normalizedMoId = new MoAccountDao().resolveCanonicalMoId(moId);
+        if (normalizedMoId.isBlank()) {
+            throw new IllegalArgumentException("缺少 moId");
+        }
+        JsonObject board = getJobBoardForMo(moId);
+        JsonArray jobs = board.getAsJsonArray("items");
+        JsonArray mergedRows = new JsonArray();
+        int unreadTotal = 0;
+        if (jobs != null) {
+            for (JsonElement e : jobs) {
+                if (e == null || !e.isJsonObject()) {
+                    continue;
+                }
+                String cc = trim(getAsString(e.getAsJsonObject(), "courseCode"));
+                if (cc.isBlank()) {
+                    continue;
+                }
+                JsonObject part = getApplicantsForCourse(cc, normalizedMoId);
+                JsonArray rows = part.getAsJsonArray("items");
+                if (rows != null) {
+                    for (JsonElement row : rows) {
+                        mergedRows.add(row.deepCopy());
+                    }
+                }
+                if (part.has("unreadCount") && part.get("unreadCount") != null && !part.get("unreadCount").isJsonNull()) {
+                    unreadTotal += part.get("unreadCount").getAsInt();
+                }
+            }
+        }
+        JsonObject payload = new JsonObject();
+        payload.addProperty("success", true);
+        payload.addProperty("courseCode", "");
+        payload.addProperty("count", mergedRows.size());
+        payload.addProperty("unreadCount", unreadTotal);
+        payload.add("items", mergedRows);
+        return payload;
+    }
+
     private void assertMoOwnsCourseResolved(String resolvedMoId, String courseCode) throws IOException {
         JsonObject job = RecruitmentCoursesDao.findNormalizedJobByCourseCode(trim(courseCode));
         if (job == null) {
