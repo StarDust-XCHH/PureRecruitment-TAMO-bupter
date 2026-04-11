@@ -142,25 +142,7 @@
                     openDetail(item);
                 });
 
-                const acceptBtn = document.createElement('button');
-                acceptBtn.className = 'pill-btn';
-                acceptBtn.type = 'button';
-                acceptBtn.textContent = '录用';
-                acceptBtn.addEventListener('click', function () {
-                    decide(item, 'selected');
-                });
-
-                const rejectBtn = document.createElement('button');
-                rejectBtn.className = 'pill-btn ghost';
-                rejectBtn.type = 'button';
-                rejectBtn.textContent = '拒绝';
-                rejectBtn.addEventListener('click', function () {
-                    decide(item, 'rejected');
-                });
-
                 actions.appendChild(viewBtn);
-                actions.appendChild(acceptBtn);
-                actions.appendChild(rejectBtn);
                 card.appendChild(actions);
                 list.appendChild(card);
             });
@@ -231,16 +213,26 @@
                     '<dt>电话</dt><dd>' + escapeHtml(ts.phone || '') + '</dd>' +
                     '<dt>简介</dt><dd>' + escapeHtml(ts.bio || '') + '</dd>' +
                     '</dl>' +
+                    '<div class="mo-detail-block mo-detail-block--resume">' +
                     '<div class="mo-detail-section-title">简历</div>' +
-                    '<p><a class="pill-btn" href="' + resumeUrl + '" target="_blank" rel="noopener">打开简历（' + escapeHtml(resume.originalFileName || '文件') + '）</a></p>' +
+                    '<div class="mo-detail-resume-row"><a class="pill-btn" href="' + resumeUrl + '" target="_blank" rel="noopener">查看简历</a></div>' +
+                    '</div>' +
+                    '<div class="mo-applicant-actions mo-applicant-detail-actions mo-applicant-detail-actions--after-resume">' +
+                    '<button type="button" class="pill-btn" id="moApplicantAcceptBtn">录用</button>' +
+                    '<button type="button" class="pill-btn ghost" id="moApplicantRejectBtn">拒绝</button>' +
+                    '</div>' +
+                    '<section class="mo-detail-plate" aria-label="流程事件">' +
                     '<div class="mo-detail-section-title">流程事件</div>' +
                     '<div class="mo-comment-list">' + (eventsHtml || '<span class="muted">暂无</span>') + '</div>' +
+                    '</section>' +
+                    '<section class="mo-detail-plate" aria-label="MO 评论">' +
                     '<div class="mo-detail-section-title">MO 评论</div>' +
                     '<div class="mo-comment-list" id="moCommentList">' + (commentsHtml || '<span class="muted">暂无</span>') + '</div>' +
                     '<div class="mo-form-grid">' +
                     '<label class="full">添加评论<textarea id="moNewCommentText" rows="2" placeholder="输入评论"></textarea></label>' +
                     '</div>' +
-                    '<button type="button" class="pill-btn" id="moSubmitCommentBtn">提交评论</button>';
+                    '<button type="button" class="pill-btn" id="moSubmitCommentBtn">提交评论</button>' +
+                    '</section>';
 
                 const submitBtn = document.getElementById('moSubmitCommentBtn');
                 const textarea = document.getElementById('moNewCommentText');
@@ -268,6 +260,19 @@
                         } catch (err) {
                             window.alert(err.message || '评论失败');
                         }
+                    });
+                }
+
+                const acceptDetailBtn = document.getElementById('moApplicantAcceptBtn');
+                const rejectDetailBtn = document.getElementById('moApplicantRejectBtn');
+                if (acceptDetailBtn) {
+                    acceptDetailBtn.addEventListener('click', function () {
+                        decide(item, 'selected');
+                    });
+                }
+                if (rejectDetailBtn) {
+                    rejectDetailBtn.addEventListener('click', function () {
+                        decide(item, 'rejected');
                     });
                 }
                 }

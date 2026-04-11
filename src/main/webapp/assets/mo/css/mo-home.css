@@ -776,6 +776,74 @@ legend.mo-field-label:has(.mo-req) {
     gap: 8px;
 }
 
+.mo-applicant-detail-actions {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: none;
+}
+
+.mo-applicant-detail-actions--after-resume {
+    margin-top: 0;
+    padding-top: 0;
+}
+
+.mo-detail-resume-row {
+    margin: 0;
+}
+
+/* 与 .mo-detail-kv 同列宽：标签列 + 值列，「查看简历」与上方各 dd 左对齐 */
+#moApplicantDetailBody .mo-detail-block--resume {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    column-gap: 10px;
+    align-items: center;
+}
+
+.mo-detail-block--resume .mo-detail-section-title {
+    margin: 0;
+}
+
+.mo-detail-block--resume .mo-detail-resume-row {
+    margin: 0;
+    justify-self: start;
+}
+
+#moApplicantDetailBody .mo-detail-plate {
+    margin-top: 0;
+}
+
+.mo-detail-plate {
+    margin-top: 16px;
+    padding: 14px 14px 16px;
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="light"] .mo-detail-plate {
+    background: rgba(0, 0, 0, 0.03);
+}
+
+.mo-detail-plate .mo-detail-section-title {
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+.mo-detail-plate .mo-comment-list {
+    border: none;
+    padding: 0;
+    max-height: 200px;
+    background: transparent;
+}
+
+.mo-detail-plate .mo-form-grid {
+    margin-top: 12px;
+}
+
+.mo-detail-plate #moSubmitCommentBtn {
+    margin-top: 8px;
+}
+
 .mo-status-ok {
     color: #22c55e;
 }
@@ -866,6 +934,119 @@ legend.mo-field-label:has(.mo-req) {
     line-height: 1.5;
     display: grid;
     gap: 12px;
+}
+
+/* 申请人详情：板块之间浅灰横线 + 更宽松的纵向节奏 */
+#moApplicantDetailBody {
+    gap: 0;
+    line-height: 1.6;
+    padding-bottom: 8px;
+}
+
+#moApplicantDetailBody > * + * {
+    margin-top: 20px;
+    border-top: 1px solid rgba(150, 150, 160, 0.35);
+    padding-top: 20px;
+}
+
+[data-theme="light"] #moApplicantDetailBody > * + * {
+    border-top-color: rgba(0, 0, 0, 0.12);
+}
+
+#moApplicantDetailBody .mo-detail-kv {
+    gap: 10px 10px;
+    row-gap: 12px;
+}
+
+#moApplicantDetailBody .mo-applicant-actions {
+    gap: 14px;
+    padding: 4px 0 6px;
+}
+
+/* 录用 / 拒绝：拒绝描边；二者悬停反馈 */
+#moApplicantDetailBody .mo-applicant-detail-actions--after-resume .pill-btn {
+    transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        color 0.18s ease,
+        box-shadow 0.18s ease,
+        filter 0.18s ease,
+        transform 0.15s ease;
+}
+
+#moApplicantDetailBody #moApplicantAcceptBtn.pill-btn:hover,
+#moApplicantDetailBody #moApplicantAcceptBtn.pill-btn:focus-visible {
+    filter: brightness(1.07) saturate(1.05);
+    box-shadow: 0 6px 20px rgba(139, 92, 246, 0.45);
+    transform: translateY(-1px);
+}
+
+#moApplicantDetailBody #moApplicantAcceptBtn.pill-btn:active {
+    transform: translateY(0);
+    filter: brightness(0.95);
+    box-shadow: 0 2px 10px rgba(139, 92, 246, 0.28);
+}
+
+#moApplicantDetailBody #moApplicantRejectBtn.pill-btn {
+    border: 1px solid rgba(255, 255, 255, 0.32);
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--text);
+}
+
+#moApplicantDetailBody #moApplicantRejectBtn.pill-btn:hover,
+#moApplicantDetailBody #moApplicantRejectBtn.pill-btn:focus-visible {
+    border-color: rgba(252, 165, 165, 0.8);
+    background: rgba(248, 113, 113, 0.16);
+    box-shadow: 0 4px 16px rgba(248, 113, 113, 0.22);
+    transform: translateY(-1px);
+}
+
+#moApplicantDetailBody #moApplicantRejectBtn.pill-btn:active {
+    transform: translateY(0);
+    background: rgba(248, 113, 113, 0.22);
+}
+
+[data-theme="light"] #moApplicantDetailBody #moApplicantRejectBtn.pill-btn {
+    border-color: rgba(0, 0, 0, 0.22);
+    background: rgba(255, 255, 255, 0.92);
+}
+
+[data-theme="light"] #moApplicantDetailBody #moApplicantRejectBtn.pill-btn:hover,
+[data-theme="light"] #moApplicantDetailBody #moApplicantRejectBtn.pill-btn:focus-visible {
+    border-color: rgba(220, 38, 38, 0.42);
+    background: rgba(254, 226, 226, 0.95);
+    box-shadow: 0 4px 14px rgba(220, 38, 38, 0.16);
+}
+
+[data-theme="light"] #moApplicantDetailBody #moApplicantAcceptBtn.pill-btn:hover,
+[data-theme="light"] #moApplicantDetailBody #moApplicantAcceptBtn.pill-btn:focus-visible {
+    box-shadow: 0 6px 22px rgba(109, 40, 217, 0.32);
+}
+
+#moApplicantDetailBody .mo-detail-plate {
+    padding: 18px 18px 22px;
+}
+
+#moApplicantDetailBody .mo-detail-plate .mo-detail-section-title {
+    margin-bottom: 14px;
+}
+
+#moApplicantDetailBody .mo-detail-plate .mo-comment-list {
+    padding: 12px 12px 14px;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] #moApplicantDetailBody .mo-detail-plate .mo-comment-list {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+#moApplicantDetailBody .mo-detail-plate .mo-form-grid {
+    margin-top: 18px;
+}
+
+#moApplicantDetailBody .mo-detail-plate #moSubmitCommentBtn {
+    margin-top: 14px;
 }
 
 .mo-detail-kv {
