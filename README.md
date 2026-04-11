@@ -1,8 +1,5 @@
 # PureRecruitment-TAMO-bupter
 
-
-[![Version](https://img.shields.io/badge/version-v1.0.0_(Pre--release)-orange.svg)](https://github.com/StarDust-XCHH/PureRecruitment-TAMO-bupter/releases/tag/v1.0.0)
-
 # Group-16 Members 成员
 |Github UserName|Chinese Name|Name in English|BUPT ID|QM ID|Email|
 |---|---|---|---|---|---|
@@ -53,84 +50,4 @@
 - TA+LogOn=story+prototype<——StarDust——>`projectFile/StarDustXCHH/imgStage1Prototype`
 
 
-# 软件发布相关
-
-
-太棒了！选择“猫头鹰与鸟类”作为主题不仅极具学术气息（完美契合高校教务与助教招募的背景），而且自然界中鸟类种类繁多，足够支撑你走完 A 到 Z 的漫长版本迭代。
-
-为了符合 ROS 2 **“形容词 (Adjective) + 动物名 (Noun)”** 的极客命名法，并结合 **语义化版本控制 (SemVer)**，我为你制定了这套完整的 A-Z 命名蓝图与发布规范。
-
----
-
-### 一、 版本生命周期示例（如何区分测试版与正式版）
-
-在 ROS 2 和标准开源项目中，**代号是不变的，状态是通过版本号后缀来区分的**。我们以首发版本 **A** 为例（代号：Astute Athene 敏锐的小鸮）：
-
-* **内部测试版 (Alpha):** 核心功能刚跑通，给开发组成员自己联调。
-   * 🏷️ 发布名称：`Astute Athene - v1.0.0-alpha.1`
-* **公开测试版 (Beta):** 准备好让少数外部用户（如部分 TA 或 MO）试用，收集 Bug。
-   * 🏷️ 发布名称：`Astute Athene - v1.0.0-beta.1`
-* **候选发布版 (RC):** 代码冻结，如果没有发现致命 Bug，这就是正式版。
-   * 🏷️ 发布名称：`Astute Athene - v1.0.0-rc.1`
-* **正式发布版 (GA):** 稳定版本，面向全员公开。
-   * 🏷️ 发布名称：`Astute Athene - v1.0.0`
-
----
-
-### 二、 从 A 到 Z 的完整命名蓝图 (The Aviary Roadmap)
-
-在这个列表中，我以**猫头鹰（鸮类）**和**猛禽/智慧鸟类**为主，挑选了寓意好、适合形容软件系统的形容词。
-
-#### **【奠基阶段：A - E】**
-* **A版本 (v1.0.0): Astute Athene** (敏锐的小鸮)
-   * *寓意：像智慧女神雅典娜的爱鸟一样，敏锐地启动整个招募系统。*
-* **B版本 (v2.0.0): Brilliant Bubo** (卓越的雕鸮)
-   * *寓意：雕鸮体型庞大，代表系统承载能力和架构的卓越升级。*
-* **C版本 (v3.0.0): Candid Corvus** (坦诚的渡鸦)
-   * *寓意：渡鸦智商极高，代表系统 AI 助手逻辑变得更加聪明和透明。*
-* **D版本 (v4.0.0): Dashing Diomedea** (潇洒的信天翁)
-   * *寓意：信天翁善于长途飞行，代表项目进入长期支持（LTS）或性能飞跃。*
-* **E版本 (v5.0.0): Eloquent Eagle** (雄辩的雄鹰)
-   * *寓意：系统交互与 AI 表达能力达到炉火纯青的阶段。*
-
-#### **【进阶阶段：F - J】**
-* **F版本 (v6.0.0): Fearless Falcon** (无畏的猎鹰)
-   * *寓意：猎鹰俯冲速度极快，代表系统响应速度和检索能力的突破。*
-* **G版本 (v7.0.0): Graceful Glaucidium** (优雅的鸺鹠 / 一种微型猫头鹰)
-   * *寓意：UI/UX 迎来重大重构，界面变得极其优雅且轻量化。*
-* **H版本 (v8.0.0): Hardy Hawk** (坚韧的苍鹰)
-   * *寓意：系统稳定性极强，能够抵御高并发和复杂错误。*
-* **I版本 (v9.0.0): Insightful Ibis** (洞察的朱鹮)
-   * *寓意：加入深度数据分析功能，能够洞察招募数据的潜在规律。*
-* **J版本 (v10.0.0): Jubilant Jay** (喜悦的松鸦)
-   * *寓意：第十个大版本的里程碑，一个充满成就感和活力的版本。*
-
-#### **【成熟阶段：K - O】**
-* **K版本 (v11.0.0): Keen Kestrel** (敏锐的红隼)
-* **L版本 (v12.0.0): Lucid Lark** (明晰的云雀)
-* **M版本 (v13.0.0): Mighty Megascops** (强大的鸣角鸮)
-* **N版本 (v14.0.0): Noble Nyctea** (高贵的雪鸮) —— *（极其漂亮的猛禽，适合作为重要的 LTS 版本）*
-* **O版本 (v15.0.0): Outstanding Osprey** (杰出的鱼鹰)
-
-#### **【扩展阶段：P - T】**
-* **P版本 (v16.0.0): Proud Ptilopsis** (骄傲的白脸鸮)
-* **Q版本 (v17.0.0): Quick Quetzal** (敏捷的绿咬鹃) —— *（中美洲神鸟，适合引入全新前端框架的版本）*
-* **R版本 (v18.0.0): Resilient Raven** (充满韧性的渡鸦)
-* **S版本 (v19.0.0): Swift Strix** (迅捷的林鸮)
-* **T版本 (v20.0.0): Tenacious Tyto** (顽强的仓鸮 / 猴面鹰)
-
-#### **【终极图鉴：U - Z】**
-* **U版本 (v21.0.0): Unique Upupa** (独特的戴胜)
-* **V版本 (v22.0.0): Valiant Vulture** (英勇的秃鹫) —— *（擅长清理，适合作为深度优化、清理历史债务重构的版本）*
-* **W版本 (v23.0.0): Wise Woodpecker** (智慧的啄木鸟) —— *（精准捕捉代码 Bug 和系统漏洞）*
-* **X版本 (v24.0.0): Xenial Xema** (友好的叉尾鸥) —— *（Xenial 意为好客的，适合强化开放 API 与第三方集成的版本）*
-* **Y版本 (v25.0.0): Youthful Yuhina** (充满活力的凤鹛)
-* **Z版本 (v26.0.0): Zealous Zosterops** (热情的绣眼鸟) —— *（Z 字母的完美收官，一个热情洋溢的终极进化版）*
-
-### 💡 极客建议
-
-当你把你的项目打成 WAR 包时，可以在首页的 Footer（页脚）或者控制台启动日志里，悄悄打出一行字：
-> `System booting... Powered by PureRecruitment v1.0.0 (Astute Athene)`
-
-这会给每一个审阅你代码的老师或使用你系统的同学一种“这不只是个大作业，这是一个正规软件工程产品”的震撼感。第一步，准备好发布你的 **Astute Athene v1.0.0-beta.1** 了吗？
 
