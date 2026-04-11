@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/ta/css/ta-jobs.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/ta/css/ta-modal.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/mo/css/mo-home.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/ta/css/ta-settings.css">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/ta/css/ta-profile.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/ta/css/ta-onboarding.css">
 </head>
 <body>
@@ -25,7 +27,6 @@
             <%@ include file="routes/mo-route-dashboard.jspf" %>
             <%@ include file="routes/mo-route-jobs.jspf" %>
             <%@ include file="routes/mo-route-applicants.jspf" %>
-            <%@ include file="routes/mo-route-profile.jspf" %>
         </section>
     </main>
 </div>
