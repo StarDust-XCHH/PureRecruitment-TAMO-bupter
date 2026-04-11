@@ -2,14 +2,14 @@
     <div class="card mo-dashboard-card">
         <div class="overview-top mo-dashboard-overview-top">
             <div class="mo-dashboard-lead">
-                <h1>MO 招聘总览</h1>
-                <p class="muted">在此总览开放岗位、候选规模与录用进度；侧栏可进入课程管理与应聘筛选。</p>
+                <h1 data-i18n="dashboard.title" data-i18n-zh="MO 招聘总览" data-i18n-en="MO Recruitment Dashboard">MO 招聘总览</h1>
+                <p class="muted" data-i18n="dashboard.desc" data-i18n-zh="在此总览开放岗位、候选规模与录用进度；侧栏可进入课程管理与应聘筛选。" data-i18n-en="Review open modules, candidate volume, and hiring progress here. Use the sidebar to enter Module Management and Applicant Screening.">在此总览开放岗位、候选规模与录用进度；侧栏可进入课程管理与应聘筛选。</p>
             </div>
             <div class="mo-dashboard-meta">
                 <div class="overview-badges mo-jobs-toolbar">
-                    <button id="refreshDashboardBtn" class="refresh-btn pill" type="button">
+                    <button id="refreshDashboardBtn" class="refresh-btn pill" type="button" data-i18n-aria-label="dashboard.refreshAria" data-i18n-aria-label-zh="刷新列表" data-i18n-aria-label-en="Refresh">
                         <span class="refresh-icon">↻</span>
-                        <span class="refresh-text">刷新列表</span>
+                        <span class="refresh-text" data-i18n="dashboard.refresh" data-i18n-zh="刷新列表" data-i18n-en="Refresh">刷新列表</span>
                     </button>
                 </div>
             </div>
@@ -22,8 +22,8 @@
                 <div class="insight-card-header">
                     <span class="insight-icon">📌</span>
                     <div>
-                        <p class="insight-label">开放岗位</p>
-                        <p class="insight-subtitle">点击查看数据摘要</p>
+                        <p class="insight-label" data-i18n="dashboard.openModules" data-i18n-zh="开放岗位" data-i18n-en="Open Modules">开放岗位</p>
+                        <p class="insight-subtitle" data-i18n="dashboard.openModulesHint" data-i18n-zh="点击查看数据摘要" data-i18n-en="View summary">点击查看数据摘要</p>
                     </div>
                 </div>
                 <div class="insight-core-number" id="dashOpenJobs">--</div>
@@ -32,8 +32,8 @@
                 <div class="insight-card-header">
                     <span class="insight-icon">👥</span>
                     <div>
-                        <p class="insight-label">候选池规模</p>
-                        <p class="insight-subtitle">TA 投递总人数，单击查看详情</p>
+                        <p class="insight-label" data-i18n="dashboard.candidatePool" data-i18n-zh="候选池规模" data-i18n-en="Candidate Pool">候选池规模</p>
+                        <p class="insight-subtitle" data-i18n="dashboard.candidatePoolHint" data-i18n-zh="TA 投递总人数，单击查看详情" data-i18n-en="Applicants · details">TA 投递总人数，单击查看详情</p>
                     </div>
                 </div>
                 <div class="insight-core-number" id="dashCandidates">--</div>
@@ -42,8 +42,8 @@
                 <div class="insight-card-header">
                     <span class="insight-icon">✅</span>
                     <div>
-                        <p class="insight-label">已录用</p>
-                        <p class="insight-subtitle">点击查看已录用名单</p>
+                        <p class="insight-label" data-i18n="dashboard.hired" data-i18n-zh="已录用" data-i18n-en="Hired">已录用</p>
+                        <p class="insight-subtitle" data-i18n="dashboard.hiredHint" data-i18n-zh="点击查看已录用名单" data-i18n-en="View hired">点击查看已录用名单</p>
                     </div>
                 </div>
                 <div class="insight-core-number" id="dashAccepted">--</div>
@@ -52,8 +52,8 @@
                 <div class="insight-card-header">
                     <span class="insight-icon">🕒</span>
                     <div>
-                        <p class="insight-label">待决策</p>
-                        <p class="insight-subtitle">点击查看待处理申请</p>
+                        <p class="insight-label" data-i18n="dashboard.pendingDecision" data-i18n-zh="待决策" data-i18n-en="Pending Decision">待决策</p>
+                        <p class="insight-subtitle" data-i18n="dashboard.pendingDecisionHint" data-i18n-zh="点击查看待处理申请" data-i18n-en="View pending">点击查看待处理申请</p>
                     </div>
                 </div>
                 <div class="insight-core-number" id="dashPending">--</div>

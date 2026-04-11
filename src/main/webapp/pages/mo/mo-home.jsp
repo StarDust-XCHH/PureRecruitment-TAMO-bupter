@@ -1,10 +1,10 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <!DOCTYPE html>
-<html lang="zh-CN" data-theme="dark">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MO 工作台</title>
+    <title>MO Workspace</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/ta/css/ta-layout.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/ta/css/ta-components.css">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/ta/css/ta-dashboard-cards.css">

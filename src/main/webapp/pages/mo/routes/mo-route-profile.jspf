@@ -1,59 +1,59 @@
-<div class="route" id="route-profile" data-route="profile">
-    <div class="card">
-        <div class="overview-top">
-            <div>
-                <h1>个人资料管理</h1>
-                <p class="muted">完善您的个人信息，便于 TA 了解课程背景与教学风格。</p>
-            </div>
-            <div class="overview-badges">
-                <span class="pill">角色：Module Organizer</span>
-                <span class="pill" id="profileSaveStatus">未保存</span>
-            </div>
-        </div>
-
-        <form id="moProfileForm" class="mo-form-grid" autocomplete="off" enctype="multipart/form-data">
-            <input type="hidden" id="moIdField" name="moId" value="">
-
-            <div class="full avatar-upload-section">
-                <label>个人头像</label>
-                <div class="avatar-preview-container">
-                    <img id="avatarPreview" src="" alt="头像预览" class="avatar-preview" style="display: none;">
-                    <div id="avatarPlaceholder" class="avatar-placeholder">👤</div>
-                </div>
-                <input type="file" id="avatarFileInput" name="avatarFile" accept="image/png,image/jpeg,image/webp,image/gif" style="display: none;">
-                <button type="button" id="uploadAvatarBtn" class="pill-btn secondary">选择头像</button>
-                <p class="muted small">支持 PNG/JPG/WEBP/GIF，最大 10MB，自动裁剪为正方形</p>
-            </div>
-
-            <label>姓名<input id="moNameInput" name="name" type="text" placeholder="如：张教授" autocomplete="name"></label>
-            <label>联系邮箱<input id="contactEmailInput" name="contactEmail" type="email" placeholder="如：professor@example.com"></label>
-
-            <label class="full">个人简介<textarea id="bioInput" name="bio" rows="4" placeholder="简要介绍您的教学背景、研究方向等信息..."></textarea></label>
-
-            <label class="full">专业技能（每行一个或逗号分隔）<textarea id="skillsInput" name="skills" rows="3" placeholder="如：软件工程&#10;数据结构&#10;机器学习"></textarea></label>
-
-            <div class="full">
-                <button type="submit" id="saveProfileBtn" class="pill-btn">保存资料</button>
-                <span id="saveProfileStatus" class="muted"></span>
-            </div>
-        </form>
-
-        <hr class="divider">
-
-        <div class="password-section">
-            <h3>修改密码</h3>
-            <form id="moPasswordForm" class="mo-form-grid" autocomplete="off">
-                <input type="hidden" id="moIdPasswordField" name="moId" value="">
-
-                <label>当前密码<input id="currentPasswordInput" name="currentPassword" type="password" placeholder="请输入当前密码"></label>
-                <label>新密码<input id="newPasswordInput" name="newPassword" type="password" placeholder="至少 6 位字符"></label>
-                <label>确认新密码<input id="confirmPasswordInput" type="password" placeholder="再次输入新密码"></label>
-
-                <div class="full">
-                    <button type="submit" id="changePasswordBtn" class="pill-btn secondary">更新密码</button>
-                    <span id="changePasswordStatus" class="muted"></span>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+<div class="route" id="route-profile" data-route="profile">
+    <div class="card">
+        <div class="overview-top">
+            <div>
+                <h1 data-i18n="modal.settings.title" data-i18n-zh="个人资料管理" data-i18n-en="Profile">个人资料管理</h1>
+                <p class="muted" data-i18n="modal.settings.subtitle" data-i18n-zh="完善您的个人信息，便于 TA 了解课程背景与教学风格。" data-i18n-en="Complete your profile so TAs understand your module background and teaching style.">完善您的个人信息，便于 TA 了解课程背景与教学风格。</p>
+            </div>
+            <div class="overview-badges">
+                <span class="pill" data-i18n="profile.route.rolePill" data-i18n-zh="角色：Module Organizer" data-i18n-en="Role: Module Organizer">角色：Module Organizer</span>
+                <span class="pill" id="profileSaveStatus" data-i18n="profile.route.unsavedPill" data-i18n-zh="未保存" data-i18n-en="Not saved">未保存</span>
+            </div>
+        </div>
+
+        <form id="moProfileForm" class="mo-form-grid" autocomplete="off" enctype="multipart/form-data">
+            <input type="hidden" id="moIdField" name="moId" value="">
+
+            <div class="full avatar-upload-section">
+                <label data-i18n="profile.route.avatarLabel" data-i18n-zh="个人头像" data-i18n-en="Profile photo">个人头像</label>
+                <div class="avatar-preview-container">
+                    <img id="avatarPreview" src="" alt="头像预览" class="avatar-preview" style="display: none;">
+                    <div id="avatarPlaceholder" class="avatar-placeholder">👤</div>
+                </div>
+                <input type="file" id="avatarFileInput" name="avatarFile" accept="image/png,image/jpeg,image/webp,image/gif" style="display: none;">
+                <button type="button" id="uploadAvatarBtn" class="pill-btn secondary" data-i18n="profile.route.chooseAvatar" data-i18n-zh="选择头像" data-i18n-en="Choose photo">选择头像</button>
+                <p class="muted small" data-i18n="profile.route.avatarHint" data-i18n-zh="支持 PNG/JPG/WEBP/GIF，最大 10MB，自动裁剪为正方形" data-i18n-en="PNG/JPG/WEBP/GIF up to 10MB; cropped to square">支持 PNG/JPG/WEBP/GIF，最大 10MB，自动裁剪为正方形</p>
+            </div>
+
+            <label><span data-i18n="modal.settings.name" data-i18n-zh="姓名" data-i18n-en="Name">姓名</span><input id="moNameInput" name="name" type="text" data-i18n-placeholder="modal.settings.phName" data-i18n-placeholder-zh="如：张教授" data-i18n-placeholder-en="e.g. Prof. Zhang" placeholder="如：张教授" autocomplete="name"></label>
+            <label><span data-i18n="modal.settings.email" data-i18n-zh="联系邮箱" data-i18n-en="Contact email">联系邮箱</span><input id="contactEmailInput" name="contactEmail" type="email" data-i18n-placeholder="modal.settings.phEmail" data-i18n-placeholder-zh="如：professor@example.com" data-i18n-placeholder-en="e.g. professor@example.com" placeholder="如：professor@example.com"></label>
+
+            <label class="full"><span data-i18n="modal.settings.bio" data-i18n-zh="个人简介" data-i18n-en="Bio">个人简介</span><textarea id="bioInput" name="bio" rows="4" data-i18n-placeholder="modal.settings.phBio" data-i18n-placeholder-zh="简要介绍您的教学背景、研究方向等信息..." data-i18n-placeholder-en="Briefly describe your teaching background and research..." placeholder="简要介绍您的教学背景、研究方向等信息..."></textarea></label>
+
+            <label class="full"><span data-i18n="profile.route.skillsLabel" data-i18n-zh="专业技能（每行一个或逗号分隔）" data-i18n-en="Skills (one per line or comma-separated)">专业技能（每行一个或逗号分隔）</span><textarea id="skillsInput" name="skills" rows="3" data-i18n-placeholder="modal.settings.phSkills" data-i18n-placeholder-zh="如：软件工程&#10;数据结构&#10;机器学习" data-i18n-placeholder-en="e.g. Software Engineering&#10;Data structures&#10;Machine learning" placeholder="如：软件工程&#10;数据结构&#10;机器学习"></textarea></label>
+
+            <div class="full">
+                <button type="submit" id="saveProfileBtn" class="pill-btn" data-i18n="profile.route.saveProfile" data-i18n-zh="保存资料" data-i18n-en="Save profile">保存资料</button>
+                <span id="saveProfileStatus" class="muted"></span>
+            </div>
+        </form>
+
+        <hr class="divider">
+
+        <div class="password-section">
+            <h3 data-i18n="modal.settings.changePassword" data-i18n-zh="修改密码" data-i18n-en="Change password">修改密码</h3>
+            <form id="moPasswordForm" class="mo-form-grid" autocomplete="off">
+                <input type="hidden" id="moIdPasswordField" name="moId" value="">
+
+                <label><span data-i18n="modal.settings.currentPw" data-i18n-zh="当前密码" data-i18n-en="Current password">当前密码</span><input id="currentPasswordInput" name="currentPassword" type="password" data-i18n-placeholder="modal.settings.phCurrentPw" data-i18n-placeholder-zh="请输入当前密码" data-i18n-placeholder-en="Enter current password" placeholder="请输入当前密码"></label>
+                <label><span data-i18n="modal.settings.newPw" data-i18n-zh="新密码" data-i18n-en="New password">新密码</span><input id="newPasswordInput" name="newPassword" type="password" data-i18n-placeholder="modal.settings.phNewPw" data-i18n-placeholder-zh="至少 6 位字符" data-i18n-placeholder-en="At least 6 characters" placeholder="至少 6 位字符"></label>
+                <label><span data-i18n="modal.settings.confirmPw" data-i18n-zh="确认新密码" data-i18n-en="Confirm new password">确认新密码</span><input id="confirmPasswordInput" type="password" data-i18n-placeholder="modal.settings.phConfirmPw" data-i18n-placeholder-zh="再次输入新密码" data-i18n-placeholder-en="Re-enter new password" placeholder="再次输入新密码"></label>
+
+                <div class="full">
+                    <button type="submit" id="changePasswordBtn" class="pill-btn secondary" data-i18n="modal.settings.updatePw" data-i18n-zh="更新密码" data-i18n-en="Update password">更新密码</button>
+                    <span id="changePasswordStatus" class="muted"></span>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

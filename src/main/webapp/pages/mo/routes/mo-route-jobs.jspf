@@ -6,23 +6,23 @@
 
             <div>
 
-                <h1>课程管理</h1>
+                <h1 data-i18n="jobs.title" data-i18n-zh="课程管理" data-i18n-en="Module Management">课程管理</h1>
 
-                <p class="muted">浏览与搜索本账号下的课程岗位。需要发布新课程时，请点击「发布岗位」按步骤填写即可。</p>
+                <p class="muted" data-i18n="jobs.desc" data-i18n-zh="浏览与搜索本账号下的课程岗位。需要发布新课程时，请点击「发布岗位」按步骤填写即可。" data-i18n-en="Browse and search your module openings. Use Post to add one.">浏览与搜索本账号下的课程岗位。需要发布新课程时，请点击「发布岗位」按步骤填写即可。</p>
 
             </div>
 
             <div class="overview-badges mo-jobs-toolbar">
 
-                <span class="pill" id="openCoursesCount">开放课程 0</span>
+                <span class="pill" id="openCoursesCount" data-i18n="jobs.openModulesCount" data-i18n-zh="开放课程 0" data-i18n-en="Open 0">开放课程 0</span>
 
-                <button id="openJobPublishModalBtn" class="pill-btn" type="button">发布课程</button>
+                <button id="openJobPublishModalBtn" class="pill-btn" type="button" data-i18n="jobs.postOpening" data-i18n-zh="发布课程" data-i18n-en="Post">发布课程</button>
 
-                <button id="refreshJobsBtn" class="refresh-btn pill" type="button">
+                <button id="refreshJobsBtn" class="refresh-btn pill" type="button" data-i18n-aria-label="jobs.refreshAria" data-i18n-aria-label-zh="刷新列表" data-i18n-aria-label-en="Refresh">
 
                     <span class="refresh-icon">↻</span>
 
-                    <span class="refresh-text">刷新列表</span>
+                    <span class="refresh-text" data-i18n="jobs.refresh" data-i18n-zh="刷新列表" data-i18n-en="Refresh">刷新列表</span>
 
                 </button>
 
@@ -38,13 +38,13 @@
 
             <span class="job-search-icon" aria-hidden="true">⌕</span>
 
-            <input id="jobSearchInput" type="text" placeholder="搜索课程编号 / 名称 / 标签" autocomplete="off" name="jobSearchKeyword">
+            <input id="jobSearchInput" type="text" placeholder="搜索课程编号 / 名称 / 标签" autocomplete="off" name="jobSearchKeyword" data-i18n-placeholder="jobs.searchPlaceholder" data-i18n-placeholder-zh="搜索课程编号 / 名称 / 标签" data-i18n-placeholder-en="Search module code / name / tags">
 
         </label>
 
         <div class="job-board course-board" id="jobBoard"></div>
 
-        <div class="job-pagination" aria-label="岗位分页" id="jobPagination"></div>
+        <div class="job-pagination" aria-label="岗位分页" id="jobPagination" data-i18n-aria-label="jobs.paginationAria" data-i18n-aria-label-zh="岗位分页" data-i18n-aria-label-en="Pagination"></div>
 
     </div>
 

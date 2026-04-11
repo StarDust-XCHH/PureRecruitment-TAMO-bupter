@@ -24,6 +24,18 @@
         };
 
         let latestApplicants = [];
+        function t(zh, en) {
+            return typeof app.t === 'function' ? app.t(zh, en) : zh;
+        }
+
+        function applicantStatusLabel(raw) {
+            var s = raw == null ? '' : String(raw).trim();
+            if (!s) return '—';
+            if (typeof app.formatApplicantStatusDisplay === 'function') {
+                return app.formatApplicantStatusDisplay(s);
+            }
+            return s;
+        }
 
         function apiUrl(path) {
             var p = path.charAt(0) === '/' ? path : '/' + path;
@@ -45,7 +57,10 @@
             if (p > 0) {
                 dashWorkflowHint.hidden = false;
                 dashWorkflowHint.textContent =
-                    '当前有 ' + p + ' 条申请待决策，建议在侧栏进入「应聘筛选」优先处理。';
+                    t(
+                        '当前有 ' + p + ' 条申请待决策，建议在侧栏进入「应聘筛选」优先处理。',
+                        'There are ' + p + ' applications pending decision. Please prioritize them in Applicant Screening.'
+                    );
             } else {
                 dashWorkflowHint.hidden = true;
                 dashWorkflowHint.textContent = '';
@@ -140,7 +155,7 @@
                     const btn = document.createElement('button');
                     btn.type = 'button';
                     btn.className = 'mo-dash-detail-link mo-summary-job-row__detail';
-                    btn.textContent = '查看详情';
+                    btn.textContent = t('查看详情', 'View details');
                     btn.addEventListener('click', function (e) {
                         e.stopPropagation();
                         if (typeof app.showMoCourseJobDetail === 'function') {
@@ -158,13 +173,22 @@
             if (summaryEls.nextHint) {
                 if (st.pending > 0) {
                     summaryEls.nextHint.textContent =
-                        '建议：前往「应聘筛选」处理 ' + st.pending + ' 条待决策申请。';
+                        t(
+                            '建议：前往「应聘筛选」处理 ' + st.pending + ' 条待决策申请。',
+                            'Suggestion: go to Applicant Screening to process ' + st.pending + ' pending applications.'
+                        );
                 } else if (st.open === 0) {
                     summaryEls.nextHint.textContent =
-                        '建议：在「课程管理」中发布岗位以接收 TA 申请。';
+                        t(
+                            '建议：在「课程管理」中发布岗位以接收 TA 申请。',
+                            'Suggestion: post an opening in Module Management to receive TA applications.'
+                        );
                 } else {
                     summaryEls.nextHint.textContent =
-                        '当前暂无待决策申请；可关注侧栏未读提醒与新收到的投递。';
+                        t(
+                            '当前暂无待决策申请；可关注侧栏未读提醒与新收到的投递。',
+                            'There are currently no pending applications. Watch the unread badge for new submissions.'
+                        );
                 }
             }
 
@@ -199,13 +223,13 @@
             if (!item || !item.applicationId) {
                 const hint = document.createElement('span');
                 hint.className = 'muted mo-dash-detail-hint';
-                hint.textContent = '无申请 ID';
+                hint.textContent = t('无申请 ID', 'No application ID');
                 actions.appendChild(hint);
             } else {
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'mo-dash-detail-link';
-                btn.textContent = '查看详情';
+                btn.textContent = t('查看详情', 'View details');
                 btn.addEventListener('click', function (e) {
                     e.stopPropagation();
                     if (typeof app.openMoApplicantDetail === 'function') {
@@ -252,7 +276,7 @@
             if (subStr) {
                 const dtEl = document.createElement('div');
                 dtEl.className = 'mo-dash-cand-item__dt muted';
-                dtEl.textContent = '投递 · ' + subStr;
+                dtEl.textContent = t('投递 · ', 'Submitted · ') + subStr;
                 main.appendChild(dtEl);
             }
 
@@ -260,7 +284,7 @@
             aside.className = 'mo-dash-cand-item__compact-aside';
             const statusEl = document.createElement('span');
             statusEl.className = 'mo-dash-cand-item__status';
-            statusEl.textContent = item.status || '—';
+            statusEl.textContent = applicantStatusLabel(item.status);
             aside.appendChild(statusEl);
             attachApplicantDetailButton(aside, item, 'compact-aside');
 
@@ -275,7 +299,8 @@
             try {
                 var d = new Date(iso);
                 if (isNaN(d.getTime())) return '';
-                return d.toLocaleString('zh-CN', {
+                var locale = (typeof app.getCurrentLanguage === 'function' && app.getCurrentLanguage() === 'en') ? 'en-GB' : 'zh-CN';
+                return d.toLocaleString(locale, {
                     month: 'numeric',
                     day: 'numeric',
                     hour: '2-digit',
@@ -307,8 +332,8 @@
             if (item.unread) {
                 const unreadEl = document.createElement('span');
                 unreadEl.className = 'mo-dash-cand-item__unread';
-                unreadEl.textContent = '未读';
-                unreadEl.setAttribute('title', '未读投递');
+                unreadEl.textContent = t('未读', 'Unread');
+                unreadEl.setAttribute('title', t('未读投递', 'Unread submission'));
                 nameRow.appendChild(unreadEl);
             }
             main.appendChild(nameRow);
@@ -324,7 +349,7 @@
             if (subStr) {
                 const dtEl = document.createElement('div');
                 dtEl.className = 'mo-dash-cand-item__dt muted';
-                dtEl.textContent = '投递 · ' + subStr;
+                dtEl.textContent = t('投递 · ', 'Submitted · ') + subStr;
                 main.appendChild(dtEl);
             }
 
@@ -332,7 +357,7 @@
             aside.className = 'mo-dash-cand-item__compact-aside';
             const statusEl = document.createElement('span');
             statusEl.className = 'mo-dash-cand-item__status';
-            statusEl.textContent = item.status || '—';
+            statusEl.textContent = applicantStatusLabel(item.status);
             aside.appendChild(statusEl);
             attachApplicantDetailButton(aside, item, 'compact-aside');
 
@@ -351,7 +376,10 @@
             const groupedEl = document.getElementById('candidatesPoolGrouped');
             if (countEl) {
                 countEl.textContent =
-                    '共 ' + uniq + ' 位候选 TA（每人计一次），' + nApps + ' 条投递；与总览「候选池规模」人数一致。';
+                    t(
+                        '共 ' + uniq + ' 位候选 TA（每人计一次），' + nApps + ' 条投递；与总览「候选池规模」人数一致。',
+                        uniq + ' unique TA candidates, ' + nApps + ' submissions in total; consistent with the Candidate Pool card.'
+                    );
             }
             if (groupedEl) {
                 groupedEl.innerHTML = '';
@@ -368,7 +396,10 @@
                     if (g.courseName) {
                         title += ' · ' + g.courseName;
                     }
-                    summary.textContent = title + '（' + g.items.length + ' 条）';
+                    summary.textContent = t(
+                        title + '（' + g.items.length + ' 条）',
+                        title + ' (' + g.items.length + ')'
+                    );
                     const ul = document.createElement('ul');
                     ul.className = 'mo-dash-cand-list mo-dash-cand-list--in-group';
                     g.items.forEach(function (item) {
@@ -393,7 +424,7 @@
             const emptyEl = document.getElementById('acceptedListEmpty');
             const listEl = document.getElementById('acceptedListDetail');
             if (countEl) {
-                countEl.textContent = '共 ' + hired.length + ' 条已录用。';
+                countEl.textContent = t('共 ' + hired.length + ' 条已录用。', hired.length + ' hired applications.');
             }
             if (listEl) {
                 listEl.innerHTML = '';
@@ -413,7 +444,10 @@
             const emptyEl = document.getElementById('pendingListEmpty');
             const listEl = document.getElementById('pendingListDetail');
             if (countEl) {
-                countEl.textContent = '共 ' + pending.length + ' 条待决策；人数与总览「待决策」一致。';
+                countEl.textContent = t(
+                    '共 ' + pending.length + ' 条待决策；人数与总览「待决策」一致。',
+                    pending.length + ' applications pending decision; consistent with the Pending Decision card.'
+                );
             }
             if (listEl) {
                 listEl.innerHTML = '';

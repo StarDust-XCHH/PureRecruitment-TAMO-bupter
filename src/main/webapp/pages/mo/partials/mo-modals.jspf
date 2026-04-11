@@ -1,14 +1,14 @@
 <div class="ta-modal-overlay" id="taModalOverlay" aria-hidden="true">
     <div class="ta-modal-panel wide job-detail-modal" data-modal="course-detail" role="dialog" aria-labelledby="modalCourseDetailTitle">
-        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <button class="modal-close" type="button" data-i18n-aria-label="modal.closeAria" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head job-detail-modal__head">
             <div class="job-detail-modal__head-main">
-                <h3 id="modalCourseDetailTitle">课程岗位详情</h3>
-                <p class="muted">查看课程安排和招聘重点，快速进入筛选流程。</p>
+                <h3 id="modalCourseDetailTitle" data-i18n="modal.courseDetail.title" data-i18n-zh="课程岗位详情" data-i18n-en="Module opening details">课程岗位详情</h3>
+                <p class="muted" data-i18n="modal.courseDetail.subtitle" data-i18n-zh="查看课程安排和招聘重点，快速进入筛选流程。" data-i18n-en="Review module schedule and hiring focus, then jump into screening.">查看课程安排和招聘重点，快速进入筛选流程。</p>
             </div>
             <div class="job-detail-modal__head-actions">
-                <button type="button" class="pill-btn job-detail-modal__edit-btn" id="toggleCourseEditBtn">修改课程信息</button>
-                <button class="pill-btn job-detail-modal__screening-btn" type="button" id="jumpToApplicantsBtn">进入应聘筛选</button>
+                <button type="button" class="pill-btn job-detail-modal__edit-btn" id="toggleCourseEditBtn" data-i18n="modal.courseDetail.editModule" data-i18n-zh="修改课程信息" data-i18n-en="Edit module">修改课程信息</button>
+                <button class="pill-btn job-detail-modal__screening-btn" type="button" id="jumpToApplicantsBtn" data-i18n="modal.courseDetail.goScreening" data-i18n-zh="进入应聘筛选" data-i18n-en="Go to applicant screening">进入应聘筛选</button>
             </div>
         </div>
         <div class="modal-body">
@@ -18,36 +18,36 @@
                         <div class="job-detail-title-row">
                             <div>
                                 <div class="job-code" id="jobDetailCode">MO-0000</div>
-                                <h4 id="jobDetailName">课程名称</h4>
+                                <h4 id="jobDetailName" data-i18n="modal.courseDetail.moduleNamePlaceholder" data-i18n-zh="课程名称" data-i18n-en="Module name">课程名称</h4>
                             </div>
                         </div>
                         <div class="job-detail-course-intro">
-                            <h5 class="job-detail-block-title">课程介绍 <span class="job-detail-field-hint job-detail-field-hint--required">（必填）</span></h5>
+                            <h5 class="job-detail-block-title" data-i18n-html="课程介绍 <span class='job-detail-field-hint job-detail-field-hint--required'>（必填）</span>|Module introduction <span class='job-detail-field-hint job-detail-field-hint--required'>(required)</span>">课程介绍 <span class="job-detail-field-hint job-detail-field-hint--required">（必填）</span></h5>
                             <p class="job-detail-summary job-detail-intro-text" id="jobDetailCourseIntro">--</p>
                         </div>
                         <div class="job-detail-meta-grid job-detail-meta-grid--mo">
-                            <div class="job-detail-meta"><span>学期</span><strong id="jobDetailSemester">--</strong></div>
-                            <div class="job-detail-meta"><span>授课周次</span><strong id="jobDetailTeachingWeeks">--</strong></div>
-                            <div class="job-detail-meta"><span>校区</span><strong id="jobDetailCampus">--</strong></div>
-                            <div class="job-detail-meta"><span>招聘状态</span><strong id="jobDetailStatus">--</strong></div>
-                            <div class="job-detail-meta"><span>TA 招聘人数</span><strong id="jobDetailTaRecruit">--</strong></div>
-                            <div class="job-detail-meta"><span>预计选课人数</span><strong id="jobDetailStudentCount">--</strong></div>
-                            <div class="job-detail-meta"><span>申请截止</span><strong id="jobDetailApplyDeadline">--</strong></div>
-                            <div class="job-detail-meta"><span>岗位记录 ID</span><strong id="jobDetailJobRecordId">--</strong></div>
+                            <div class="job-detail-meta"><span data-i18n="modal.courseDetail.semester" data-i18n-zh="学期" data-i18n-en="Semester">学期</span><strong id="jobDetailSemester">--</strong></div>
+                            <div class="job-detail-meta"><span data-i18n="modal.courseDetail.teachingWeeks" data-i18n-zh="授课周次" data-i18n-en="Teaching weeks">授课周次</span><strong id="jobDetailTeachingWeeks">--</strong></div>
+                            <div class="job-detail-meta"><span data-i18n="modal.courseDetail.campus" data-i18n-zh="校区" data-i18n-en="Campus">校区</span><strong id="jobDetailCampus">--</strong></div>
+                            <div class="job-detail-meta"><span data-i18n="modal.courseDetail.recruitmentStatus" data-i18n-zh="招聘状态" data-i18n-en="Recruitment status">招聘状态</span><strong id="jobDetailStatus">--</strong></div>
+                            <div class="job-detail-meta"><span data-i18n="modal.courseDetail.taSlots" data-i18n-zh="TA 招聘人数" data-i18n-en="TA openings">TA 招聘人数</span><strong id="jobDetailTaRecruit">--</strong></div>
+                            <div class="job-detail-meta"><span data-i18n="modal.courseDetail.expectedEnrollment" data-i18n-zh="预计选课人数" data-i18n-en="Expected enrolment">预计选课人数</span><strong id="jobDetailStudentCount">--</strong></div>
+                            <div class="job-detail-meta"><span data-i18n="modal.courseDetail.applyDeadline" data-i18n-zh="申请截止" data-i18n-en="Application deadline">申请截止</span><strong id="jobDetailApplyDeadline">--</strong></div>
+                            <div class="job-detail-meta"><span data-i18n="modal.courseDetail.jobRecordId" data-i18n-zh="岗位记录 ID" data-i18n-en="Opening record ID">岗位记录 ID</span><strong id="jobDetailJobRecordId">--</strong></div>
                         </div>
                     </div>
                 </section>
                 <aside class="job-detail-side job-detail-side--mo-extra">
                     <div class="job-detail-section">
-                        <h5>课程标签</h5>
+                        <h5 data-i18n="modal.courseDetail.moduleTags" data-i18n-zh="课程标签" data-i18n-en="Module tags">课程标签</h5>
                         <div class="job-detail-tags" id="jobDetailTags"></div>
                     </div>
                     <div class="job-detail-section">
-                        <h5>TA 工作清单（可选）</h5>
+                        <h5 data-i18n="modal.courseDetail.taChecklist" data-i18n-zh="TA 工作清单（可选）" data-i18n-en="TA task list (optional)">TA 工作清单（可选）</h5>
                         <ul class="job-detail-checklist" id="jobDetailChecklist"></ul>
                     </div>
                     <div class="job-detail-section job-detail-section--recruitment-brief">
-                        <h5>招募说明 <span class="job-detail-field-hint job-detail-field-hint--optional">（可选）</span></h5>
+                        <h5 data-i18n-html="招募说明 <span class='job-detail-field-hint job-detail-field-hint--optional'>（可选）</span>|Recruitment brief <span class='job-detail-field-hint job-detail-field-hint--optional'>(optional)</span>">招募说明 <span class="job-detail-field-hint job-detail-field-hint--optional">（可选）</span></h5>
                         <div class="job-detail-summary job-detail-long-desc" id="jobDetailRecruitmentBrief">--</div>
                     </div>
                 </aside>
@@ -56,35 +56,35 @@
     </div>
 
     <div class="ta-modal-panel wide mo-job-publish-modal" data-modal="job-publish" role="dialog" aria-modal="true" aria-labelledby="modalJobPublishTitle">
-        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <button class="modal-close" type="button" data-i18n-aria-label="modal.closeAria" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head mo-job-publish-modal__head">
             <div class="mo-job-publish-modal__head-main">
-                <h3 id="modalJobPublishTitle">发布课程岗位</h3>
-                <p class="muted">按左侧步骤填写完成后即可发布；新课程会出现在您的课程列表中，学生端也会看到。</p>
+                <h3 id="modalJobPublishTitle" data-i18n="modal.publish.title" data-i18n-zh="发布课程岗位" data-i18n-en="Post module opening">发布课程岗位</h3>
+                <p class="muted" data-i18n="modal.publish.subtitle" data-i18n-zh="按左侧步骤填写完成后即可发布；新课程会出现在您的课程列表中，学生端也会看到。" data-i18n-en="Complete the steps on the left to publish. The new module appears in your list and to students.">按左侧步骤填写完成后即可发布；新课程会出现在您的课程列表中，学生端也会看到。</p>
             </div>
             <div class="mo-job-publish-modal__head-actions">
                 <span id="publishJobStatus" class="muted mo-job-publish-modal__status" role="status" aria-live="polite"></span>
-                <button class="pill-btn" id="publishJobBtn" type="submit" form="jobPublishForm" aria-describedby="publishJobStatus">发布岗位</button>
+                <button class="pill-btn" id="publishJobBtn" type="submit" form="jobPublishForm" aria-describedby="publishJobStatus" data-i18n="modal.publish.submit" data-i18n-zh="发布岗位" data-i18n-en="Post opening">发布岗位</button>
             </div>
         </div>
         <div class="modal-body mo-job-publish-modal__body">
             <div class="mo-publish-layout">
-                <nav class="mo-publish-nav" aria-label="发布岗位导航">
+                <nav class="mo-publish-nav" data-i18n-aria-label="modal.publish.navAria" data-i18n-aria-label-zh="发布岗位导航" data-i18n-aria-label-en="Post opening navigation" aria-label="发布岗位导航">
                     <ul class="mo-publish-nav-list">
                         <li class="mo-publish-nav-item">
-                            <a href="#basic-info" class="mo-publish-nav-link active" aria-current="true">基本信息<span class="mo-req" aria-hidden="true">*</span></a>
+                            <a href="#basic-info" class="mo-publish-nav-link active" aria-current="true" data-i18n-html="基本信息<span class='mo-req' aria-hidden='true'>*</span>|Basic info<span class='mo-req' aria-hidden='true'>*</span>">基本信息<span class="mo-req" aria-hidden="true">*</span></a>
                         </li>
                         <li class="mo-publish-nav-item">
-                            <a href="#required-skills" class="mo-publish-nav-link">所需技能<span class="mo-req" aria-hidden="true">*</span></a>
+                            <a href="#required-skills" class="mo-publish-nav-link" data-i18n-html="所需技能<span class='mo-req' aria-hidden='true'>*</span>|Required skills<span class='mo-req' aria-hidden='true'>*</span>">所需技能<span class="mo-req" aria-hidden="true">*</span></a>
                         </li>
                         <li class="mo-publish-nav-item">
-                            <a href="#teaching-weeks" class="mo-publish-nav-link">授课周次</a>
+                            <a href="#teaching-weeks" class="mo-publish-nav-link" data-i18n="modal.publish.navWeeks" data-i18n-zh="授课周次" data-i18n-en="Teaching weeks">授课周次</a>
                         </li>
                         <li class="mo-publish-nav-item">
-                            <a href="#assessment" class="mo-publish-nav-link">任务安排</a>
+                            <a href="#assessment" class="mo-publish-nav-link" data-i18n="modal.publish.navAssessment" data-i18n-zh="任务安排" data-i18n-en="Tasks &amp; assessments">任务安排</a>
                         </li>
                         <li class="mo-publish-nav-item">
-                            <a href="#recruitment-brief" class="mo-publish-nav-link">招募说明</a>
+                            <a href="#recruitment-brief" class="mo-publish-nav-link" data-i18n="modal.publish.navBrief" data-i18n-zh="招募说明" data-i18n-en="Recruitment brief">招募说明</a>
                         </li>
                     </ul>
                 </nav>
@@ -92,65 +92,65 @@
                 <div class="mo-publish-content">
                     <form id="jobPublishForm" class="mo-publish-form mo-form-grid" autocomplete="off">
                         <div class="mo-publish-section full" id="basic-info">
-                            <h4 class="mo-publish-section-title">基本信息</h4>
+                            <h4 class="mo-publish-section-title" data-i18n="modal.publish.sectionBasic" data-i18n-zh="基本信息" data-i18n-en="Basic information">基本信息</h4>
                             <div class="mo-form-grid">
                                 <label class="mo-field">
-                                    <span class="mo-field-label">岗位/课程名称 <span class="mo-req" aria-hidden="true">*</span></span>
-                                    <input id="courseNameInput" required type="text" placeholder="如：Software Engineering TA (Semester)" aria-required="true" class="mo-field-input">
+                                    <span class="mo-field-label" data-i18n-html="岗位/课程名称 <span class='mo-req' aria-hidden='true'>*</span>|Opening / module name <span class='mo-req' aria-hidden='true'>*</span>">岗位/课程名称 <span class="mo-req" aria-hidden="true">*</span></span>
+                                    <input id="courseNameInput" required type="text" data-i18n-placeholder="modal.publish.phCourseName" data-i18n-placeholder-zh="如：Software Engineering TA (Semester)" data-i18n-placeholder-en="e.g. Software Engineering TA (Semester)" placeholder="如：Software Engineering TA (Semester)" aria-required="true" class="mo-field-input">
                                 </label>
                                 <label class="mo-field">
-                                    <span class="mo-field-label">课程编码 <span class="mo-req" aria-hidden="true">*</span></span>
-                                    <input id="courseCodeInput" required type="text" placeholder="如：SE-TA-2026S" aria-required="true" class="mo-field-input">
+                                    <span class="mo-field-label" data-i18n-html="课程编码 <span class='mo-req' aria-hidden='true'>*</span>|Module code <span class='mo-req' aria-hidden='true'>*</span>">课程编码 <span class="mo-req" aria-hidden="true">*</span></span>
+                                    <input id="courseCodeInput" required type="text" data-i18n-placeholder="modal.publish.phCourseCode" data-i18n-placeholder-zh="如：SE-TA-2026S" data-i18n-placeholder-en="e.g. SE-TA-2026S" placeholder="如：SE-TA-2026S" aria-required="true" class="mo-field-input">
                                 </label>
                                 <div class="mo-semester-status-group full">
                                     <div class="mo-publish-semester-status-row">
                                         <div class="mo-field mo-semester-field mo-semester-field--compact">
-                                            <span class="mo-field-label">学期 <span class="mo-req" aria-hidden="true">*</span></span>
-                                            <div class="mo-semester-combined" role="group" aria-label="学年与学期">
-                                                <select id="semesterYearInput" class="mo-semester-combined__year" required aria-required="true" aria-label="年份"></select>
-                                                <select id="semesterTermInput" class="mo-semester-combined__term" required aria-required="true" aria-label="春季或秋季学期">
-                                                    <option value="">学期</option>
-                                                    <option value="Spring">春季 Spring</option>
-                                                    <option value="Fall">秋季 Fall</option>
+                                            <span class="mo-field-label" data-i18n-html="学期 <span class='mo-req' aria-hidden='true'>*</span>|Semester <span class='mo-req' aria-hidden='true'>*</span>">学期 <span class="mo-req" aria-hidden="true">*</span></span>
+                                            <div class="mo-semester-combined" role="group" data-i18n-aria-label="modal.publish.yearTermGroup" data-i18n-aria-label-zh="学年与学期" data-i18n-aria-label-en="Academic year and term" aria-label="学年与学期">
+                                                <select id="semesterYearInput" class="mo-semester-combined__year" required aria-required="true" data-i18n-aria-label="modal.publish.yearAria" data-i18n-aria-label-zh="年份" data-i18n-aria-label-en="Year" aria-label="年份"></select>
+                                                <select id="semesterTermInput" class="mo-semester-combined__term" required aria-required="true" data-i18n-aria-label="modal.publish.termAria" data-i18n-aria-label-zh="春季或秋季学期" data-i18n-aria-label-en="Spring or fall term" aria-label="春季或秋季学期">
+                                                    <option value="" data-i18n="modal.publish.optTerm" data-i18n-zh="学期" data-i18n-en="Term">学期</option>
+                                                    <option value="Spring" data-i18n="modal.publish.optSpring" data-i18n-zh="春季 Spring" data-i18n-en="Spring">春季 Spring</option>
+                                                    <option value="Fall" data-i18n="modal.publish.optFall" data-i18n-zh="秋季 Fall" data-i18n-en="Fall">秋季 Fall</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <fieldset class="mo-field-fieldset mo-field-fieldset--inline-status">
-                                            <legend class="mo-field-label">招聘状态 <span class="mo-req" aria-hidden="true">*</span></legend>
-                                            <div class="mo-radio-row" role="radiogroup" aria-label="招聘状态">
+                                            <legend class="mo-field-label" data-i18n-html="招聘状态 <span class='mo-req' aria-hidden='true'>*</span>|Recruitment status <span class='mo-req' aria-hidden='true'>*</span>">招聘状态 <span class="mo-req" aria-hidden="true">*</span></legend>
+                                            <div class="mo-radio-row" role="radiogroup" data-i18n-aria-label="modal.publish.recruitmentStatusGroup" data-i18n-aria-label-zh="招聘状态" data-i18n-aria-label-en="Recruitment status" aria-label="招聘状态">
                                                 <label class="mo-radio-pill"><input type="radio" name="recruitmentStatus" id="recruitmentStatusOpen" value="OPEN" checked> <span>OPEN</span></label>
                                                 <label class="mo-radio-pill"><input type="radio" name="recruitmentStatus" id="recruitmentStatusClosed" value="CLOSED"> <span>CLOSED</span></label>
                                             </div>
                                         </fieldset>
                                     </div>
-                                    <p class="mo-hint mo-semester-field__hint">先选学年，再选春季或秋季。年份可在下拉列表中调整。</p>
+                                    <p class="mo-hint mo-semester-field__hint" data-i18n="modal.publish.semesterHint" data-i18n-zh="先选学年，再选春季或秋季。年份可在下拉列表中调整。" data-i18n-en="Choose the academic year first, then spring or fall. Adjust the year from the list.">先选学年，再选春季或秋季。年份可在下拉列表中调整。</p>
                                 </div>
 
                                 <label class="mo-field">
-                                    <span class="mo-field-label">TA 招聘人数 <span class="mo-req" aria-hidden="true">*</span></span>
-                                    <input id="taRecruitCountInput" type="number" min="1" step="1" required placeholder="如：6" aria-required="true" class="mo-field-input">
+                                    <span class="mo-field-label" data-i18n-html="TA 招聘人数 <span class='mo-req' aria-hidden='true'>*</span>|Number of TA openings <span class='mo-req' aria-hidden='true'>*</span>">TA 招聘人数 <span class="mo-req" aria-hidden="true">*</span></span>
+                                    <input id="taRecruitCountInput" type="number" min="1" step="1" required data-i18n-placeholder="modal.publish.phTaCount" data-i18n-placeholder-zh="如：6" data-i18n-placeholder-en="e.g. 6" placeholder="如：6" aria-required="true" class="mo-field-input">
                                 </label>
                                 <label class="mo-field">
-                                    <span class="mo-field-label">校区 <span class="mo-req" aria-hidden="true">*</span></span>
-                                    <select id="campusInput" required aria-label="校区" aria-required="true" class="mo-field-input">
-                                        <option value="">（请选择）</option>
+                                    <span class="mo-field-label" data-i18n-html="校区 <span class='mo-req' aria-hidden='true'>*</span>|Campus <span class='mo-req' aria-hidden='true'>*</span>">校区 <span class="mo-req" aria-hidden="true">*</span></span>
+                                    <select id="campusInput" required data-i18n-aria-label="modal.publish.campusAria" data-i18n-aria-label-zh="校区" data-i18n-aria-label-en="Campus" aria-label="校区" aria-required="true" class="mo-field-input">
+                                        <option value="" data-i18n="modal.publish.optSelect" data-i18n-zh="（请选择）" data-i18n-en="(Select)">（请选择）</option>
                                         <option value="Main">Main</option>
                                         <option value="Shahe">Shahe</option>
                                     </select>
                                 </label>
 
                                 <label class="mo-field">
-                                    <span class="mo-field-label">预计学生人数</span>
-                                    <input id="studentCountInput" type="number" min="0" placeholder="如：180（可选）" class="mo-field-input">
+                                    <span class="mo-field-label" data-i18n="modal.publish.expectedStudents" data-i18n-zh="预计学生人数" data-i18n-en="Expected students">预计学生人数</span>
+                                    <input id="studentCountInput" type="number" min="0" data-i18n-placeholder="modal.publish.phStudents" data-i18n-placeholder-zh="如：180（可选）" data-i18n-placeholder-en="e.g. 180 (optional)" placeholder="如：180（可选）" class="mo-field-input">
                                 </label>
                                 <div class="mo-field">
-                                    <label class="mo-field-label" for="applicationDeadlineInput">截止申请时间</label>
-                                    <input id="applicationDeadlineInput" type="datetime-local" class="mo-field-input" aria-describedby="applicationDeadlineHint" aria-label="截止申请时间">
-                                    <p id="applicationDeadlineHint" class="mo-hint">时间按您当前设备的时区保存；候选人查看时会显示为其本地时间。</p>
+                                    <label class="mo-field-label" for="applicationDeadlineInput" data-i18n="modal.publish.deadlineLabel" data-i18n-zh="截止申请时间" data-i18n-en="Application deadline">截止申请时间</label>
+                                    <input id="applicationDeadlineInput" type="datetime-local" class="mo-field-input" aria-describedby="applicationDeadlineHint" data-i18n-aria-label="modal.publish.deadlineAria" data-i18n-aria-label-zh="截止申请时间" data-i18n-aria-label-en="Application deadline" aria-label="截止申请时间">
+                                    <p id="applicationDeadlineHint" class="mo-hint" data-i18n="modal.publish.deadlineHint" data-i18n-zh="时间按您当前设备的时区保存；候选人查看时会显示为其本地时间。" data-i18n-en="Times are saved in your device timezone; candidates see them in their local time.">时间按您当前设备的时区保存；候选人查看时会显示为其本地时间。</p>
                                 </div>
                                 <label class="mo-field full">
-                                    <span class="mo-field-label">课程介绍 <span class="mo-req" aria-hidden="true">*</span></span>
-                                    <textarea id="courseDescInput" required rows="2" placeholder="简要介绍课程目标、内容与考核方式等" aria-required="true" class="mo-field-input mo-course-intro-input"></textarea>
+                                    <span class="mo-field-label" data-i18n-html="课程介绍 <span class='mo-req' aria-hidden='true'>*</span>|Module introduction <span class='mo-req' aria-hidden='true'>*</span>">课程介绍 <span class="mo-req" aria-hidden="true">*</span></span>
+                                    <textarea id="courseDescInput" required rows="2" data-i18n-placeholder="modal.publish.phIntro" data-i18n-placeholder-zh="简要介绍课程目标、内容与考核方式等" data-i18n-placeholder-en="Briefly describe learning outcomes, content, and assessment" placeholder="简要介绍课程目标、内容与考核方式等" aria-required="true" class="mo-field-input mo-course-intro-input"></textarea>
                                 </label>
                             </div>
 
@@ -158,49 +158,49 @@
 
                         <div class="mo-publish-section full" id="required-skills">
                             <div class="mo-publish-section-head">
-                                <h4 class="mo-publish-section-title">所需技能 <span class="mo-req" aria-hidden="true">*</span></h4>
-                                <button type="button" class="pill-btn ghost mo-btn-sm" id="openPublishFixedSkillsBtn">＋ 添加技能标签</button>
+                                <h4 class="mo-publish-section-title" data-i18n-html="所需技能 <span class='mo-req' aria-hidden='true'>*</span>|Required skills <span class='mo-req' aria-hidden='true'>*</span>">所需技能 <span class="mo-req" aria-hidden="true">*</span></h4>
+                                <button type="button" class="pill-btn ghost mo-btn-sm" id="openPublishFixedSkillsBtn" data-i18n="modal.publish.addSkillTags" data-i18n-zh="＋ 添加技能标签" data-i18n-en="+ Add skill tags">＋ 添加技能标签</button>
                             </div>
                             <div class="mo-section-content">
-                                <p class="mo-hint">请至少选择一项技能标签。若列表中没有合适的，可在选择窗口中点 <strong>Other</strong> 自行填写。</p>
+                                <p class="mo-hint" data-i18n-html="请至少选择一项技能标签。若列表中没有合适的，可在选择窗口中点 <strong>Other</strong> 自行填写。|Select at least one skill tag. If none fit, click <strong>Other</strong> in the picker to add your own.">请至少选择一项技能标签。若列表中没有合适的，可在选择窗口中点 <strong>Other</strong> 自行填写。</p>
                                 <p id="publishSkillsFieldError" class="mo-inline-field-error" role="alert" hidden></p>
-                                <p class="mo-picker-summary" id="publishFixedSkillsSummary">尚未选择技能，可点击上方「＋ 添加技能标签」按钮。</p>
+                                <p class="mo-picker-summary" id="publishFixedSkillsSummary" data-i18n="modal.publish.skillsSummaryEmpty" data-i18n-zh="尚未选择技能，可点击上方「＋ 添加技能标签」按钮。" data-i18n-en="No skills selected yet. Use “+ Add skill tags” above.">尚未选择技能，可点击上方「＋ 添加技能标签」按钮。</p>
                                 <div class="mo-picker-actions">
-                                    <button type="button" class="pill-btn ghost mo-btn-sm" id="clearPublishFixedSkillsBtn">清除所有标签</button>
+                                    <button type="button" class="pill-btn ghost mo-btn-sm" id="clearPublishFixedSkillsBtn" data-i18n="modal.publish.clearAllTags" data-i18n-zh="清除所有标签" data-i18n-en="Clear all tags">清除所有标签</button>
                                 </div>
                                 <ul class="mo-composite-list mo-composite-list--skills-extra" id="publishCustomSkillList" aria-live="polite"></ul>
                             </div>
                         </div>
 
                         <div class="mo-publish-section full" id="teaching-weeks">
-                            <h4 class="mo-publish-section-title">授课周次 <span class="mo-muted">（可选）</span></h4>
+                            <h4 class="mo-publish-section-title" data-i18n-html="授课周次 <span class='mo-muted'>（可选）</span>|Teaching weeks <span class='mo-muted'>(optional)</span>">授课周次 <span class="mo-muted">（可选）</span></h4>
                             <div class="mo-section-content">
-                                <p class="mo-picker-summary" id="publishTeachingWeeksSummary">尚未选择授课周次（选填）。</p>
+                                <p class="mo-picker-summary" id="publishTeachingWeeksSummary" data-i18n="modal.publish.weeksSummaryEmpty" data-i18n-zh="尚未选择授课周次（选填）。" data-i18n-en="No teaching weeks selected yet (optional).">尚未选择授课周次（选填）。</p>
                                 <div class="mo-picker-actions">
-                                    <button type="button" class="pill-btn ghost mo-btn-sm" id="openPublishTeachingWeeksBtn">选择授课周次</button>
-                                    <button type="button" class="pill-btn ghost mo-btn-sm" id="clearPublishTeachingWeeksBtn">清除周次</button>
+                                    <button type="button" class="pill-btn ghost mo-btn-sm" id="openPublishTeachingWeeksBtn" data-i18n="modal.publish.chooseWeeks" data-i18n-zh="选择授课周次" data-i18n-en="Choose teaching weeks">选择授课周次</button>
+                                    <button type="button" class="pill-btn ghost mo-btn-sm" id="clearPublishTeachingWeeksBtn" data-i18n="modal.publish.clearWeeks" data-i18n-zh="清除周次" data-i18n-en="Clear weeks">清除周次</button>
                                 </div>
                             </div>
                         </div>
 
                         <div class="mo-publish-section full" id="assessment">
                             <div class="mo-publish-section-head">
-                                <h4 class="mo-publish-section-title">任务安排 <span class="mo-muted">（可选）</span></h4>
-                                <button type="button" class="pill-btn ghost mo-btn-sm" id="openPublishAssessmentModalBtn">＋ 添加任务项</button>
+                                <h4 class="mo-publish-section-title" data-i18n-html="任务安排 <span class='mo-muted'>（可选）</span>|Tasks &amp; assessments <span class='mo-muted'>(optional)</span>">任务安排 <span class="mo-muted">（可选）</span></h4>
+                                <button type="button" class="pill-btn ghost mo-btn-sm" id="openPublishAssessmentModalBtn" data-i18n="modal.publish.addTaskItem" data-i18n-zh="＋ 添加任务项" data-i18n-en="+ Add task">＋ 添加任务项</button>
                             </div>
                             <div class="mo-section-content">
-                                <p class="mo-hint">建议按任务安排逐条填写名称、时间与说明，便于 TA 了解安排。</p>
+                                <p class="mo-hint" data-i18n="modal.publish.assessmentHint" data-i18n-zh="建议按任务安排逐条填写名称、时间与说明，便于 TA 了解安排。" data-i18n-en="Add each task with name, timing, and notes so TAs know what to expect.">建议按任务安排逐条填写名称、时间与说明，便于 TA 了解安排。</p>
                                 <ul class="mo-composite-list" id="publishAssessmentList" aria-live="polite"></ul>
-                                <p class="mo-empty-hint" id="publishAssessmentEmpty">尚未添加任务项，可点击上方按钮填写。</p>
+                                <p class="mo-empty-hint" id="publishAssessmentEmpty" data-i18n="modal.publish.assessmentEmpty" data-i18n-zh="尚未添加任务项，可点击上方按钮填写。" data-i18n-en="No tasks yet. Use the button above to add one.">尚未添加任务项，可点击上方按钮填写。</p>
                             </div>
                         </div>
 
                         <div class="mo-publish-section full" id="recruitment-brief">
-                            <h4 class="mo-publish-section-title">招募说明 <span class="mo-muted">（可选）</span></h4>
+                            <h4 class="mo-publish-section-title" data-i18n-html="招募说明 <span class='mo-muted'>（可选）</span>|Recruitment brief <span class='mo-muted'>(optional)</span>">招募说明 <span class="mo-muted">（可选）</span></h4>
                             <div class="mo-section-content">
                                 <label class="mo-field full">
-                                    <span class="mo-field-label">招募说明</span>
-                                    <textarea id="recruitmentBriefInput" rows="6" placeholder="详细说明职责、投入时间、沟通方式、任务与评价方式等（可选）" class="mo-field-input"></textarea>
+                                    <span class="mo-field-label" data-i18n="modal.publish.briefLabel" data-i18n-zh="招募说明" data-i18n-en="Recruitment brief">招募说明</span>
+                                    <textarea id="recruitmentBriefInput" rows="6" data-i18n-placeholder="modal.publish.phBrief" data-i18n-placeholder-zh="详细说明职责、投入时间、沟通方式、任务与评价方式等（可选）" data-i18n-placeholder-en="Describe duties, time commitment, communication, tasks, and evaluation (optional)" placeholder="详细说明职责、投入时间、沟通方式、任务与评价方式等（可选）" class="mo-field-input"></textarea>
                                 </label>
                             </div>
                         </div>
@@ -211,35 +211,35 @@
     </div>
 
     <div class="ta-modal-panel wide mo-job-publish-modal mo-job-edit-modal" data-modal="course-edit" role="dialog" aria-modal="true" aria-labelledby="modalCourseEditTitle">
-        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <button class="modal-close" type="button" data-i18n-aria-label="modal.closeAria" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head mo-job-publish-modal__head">
             <div class="mo-job-publish-modal__head-main">
-                <h3 id="modalCourseEditTitle">修改课程信息</h3>
-                <p class="muted">课程编号创建后不可修改；其余填写项与发布岗位表单相同，保存后返回课程详情。</p>
+                <h3 id="modalCourseEditTitle" data-i18n="modal.edit.title" data-i18n-zh="修改课程信息" data-i18n-en="Edit module">修改课程信息</h3>
+                <p class="muted" data-i18n="modal.edit.subtitle" data-i18n-zh="课程编号创建后不可修改；其余填写项与发布岗位表单相同，保存后返回课程详情。" data-i18n-en="The module code cannot be changed after creation. Other fields match the post form; saving returns you to module details.">课程编号创建后不可修改；其余填写项与发布岗位表单相同，保存后返回课程详情。</p>
             </div>
             <div class="mo-job-publish-modal__head-actions">
                 <span id="courseEditStatus" class="muted mo-job-publish-modal__status" role="status" aria-live="polite"></span>
-                <button class="pill-btn" id="saveCourseEditBtn" type="submit" form="courseEditForm" aria-describedby="courseEditStatus">保存修改</button>
+                <button class="pill-btn" id="saveCourseEditBtn" type="submit" form="courseEditForm" aria-describedby="courseEditStatus" data-i18n="modal.edit.save" data-i18n-zh="保存修改" data-i18n-en="Save changes">保存修改</button>
             </div>
         </div>
         <div class="modal-body mo-job-publish-modal__body">
             <div class="mo-publish-layout">
-                <nav class="mo-publish-nav" aria-label="编辑课程导航">
+                <nav class="mo-publish-nav" data-i18n-aria-label="modal.edit.navAria" data-i18n-aria-label-zh="编辑课程导航" data-i18n-aria-label-en="Edit module navigation" aria-label="编辑课程导航">
                     <ul class="mo-publish-nav-list">
                         <li class="mo-publish-nav-item">
-                            <a href="#edit-basic-info" class="mo-publish-nav-link active" aria-current="true">基本信息<span class="mo-req" aria-hidden="true">*</span></a>
+                            <a href="#edit-basic-info" class="mo-publish-nav-link active" aria-current="true" data-i18n-html="基本信息<span class='mo-req' aria-hidden='true'>*</span>|Basic info<span class='mo-req' aria-hidden='true'>*</span>">基本信息<span class="mo-req" aria-hidden="true">*</span></a>
                         </li>
                         <li class="mo-publish-nav-item">
-                            <a href="#edit-required-skills" class="mo-publish-nav-link">所需技能<span class="mo-req" aria-hidden="true">*</span></a>
+                            <a href="#edit-required-skills" class="mo-publish-nav-link" data-i18n-html="所需技能<span class='mo-req' aria-hidden='true'>*</span>|Required skills<span class='mo-req' aria-hidden='true'>*</span>">所需技能<span class="mo-req" aria-hidden="true">*</span></a>
                         </li>
                         <li class="mo-publish-nav-item">
-                            <a href="#edit-teaching-weeks" class="mo-publish-nav-link">授课周次</a>
+                            <a href="#edit-teaching-weeks" class="mo-publish-nav-link" data-i18n="modal.publish.navWeeks" data-i18n-zh="授课周次" data-i18n-en="Teaching weeks">授课周次</a>
                         </li>
                         <li class="mo-publish-nav-item">
-                            <a href="#edit-assessment" class="mo-publish-nav-link">任务安排</a>
+                            <a href="#edit-assessment" class="mo-publish-nav-link" data-i18n="modal.publish.navAssessment" data-i18n-zh="任务安排" data-i18n-en="Tasks &amp; assessments">任务安排</a>
                         </li>
                         <li class="mo-publish-nav-item">
-                            <a href="#edit-recruitment-brief" class="mo-publish-nav-link">招募说明</a>
+                            <a href="#edit-recruitment-brief" class="mo-publish-nav-link" data-i18n="modal.publish.navBrief" data-i18n-zh="招募说明" data-i18n-en="Recruitment brief">招募说明</a>
                         </li>
                     </ul>
                 </nav>
@@ -247,114 +247,114 @@
                 <div class="mo-publish-content">
                     <form id="courseEditForm" class="mo-publish-form mo-form-grid" autocomplete="off">
                         <div class="mo-publish-section full" id="edit-basic-info">
-                            <h4 class="mo-publish-section-title">基本信息</h4>
+                            <h4 class="mo-publish-section-title" data-i18n="modal.publish.sectionBasic" data-i18n-zh="基本信息" data-i18n-en="Basic information">基本信息</h4>
                             <div class="mo-form-grid">
                                 <label class="mo-field">
-                                    <span class="mo-field-label">岗位/课程名称 <span class="mo-req" aria-hidden="true">*</span></span>
-                                    <input id="editCourseNameInput" required type="text" placeholder="课程名称" aria-required="true" class="mo-field-input" autocomplete="off">
+                                    <span class="mo-field-label" data-i18n-html="岗位/课程名称 <span class='mo-req' aria-hidden='true'>*</span>|Opening / module name <span class='mo-req' aria-hidden='true'>*</span>">岗位/课程名称 <span class="mo-req" aria-hidden="true">*</span></span>
+                                    <input id="editCourseNameInput" required type="text" data-i18n-placeholder="modal.edit.phModuleName" data-i18n-placeholder-zh="课程名称" data-i18n-placeholder-en="Module name" placeholder="课程名称" aria-required="true" class="mo-field-input" autocomplete="off">
                                 </label>
                                 <div class="mo-field">
-                                    <span class="mo-field-label">课程编码 <span class="mo-muted">（不可修改）</span></span>
-                                    <div id="editCourseCodeDisplay" class="mo-field-input mo-field-input--readonly" aria-label="课程编码（不可修改）"></div>
+                                    <span class="mo-field-label" data-i18n-html="课程编码 <span class='mo-muted'>（不可修改）</span>|Module code <span class='mo-muted'>(read-only)</span>">课程编码 <span class="mo-muted">（不可修改）</span></span>
+                                    <div id="editCourseCodeDisplay" class="mo-field-input mo-field-input--readonly" data-i18n-aria-label="modal.edit.codeReadonlyAria" data-i18n-aria-label-zh="课程编码（不可修改）" data-i18n-aria-label-en="Module code (read-only)" aria-label="课程编码（不可修改）"></div>
                                 </div>
                                 <div class="mo-semester-status-group full">
                                     <div class="mo-publish-semester-status-row">
                                         <div class="mo-field mo-semester-field mo-semester-field--compact">
-                                            <span class="mo-field-label">学期 <span class="mo-req" aria-hidden="true">*</span></span>
-                                            <div class="mo-semester-combined" role="group" aria-label="学年与学期">
-                                                <select id="editSemesterYearInput" class="mo-semester-combined__year" required aria-required="true" aria-label="年份"></select>
-                                                <select id="editSemesterTermInput" class="mo-semester-combined__term" required aria-required="true" aria-label="春季或秋季学期">
-                                                    <option value="">学期</option>
-                                                    <option value="Spring">春季 Spring</option>
-                                                    <option value="Fall">秋季 Fall</option>
+                                            <span class="mo-field-label" data-i18n-html="学期 <span class='mo-req' aria-hidden='true'>*</span>|Semester <span class='mo-req' aria-hidden='true'>*</span>">学期 <span class="mo-req" aria-hidden="true">*</span></span>
+                                            <div class="mo-semester-combined" role="group" data-i18n-aria-label="modal.publish.yearTermGroup" data-i18n-aria-label-zh="学年与学期" data-i18n-aria-label-en="Academic year and term" aria-label="学年与学期">
+                                                <select id="editSemesterYearInput" class="mo-semester-combined__year" required aria-required="true" data-i18n-aria-label="modal.publish.yearAria" data-i18n-aria-label-zh="年份" data-i18n-aria-label-en="Year" aria-label="年份"></select>
+                                                <select id="editSemesterTermInput" class="mo-semester-combined__term" required aria-required="true" data-i18n-aria-label="modal.publish.termAria" data-i18n-aria-label-zh="春季或秋季学期" data-i18n-aria-label-en="Spring or fall term" aria-label="春季或秋季学期">
+                                                    <option value="" data-i18n="modal.publish.optTerm" data-i18n-zh="学期" data-i18n-en="Term">学期</option>
+                                                    <option value="Spring" data-i18n="modal.publish.optSpring" data-i18n-zh="春季 Spring" data-i18n-en="Spring">春季 Spring</option>
+                                                    <option value="Fall" data-i18n="modal.publish.optFall" data-i18n-zh="秋季 Fall" data-i18n-en="Fall">秋季 Fall</option>
                                                 </select>
                                             </div>
                                         </div>
                                         <fieldset class="mo-field-fieldset mo-field-fieldset--inline-status">
-                                            <legend class="mo-field-label">招聘状态 <span class="mo-req" aria-hidden="true">*</span></legend>
-                                            <div class="mo-radio-row" role="radiogroup" aria-label="招聘状态">
+                                            <legend class="mo-field-label" data-i18n-html="招聘状态 <span class='mo-req' aria-hidden='true'>*</span>|Recruitment status <span class='mo-req' aria-hidden='true'>*</span>">招聘状态 <span class="mo-req" aria-hidden="true">*</span></legend>
+                                            <div class="mo-radio-row" role="radiogroup" data-i18n-aria-label="modal.publish.recruitmentStatusGroup" data-i18n-aria-label-zh="招聘状态" data-i18n-aria-label-en="Recruitment status" aria-label="招聘状态">
                                                 <label class="mo-radio-pill"><input type="radio" name="editRecruitmentStatus" id="editRecruitmentStatusOpen" value="OPEN" checked> <span>OPEN</span></label>
                                                 <label class="mo-radio-pill"><input type="radio" name="editRecruitmentStatus" id="editRecruitmentStatusClosed" value="CLOSED"> <span>CLOSED</span></label>
                                             </div>
                                         </fieldset>
                                     </div>
-                                    <p class="mo-hint mo-semester-field__hint">先选学年，再选春季或秋季。年份可在下拉列表中调整。</p>
+                                    <p class="mo-hint mo-semester-field__hint" data-i18n="modal.publish.semesterHint" data-i18n-zh="先选学年，再选春季或秋季。年份可在下拉列表中调整。" data-i18n-en="Choose the academic year first, then spring or fall. Adjust the year from the list.">先选学年，再选春季或秋季。年份可在下拉列表中调整。</p>
                                 </div>
 
                                 <label class="mo-field">
-                                    <span class="mo-field-label">TA 招聘人数 <span class="mo-req" aria-hidden="true">*</span></span>
-                                    <input id="editTaRecruitCountInput" type="number" min="1" step="1" required placeholder="如：6" aria-required="true" class="mo-field-input">
+                                    <span class="mo-field-label" data-i18n-html="TA 招聘人数 <span class='mo-req' aria-hidden='true'>*</span>|Number of TA openings <span class='mo-req' aria-hidden='true'>*</span>">TA 招聘人数 <span class="mo-req" aria-hidden="true">*</span></span>
+                                    <input id="editTaRecruitCountInput" type="number" min="1" step="1" required data-i18n-placeholder="modal.publish.phTaCount" data-i18n-placeholder-zh="如：6" data-i18n-placeholder-en="e.g. 6" placeholder="如：6" aria-required="true" class="mo-field-input">
                                 </label>
                                 <label class="mo-field">
-                                    <span class="mo-field-label">校区 <span class="mo-req" aria-hidden="true">*</span></span>
-                                    <select id="editCampusInput" required aria-label="校区" aria-required="true" class="mo-field-input">
-                                        <option value="">（请选择）</option>
+                                    <span class="mo-field-label" data-i18n-html="校区 <span class='mo-req' aria-hidden='true'>*</span>|Campus <span class='mo-req' aria-hidden='true'>*</span>">校区 <span class="mo-req" aria-hidden="true">*</span></span>
+                                    <select id="editCampusInput" required data-i18n-aria-label="modal.publish.campusAria" data-i18n-aria-label-zh="校区" data-i18n-aria-label-en="Campus" aria-label="校区" aria-required="true" class="mo-field-input">
+                                        <option value="" data-i18n="modal.publish.optSelect" data-i18n-zh="（请选择）" data-i18n-en="(Select)">（请选择）</option>
                                         <option value="Main">Main</option>
                                         <option value="Shahe">Shahe</option>
                                     </select>
                                 </label>
 
                                 <label class="mo-field">
-                                    <span class="mo-field-label">预计学生人数</span>
-                                    <input id="editStudentCountInput" type="number" min="0" placeholder="如：180（可选）" class="mo-field-input">
+                                    <span class="mo-field-label" data-i18n="modal.publish.expectedStudents" data-i18n-zh="预计学生人数" data-i18n-en="Expected students">预计学生人数</span>
+                                    <input id="editStudentCountInput" type="number" min="0" data-i18n-placeholder="modal.publish.phStudents" data-i18n-placeholder-zh="如：180（可选）" data-i18n-placeholder-en="e.g. 180 (optional)" placeholder="如：180（可选）" class="mo-field-input">
                                 </label>
                                 <div class="mo-field">
-                                    <label class="mo-field-label" for="editApplicationDeadlineInput">截止申请时间</label>
-                                    <input id="editApplicationDeadlineInput" type="datetime-local" class="mo-field-input" aria-describedby="editApplicationDeadlineHint" aria-label="截止申请时间">
-                                    <p id="editApplicationDeadlineHint" class="mo-hint">时间按您当前设备的时区保存；候选人查看时会显示为其本地时间。</p>
+                                    <label class="mo-field-label" for="editApplicationDeadlineInput" data-i18n="modal.publish.deadlineLabel" data-i18n-zh="截止申请时间" data-i18n-en="Application deadline">截止申请时间</label>
+                                    <input id="editApplicationDeadlineInput" type="datetime-local" class="mo-field-input" aria-describedby="editApplicationDeadlineHint" data-i18n-aria-label="modal.publish.deadlineAria" data-i18n-aria-label-zh="截止申请时间" data-i18n-aria-label-en="Application deadline" aria-label="截止申请时间">
+                                    <p id="editApplicationDeadlineHint" class="mo-hint" data-i18n="modal.publish.deadlineHint" data-i18n-zh="时间按您当前设备的时区保存；候选人查看时会显示为其本地时间。" data-i18n-en="Times are saved in your device timezone; candidates see them in their local time.">时间按您当前设备的时区保存；候选人查看时会显示为其本地时间。</p>
                                 </div>
                                 <label class="mo-field full">
-                                    <span class="mo-field-label">课程介绍 <span class="mo-req" aria-hidden="true">*</span></span>
-                                    <textarea id="editCourseDescInput" required rows="2" placeholder="简要介绍课程目标、内容与考核方式等" aria-required="true" class="mo-field-input mo-course-intro-input"></textarea>
+                                    <span class="mo-field-label" data-i18n-html="课程介绍 <span class='mo-req' aria-hidden='true'>*</span>|Module introduction <span class='mo-req' aria-hidden='true'>*</span>">课程介绍 <span class="mo-req" aria-hidden="true">*</span></span>
+                                    <textarea id="editCourseDescInput" required rows="2" data-i18n-placeholder="modal.publish.phIntro" data-i18n-placeholder-zh="简要介绍课程目标、内容与考核方式等" data-i18n-placeholder-en="Briefly describe learning outcomes, content, and assessment" placeholder="简要介绍课程目标、内容与考核方式等" aria-required="true" class="mo-field-input mo-course-intro-input"></textarea>
                                 </label>
                             </div>
                         </div>
 
                         <div class="mo-publish-section full" id="edit-required-skills">
                             <div class="mo-publish-section-head">
-                                <h4 class="mo-publish-section-title">所需技能 <span class="mo-req" aria-hidden="true">*</span></h4>
-                                <button type="button" class="pill-btn ghost mo-btn-sm" id="openEditFixedSkillsBtn">＋ 添加技能标签</button>
+                                <h4 class="mo-publish-section-title" data-i18n-html="所需技能 <span class='mo-req' aria-hidden='true'>*</span>|Required skills <span class='mo-req' aria-hidden='true'>*</span>">所需技能 <span class="mo-req" aria-hidden="true">*</span></h4>
+                                <button type="button" class="pill-btn ghost mo-btn-sm" id="openEditFixedSkillsBtn" data-i18n="modal.publish.addSkillTags" data-i18n-zh="＋ 添加技能标签" data-i18n-en="+ Add skill tags">＋ 添加技能标签</button>
                             </div>
                             <div class="mo-section-content">
-                                <p class="mo-hint">请至少选择一项技能标签。若列表中没有合适的，可在选择窗口中点 <strong>Other</strong> 自行填写。</p>
+                                <p class="mo-hint" data-i18n-html="请至少选择一项技能标签。若列表中没有合适的，可在选择窗口中点 <strong>Other</strong> 自行填写。|Select at least one skill tag. If none fit, click <strong>Other</strong> in the picker to add your own.">请至少选择一项技能标签。若列表中没有合适的，可在选择窗口中点 <strong>Other</strong> 自行填写。</p>
                                 <p id="editSkillsFieldError" class="mo-inline-field-error" role="alert" hidden></p>
-                                <p class="mo-picker-summary" id="editFixedSkillsSummary">尚未选择技能，可点击上方「＋ 添加技能标签」按钮。</p>
+                                <p class="mo-picker-summary" id="editFixedSkillsSummary" data-i18n="modal.publish.skillsSummaryEmpty" data-i18n-zh="尚未选择技能，可点击上方「＋ 添加技能标签」按钮。" data-i18n-en="No skills selected yet. Use “+ Add skill tags” above.">尚未选择技能，可点击上方「＋ 添加技能标签」按钮。</p>
                                 <div class="mo-picker-actions">
-                                    <button type="button" class="pill-btn ghost mo-btn-sm" id="clearEditFixedSkillsBtn">清除所有标签</button>
+                                    <button type="button" class="pill-btn ghost mo-btn-sm" id="clearEditFixedSkillsBtn" data-i18n="modal.publish.clearAllTags" data-i18n-zh="清除所有标签" data-i18n-en="Clear all tags">清除所有标签</button>
                                 </div>
                                 <ul class="mo-composite-list mo-composite-list--skills-extra" id="editCustomSkillList" aria-live="polite"></ul>
                             </div>
                         </div>
 
                         <div class="mo-publish-section full" id="edit-teaching-weeks">
-                            <h4 class="mo-publish-section-title">授课周次 <span class="mo-muted">（可选）</span></h4>
+                            <h4 class="mo-publish-section-title" data-i18n-html="授课周次 <span class='mo-muted'>（可选）</span>|Teaching weeks <span class='mo-muted'>(optional)</span>">授课周次 <span class="mo-muted">（可选）</span></h4>
                             <div class="mo-section-content">
-                                <p class="mo-picker-summary" id="editTeachingWeeksSummary">尚未选择授课周次（选填）。</p>
+                                <p class="mo-picker-summary" id="editTeachingWeeksSummary" data-i18n="modal.publish.weeksSummaryEmpty" data-i18n-zh="尚未选择授课周次（选填）。" data-i18n-en="No teaching weeks selected yet (optional).">尚未选择授课周次（选填）。</p>
                                 <div class="mo-picker-actions">
-                                    <button type="button" class="pill-btn ghost mo-btn-sm" id="openEditTeachingWeeksBtn">选择授课周次</button>
-                                    <button type="button" class="pill-btn ghost mo-btn-sm" id="clearEditTeachingWeeksBtn">清除周次</button>
+                                    <button type="button" class="pill-btn ghost mo-btn-sm" id="openEditTeachingWeeksBtn" data-i18n="modal.publish.chooseWeeks" data-i18n-zh="选择授课周次" data-i18n-en="Choose teaching weeks">选择授课周次</button>
+                                    <button type="button" class="pill-btn ghost mo-btn-sm" id="clearEditTeachingWeeksBtn" data-i18n="modal.publish.clearWeeks" data-i18n-zh="清除周次" data-i18n-en="Clear weeks">清除周次</button>
                                 </div>
                             </div>
                         </div>
 
                         <div class="mo-publish-section full" id="edit-assessment">
                             <div class="mo-publish-section-head">
-                                <h4 class="mo-publish-section-title">任务安排 <span class="mo-muted">（可选）</span></h4>
-                                <button type="button" class="pill-btn ghost mo-btn-sm" id="openEditAssessmentModalBtn">＋ 添加任务项</button>
+                                <h4 class="mo-publish-section-title" data-i18n-html="任务安排 <span class='mo-muted'>（可选）</span>|Tasks &amp; assessments <span class='mo-muted'>(optional)</span>">任务安排 <span class="mo-muted">（可选）</span></h4>
+                                <button type="button" class="pill-btn ghost mo-btn-sm" id="openEditAssessmentModalBtn" data-i18n="modal.publish.addTaskItem" data-i18n-zh="＋ 添加任务项" data-i18n-en="+ Add task">＋ 添加任务项</button>
                             </div>
                             <div class="mo-section-content">
-                                <p class="mo-hint">建议按任务安排逐条填写名称、时间与说明，便于 TA 了解安排。</p>
+                                <p class="mo-hint" data-i18n="modal.publish.assessmentHint" data-i18n-zh="建议按任务安排逐条填写名称、时间与说明，便于 TA 了解安排。" data-i18n-en="Add each task with name, timing, and notes so TAs know what to expect.">建议按任务安排逐条填写名称、时间与说明，便于 TA 了解安排。</p>
                                 <ul class="mo-composite-list" id="editAssessmentList" aria-live="polite"></ul>
-                                <p class="mo-empty-hint" id="editAssessmentEmpty">尚未添加任务项，可点击上方按钮填写。</p>
+                                <p class="mo-empty-hint" id="editAssessmentEmpty" data-i18n="modal.publish.assessmentEmpty" data-i18n-zh="尚未添加任务项，可点击上方按钮填写。" data-i18n-en="No tasks yet. Use the button above to add one.">尚未添加任务项，可点击上方按钮填写。</p>
                             </div>
                         </div>
 
                         <div class="mo-publish-section full" id="edit-recruitment-brief">
-                            <h4 class="mo-publish-section-title">招募说明 <span class="mo-muted">（可选）</span></h4>
+                            <h4 class="mo-publish-section-title" data-i18n-html="招募说明 <span class='mo-muted'>（可选）</span>|Recruitment brief <span class='mo-muted'>(optional)</span>">招募说明 <span class="mo-muted">（可选）</span></h4>
                             <div class="mo-section-content">
                                 <label class="mo-field full">
-                                    <span class="mo-field-label">招募说明</span>
-                                    <textarea id="editRecruitmentBriefInput" rows="6" placeholder="详细说明职责、投入时间、沟通方式、任务与评价方式等（可选）" class="mo-field-input"></textarea>
+                                    <span class="mo-field-label" data-i18n="modal.publish.briefLabel" data-i18n-zh="招募说明" data-i18n-en="Recruitment brief">招募说明</span>
+                                    <textarea id="editRecruitmentBriefInput" rows="6" data-i18n-placeholder="modal.publish.phBrief" data-i18n-placeholder-zh="详细说明职责、投入时间、沟通方式、任务与评价方式等（可选）" data-i18n-placeholder-en="Describe duties, time commitment, communication, tasks, and evaluation (optional)" placeholder="详细说明职责、投入时间、沟通方式、任务与评价方式等（可选）" class="mo-field-input"></textarea>
                                 </label>
                             </div>
                         </div>
@@ -365,111 +365,111 @@
     </div>
 
     <div class="ta-modal-panel mo-summary-modal wide" data-modal="summary" role="dialog" aria-labelledby="modalSummaryTitle">
-        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <button class="modal-close" type="button" data-i18n-aria-label="modal.closeAria" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head">
-            <h3 id="modalSummaryTitle">招聘数据摘要</h3>
-            <p class="muted">汇总当前岗位与申请情况；每次打开时会更新未读申请条数。</p>
+            <h3 id="modalSummaryTitle" data-i18n="modal.summary.title" data-i18n-zh="招聘数据摘要" data-i18n-en="Recruitment summary">招聘数据摘要</h3>
+            <p class="muted" data-i18n="modal.summary.subtitle" data-i18n-zh="汇总当前岗位与申请情况；每次打开时会更新未读申请条数。" data-i18n-en="Aggregates openings and applications; unread counts refresh when you open this.">汇总当前岗位与申请情况；每次打开时会更新未读申请条数。</p>
         </div>
         <div class="modal-body mo-summary-modal__body">
             <section class="mo-summary-section" aria-labelledby="summarySnapshotHeading">
-                <h4 class="mo-summary-section__title" id="summarySnapshotHeading">关键指标</h4>
+                <h4 class="mo-summary-section__title" id="summarySnapshotHeading" data-i18n="modal.summary.keyMetrics" data-i18n-zh="关键指标" data-i18n-en="Key metrics">关键指标</h4>
                 <div class="mo-summary-snapshot" role="group">
                     <div class="mo-summary-snapshot__item">
-                        <span class="mo-summary-snapshot__label">开放岗位</span>
+                        <span class="mo-summary-snapshot__label" data-i18n="modal.summary.openOpenings" data-i18n-zh="开放岗位" data-i18n-en="Open openings">开放岗位</span>
                         <strong class="mo-summary-snapshot__value" id="summarySnapshotOpen">—</strong>
                     </div>
                     <div class="mo-summary-snapshot__item">
-                        <span class="mo-summary-snapshot__label">候选 TA（每人计一次）</span>
+                        <span class="mo-summary-snapshot__label" data-i18n="modal.summary.candidateTa" data-i18n-zh="候选 TA（每人计一次）" data-i18n-en="Candidate TAs (unique)">候选 TA（每人计一次）</span>
                         <strong class="mo-summary-snapshot__value" id="summarySnapshotCandidates">—</strong>
                     </div>
                     <div class="mo-summary-snapshot__item">
-                        <span class="mo-summary-snapshot__label">已录用</span>
+                        <span class="mo-summary-snapshot__label" data-i18n="dashboard.hired" data-i18n-zh="已录用" data-i18n-en="Hired">已录用</span>
                         <strong class="mo-summary-snapshot__value" id="summarySnapshotAccepted">—</strong>
                     </div>
                     <div class="mo-summary-snapshot__item">
-                        <span class="mo-summary-snapshot__label">待决策</span>
+                        <span class="mo-summary-snapshot__label" data-i18n="dashboard.pendingDecision" data-i18n-zh="待决策" data-i18n-en="Pending Decision">待决策</span>
                         <strong class="mo-summary-snapshot__value" id="summarySnapshotPending">—</strong>
                     </div>
                     <div class="mo-summary-snapshot__item mo-summary-snapshot__item--accent">
-                        <span class="mo-summary-snapshot__label">未读申请</span>
+                        <span class="mo-summary-snapshot__label" data-i18n="modal.summary.unreadApps" data-i18n-zh="未读申请" data-i18n-en="Unread applications">未读申请</span>
                         <strong class="mo-summary-snapshot__value" id="summarySnapshotUnread">—</strong>
                     </div>
                 </div>
             </section>
 
             <section class="mo-summary-section" aria-labelledby="summaryJobsHeading">
-                <h4 class="mo-summary-section__title" id="summaryJobsHeading">当前开放岗位</h4>
-                <p class="mo-summary-empty muted" id="summaryJobEmpty" hidden>暂无已发布岗位，请前往侧栏「课程管理」发布。</p>
+                <h4 class="mo-summary-section__title" id="summaryJobsHeading" data-i18n="modal.summary.currentOpen" data-i18n-zh="当前开放岗位" data-i18n-en="Current open openings">当前开放岗位</h4>
+                <p class="mo-summary-empty muted" id="summaryJobEmpty" hidden data-i18n="modal.summary.noOpenJobs" data-i18n-zh="暂无已发布岗位，请前往侧栏「课程管理」发布。" data-i18n-en="No published openings yet. Post one from Module Management in the sidebar.">暂无已发布岗位，请前往侧栏「课程管理」发布。</p>
                 <ul class="mo-summary-job-list" id="summaryJobList"></ul>
             </section>
 
             <p class="mo-summary-next muted" id="summaryNextHint"></p>
 
             <details class="mo-summary-workflow">
-                <summary>工作流程说明</summary>
+                <summary data-i18n="modal.summary.workflowTitle" data-i18n-zh="工作流程说明" data-i18n-en="Workflow">工作流程说明</summary>
                 <ol class="mo-summary-workflow__ol">
-                    <li><strong>课程管理与发布</strong> — 在「课程管理」中使用「发布岗位」维护课程；保存后总览会随之更新。</li>
-                    <li><strong>应聘查看</strong> — 在「应聘筛选」中按课程查看 TA 资料与投递状态。</li>
-                    <li><strong>筛选与决策</strong> — 录用或拒绝后，申请人会看到与您操作一致的最新状态。</li>
+                    <li data-i18n-html="&lt;strong&gt;课程管理与发布&lt;/strong&gt; — 在「课程管理」中使用「发布岗位」维护课程；保存后总览会随之更新。|&lt;strong&gt;Module management &amp; posting&lt;/strong&gt; — In &lt;strong&gt;Module Management&lt;/strong&gt;, use &lt;strong&gt;Post Opening&lt;/strong&gt; to maintain modules; the dashboard updates after you save."><strong>课程管理与发布</strong> — 在「课程管理」中使用「发布岗位」维护课程；保存后总览会随之更新。</li>
+                    <li data-i18n-html="&lt;strong&gt;应聘查看&lt;/strong&gt; — 在「应聘筛选」中按课程查看 TA 资料与投递状态。|&lt;strong&gt;Applications&lt;/strong&gt; — In &lt;strong&gt;Applicant Screening&lt;/strong&gt;, review TA profiles and submission status by module."><strong>应聘查看</strong> — 在「应聘筛选」中按课程查看 TA 资料与投递状态。</li>
+                    <li data-i18n-html="&lt;strong&gt;筛选与决策&lt;/strong&gt; — 录用或拒绝后，申请人会看到与您操作一致的最新状态。|&lt;strong&gt;Selection&lt;/strong&gt; — After hire or reject, applicants see the latest status matching your action."><strong>筛选与决策</strong> — 录用或拒绝后，申请人会看到与您操作一致的最新状态。</li>
                 </ol>
             </details>
         </div>
     </div>
 
     <div class="ta-modal-panel mo-summary-modal wide" data-modal="candidates-pool" role="dialog" aria-labelledby="modalCandidatesTitle">
-        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <button class="modal-close" type="button" data-i18n-aria-label="modal.closeAria" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head">
-            <h3 id="modalCandidatesTitle">候选池明细</h3>
-            <p class="muted">下方按课程列出投递明细。人数与总览「候选池规模」一致：同一位 TA 若投递多门课，在人数上仍只计<strong>一名</strong>候选人。</p>
+            <h3 id="modalCandidatesTitle" data-i18n="modal.candidatesPool.title" data-i18n-zh="候选池明细" data-i18n-en="Candidate pool detail">候选池明细</h3>
+            <p class="muted" data-i18n-html="下方按课程列出投递明细。人数与总览「候选池规模」一致：同一位 TA 若投递多门课，在人数上仍只计<strong>一名</strong>候选人。|Applications are listed by module below. The count matches dashboard “Candidate Pool”: if one TA applies to several modules, they still count as <strong>one</strong> candidate.">下方按课程列出投递明细。人数与总览「候选池规模」一致：同一位 TA 若投递多门课，在人数上仍只计<strong>一名</strong>候选人。</p>
         </div>
         <div class="modal-body mo-summary-modal__body">
             <p class="mo-dash-modal-count" id="candidatesPoolCountLine" aria-live="polite"></p>
-            <p class="mo-summary-empty muted" id="candidatesPoolEmpty" hidden>暂无候选人数据。请到侧栏「应聘筛选」查看，或等待 TA 投递。</p>
+            <p class="mo-summary-empty muted" id="candidatesPoolEmpty" hidden data-i18n="modal.candidatesPool.empty" data-i18n-zh="暂无候选人数据。请到侧栏「应聘筛选」查看，或等待 TA 投递。" data-i18n-en="No candidates yet. Open Applicant Screening in the sidebar, or wait for applications.">暂无候选人数据。请到侧栏「应聘筛选」查看，或等待 TA 投递。</p>
             <div class="mo-dash-cand-grouped" id="candidatesPoolGrouped"></div>
         </div>
     </div>
 
     <div class="ta-modal-panel mo-summary-modal wide" data-modal="accepted-list" role="dialog" aria-labelledby="modalAcceptedTitle">
-        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <button class="modal-close" type="button" data-i18n-aria-label="modal.closeAria" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head">
-            <h3 id="modalAcceptedTitle">已录用名单</h3>
-            <p class="muted">申请状态为「已录用」的记录。</p>
+            <h3 id="modalAcceptedTitle" data-i18n="modal.accepted.title" data-i18n-zh="已录用名单" data-i18n-en="Hired list">已录用名单</h3>
+            <p class="muted" data-i18n="modal.accepted.subtitle" data-i18n-zh="申请状态为「已录用」的记录。" data-i18n-en="Applications with status Hired.">申请状态为「已录用」的记录。</p>
         </div>
         <div class="modal-body mo-summary-modal__body">
             <p class="mo-dash-modal-count" id="acceptedListCountLine" aria-live="polite"></p>
-            <p class="mo-summary-empty muted" id="acceptedListEmpty" hidden>暂无已录用记录。</p>
+            <p class="mo-summary-empty muted" id="acceptedListEmpty" hidden data-i18n="modal.accepted.empty" data-i18n-zh="暂无已录用记录。" data-i18n-en="No hired applications yet.">暂无已录用记录。</p>
             <ul class="mo-dash-cand-list" id="acceptedListDetail"></ul>
         </div>
     </div>
 
     <div class="ta-modal-panel mo-summary-modal wide" data-modal="pending-list" role="dialog" aria-labelledby="modalPendingTitle">
-        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <button class="modal-close" type="button" data-i18n-aria-label="modal.closeAria" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head">
-            <h3 id="modalPendingTitle">待决策申请</h3>
-            <p class="muted">尚未录用或拒绝的申请均在此列出，人数与总览「待决策」一致。请在侧栏「应聘筛选」中处理。</p>
+            <h3 id="modalPendingTitle" data-i18n="modal.pending.title" data-i18n-zh="待决策申请" data-i18n-en="Pending applications">待决策申请</h3>
+            <p class="muted" data-i18n="modal.pending.subtitle" data-i18n-zh="尚未录用或拒绝的申请均在此列出，人数与总览「待决策」一致。请在侧栏「应聘筛选」中处理。" data-i18n-en="Applications not yet hired or rejected; count matches dashboard “Pending”. Handle them in Applicant Screening.">尚未录用或拒绝的申请均在此列出，人数与总览「待决策」一致。请在侧栏「应聘筛选」中处理。</p>
         </div>
         <div class="modal-body mo-summary-modal__body">
             <p class="mo-dash-modal-count" id="pendingListCountLine" aria-live="polite"></p>
-            <p class="mo-summary-empty muted" id="pendingListEmpty" hidden>暂无待决策申请。</p>
+            <p class="mo-summary-empty muted" id="pendingListEmpty" hidden data-i18n="modal.pending.empty" data-i18n-zh="暂无待决策申请。" data-i18n-en="No pending applications.">暂无待决策申请。</p>
             <ul class="mo-dash-cand-list" id="pendingListDetail"></ul>
         </div>
     </div>
 
     <div class="ta-modal-panel ta-settings-modal" data-modal="settings" role="dialog" aria-labelledby="modalSettingsTitle">
-        <button class="modal-close" type="button" aria-label="关闭" data-modal-close>&times;</button>
+        <button class="modal-close" type="button" data-i18n-aria-label="modal.closeAria" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head">
-            <h3 id="modalSettingsTitle">个人资料管理</h3>
-            <p class="muted">完善您的个人信息，便于 TA 了解课程背景与教学风格。</p>
+            <h3 id="modalSettingsTitle" data-i18n="modal.settings.title" data-i18n-zh="个人资料管理" data-i18n-en="Profile">个人资料管理</h3>
+            <p class="muted" data-i18n="modal.settings.subtitle" data-i18n-zh="完善您的个人信息，便于 TA 了解课程背景与教学风格。" data-i18n-en="Complete your profile so TAs understand your module background and teaching style.">完善您的个人信息，便于 TA 了解课程背景与教学风格。</p>
         </div>
         <div class="modal-body settings-body">
-            <div class="settings-tabs" role="tablist" aria-label="个人资料菜单">
+            <div class="settings-tabs" role="tablist" data-i18n-aria-label="modal.settings.tablistAria" data-i18n-aria-label-zh="个人资料菜单" data-i18n-aria-label-en="Profile sections" aria-label="个人资料菜单">
                 <button class="settings-tab active" type="button" data-settings-tab="profile" role="tab" aria-selected="true" aria-controls="panel-profile">
                     <span>👤</span>
-                    <span>基础资料</span>
+                    <span data-i18n="modal.settings.tabProfile" data-i18n-zh="基础资料" data-i18n-en="Basic info">基础资料</span>
                 </button>
                 <button class="settings-tab" type="button" data-settings-tab="security" role="tab" aria-selected="false" aria-controls="panel-security">
                     <span>🔒</span>
-                    <span>账号与安全</span>
+                    <span data-i18n="modal.settings.tabSecurity" data-i18n-zh="账号与安全" data-i18n-en="Account &amp; security">账号与安全</span>
                 </button>
             </div>
 
@@ -481,59 +481,59 @@
                                 <span class="settings-status-badge" id="profileSaveStatus">已加载</span>
                             </div>
                             <div class="settings-action-group">
-                                <button class="pill-btn" type="button" id="saveProfileBtn">保存</button>
+                                <button class="pill-btn" type="button" id="saveProfileBtn" data-i18n="modal.settings.save" data-i18n-zh="保存" data-i18n-en="Save">保存</button>
                             </div>
                         </div>
-                        <div class="settings-avatar" role="button" tabindex="0" id="profileAvatarBox" aria-label="更换头像">M
+                        <div class="settings-avatar" role="button" tabindex="0" id="profileAvatarBox" data-i18n-aria-label="modal.settings.changeAvatar" data-i18n-aria-label-zh="更换头像" data-i18n-aria-label-en="Change avatar" aria-label="更换头像">M
                             <span class="settings-avatar-ring" aria-hidden="true"></span>
                         </div>
                         <label class="settings-field full settings-avatar-upload-field" for="avatarFile">
-                            <span>头像上传</span>
+                            <span data-i18n="modal.settings.avatarUpload" data-i18n-zh="头像上传" data-i18n-en="Avatar upload">头像上传</span>
                             <input id="avatarFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" hidden>
-                            <small class="muted" id="avatarUploadHint">支持 PNG / JPG / WEBP / GIF，大小限制 10MB。点击头像即可更换。</small>
+                            <small class="muted" id="avatarUploadHint" data-i18n="modal.settings.avatarHint" data-i18n-zh="支持 PNG / JPG / WEBP / GIF，大小限制 10MB。点击头像即可更换。" data-i18n-en="PNG / JPG / WEBP / GIF up to 10MB. Click the avatar to change.">支持 PNG / JPG / WEBP / GIF，大小限制 10MB。点击头像即可更换。</small>
                         </label>
                         <div class="settings-grid two-column">
                             <label class="settings-field">
-                                <span>姓名</span>
-                                <input id="moNameInput" type="text" placeholder="如：张教授" autocomplete="name">
+                                <span data-i18n="modal.settings.name" data-i18n-zh="姓名" data-i18n-en="Name">姓名</span>
+                                <input id="moNameInput" type="text" data-i18n-placeholder="modal.settings.phName" data-i18n-placeholder-zh="如：张教授" data-i18n-placeholder-en="e.g. Prof. Zhang" placeholder="如：张教授" autocomplete="name">
                             </label>
                             <label class="settings-field">
-                                <span>联系邮箱</span>
-                                <input id="contactEmailInput" type="email" placeholder="如：professor@example.com">
+                                <span data-i18n="modal.settings.email" data-i18n-zh="联系邮箱" data-i18n-en="Contact email">联系邮箱</span>
+                                <input id="contactEmailInput" type="email" data-i18n-placeholder="modal.settings.phEmail" data-i18n-placeholder-zh="如：professor@example.com" data-i18n-placeholder-en="e.g. professor@example.com" placeholder="如：professor@example.com">
                             </label>
                         </div>
                         <label class="settings-field full">
-                            <span>个人简介</span>
-                            <textarea id="bioInput" rows="4" placeholder="简要介绍您的教学背景、研究方向等信息..."></textarea>
+                            <span data-i18n="modal.settings.bio" data-i18n-zh="个人简介" data-i18n-en="Bio">个人简介</span>
+                            <textarea id="bioInput" rows="4" data-i18n-placeholder="modal.settings.phBio" data-i18n-placeholder-zh="简要介绍您的教学背景、研究方向等信息..." data-i18n-placeholder-en="Briefly describe your teaching background and research..." placeholder="简要介绍您的教学背景、研究方向等信息..."></textarea>
                         </label>
                         <label class="settings-field full">
-                            <span>专业技能</span>
-                            <textarea id="skillsInput" rows="3" placeholder="如：软件工程&#10;数据结构&#10;机器学习"></textarea>
-                            <small class="muted">每行一个技能或使用逗号分隔</small>
+                            <span data-i18n="modal.settings.skills" data-i18n-zh="专业技能" data-i18n-en="Skills">专业技能</span>
+                            <textarea id="skillsInput" rows="3" data-i18n-placeholder="modal.settings.phSkills" data-i18n-placeholder-zh="如：软件工程&#10;数据结构&#10;机器学习" data-i18n-placeholder-en="e.g. Software Engineering&#10;Data structures&#10;Machine learning" placeholder="如：软件工程&#10;数据结构&#10;机器学习"></textarea>
+                            <small class="muted" data-i18n="modal.settings.skillsHint" data-i18n-zh="每行一个技能或使用逗号分隔" data-i18n-en="One skill per line, or comma-separated">每行一个技能或使用逗号分隔</small>
                         </label>
                     </div>
                 </div>
 
                 <div class="settings-panel" id="panel-security" data-settings-panel="security" role="tabpanel" hidden>
                     <div class="settings-section">
-                        <div class="settings-subtitle">修改密码</div>
+                        <div class="settings-subtitle" data-i18n="modal.settings.changePassword" data-i18n-zh="修改密码" data-i18n-en="Change password">修改密码</div>
                         <div class="settings-grid stack">
                             <label class="settings-field">
-                                <span>当前密码</span>
-                                <input id="currentPasswordInput" type="password" autocomplete="current-password" placeholder="请输入当前密码">
+                                <span data-i18n="modal.settings.currentPw" data-i18n-zh="当前密码" data-i18n-en="Current password">当前密码</span>
+                                <input id="currentPasswordInput" type="password" autocomplete="current-password" data-i18n-placeholder="modal.settings.phCurrentPw" data-i18n-placeholder-zh="请输入当前密码" data-i18n-placeholder-en="Enter current password" placeholder="请输入当前密码">
                             </label>
                             <label class="settings-field">
-                                <span>新密码</span>
-                                <input id="newPasswordInput" type="password" autocomplete="new-password" placeholder="至少 6 位字符">
+                                <span data-i18n="modal.settings.newPw" data-i18n-zh="新密码" data-i18n-en="New password">新密码</span>
+                                <input id="newPasswordInput" type="password" autocomplete="new-password" data-i18n-placeholder="modal.settings.phNewPw" data-i18n-placeholder-zh="至少 6 位字符" data-i18n-placeholder-en="At least 6 characters" placeholder="至少 6 位字符">
                             </label>
                             <label class="settings-field">
-                                <span>确认新密码</span>
-                                <input id="confirmPasswordInput" type="password" autocomplete="new-password" placeholder="再次输入新密码">
+                                <span data-i18n="modal.settings.confirmPw" data-i18n-zh="确认新密码" data-i18n-en="Confirm new password">确认新密码</span>
+                                <input id="confirmPasswordInput" type="password" autocomplete="new-password" data-i18n-placeholder="modal.settings.phConfirmPw" data-i18n-placeholder-zh="再次输入新密码" data-i18n-placeholder-en="Re-enter new password" placeholder="再次输入新密码">
                             </label>
                         </div>
                         <div class="settings-action-row">
                             <span class="muted" id="passwordSaveStatus">尚未保存</span>
-                            <button class="pill-btn" type="button" id="changePasswordBtn">更新密码</button>
+                            <button class="pill-btn" type="button" id="changePasswordBtn" data-i18n="modal.settings.updatePw" data-i18n-zh="更新密码" data-i18n-en="Update password">更新密码</button>
                         </div>
                     </div>
                 </div>
@@ -546,25 +546,25 @@
     <div class="mo-publish-modal__backdrop" data-mo-close="assessment"></div>
     <div class="mo-publish-modal__panel" role="dialog" aria-modal="true" aria-labelledby="moCompositeAssessmentTitle">
         <div class="mo-publish-modal__head">
-            <h3 id="moCompositeAssessmentTitle">添加任务项</h3>
-            <button type="button" class="mo-publish-modal__close" data-mo-close="assessment" aria-label="关闭">&times;</button>
+            <h3 id="moCompositeAssessmentTitle" data-i18n="modal.composite.addTask" data-i18n-zh="添加任务项" data-i18n-en="Add task">添加任务项</h3>
+            <button type="button" class="mo-publish-modal__close" data-mo-close="assessment" data-i18n-aria-label="modal.closeAria" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close" aria-label="关闭">&times;</button>
         </div>
         <div class="mo-publish-modal__body">
             <label class="mo-field">
-                <span class="mo-field-label">名称 <span class="mo-req">*</span></span>
-                <input type="text" id="moAssessmentNameInput" placeholder="如：期中机考" autocomplete="off">
+                <span class="mo-field-label" data-i18n-html="名称 <span class='mo-req'>*</span>|Name <span class='mo-req'>*</span>">名称 <span class="mo-req">*</span></span>
+                <input type="text" id="moAssessmentNameInput" data-i18n-placeholder="modal.composite.phMidterm" data-i18n-placeholder-zh="如：期中机考" data-i18n-placeholder-en="e.g. Midterm exam" placeholder="如：期中机考" autocomplete="off">
             </label>
             <fieldset class="mo-field mo-field-fieldset">
-                <legend class="mo-field-label">涉及周次 <span class="mo-muted">（可选）</span></legend>
-                <div class="mo-week-grid mo-week-grid--compact" id="moAssessmentWeeksGrid" aria-label="任务涉及周次"></div>
+                <legend class="mo-field-label" data-i18n-html="涉及周次 <span class='mo-muted'>（可选）</span>|Weeks covered <span class='mo-muted'>(optional)</span>">涉及周次 <span class="mo-muted">（可选）</span></legend>
+                <div class="mo-week-grid mo-week-grid--compact" id="moAssessmentWeeksGrid" data-i18n-aria-label="modal.composite.weeksAria" data-i18n-aria-label-zh="任务涉及周次" data-i18n-aria-label-en="Weeks for this task" aria-label="任务涉及周次"></div>
             </fieldset>
             <label class="mo-field">
-                <span class="mo-field-label">说明</span>
-                <textarea id="moAssessmentDescInput" rows="3" placeholder="任务形式、时长、注意事项等"></textarea>
+                <span class="mo-field-label" data-i18n="modal.composite.notes" data-i18n-zh="说明" data-i18n-en="Notes">说明</span>
+                <textarea id="moAssessmentDescInput" rows="3" data-i18n-placeholder="modal.composite.phTaskNotes" data-i18n-placeholder-zh="任务形式、时长、注意事项等" data-i18n-placeholder-en="Format, duration, notes…" placeholder="任务形式、时长、注意事项等"></textarea>
             </label>
             <div class="mo-publish-modal__actions">
-                <button type="button" class="pill-btn ghost" data-mo-close="assessment">取消</button>
-                <button type="button" class="pill-btn" id="moCompositeAssessmentConfirmBtn">加入列表</button>
+                <button type="button" class="pill-btn ghost" data-mo-close="assessment" data-i18n="modal.composite.cancel" data-i18n-zh="取消" data-i18n-en="Cancel">取消</button>
+                <button type="button" class="pill-btn" id="moCompositeAssessmentConfirmBtn" data-i18n="modal.composite.addToList" data-i18n-zh="加入列表" data-i18n-en="Add to list">加入列表</button>
             </div>
         </div>
     </div>
@@ -574,20 +574,20 @@
     <div class="mo-publish-modal__backdrop" data-mo-close="teaching-weeks"></div>
     <div class="mo-publish-modal__panel mo-publish-modal__panel--teaching-weeks" role="dialog" aria-modal="true" aria-labelledby="moTeachingWeeksModalTitle">
         <div class="mo-publish-modal__head mo-publish-modal__head--teaching-weeks">
-            <h3 id="moTeachingWeeksModalTitle">请选择周数</h3>
-            <button type="button" class="mo-publish-modal__close" data-mo-close="teaching-weeks" aria-label="关闭">&times;</button>
+            <h3 id="moTeachingWeeksModalTitle" data-i18n="modal.weeksPicker.title" data-i18n-zh="请选择周数" data-i18n-en="Select weeks">请选择周数</h3>
+            <button type="button" class="mo-publish-modal__close" data-mo-close="teaching-weeks" data-i18n-aria-label="modal.closeAria" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close" aria-label="关闭">&times;</button>
         </div>
         <div class="mo-publish-modal__body mo-publish-modal__body--teaching-weeks">
-            <p class="mo-hint mo-hint--teaching-weeks">请勾选实际授课的周次（第 1–20 周）。如暂不填写，可直接点「确定」跳过。</p>
-            <div class="mo-week-grid mo-week-grid--picker" id="moTeachingWeeksPickerGrid" aria-label="授课周次"></div>
-            <div class="mo-week-picker-presets" role="group" aria-label="快捷选择周次">
-                <button type="button" class="mo-week-preset" data-week-preset="all">全周</button>
-                <button type="button" class="mo-week-preset" data-week-preset="odd">单周</button>
-                <button type="button" class="mo-week-preset" data-week-preset="even">双周</button>
+            <p class="mo-hint mo-hint--teaching-weeks" data-i18n="modal.weeksPicker.hint" data-i18n-zh="请勾选实际授课的周次（第 1–20 周）。如暂不填写，可直接点「确定」跳过。" data-i18n-en="Select the weeks you teach (weeks 1–20). You can click OK to skip for now.">请勾选实际授课的周次（第 1–20 周）。如暂不填写，可直接点「确定」跳过。</p>
+            <div class="mo-week-grid mo-week-grid--picker" id="moTeachingWeeksPickerGrid" data-i18n-aria-label="modal.weeksPicker.gridAria" data-i18n-aria-label-zh="授课周次" data-i18n-aria-label-en="Teaching weeks" aria-label="授课周次"></div>
+            <div class="mo-week-picker-presets" role="group" data-i18n-aria-label="modal.weeksPicker.presetsAria" data-i18n-aria-label-zh="快捷选择周次" data-i18n-aria-label-en="Week presets" aria-label="快捷选择周次">
+                <button type="button" class="mo-week-preset" data-week-preset="all" data-i18n="modal.weeksPicker.allWeeks" data-i18n-zh="全周" data-i18n-en="All weeks">全周</button>
+                <button type="button" class="mo-week-preset" data-week-preset="odd" data-i18n="modal.weeksPicker.oddWeeks" data-i18n-zh="单周" data-i18n-en="Odd weeks">单周</button>
+                <button type="button" class="mo-week-preset" data-week-preset="even" data-i18n="modal.weeksPicker.evenWeeks" data-i18n-zh="双周" data-i18n-en="Even weeks">双周</button>
             </div>
             <div class="mo-publish-modal__actions mo-publish-modal__actions--teaching-weeks">
-                <button type="button" class="mo-week-modal-cancel" data-mo-close="teaching-weeks">取消</button>
-                <button type="button" class="pill-btn mo-week-modal-confirm" id="moTeachingWeeksConfirmBtn">确定</button>
+                <button type="button" class="mo-week-modal-cancel" data-mo-close="teaching-weeks" data-i18n="modal.composite.cancel" data-i18n-zh="取消" data-i18n-en="Cancel">取消</button>
+                <button type="button" class="pill-btn mo-week-modal-confirm" id="moTeachingWeeksConfirmBtn" data-i18n="modal.weeksPicker.ok" data-i18n-zh="确定" data-i18n-en="OK">确定</button>
             </div>
         </div>
     </div>
@@ -597,15 +597,15 @@
     <div class="mo-publish-modal__backdrop" data-mo-close="fixed-skills"></div>
     <div class="mo-publish-modal__panel mo-publish-modal__panel--wide" role="dialog" aria-modal="true" aria-labelledby="moFixedSkillsPickerTitle">
         <div class="mo-publish-modal__head">
-            <h3 id="moFixedSkillsPickerTitle">选择技能标签</h3>
-            <button type="button" class="mo-publish-modal__close" data-mo-close="fixed-skills" aria-label="关闭">&times;</button>
+            <h3 id="moFixedSkillsPickerTitle" data-i18n="modal.skillsPicker.title" data-i18n-zh="选择技能标签" data-i18n-en="Choose skill tags">选择技能标签</h3>
+            <button type="button" class="mo-publish-modal__close" data-mo-close="fixed-skills" data-i18n-aria-label="modal.closeAria" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close" aria-label="关闭">&times;</button>
         </div>
         <div class="mo-publish-modal__body">
-            <p class="mo-hint">请至少选择一项技能。需要额外技能时点 <span class="mo-skill-other-hint">Other</span> 填写名称和说明（说明可空）。点紫色标签可取消该项。</p>
-            <div class="mo-skill-chips mo-skill-chips--modal mo-skill-chips--picker-flow" id="moFixedSkillsPickerFlow" role="group" aria-label="技能标签选择"></div>
+            <p class="mo-hint" data-i18n-html="请至少选择一项技能。需要额外技能时点 <span class='mo-skill-other-hint'>Other</span> 填写名称和说明（说明可空）。点紫色标签可取消该项。|Select at least one skill. For extras, click <span class='mo-skill-other-hint'>Other</span> to enter a name and notes (notes optional). Click a purple tag again to deselect.">请至少选择一项技能。需要额外技能时点 <span class="mo-skill-other-hint">Other</span> 填写名称和说明（说明可空）。点紫色标签可取消该项。</p>
+            <div class="mo-skill-chips mo-skill-chips--modal mo-skill-chips--picker-flow" id="moFixedSkillsPickerFlow" role="group" data-i18n-aria-label="modal.skillsPicker.flowAria" data-i18n-aria-label-zh="技能标签选择" data-i18n-aria-label-en="Skill tag selection" aria-label="技能标签选择"></div>
             <div class="mo-publish-modal__actions">
-                <button type="button" class="pill-btn ghost" data-mo-close="fixed-skills">取消</button>
-                <button type="button" class="pill-btn" id="moFixedSkillsConfirmBtn">确定</button>
+                <button type="button" class="pill-btn ghost" data-mo-close="fixed-skills" data-i18n="modal.composite.cancel" data-i18n-zh="取消" data-i18n-en="Cancel">取消</button>
+                <button type="button" class="pill-btn" id="moFixedSkillsConfirmBtn" data-i18n="modal.weeksPicker.ok" data-i18n-zh="确定" data-i18n-en="OK">确定</button>
             </div>
         </div>
     </div>
@@ -615,21 +615,21 @@
     <div class="mo-publish-modal__backdrop" data-mo-close="custom-skill"></div>
     <div class="mo-publish-modal__panel" role="dialog" aria-modal="true" aria-labelledby="moCompositeCustomSkillTitle">
         <div class="mo-publish-modal__head">
-            <h3 id="moCompositeCustomSkillTitle">添加自定义技能</h3>
-            <button type="button" class="mo-publish-modal__close" data-mo-close="custom-skill" aria-label="关闭">&times;</button>
+            <h3 id="moCompositeCustomSkillTitle" data-i18n="modal.customSkill.title" data-i18n-zh="添加自定义技能" data-i18n-en="Add custom skill">添加自定义技能</h3>
+            <button type="button" class="mo-publish-modal__close" data-mo-close="custom-skill" data-i18n-aria-label="modal.closeAria" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close" aria-label="关闭">&times;</button>
         </div>
         <div class="mo-publish-modal__body">
             <label class="mo-field">
-                <span class="mo-field-label">技能名称 <span class="mo-req">*</span></span>
-                <input type="text" id="moCustomSkillNameInput" placeholder="如：代码评审" autocomplete="off">
+                <span class="mo-field-label" data-i18n-html="技能名称 <span class='mo-req'>*</span>|Skill name <span class='mo-req'>*</span>">技能名称 <span class="mo-req">*</span></span>
+                <input type="text" id="moCustomSkillNameInput" data-i18n-placeholder="modal.customSkill.phName" data-i18n-placeholder-zh="如：代码评审" data-i18n-placeholder-en="e.g. Code review" placeholder="如：代码评审" autocomplete="off">
             </label>
             <label class="mo-field">
-                <span class="mo-field-label">说明</span>
-                <textarea id="moCustomSkillDescInput" rows="3" placeholder="简要描述期望与场景"></textarea>
+                <span class="mo-field-label" data-i18n="modal.composite.notes" data-i18n-zh="说明" data-i18n-en="Notes">说明</span>
+                <textarea id="moCustomSkillDescInput" rows="3" data-i18n-placeholder="modal.customSkill.phDesc" data-i18n-placeholder-zh="简要描述期望与场景" data-i18n-placeholder-en="Briefly describe expectations and context" placeholder="简要描述期望与场景"></textarea>
             </label>
             <div class="mo-publish-modal__actions">
-                <button type="button" class="pill-btn ghost" data-mo-close="custom-skill">取消</button>
-                <button type="button" class="pill-btn" id="moCompositeCustomSkillConfirmBtn">加入列表</button>
+                <button type="button" class="pill-btn ghost" data-mo-close="custom-skill" data-i18n="modal.composite.cancel" data-i18n-zh="取消" data-i18n-en="Cancel">取消</button>
+                <button type="button" class="pill-btn" id="moCompositeCustomSkillConfirmBtn" data-i18n="modal.composite.addToList" data-i18n-zh="加入列表" data-i18n-en="Add to list">加入列表</button>
             </div>
         </div>
     </div>

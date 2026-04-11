@@ -6,9 +6,9 @@
         <h3 id="guideTitle">欢迎使用 MO 工作台</h3>
         <p class="muted" id="guideDesc">将依次介绍招聘总览、课程管理与发布岗位、应聘筛选与账号设置。</p>
         <div class="guide-actions">
-            <button class="guide-btn ghost" id="guideBack" type="button">上一步</button>
+            <button class="guide-btn ghost" id="guideBack" type="button" data-i18n="onboarding.back" data-i18n-zh="上一步" data-i18n-en="Back">上一步</button>
             <div style="display:flex; gap:10px;">
-                <button class="guide-btn ghost" id="skipBtn" type="button">跳过指引</button>
+                <button class="guide-btn ghost" id="skipBtn" type="button" data-i18n="onboarding.skip" data-i18n-zh="跳过指引" data-i18n-en="Skip">跳过指引</button>
                 <button class="guide-btn primary" id="guideNext" type="button">下一步</button>
             </div>
         </div>

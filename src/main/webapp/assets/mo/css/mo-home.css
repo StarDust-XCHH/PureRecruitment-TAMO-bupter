@@ -789,6 +789,22 @@ legend.mo-field-label:has(.mo-req) {
     justify-items: stretch;
 }
 
+/* MO 招聘总览四卡：主标题（开放岗位 / Open Modules 等）加大、加粗，中英文均适用 */
+.mo-dashboard-card .insight-label {
+    font-size: clamp(15px, 1.15vw, 18px);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+}
+
+/* 四卡大数字底对齐：标题单行/多行时，数字仍在各自弹性区内贴底，四卡数字同一水平线 */
+.mo-dashboard-card .mo-dashboard-stat-grid .insight-card {
+    grid-template-rows: auto 1fr;
+    align-content: stretch;
+}
+.mo-dashboard-card .mo-dashboard-stat-grid .insight-card .insight-core-number {
+    align-self: end;
+}
+
 /* 四卡等宽铺满，避免 auto-fit 产生空白轨导致「整体偏左」观感 */
 .mo-dashboard-card .mo-dashboard-stat-grid.stat-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));

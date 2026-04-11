@@ -27,6 +27,9 @@
         const routeApplicantsEl = document.getElementById('route-applicants');
 
         let currentDetailApplicationId = '';
+        function t(zh, en) {
+            return typeof app.t === 'function' ? app.t(zh, en) : zh;
+        }
 
         function scrollApplicantsPanelToTop() {
             if (routeApplicantsEl && typeof routeApplicantsEl.scrollIntoView === 'function') {
@@ -60,7 +63,7 @@
                 : (job.jobId != null ? String(job.jobId).trim() : '--');
             var name = job.courseName != null && String(job.courseName).trim() !== ''
                 ? String(job.courseName).trim()
-                : '未命名岗位';
+                : t('未命名岗位', 'Untitled opening');
             return code + ' · ' + name;
         }
 
@@ -80,7 +83,7 @@
             courseSelect.innerHTML = '';
             const optAll = document.createElement('option');
             optAll.value = '';
-            optAll.textContent = '全部课程';
+            optAll.textContent = t('全部课程', 'All modules');
             courseSelect.appendChild(optAll);
             (jobs || []).forEach(function (job) {
                 const val = jobOptionValue(job);
@@ -177,6 +180,26 @@
             return 'mo-applicant-status--neutral';
         }
 
+        /** 后端固定返回中文状态；界面按当前语言映射展示（不改变比较用的原始值） */
+        function formatApplicantStatusDisplay(raw) {
+            var s = (raw == null ? '' : String(raw)).trim();
+            if (!s) return t('未知', 'Unknown');
+            switch (s) {
+                case '已录用':
+                    return t('已录用', 'Hired');
+                case '未录用':
+                    return t('未录用', 'Not hired');
+                case '待审核':
+                    return t('待审核', 'Pending');
+                case '审核中':
+                    return t('审核中', 'Under review');
+                case '已投递':
+                    return t('已投递', 'Submitted');
+                default:
+                    return s;
+            }
+        }
+
         /**
          * @param {Array|undefined} items 传入时表示新数据并重置到第 1 页；不传则仅按当前页从缓存重绘（用于翻页）
          */
@@ -210,7 +233,7 @@
                             btn.type = 'button';
                             btn.className = 'job-page-btn' + (pageNum === applicantPageIndex ? ' active' : '');
                             btn.textContent = String(pageNum);
-                            btn.setAttribute('aria-label', '第 ' + pageNum + ' 页');
+                            btn.setAttribute('aria-label', t('第 ' + pageNum + ' 页', 'Page ' + pageNum));
                             if (pageNum === applicantPageIndex) {
                                 btn.setAttribute('aria-current', 'page');
                             }
@@ -236,21 +259,21 @@
                 const card = document.createElement('div');
                 card.className = 'mo-applicant-board-card job-card course-job-card';
                 card.setAttribute('tabindex', '-1');
-                const unreadDot = item.unread ? '<span class="mo-unread-dot" title="未读"></span>' : '';
+                const unreadDot = item.unread ? '<span class="mo-unread-dot" title="' + t('未读', 'Unread') + '"></span>' : '';
 
                 card.innerHTML =
                     '<div class="course-card-topline">' +
                     '<span class="job-code">' + escapeHtml(item.courseCode || '--') + '</span>' +
                     '<span class="pill course-mo-badge">' + escapeHtml(item.taId || '--') + '</span>' +
                     '<span class="mo-applicant-status-badge ' + applicantStatusClass(item.status) + '">' +
-                    escapeHtml(item.status || '未知') + '</span>' +
+                    escapeHtml(formatApplicantStatusDisplay(item.status)) + '</span>' +
                     '</div>' +
                     '<h4 class="course-card-title mo-applicant-card__title">' + escapeHtml(item.name || item.taId) + unreadDot + '</h4>' +
                     '<p class="course-card-description">' +
-                    '课程 · ' + escapeHtml(item.courseCode || '--') + ' · ' + escapeHtml(item.courseName || '--') +
+                    t('课程', 'Module') + ' · ' + escapeHtml(item.courseCode || '--') + ' · ' + escapeHtml(item.courseName || '--') +
                     '</p>' +
                     '<div class="course-card-hint mo-applicant-card__hint">' +
-                    '<button type="button" class="pill-btn ghost mo-applicant-view-btn">查看详情</button>' +
+                    '<button type="button" class="pill-btn ghost mo-applicant-view-btn">' + t('查看详情', 'View details') + '</button>' +
                     '</div>';
 
                 const viewBtn = card.querySelector('.mo-applicant-view-btn');
@@ -291,7 +314,7 @@
             const moId = getMoId();
             if (!detailModal || !detailBody || !moId || !item.applicationId) return;
             currentDetailApplicationId = item.applicationId;
-            detailBody.innerHTML = '<p class="muted">加载中…</p>';
+            detailBody.innerHTML = '<p class="muted">' + t('加载中…', 'Loading...') + '</p>';
             detailModal.hidden = false;
             detailModal.setAttribute('aria-hidden', 'false');
 
@@ -302,7 +325,7 @@
                     + '&applicationId=' + encodeURIComponent(item.applicationId));
                 const d = await res.json();
                 if (!res.ok || d.success === false) {
-                    detailBody.innerHTML = '<p class="mo-status-warn">' + escapeHtml(d.message || '加载失败') + '</p>';
+                    detailBody.innerHTML = '<p class="mo-status-warn">' + escapeHtml(d.message || t('加载失败', 'Load failed')) + '</p>';
                 } else {
                 const ts = d.taSnapshot || {};
                 const resume = d.resume || {};
@@ -332,52 +355,52 @@
                 }());
                 const statusDdHtml = statusText
                     ? '<span class="mo-applicant-status-badge ' + applicantStatusClass(statusText) + '">'
-                    + escapeHtml(statusText) + '</span>'
+                    + escapeHtml(formatApplicantStatusDisplay(statusText)) + '</span>'
                     : '<span class="muted">—</span>';
                 const detailIsHired = statusText === '已录用';
                 const detailIsRejected = statusText === '未录用';
                 var actionsDetailHtml;
                 if (detailIsHired) {
-                    actionsDetailHtml = '<button type="button" class="pill-btn mo-applicant-withdraw-btn" id="moApplicantWithdrawBtn">撤回录用</button>';
+                    actionsDetailHtml = '<button type="button" class="pill-btn mo-applicant-withdraw-btn" id="moApplicantWithdrawBtn">' + t('撤回录用', 'Withdraw hire') + '</button>';
                 } else if (detailIsRejected) {
-                    actionsDetailHtml = '<button type="button" class="pill-btn mo-applicant-withdraw-btn" id="moApplicantWithdrawRejectBtn">撤回拒绝</button>';
+                    actionsDetailHtml = '<button type="button" class="pill-btn mo-applicant-withdraw-btn" id="moApplicantWithdrawRejectBtn">' + t('撤回拒绝', 'Withdraw rejection') + '</button>';
                 } else {
-                    actionsDetailHtml = '<button type="button" class="pill-btn" id="moApplicantAcceptBtn">录用</button>'
-                        + '<button type="button" class="pill-btn ghost" id="moApplicantRejectBtn">拒绝</button>';
+                    actionsDetailHtml = '<button type="button" class="pill-btn" id="moApplicantAcceptBtn">' + t('录用', 'Hire') + '</button>'
+                        + '<button type="button" class="pill-btn ghost" id="moApplicantRejectBtn">' + t('拒绝', 'Reject') + '</button>';
                 }
 
                 detailBody.innerHTML =
                     '<dl class="mo-detail-kv">' +
-                    '<dt>申请 ID</dt><dd>' + escapeHtml(d.applicationId) + '</dd>' +
+                    '<dt>' + t('申请 ID', 'Application ID') + '</dt><dd>' + escapeHtml(d.applicationId) + '</dd>' +
                     '<dt>TA ID</dt><dd>' + escapeHtml(d.taId) + '</dd>' +
-                    '<dt>课程</dt><dd>' + escapeHtml(d.courseCode) + ' ' + escapeHtml(d.courseName) + '</dd>' +
-                    '<dt>状态</dt><dd>' + statusDdHtml + '</dd>' +
-                    '<dt>姓名</dt><dd>' + escapeHtml((ts.name || ts.realName || '').trim()) + '</dd>' +
-                    '<dt>学号</dt><dd>' + escapeHtml(ts.studentId || '') + '</dd>' +
-                    '<dt>邮箱</dt><dd>' + escapeHtml(ts.contactEmail || '') + '</dd>' +
-                    '<dt>电话</dt><dd>' + escapeHtml(ts.phone || '') + '</dd>' +
-                    '<dt>简介</dt><dd>' + escapeHtml(ts.bio || '') + '</dd>' +
-                    '<dt>意向</dt><dd>' + detailKvOrDash(formatSnapshotIntent(ts)) + '</dd>' +
-                    '<dt>技能</dt><dd>' + detailKvOrDash(formatSnapshotSkills(ts)) + '</dd>' +
+                    '<dt>' + t('课程', 'Module') + '</dt><dd>' + escapeHtml(d.courseCode) + ' ' + escapeHtml(d.courseName) + '</dd>' +
+                    '<dt>' + t('状态', 'Status') + '</dt><dd>' + statusDdHtml + '</dd>' +
+                    '<dt>' + t('姓名', 'Name') + '</dt><dd>' + escapeHtml((ts.name || ts.realName || '').trim()) + '</dd>' +
+                    '<dt>' + t('学号', 'Student ID') + '</dt><dd>' + escapeHtml(ts.studentId || '') + '</dd>' +
+                    '<dt>' + t('邮箱', 'Email') + '</dt><dd>' + escapeHtml(ts.contactEmail || '') + '</dd>' +
+                    '<dt>' + t('电话', 'Phone') + '</dt><dd>' + escapeHtml(ts.phone || '') + '</dd>' +
+                    '<dt>' + t('简介', 'Bio') + '</dt><dd>' + escapeHtml(ts.bio || '') + '</dd>' +
+                    '<dt>' + t('意向', 'Intent') + '</dt><dd>' + detailKvOrDash(formatSnapshotIntent(ts)) + '</dd>' +
+                    '<dt>' + t('技能', 'Skills') + '</dt><dd>' + detailKvOrDash(formatSnapshotSkills(ts)) + '</dd>' +
                     '</dl>' +
                     '<div class="mo-detail-block mo-detail-block--resume">' +
-                    '<div class="mo-detail-section-title">简历</div>' +
-                    '<div class="mo-detail-resume-row"><a class="pill-btn" href="' + resumeUrl + '" target="_blank" rel="noopener">查看简历</a></div>' +
+                    '<div class="mo-detail-section-title">' + t('简历', 'CV') + '</div>' +
+                    '<div class="mo-detail-resume-row"><a class="pill-btn" href="' + resumeUrl + '" target="_blank" rel="noopener">' + t('查看简历', 'View CV') + '</a></div>' +
                     '</div>' +
                     '<div class="mo-applicant-actions mo-applicant-detail-actions mo-applicant-detail-actions--after-resume">' +
                     actionsDetailHtml +
                     '</div>' +
-                    '<section class="mo-detail-plate" aria-label="MO 评论">' +
-                    '<div class="mo-detail-section-title">MO 评论</div>' +
-                    '<div class="mo-comment-list" id="moCommentList">' + (commentsHtml || '<span class="muted">暂无</span>') + '</div>' +
+                    '<section class="mo-detail-plate" aria-label="' + t('MO 评论', 'MO comments') + '">' +
+                    '<div class="mo-detail-section-title">' + t('MO 评论', 'MO comments') + '</div>' +
+                    '<div class="mo-comment-list" id="moCommentList">' + (commentsHtml || '<span class="muted">' + t('暂无', 'None') + '</span>') + '</div>' +
                     '<div class="mo-form-grid">' +
-                    '<label class="full">添加评论<textarea id="moNewCommentText" rows="2" placeholder="输入评论"></textarea></label>' +
+                    '<label class="full">' + t('添加评论', 'Add comment') + '<textarea id="moNewCommentText" rows="2" placeholder="' + t('输入评论', 'Enter a comment') + '"></textarea></label>' +
                     '</div>' +
-                    '<button type="button" class="pill-btn" id="moSubmitCommentBtn">提交评论</button>' +
+                    '<button type="button" class="pill-btn" id="moSubmitCommentBtn">' + t('提交评论', 'Submit comment') + '</button>' +
                     '</section>' +
-                    '<section class="mo-detail-plate" aria-label="流程事件">' +
-                    '<div class="mo-detail-section-title">流程事件</div>' +
-                    '<div class="mo-comment-list">' + (eventsHtml || '<span class="muted">暂无</span>') + '</div>' +
+                    '<section class="mo-detail-plate" aria-label="' + t('流程事件', 'Workflow events') + '">' +
+                    '<div class="mo-detail-section-title">' + t('流程事件', 'Workflow events') + '</div>' +
+                    '<div class="mo-comment-list">' + (eventsHtml || '<span class="muted">' + t('暂无', 'None') + '</span>') + '</div>' +
                     '</section>';
 
                 const submitBtn = document.getElementById('moSubmitCommentBtn');
@@ -398,13 +421,13 @@
                             });
                             const cp = await cr.json();
                             if (!cr.ok || cp.success === false) {
-                                window.alert(cp.message || '失败');
+                                window.alert(cp.message || t('失败', 'Failed'));
                                 return;
                             }
                             textarea.value = '';
                             openDetail(item);
                         } catch (err) {
-                            window.alert(err.message || '评论失败');
+                            window.alert(err.message || t('评论失败', 'Comment failed'));
                         }
                     });
                 }
@@ -444,7 +467,7 @@
                 }
                 }
             } catch (err) {
-                detailBody.innerHTML = '<p class="mo-status-warn">' + escapeHtml(err.message || '加载失败') + '</p>';
+                detailBody.innerHTML = '<p class="mo-status-warn">' + escapeHtml(err.message || t('加载失败', 'Load failed')) + '</p>';
             }
 
             try {
@@ -458,11 +481,11 @@
             const code = (courseSelect.value || '').trim();
             const moId = getMoId();
             if (!moId) {
-                setStatus('未登录或会话已失效，请刷新页面后重试');
+                setStatus(t('未登录或会话已失效，请刷新页面后重试', 'Session expired or not logged in. Please refresh and try again.'));
                 renderApplicants([]);
                 return;
             }
-            setStatus('加载中...');
+            setStatus(t('加载中...', 'Loading...'));
             try {
                 var url = apiUrl('/api/mo/applicants') + '?moId=' + encodeURIComponent(moId);
                 if (code) {
@@ -471,19 +494,24 @@
                 const res = await fetch(url);
                 const payload = await res.json();
                 if (!res.ok || payload.success === false) {
-                    setStatus(payload.message || '加载失败');
+                    setStatus(payload.message || t('加载失败', 'Load failed'));
                     renderApplicants([]);
                     return;
                 }
                 const items = Array.isArray(payload.items) ? payload.items : [];
                 renderApplicants(items);
                 const unread = typeof payload.unreadCount === 'number' ? payload.unreadCount : 0;
-                var scopeHint = code ? '' : '（全部课程）';
-                setStatus('已加载 ' + items.length + ' 名申请人' + scopeHint + (unread > 0 ? ' · 未读 ' + unread + ' 条' : ''));
+                var scopeHint = code ? '' : t('（全部课程）', ' (All modules)');
+                setStatus(
+                    t(
+                        '已加载 ' + items.length + ' 名申请人' + scopeHint + (unread > 0 ? ' · 未读 ' + unread + ' 条' : ''),
+                        'Loaded ' + items.length + ' applicants' + scopeHint + (unread > 0 ? ' · ' + unread + ' unread' : '')
+                    )
+                );
                 if (typeof app.onApplicantsLoaded === 'function') app.onApplicantsLoaded(items);
                 await refreshNavUnreadBadge();
             } catch (err) {
-                setStatus(err.message || '加载失败');
+                setStatus(err.message || t('加载失败', 'Load failed'));
                 renderApplicants([]);
             }
         }
@@ -494,11 +522,14 @@
             const actionText = promptActionLabel
                 ? String(promptActionLabel)
                 : (decision === 'selected' ? '录用'
-                    : decision === 'withdrawn' ? '撤回录用' : '拒绝');
-            const comment = window.prompt('请输入' + actionText + '备注（可选）', '');
+                    : decision === 'withdrawn' ? t('撤回录用', 'Withdraw hire') : t('拒绝', 'Reject'));
+            const comment = window.prompt(
+                t('请输入' + actionText + '备注（可选）', 'Please enter a note for "' + actionText + '" (optional)'),
+                ''
+            );
             if (comment === null) return;
             if (!code) {
-                setStatus('缺少课程编号，无法提交');
+                setStatus(t('缺少课程编号，无法提交', 'Missing module code. Unable to submit.'));
                 return;
             }
             try {
@@ -515,17 +546,17 @@
                 });
                 const payload = await res.json();
                 if (!res.ok || payload.success === false) {
-                    setStatus(payload.message || '操作失败');
+                    setStatus(payload.message || t('操作失败', 'Operation failed'));
                     return;
                 }
-                setStatus('已完成：' + actionText + ' ' + item.taId);
+                setStatus(t('已完成：' + actionText + ' ' + item.taId, 'Completed: ' + actionText + ' ' + item.taId));
                 await loadApplicants();
                 if (typeof app.loadDashboard === 'function') app.loadDashboard();
                 if (currentDetailApplicationId === item.applicationId && detailModal && !detailModal.hidden) {
                     openDetail(item);
                 }
             } catch (err) {
-                setStatus(err.message || '保存失败');
+                setStatus(err.message || t('保存失败', 'Save failed'));
             }
         }
 
@@ -634,6 +665,22 @@
                 loadApplicants();
             });
         }
+
+        app.formatApplicantStatusDisplay = formatApplicantStatusDisplay;
+
+        app.refreshApplicantsLanguage = function () {
+            if (applicantListCache.length) {
+                renderApplicants();
+            }
+            if (currentDetailApplicationId && detailModal && !detailModal.hidden) {
+                var found = applicantListCache.filter(function (it) {
+                    return it && String(it.applicationId) === String(currentDetailApplicationId);
+                })[0];
+                if (found) {
+                    void openDetail(found);
+                }
+            }
+        };
 
         refreshNavUnreadBadge();
         refreshCourseOptionsFromApi();

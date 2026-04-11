@@ -1,8 +1,8 @@
-<div class="welcome-card actionable" id="welcomeCard" role="button" tabindex="0" aria-label="首次登录提示，点击打开设置">
-    <div class="badge">新</div>
+<div class="welcome-card actionable" id="welcomeCard" role="button" tabindex="0" aria-label="首次登录提示，点击打开设置" data-i18n-aria-label="welcome.cardAria" data-i18n-aria-label-zh="首次登录提示，点击打开设置" data-i18n-aria-label-en="First-time tip, click to open settings">
+    <div class="badge" data-i18n="welcome.badge" data-i18n-zh="新" data-i18n-en="New">新</div>
     <div>
-        <h3>首次登录提示</h3>
-        <p>欢迎使用课程负责人工作台。可从招聘总览进入各模块，在课程管理中维护岗位，或通过右上角菜单管理账号与主题。</p>
-        <button class="hint hint-link" id="welcomeProfileHint" type="button">建议从右上角用户入口打开设置</button>
+        <h3 data-i18n="welcome.title" data-i18n-zh="首次登录提示" data-i18n-en="First-time Tip">首次登录提示</h3>
+        <p data-i18n="welcome.desc" data-i18n-zh="欢迎使用课程负责人工作台。可从招聘总览进入各模块，在课程管理中维护岗位，或通过右上角菜单管理账号与主题。" data-i18n-en="Welcome to the Module Organizer workspace. Start from the Recruitment Dashboard, manage openings in Module Management, and use the top-right menu for account and theme settings.">欢迎使用课程负责人工作台。可从招聘总览进入各模块，在课程管理中维护岗位，或通过右上角菜单管理账号与主题。</p>
+        <button class="hint hint-link" id="welcomeProfileHint" type="button" data-i18n="welcome.openSettings" data-i18n-zh="建议从右上角用户入口打开设置" data-i18n-en="Open settings (top-right)">建议从右上角用户入口打开设置</button>
     </div>
 </div>
