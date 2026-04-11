@@ -49,25 +49,29 @@
                         <span class="mo-field-label">课程名称 <span class="mo-req">*</span></span>
                         <input id="editCourseNameInput" type="text" autocomplete="off">
                     </label>
-                    <div class="mo-field mo-semester-field">
-                        <span class="mo-field-label">学期 <span class="mo-req">*</span></span>
-                        <div class="mo-semester-combined" role="group" aria-label="学年与学期">
-                            <select id="editSemesterYearInput" class="mo-semester-combined__year" required aria-required="true" aria-label="年份"></select>
-                            <select id="editSemesterTermInput" class="mo-semester-combined__term" required aria-required="true" aria-label="春季或秋季学期">
-                                <option value="">学期</option>
-                                <option value="Spring">春季 Spring</option>
-                                <option value="Fall">秋季 Fall</option>
-                            </select>
+                    <div class="mo-semester-status-group full">
+                        <div class="mo-publish-semester-status-row">
+                            <div class="mo-field mo-semester-field mo-semester-field--compact">
+                                <span class="mo-field-label">学期 <span class="mo-req">*</span></span>
+                                <div class="mo-semester-combined" role="group" aria-label="学年与学期">
+                                    <select id="editSemesterYearInput" class="mo-semester-combined__year" required aria-required="true" aria-label="年份"></select>
+                                    <select id="editSemesterTermInput" class="mo-semester-combined__term" required aria-required="true" aria-label="春季或秋季学期">
+                                        <option value="">学期</option>
+                                        <option value="Spring">春季 Spring</option>
+                                        <option value="Fall">秋季 Fall</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <fieldset class="mo-field-fieldset mo-field-fieldset--inline-status">
+                                <legend class="mo-field-label">招聘状态 <span class="mo-req">*</span></legend>
+                                <div class="mo-radio-row" role="radiogroup" aria-label="招聘状态">
+                                    <label class="mo-radio-pill"><input type="radio" name="editRecruitmentStatus" id="editRecruitmentStatusOpen" value="OPEN" checked> <span>OPEN</span></label>
+                                    <label class="mo-radio-pill"><input type="radio" name="editRecruitmentStatus" id="editRecruitmentStatusClosed" value="CLOSED"> <span>CLOSED</span></label>
+                                </div>
+                            </fieldset>
                         </div>
                         <p class="mo-hint mo-semester-field__hint">先选学年，再选春季或秋季。年份可在下拉列表中调整。</p>
                     </div>
-                    <fieldset class="mo-field mo-field-fieldset full">
-                        <legend class="mo-field-label">招聘状态 <span class="mo-req">*</span></legend>
-                        <div class="mo-radio-row" role="radiogroup" aria-label="招聘状态">
-                            <label class="mo-radio-pill"><input type="radio" name="editRecruitmentStatus" id="editRecruitmentStatusOpen" value="OPEN" checked> <span>开放 OPEN</span></label>
-                            <label class="mo-radio-pill"><input type="radio" name="editRecruitmentStatus" id="editRecruitmentStatusClosed" value="CLOSED"> <span>关闭 CLOSED</span></label>
-                        </div>
-                    </fieldset>
                     <label class="mo-field">
                         <span class="mo-field-label">预计学生人数</span>
                         <input id="editStudentCountInput" type="number" min="0">
@@ -175,26 +179,29 @@
                                     <span class="mo-field-label">课程编码 <span class="mo-req" aria-hidden="true">*</span></span>
                                     <input id="courseCodeInput" required type="text" placeholder="如：SE-TA-2026S" aria-required="true" class="mo-field-input">
                                 </label>
-                                <div class="mo-field mo-semester-field">
-                                    <span class="mo-field-label">学期 <span class="mo-req" aria-hidden="true">*</span></span>
-                                    <div class="mo-semester-combined" role="group" aria-label="学年与学期">
-                                        <select id="semesterYearInput" class="mo-semester-combined__year" required aria-required="true" aria-label="年份"></select>
-                                        <select id="semesterTermInput" class="mo-semester-combined__term" required aria-required="true" aria-label="春季或秋季学期">
-                                            <option value="">学期</option>
-                                            <option value="Spring">春季 Spring</option>
-                                            <option value="Fall">秋季 Fall</option>
-                                        </select>
+                                <div class="mo-semester-status-group full">
+                                    <div class="mo-publish-semester-status-row">
+                                        <div class="mo-field mo-semester-field mo-semester-field--compact">
+                                            <span class="mo-field-label">学期 <span class="mo-req" aria-hidden="true">*</span></span>
+                                            <div class="mo-semester-combined" role="group" aria-label="学年与学期">
+                                                <select id="semesterYearInput" class="mo-semester-combined__year" required aria-required="true" aria-label="年份"></select>
+                                                <select id="semesterTermInput" class="mo-semester-combined__term" required aria-required="true" aria-label="春季或秋季学期">
+                                                    <option value="">学期</option>
+                                                    <option value="Spring">春季 Spring</option>
+                                                    <option value="Fall">秋季 Fall</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <fieldset class="mo-field-fieldset mo-field-fieldset--inline-status">
+                                            <legend class="mo-field-label">招聘状态 <span class="mo-req" aria-hidden="true">*</span></legend>
+                                            <div class="mo-radio-row" role="radiogroup" aria-label="招聘状态">
+                                                <label class="mo-radio-pill"><input type="radio" name="recruitmentStatus" id="recruitmentStatusOpen" value="OPEN" checked> <span>OPEN</span></label>
+                                                <label class="mo-radio-pill"><input type="radio" name="recruitmentStatus" id="recruitmentStatusClosed" value="CLOSED"> <span>CLOSED</span></label>
+                                            </div>
+                                        </fieldset>
                                     </div>
                                     <p class="mo-hint mo-semester-field__hint">先选学年，再选春季或秋季。年份可在下拉列表中调整。</p>
                                 </div>
-
-                                <fieldset class="mo-field mo-field-fieldset full">
-                                    <legend class="mo-field-label">招聘状态 <span class="mo-req" aria-hidden="true">*</span></legend>
-                                    <div class="mo-radio-row" role="radiogroup" aria-label="招聘状态">
-                                        <label class="mo-radio-pill"><input type="radio" name="recruitmentStatus" id="recruitmentStatusOpen" value="OPEN" checked> <span>开放 OPEN</span></label>
-                                        <label class="mo-radio-pill"><input type="radio" name="recruitmentStatus" id="recruitmentStatusClosed" value="CLOSED"> <span>关闭 CLOSED</span></label>
-                                    </div>
-                                </fieldset>
 
                                 <label class="mo-field">
                                     <span class="mo-field-label">预计学生人数</span>

@@ -252,9 +252,16 @@ legend.mo-field-label:has(.mo-req) {
     margin-top: 6px;
 }
 
+/* 学期 + 招聘状态：外层占满栅格，提示在下一行 */
+.mo-semester-status-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
 /* 学期（紧凑）与招聘状态同一行 */
 .mo-publish-semester-status-row {
-    grid-column: 1 / -1;
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
@@ -293,6 +300,9 @@ legend.mo-field-label:has(.mo-req) {
     min-width: min(100%, 200px);
     margin: 0;
     align-self: center;
+    border: none;
+    padding: 0;
+    background: transparent;
 }
 
 .mo-skill-chips--modal {
