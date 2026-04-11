@@ -536,6 +536,7 @@ public class MoRecruitmentDao {
         detail.addProperty("updatedAt", rec.updatedAt());
         detail.addProperty("summary", rec.summary());
         detail.addProperty("nextAction", rec.nextAction());
+        detail.addProperty("status", resolveApplicantDisplayStatus(rec, moRow));
         return detail;
     }
 
@@ -606,7 +607,23 @@ public class MoRecruitmentDao {
                 return st;
             }
         }
-        return firstNonBlank(rec.statusLabel(), mapTaStatusCodeToShortLabel(getAsString(rec.rawRecord(), "status")));
+        return taSideDisplayStatusForMo(rec);
+    }
+
+    /**
+     * MO 列表/详情：不采用 TA 侧「已投递」文案；按状态码映射为「待审核」等，避免与 MO 决策后的展示混淆。
+     */
+    private String taSideDisplayStatusForMo(MoTaApplicationReadService.TaApplicationRecord rec) {
+        String code = getAsString(rec.rawRecord(), "status");
+        String mapped = mapTaStatusCodeToShortLabel(code);
+        String label = trim(rec.statusLabel());
+        if ("已投递".equals(label)) {
+            return mapped;
+        }
+        if (!label.isEmpty()) {
+            return label;
+        }
+        return mapped;
     }
 
     private static boolean isAcceptedDecisionText(String status) {
@@ -627,8 +644,8 @@ public class MoRecruitmentDao {
         String c = trim(code).toUpperCase(Locale.ROOT);
         return switch (c) {
             case "UNDER_REVIEW" -> "审核中";
-            case "SUBMITTED" -> "已投递";
-            default -> c.isEmpty() ? "已投递" : code;
+            case "SUBMITTED" -> "待审核";
+            default -> c.isEmpty() ? "待审核" : code;
         };
     }
 
@@ -786,8 +803,11 @@ public class MoRecruitmentDao {
             throw new IllegalArgumentException("courseCode 与 taId 不能为空");
         }
         String normalizedMoId = assertMoOwnsCourse(moId, normalizedCourseCode);
-        if (!"selected".equals(normalizedDecision) && !"rejected".equals(normalizedDecision)) {
-            throw new IllegalArgumentException("decision 仅支持 selected 或 rejected");
+        boolean decisionSelected = "selected".equals(normalizedDecision);
+        boolean decisionRejected = "rejected".equals(normalizedDecision);
+        boolean decisionWithdrawn = "withdrawn".equals(normalizedDecision);
+        if (!decisionSelected && !decisionRejected && !decisionWithdrawn) {
+            throw new IllegalArgumentException("decision 仅支持 selected、rejected 或 withdrawn（撤回录用）");
         }
 
         MoTaApplicationsMutationDao mutationDao = new MoTaApplicationsMutationDao();
@@ -798,10 +818,19 @@ public class MoRecruitmentDao {
         JsonObject course = RecruitmentCoursesDao.findNormalizedJobByCourseCode(normalizedCourseCode);
 
         String now = Instant.now().toString();
-        String statusText = "selected".equals(normalizedDecision) ? "已录用" : "未录用";
-        String summaryText = normalizedComment.isBlank()
-                ? ("selected".equals(normalizedDecision) ? "MO 已确认录用该 TA。" : "MO 已结束该候选人的招聘流程。")
-                : normalizedComment;
+        String statusText;
+        String defaultSummary;
+        if (decisionWithdrawn) {
+            statusText = "审核中";
+            defaultSummary = "MO 已撤回此前结论，申请重新进入审核流程。";
+        } else if (decisionSelected) {
+            statusText = "已录用";
+            defaultSummary = "MO 已确认录用该 TA。";
+        } else {
+            statusText = "未录用";
+            defaultSummary = "MO 已结束该候选人的招聘流程。";
+        }
+        String summaryText = normalizedComment.isBlank() ? defaultSummary : normalizedComment;
 
         JsonObject target = findLatestApplicationForCourse(appItems, normalizedTaId, normalizedCourseCode, normalizeSlug(normalizedCourseCode));
         JsonArray preservedComments = new JsonArray();
@@ -836,14 +865,22 @@ public class MoRecruitmentDao {
         target.addProperty("taId", normalizedTaId);
         target.addProperty("ownerMoId", normalizedMoId);
         target.addProperty("status", statusText);
-        target.addProperty("statusTone", "selected".equals(normalizedDecision) ? "success" : "danger");
+        if (decisionWithdrawn) {
+            target.addProperty("statusTone", "warn");
+        } else {
+            target.addProperty("statusTone", decisionSelected ? "success" : "danger");
+        }
         target.addProperty("summary", summaryText);
         target.addProperty("moComment", summaryText);
-        target.addProperty("nextAction", "selected".equals(normalizedDecision) ? "请等待签约与排班通知。" : "可继续申请其他课程岗位。");
+        if (decisionWithdrawn) {
+            target.addProperty("nextAction", "课程负责人将重新审核该申请。");
+        } else {
+            target.addProperty("nextAction", decisionSelected ? "请等待签约与排班通知。" : "可继续申请其他课程岗位。");
+        }
         target.addProperty("nextStep", target.get("nextAction").getAsString());
         target.addProperty("updatedAt", now);
         target.addProperty("category", "MO 招聘流程");
-        target.addProperty("matchLevel", "selected".equals(normalizedDecision) ? "高" : "中");
+        target.addProperty("matchLevel", decisionSelected ? "高" : "中");
         if (course != null && getAsString(target, "courseName").isBlank()) {
             target.addProperty("courseName", getAsString(course, "courseName"));
         }
@@ -851,11 +888,22 @@ public class MoRecruitmentDao {
         touchTaApplicationStatusMeta(appRoot);
         writeJson(TA_APPLICATION_STATUS, appRoot);
 
+        if (decisionWithdrawn) {
+            String appId = trim(getAsString(target, "applicationId"));
+            if (!appId.isEmpty()) {
+                mutationDao.markUnderReview(appId);
+            }
+        }
+
         syncRecruitmentCourseApplicationStatsFromTa(normalizedCourseCode);
 
         JsonObject payload = new JsonObject();
         payload.addProperty("success", true);
-        payload.addProperty("message", "selected".equals(normalizedDecision) ? "已录用该 TA" : "已拒绝该 TA");
+        if (decisionWithdrawn) {
+            payload.addProperty("message", "已撤回此前结论，状态已恢复为审核中");
+        } else {
+            payload.addProperty("message", decisionSelected ? "已录用该 TA" : "已拒绝该 TA");
+        }
         payload.addProperty("taId", normalizedTaId);
         payload.addProperty("courseCode", normalizedCourseCode);
         payload.addProperty("applicationId", getAsString(target, "applicationId"));

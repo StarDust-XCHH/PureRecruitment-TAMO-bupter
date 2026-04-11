@@ -8,7 +8,9 @@
         const root = document.documentElement;
         const themeToggle = document.getElementById('themeToggle');
         const logoutBtn = document.getElementById('logoutBtn');
+        const languageToggle = document.getElementById('languageToggle');
         const welcomeName = document.getElementById('welcomeName');
+        const welcomeTitle = document.getElementById('welcomeTitle');
         const userName = document.getElementById('userName');
         const userTrigger = document.getElementById('userTrigger');
         const welcomeCard = document.getElementById('welcomeCard');
@@ -19,6 +21,7 @@
         const settingsPanels = Array.from(document.querySelectorAll('.settings-panel'));
         const profileAvatarBox = document.getElementById('profileAvatarBox');
         const avatarFileInput = document.getElementById('avatarFile');
+        const storedLanguage = localStorage.getItem('mo-language');
 
         app.state = app.state || {};
 
@@ -33,6 +36,64 @@
         }
 
         app.getMoUser = getMoUser;
+
+        function resolveWelcomeName(user) {
+            if (!user) return 'MO';
+            return String(user.name || user.moName || user.username || 'MO').trim() || 'MO';
+        }
+
+        function getCurrentLanguage() {
+            /** MO 默认英文；仅当用户曾手动选中文（localStorage mo-language=zh）时为 zh */
+            return app.state.settings && app.state.settings.currentLanguage === 'zh' ? 'zh' : 'en';
+        }
+
+        function getTranslationValue(el, lang, type) {
+            if (!el) return '';
+            const suffix = lang === 'en' ? 'en' : 'zh';
+            if (type === 'html') {
+                const raw = el.getAttribute('data-i18n-html') || '';
+                const parts = raw.split('|');
+                return suffix === 'en' ? (parts[1] || parts[0] || '') : (parts[0] || '');
+            }
+            if (type === 'aria-label') {
+                return el.getAttribute('data-i18n-aria-label-' + suffix) || '';
+            }
+            if (type === 'placeholder') {
+                return el.getAttribute('data-i18n-placeholder-' + suffix) || '';
+            }
+            if (type === 'title') {
+                return el.getAttribute('data-i18n-title-' + suffix) || '';
+            }
+            return el.getAttribute('data-i18n-' + suffix) || '';
+        }
+
+        function applyI18nToElement(el, lang) {
+            if (!el) return;
+            if (el.hasAttribute('data-i18n-html')) {
+                el.innerHTML = getTranslationValue(el, lang, 'html');
+                return;
+            }
+            if (el.hasAttribute('data-i18n')) {
+                const text = getTranslationValue(el, lang, 'text');
+                if (text) el.textContent = text;
+            }
+            if (el.hasAttribute('data-i18n-placeholder')) {
+                const placeholder = getTranslationValue(el, lang, 'placeholder');
+                if (placeholder) el.setAttribute('placeholder', placeholder);
+            }
+            if (el.hasAttribute('data-i18n-aria-label')) {
+                const ariaLabel = getTranslationValue(el, lang, 'aria-label');
+                if (ariaLabel) el.setAttribute('aria-label', ariaLabel);
+            }
+            if (el.hasAttribute('data-i18n-title')) {
+                const title = getTranslationValue(el, lang, 'title');
+                if (title) el.setAttribute('title', title);
+            }
+        }
+
+        function t(zh, en) {
+            return getCurrentLanguage() === 'en' ? en : zh;
+        }
 
         function getUserData() {
             return app.state.settings ? app.state.settings.userData : null;
@@ -89,6 +150,49 @@
             return !!target.closest('a, button, input, textarea, select');
         }
 
+        function applyWelcomeTitle() {
+            const currentTitle = document.getElementById('welcomeTitle');
+            const currentName = document.getElementById('welcomeName');
+            const displayName = resolveWelcomeName(getUserData());
+            if (currentName) currentName.textContent = displayName;
+            if (!currentName && currentTitle) currentTitle.textContent = t('欢迎回来，', 'Welcome back, ') + displayName;
+            if (userName) userName.textContent = displayName;
+            if (settingsUser) settingsUser.textContent = displayName;
+        }
+
+        function applyLanguage(reason) {
+            const lang = getCurrentLanguage();
+            root.lang = lang === 'en' ? 'en' : 'zh-CN';
+            document.querySelectorAll('[data-i18n], [data-i18n-html], [data-i18n-placeholder], [data-i18n-aria-label], [data-i18n-title]').forEach(function (el) {
+                applyI18nToElement(el, lang);
+            });
+            localStorage.setItem('mo-language', lang);
+            applyWelcomeTitle();
+            if (typeof app.refreshProfileLanguage === 'function') {
+                app.refreshProfileLanguage(reason || 'language');
+            }
+            if (typeof app.refreshJobBoardLanguage === 'function') {
+                app.refreshJobBoardLanguage();
+            }
+            if (typeof app.refreshApplicantsLanguage === 'function') {
+                app.refreshApplicantsLanguage();
+            }
+            if (typeof app.refreshOnboardingLanguage === 'function') {
+                app.refreshOnboardingLanguage(reason || 'language');
+            }
+            if (reason === 'toggle' && typeof app.refreshMoWorkspaceAll === 'function') {
+                void app.refreshMoWorkspaceAll();
+            } else if (typeof app.loadDashboard === 'function') {
+                app.loadDashboard();
+            }
+        }
+
+        function toggleLanguage() {
+            if (!app.state.settings) return;
+            app.state.settings.currentLanguage = getCurrentLanguage() === 'en' ? 'zh' : 'en';
+            applyLanguage('toggle');
+        }
+
         function applyTheme(theme) {
             const safeTheme = theme === 'light' ? 'light' : 'dark';
             if (safeTheme === 'light') {
@@ -125,20 +229,21 @@
         const moUser = getMoUser();
         app.state.settings = {
             userData: moUser,
-            guideActive: false
+            guideActive: false,
+            currentLanguage: storedLanguage === 'zh' ? 'zh' : 'en'
         };
 
-        const displayName = moUser && (moUser.username || moUser.name) ? (moUser.username || moUser.name) : 'MO';
-        if (welcomeName) welcomeName.textContent = displayName;
-        if (userName) userName.textContent = displayName;
-        if (settingsUser) settingsUser.textContent = displayName;
-
         applyTheme(localStorage.getItem('mo-theme') || 'dark');
+        applyLanguage('init');
+        requestAnimationFrame(function () {
+            applyLanguage('raf');
+        });
 
         if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
+        if (languageToggle) languageToggle.addEventListener('click', toggleLanguage);
         if (logoutBtn) {
             logoutBtn.addEventListener('click', function () {
-                if (!window.confirm('确认退出登录吗？')) return;
+                if (!window.confirm(t('确认退出登录吗？', 'Are you sure you want to log out?'))) return;
                 setUserData(null);
                 window.location.replace('../../index.jsp');
             });
@@ -185,5 +290,9 @@
         app.debugOnboardingLog = debugOnboardingLog;
         app.openSettingsModal = openSettingsModal;
         app.activateSettingsTab = activateSettingsTab;
+        app.applyLanguage = applyLanguage;
+        app.toggleLanguage = toggleLanguage;
+        app.getCurrentLanguage = getCurrentLanguage;
+        app.t = t;
     };
 })();

@@ -1,22 +1,22 @@
 <div class="brand">
     <div class="logo">MO</div>
     <div>
-        <div>Module Organizer</div>
-        <small class="brand-subtitle">Recruitment Suite</small>
+        <div data-i18n="sidebar.brandTitle" data-i18n-zh="Module Organizer" data-i18n-en="Module Organizer">Module Organizer</div>
+        <small class="brand-subtitle" data-i18n="sidebar.brandSubtitle" data-i18n-zh="Recruitment Suite" data-i18n-en="Recruitment Suite">Recruitment Suite</small>
     </div>
 </div>
-<nav class="nav" aria-label="MO 工作台导航">
+<nav class="nav" aria-label="MO workspace navigation" data-i18n-aria-label="sidebar.navAria" data-i18n-aria-label-zh="MO 工作台导航" data-i18n-aria-label-en="MO workspace navigation">
     <button class="nav-item active" type="button" data-route="dashboard" aria-current="page">
         <span>📊</span>
-        <span>招聘总览</span>
+        <span data-i18n="sidebar.dashboard" data-i18n-zh="招聘总览" data-i18n-en="Recruitment Dashboard">Recruitment Dashboard</span>
     </button>
     <button class="nav-item" type="button" data-route="jobs" aria-current="false">
         <span>🧩</span>
-        <span>课程管理</span>
+        <span data-i18n="sidebar.jobs" data-i18n-zh="课程管理" data-i18n-en="Module Management">Module Management</span>
     </button>
     <button class="nav-item" type="button" data-route="applicants" aria-current="false">
         <span>🧑‍🎓</span>
-        <span class="mo-nav-label">应聘筛选</span>
-        <span class="mo-nav-badge" id="navApplicantsBadge" hidden aria-label="未读申请">●</span>
+        <span class="mo-nav-label" data-i18n="sidebar.applicants" data-i18n-zh="应聘筛选" data-i18n-en="Applicant Screening">Applicant Screening</span>
+        <span class="mo-nav-badge" id="navApplicantsBadge" hidden aria-label="Unread applications" data-i18n-aria-label="sidebar.unreadApplicants" data-i18n-aria-label-zh="未读申请" data-i18n-aria-label-en="Unread applications">●</span>
     </button>
 </nav>

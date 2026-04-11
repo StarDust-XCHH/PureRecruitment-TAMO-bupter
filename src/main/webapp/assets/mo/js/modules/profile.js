@@ -18,6 +18,64 @@
         ? window.moApiPath('/mo-assets')
         : '../../mo-assets';
 
+    let moAppRef = null;
+
+    function t(zh, en) {
+        return moAppRef && typeof moAppRef.t === 'function' ? moAppRef.t(zh, en) : zh;
+    }
+
+    let profileSaveKind = 'loaded';
+    let profileSaveErrorExtra = '';
+    let passwordStatusKind = 'idle';
+    let passwordSaveErrorExtra = '';
+
+    function applyProfileSaveStatus() {
+        const el = document.getElementById('profileSaveStatus');
+        if (!el) return;
+        if (profileSaveKind === 'error' && profileSaveErrorExtra) {
+            el.textContent = '✗ ' + profileSaveErrorExtra;
+            return;
+        }
+        const map = {
+            loaded: function () { return t('已加载', 'Loaded'); },
+            saving: function () { return t('保存中...', 'Saving...'); },
+            saved: function () { return t('✓ 已保存', '✓ Saved'); }
+        };
+        el.textContent = map[profileSaveKind] ? map[profileSaveKind]() : '';
+    }
+
+    function setProfileSaveKind(kind, extraErr) {
+        profileSaveKind = kind;
+        profileSaveErrorExtra = extraErr != null ? String(extraErr) : '';
+        applyProfileSaveStatus();
+    }
+
+    function applyPasswordSaveStatus() {
+        const el = document.getElementById('passwordSaveStatus');
+        if (!el) return;
+        if (passwordStatusKind === 'error' && passwordSaveErrorExtra) {
+            el.textContent = '✗ ' + passwordSaveErrorExtra;
+            return;
+        }
+        const map = {
+            idle: function () { return t('尚未保存', 'Not saved'); },
+            updating: function () { return t('更新中...', 'Updating...'); },
+            saved: function () { return t('✓ 密码已更新', '✓ Password updated'); }
+        };
+        el.textContent = map[passwordStatusKind] ? map[passwordStatusKind]() : '';
+    }
+
+    function setPasswordStatusKind(kind, extraErr) {
+        passwordStatusKind = kind;
+        passwordSaveErrorExtra = extraErr != null ? String(extraErr) : '';
+        applyPasswordSaveStatus();
+    }
+
+    function refreshProfileLanguage() {
+        applyProfileSaveStatus();
+        applyPasswordSaveStatus();
+    }
+
     let currentMoId = null;
     let selectedAvatarFile = null;
     let avatarChanged = false;
@@ -28,6 +86,8 @@
      * 初始化个人资料模块
      */
     function init(moApp) {
+        moAppRef = moApp;
+        moAppRef.refreshProfileLanguage = refreshProfileLanguage;
         console.log('[MO-PROFILE] init() 被调用');
         bindEvents();
         loadMoIdFromStorage();
@@ -37,6 +97,8 @@
         } else {
             console.warn('[MO-PROFILE] 未找到 MO ID，无法加载资料');
         }
+
+        applyPasswordSaveStatus();
     }
 
     /**
@@ -144,7 +206,7 @@
             updateAvatarPreview(data.avatar);
         }
 
-        updateSaveStatus('已加载');
+        setProfileSaveKind('loaded');
     }
 
     /**
@@ -171,7 +233,7 @@
         if (!file) return;
 
         if (file.size > 10 * 1024 * 1024) {
-            alert('头像大小不能超过 10MB');
+            alert(t('头像大小不能超过 10MB', 'Avatar must be 10MB or smaller'));
             event.target.value = '';
             return;
         }
@@ -201,7 +263,7 @@
         if (event) event.preventDefault();
 
         if (!currentMoId) {
-            alert('请先登录');
+            alert(t('请先登录', 'Please sign in first'));
             return;
         }
 
@@ -221,8 +283,7 @@
             formData.append('avatarFile', selectedAvatarFile);
         }
 
-        const statusEl = document.getElementById('profileSaveStatus');
-        if (statusEl) statusEl.textContent = '保存中...';
+        setProfileSaveKind('saving');
 
         try {
             const response = await fetch(PROFILE_API, {
@@ -232,20 +293,20 @@
             const result = await response.json();
 
             if (result.success) {
-                if (statusEl) statusEl.textContent = '✓ 已保存';
+                setProfileSaveKind('saved');
                 selectedAvatarFile = null;
                 avatarChanged = false;
-                setTimeout(() => {
-                    if (statusEl) statusEl.textContent = '已加载';
+                setTimeout(function () {
+                    setProfileSaveKind('loaded');
                 }, 3000);
             } else {
-                if (statusEl) statusEl.textContent = `✗ ${result.message}`;
-                alert(`保存失败: ${result.message}`);
+                setProfileSaveKind('error', result.message);
+                alert(t('保存失败: ', 'Save failed: ') + (result.message || ''));
             }
         } catch (error) {
             console.error('[MO-PROFILE] 保存失败:', error);
-            if (statusEl) statusEl.textContent = '✗ 网络错误';
-            alert('保存失败，请检查网络连接');
+            setProfileSaveKind('error', t('网络错误', 'Network error'));
+            alert(t('保存失败，请检查网络连接', 'Save failed. Check your network connection.'));
         }
     }
 
@@ -257,7 +318,7 @@
 
         if (!currentMoId) {
             console.error('[MO-PROFILE] 密码修改失败：currentMoId 为空');
-            alert('请先登录');
+            alert(t('请先登录', 'Please sign in first'));
             return;
         }
 
@@ -268,22 +329,21 @@
         const confirmTrimmed = confirmPassword.trim();
 
         if (!currentPassword || !newTrimmed || !confirmTrimmed) {
-            alert('请填写所有密码字段');
+            alert(t('请填写所有密码字段', 'Please fill in all password fields'));
             return;
         }
 
         if (newTrimmed !== confirmTrimmed) {
-            alert('两次输入的新密码不一致');
+            alert(t('两次输入的新密码不一致', 'The new passwords do not match'));
             return;
         }
 
         if (newTrimmed.length < 6) {
-            alert('新密码至少需要 6 位字符');
+            alert(t('新密码至少需要 6 位字符', 'New password must be at least 6 characters'));
             return;
         }
 
-        const statusEl = document.getElementById('passwordSaveStatus');
-        if (statusEl) statusEl.textContent = '更新中...';
+        setPasswordStatusKind('updating');
 
         const formData = new FormData();
         formData.append('moId', currentMoId);
@@ -300,31 +360,21 @@
             const result = await response.json();
 
             if (result.success) {
-                if (statusEl) statusEl.textContent = '✓ 密码已更新';
+                setPasswordStatusKind('saved');
                 document.getElementById('currentPasswordInput').value = '';
                 document.getElementById('newPasswordInput').value = '';
                 document.getElementById('confirmPasswordInput').value = '';
-                setTimeout(() => {
-                    if (statusEl) statusEl.textContent = '尚未保存';
+                setTimeout(function () {
+                    setPasswordStatusKind('idle');
                 }, 3000);
             } else {
-                if (statusEl) statusEl.textContent = `✗ ${result.message}`;
-                alert(`更新失败: ${result.message}`);
+                setPasswordStatusKind('error', result.message);
+                alert(t('更新失败: ', 'Update failed: ') + (result.message || ''));
             }
         } catch (error) {
             console.error('[MO-PROFILE] 密码更新失败:', error);
-            if (statusEl) statusEl.textContent = '✗ 网络错误';
-            alert('更新失败，请检查网络连接');
-        }
-    }
-
-    /**
-     * 更新保存状态显示
-     */
-    function updateSaveStatus(status) {
-        const statusEl = document.getElementById('profileSaveStatus');
-        if (statusEl) {
-            statusEl.textContent = status;
+            setPasswordStatusKind('error', t('网络错误', 'Network error'));
+            alert(t('更新失败，请检查网络连接', 'Update failed. Check your network connection.'));
         }
     }
 

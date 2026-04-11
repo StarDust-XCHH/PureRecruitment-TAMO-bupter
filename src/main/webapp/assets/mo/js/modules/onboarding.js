@@ -27,19 +27,19 @@
             return [
                 {
                     title: t('从总览了解招聘态势', 'See recruitment metrics at a glance'),
-                    desc: t('在「招聘总览」查看开放岗位、候选规模与待决策数量。', 'On Dashboard, review open roles, candidate volume, and pending decisions.'),
+                    desc: t('在「招聘总览」查看开放岗位、候选规模与待决策数量。', 'On the Recruitment Dashboard, review open modules, candidate volume, and pending decisions.'),
                     selector: '.nav-item[data-route="dashboard"]',
                     route: 'dashboard'
                 },
                 {
-                    title: t('管理课程与发布岗位', 'Manage courses and publish roles'),
-                    desc: t('在「课程管理」中浏览列表，并点击「发布岗位」在弹窗中填写课程信息、技能标签与招聘状态。', 'In Course management, review the list and click Publish opening to enter course details, skills, and recruitment status in a dialog.'),
+                    title: t('管理课程与发布岗位', 'Manage modules and post openings'),
+                    desc: t('在「课程管理」中浏览列表，并点击「发布岗位」在弹窗中填写课程信息、技能标签与招聘状态。', 'In Module Management, browse the list and tap Post to enter module details, skills, and status.'),
                     selector: '.nav-item[data-route="jobs"]',
                     route: 'jobs'
                 },
                 {
-                    title: t('筛选应聘者并做出决策', 'Review applicants and decide'),
-                    desc: t('在「应聘筛选」查看申请者资料，并完成录用或拒绝。', 'In Applicants, review profiles and submit hire or reject decisions.'),
+                    title: t('筛选应聘者并做出决策', 'Screen applicants and decide'),
+                    desc: t('在「应聘筛选」查看申请者资料，并完成录用或拒绝。', 'In Applicant Screening, review profiles and submit hire or reject decisions.'),
                     selector: '.nav-item[data-route="applicants"]',
                     route: 'applicants'
                 },
@@ -224,7 +224,7 @@
             guideProgress.textContent = t('引导 ', 'Guide ') + (guideIndex + 1) + ' / ' + steps.length;
             guideBack.disabled = guideIndex === 0;
             guideBack.style.opacity = guideIndex === 0 ? '0.4' : '1';
-            guideNext.textContent = guideIndex === steps.length - 1 ? t('完成', 'Finish') : t('下一步', 'Next');
+            guideNext.textContent = guideIndex === steps.length - 1 ? t('完成', 'Done') : t('下一步', 'Next');
 
             if (step.selector === '#userTrigger') applyGuideHighlight('settings');
             else if (step.route) applyGuideHighlight(step.route);
