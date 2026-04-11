@@ -1,8 +1,7 @@
 # PureRecruitment-TAMO-bupter
 
 
-[![GitHub release](https://img.shields.io/github/v/release/StarDust-XCHH/PureRecruitment-TAMO-bupter)](https://github.com/StarDust-XCHH/PureRecruitment-TAMO-bupter/releases/latest)
-
+[![Version](https://img.shields.io/badge/version-v1.0.0_(Pre--release)-orange.svg)](https://github.com/StarDust-XCHH/PureRecruitment-TAMO-bupter/releases/tag/v1.0.0)
 
 # Group-16 Members 成员
 |Github UserName|Chinese Name|Name in English|BUPT ID|QM ID|Email|
