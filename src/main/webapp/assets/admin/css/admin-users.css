@@ -97,3 +97,25 @@
     font-family: monospace;
     color: var(--text-secondary);
 }
+
+.course-cell-id {
+    font-family: monospace;
+    color: var(--text-secondary);
+}
+
+/* Loading & Empty States */
+.loading, .empty, .error {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 40px !important;
+}
+
+.error {
+    color: var(--danger-color);
+}
+
+.loading-state {
+    text-align: center;
+    color: var(--text-secondary);
+    padding: 40px;
+}
