@@ -16,6 +16,7 @@
         <div class="mo-applicants-toolbar">
             <label for="applicantCourseSelect">选择课程岗位</label>
             <select id="applicantCourseSelect"></select>
+            <button type="button" class="mo-applicants-toolbar__clear" id="clearApplicantCourseFilterBtn" hidden aria-label="清除课程筛选，恢复全部课程">清除筛选</button>
             <span class="muted" id="applicantsStatusText"></span>
         </div>
 

@@ -737,6 +737,45 @@ legend.mo-field-label:has(.mo-req) {
     padding: 8px 10px;
 }
 
+.mo-applicants-toolbar__clear {
+    flex-shrink: 0;
+    padding: 7px 12px;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1.2;
+    border-radius: 10px;
+    border: 1px solid var(--card-border);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.mo-applicants-toolbar__clear:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.18);
+}
+
+.mo-applicants-toolbar__clear:focus-visible {
+    outline: 2px solid rgba(99, 102, 241, 0.55);
+    outline-offset: 2px;
+}
+
+.mo-applicants-toolbar__clear:active {
+    background: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="light"] .mo-applicants-toolbar__clear {
+    background: #fff;
+    border-color: rgba(15, 23, 42, 0.14);
+    color: #111827;
+}
+
+[data-theme="light"] .mo-applicants-toolbar__clear:hover {
+    background: #f3f4f6;
+    border-color: rgba(15, 23, 42, 0.22);
+}
+
 .mo-applicants-toolbar #applicantsStatusText {
     margin-left: auto;
 }

@@ -14,6 +14,7 @@
         }
 
         const courseSelect = document.getElementById('applicantCourseSelect');
+        const clearCourseFilterBtn = document.getElementById('clearApplicantCourseFilterBtn');
         const refreshBtn = document.getElementById('refreshApplicantsBtn');
         const statusText = document.getElementById('applicantsStatusText');
         const list = document.getElementById('applicantList');
@@ -67,6 +68,13 @@
             if (statusText) statusText.textContent = text || '';
         }
 
+        function updateClearCourseFilterButton() {
+            if (!clearCourseFilterBtn || !courseSelect) return;
+            const hasFilter = (courseSelect.value || '').trim() !== '';
+            clearCourseFilterBtn.hidden = !hasFilter;
+            clearCourseFilterBtn.setAttribute('aria-hidden', hasFilter ? 'false' : 'true');
+        }
+
         function renderCourses(jobs) {
             const prev = courseSelect.value;
             courseSelect.innerHTML = '';
@@ -87,6 +95,7 @@
             } else {
                 courseSelect.value = '';
             }
+            updateClearCourseFilterButton();
         }
 
         async function refreshNavUnreadBadge() {
@@ -509,6 +518,7 @@
             } else {
                 courseSelect.value = '';
             }
+            updateClearCourseFilterButton();
             loadApplicants();
         };
         app.refreshMoApplicantUnreadBadge = refreshNavUnreadBadge;
@@ -518,9 +528,20 @@
                 loadApplicants();
             });
         });
-        courseSelect.addEventListener('change', loadApplicants);
+        courseSelect.addEventListener('change', function () {
+            updateClearCourseFilterButton();
+            loadApplicants();
+        });
+        if (clearCourseFilterBtn) {
+            clearCourseFilterBtn.addEventListener('click', function () {
+                courseSelect.value = '';
+                updateClearCourseFilterButton();
+                loadApplicants();
+            });
+        }
 
         refreshNavUnreadBadge();
         refreshCourseOptionsFromApi();
+        updateClearCourseFilterButton();
     };
 })();
