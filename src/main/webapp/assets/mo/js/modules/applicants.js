@@ -101,6 +101,29 @@
                 .replace(/"/g, '&quot;');
         }
 
+        /** 与列表接口一致：taSnapshot.applicationIntent */
+        function formatSnapshotIntent(ts) {
+            if (!ts || ts.applicationIntent == null) return '';
+            return String(ts.applicationIntent).trim();
+        }
+
+        /** 与后端 joinSnapshotSkills 一致：taSnapshot.skills 字符串数组，逗号拼接 */
+        function formatSnapshotSkills(ts) {
+            if (!ts || !Array.isArray(ts.skills)) return '';
+            var parts = [];
+            ts.skills.forEach(function (s) {
+                if (s == null) return;
+                var t = String(s).trim();
+                if (t) parts.push(t);
+            });
+            return parts.join(', ');
+        }
+
+        function detailKvOrDash(text) {
+            var v = (text == null ? '' : String(text)).trim();
+            return v ? escapeHtml(v) : '--';
+        }
+
         function renderApplicants(items) {
             list.innerHTML = '';
             const rows = Array.isArray(items) ? items : [];
@@ -116,26 +139,18 @@
 
                 card.innerHTML =
                     '<div class="mo-applicant-head">' +
-                    '<div><strong>' + escapeHtml(item.name || item.taId) + '</strong>' + unreadDot +
-                    '<div class="muted">' + escapeHtml(item.taId) + '</div>' +
-                    '<div class="muted" style="font-size:12px">申请 ' + escapeHtml(item.applicationId || '') + '</div></div>' +
+                    '<div><strong>' + escapeHtml(item.name || item.taId) + '</strong>' + unreadDot + '</div>' +
                     '<div class="' + toneClass + '">' + escapeHtml(item.status || '未知') + '</div>' +
                     '</div>' +
-                    '<div class="mo-applicant-meta">' +
-                    '<span>课程：' + escapeHtml(item.courseCode || '--') + ' · ' + escapeHtml(item.courseName || '--') + '</span>' +
-                    '<span>邮箱：' + escapeHtml(item.email || '--') + '</span>' +
-                    '<span>手机：' + escapeHtml(item.phone || '--') + '</span>' +
-                    '<span>学号：' + escapeHtml(item.studentId || '--') + '</span>' +
-                    '<span>意向：' + escapeHtml(item.intent || '--') + '</span>' +
-                    '</div>' +
-                    '<div class="muted">技能：' + escapeHtml(item.skills || '--') + '</div>' +
-                    '<div class="muted">摘要：' + escapeHtml(item.comment || '--') + '</div>';
+                    '<div class="mo-applicant-card__peek muted">' +
+                    '课程 · ' + escapeHtml(item.courseCode || '--') + ' · ' + escapeHtml(item.courseName || '--') +
+                    '</div>';
 
                 const actions = document.createElement('div');
                 actions.className = 'mo-applicant-actions';
 
                 const viewBtn = document.createElement('button');
-                viewBtn.className = 'pill-btn ghost';
+                viewBtn.className = 'pill-btn ghost mo-applicant-view-btn';
                 viewBtn.type = 'button';
                 viewBtn.textContent = '查看详情';
                 viewBtn.addEventListener('click', function () {
@@ -212,6 +227,8 @@
                     '<dt>邮箱</dt><dd>' + escapeHtml(ts.contactEmail || '') + '</dd>' +
                     '<dt>电话</dt><dd>' + escapeHtml(ts.phone || '') + '</dd>' +
                     '<dt>简介</dt><dd>' + escapeHtml(ts.bio || '') + '</dd>' +
+                    '<dt>意向</dt><dd>' + detailKvOrDash(formatSnapshotIntent(ts)) + '</dd>' +
+                    '<dt>技能</dt><dd>' + detailKvOrDash(formatSnapshotSkills(ts)) + '</dd>' +
                     '</dl>' +
                     '<div class="mo-detail-block mo-detail-block--resume">' +
                     '<div class="mo-detail-section-title">简历</div>' +

@@ -745,10 +745,10 @@ legend.mo-field-label:has(.mo-req) {
 .mo-applicant-card {
     border: 1px solid var(--card-border);
     border-radius: 14px;
-    padding: 14px;
+    padding: 12px 14px;
     background: rgba(0, 0, 0, 0.2);
     display: grid;
-    gap: 10px;
+    gap: 8px;
 }
 
 [data-theme="light"] .mo-applicant-card {
@@ -770,10 +770,56 @@ legend.mo-field-label:has(.mo-req) {
     font-size: 13px;
 }
 
+/* 列表卡片仅保留一行「课程」摘要，长标题省略 */
+.mo-applicant-card__peek {
+    font-size: 13px;
+    line-height: 1.45;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+}
+
 .mo-applicant-actions {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+}
+
+.mo-applicant-card .mo-applicant-view-btn.pill-btn {
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    background: rgba(255, 255, 255, 0.07);
+    transition:
+        background 0.18s ease,
+        border-color 0.18s ease,
+        box-shadow 0.18s ease,
+        transform 0.15s ease;
+}
+
+.mo-applicant-card .mo-applicant-view-btn.pill-btn:hover,
+.mo-applicant-card .mo-applicant-view-btn.pill-btn:focus-visible {
+    border-color: rgba(167, 139, 250, 0.85);
+    background: rgba(139, 92, 246, 0.14);
+    box-shadow: 0 4px 16px rgba(139, 92, 246, 0.22);
+    transform: translateY(-1px);
+}
+
+.mo-applicant-card .mo-applicant-view-btn.pill-btn:active {
+    transform: translateY(0);
+    background: rgba(139, 92, 246, 0.2);
+}
+
+[data-theme="light"] .mo-applicant-card .mo-applicant-view-btn.pill-btn {
+    border-color: rgba(0, 0, 0, 0.18);
+    background: rgba(255, 255, 255, 0.92);
+}
+
+[data-theme="light"] .mo-applicant-card .mo-applicant-view-btn.pill-btn:hover,
+[data-theme="light"] .mo-applicant-card .mo-applicant-view-btn.pill-btn:focus-visible {
+    border-color: rgba(109, 40, 217, 0.42);
+    background: rgba(237, 233, 254, 0.98);
+    box-shadow: 0 4px 14px rgba(109, 40, 217, 0.14);
 }
 
 .mo-applicant-detail-actions {
@@ -961,6 +1007,22 @@ legend.mo-field-label:has(.mo-req) {
 #moApplicantDetailBody .mo-applicant-actions {
     gap: 14px;
     padding: 16px 0 20px;
+}
+
+/* 查看简历、录用：渐变底上的白字 */
+#moApplicantDetailBody .mo-detail-resume-row .pill-btn,
+#moApplicantDetailBody #moApplicantAcceptBtn.pill-btn {
+    color: #fff;
+    text-decoration: none;
+}
+
+#moApplicantDetailBody .mo-detail-resume-row .pill-btn:hover,
+#moApplicantDetailBody .mo-detail-resume-row .pill-btn:focus-visible,
+#moApplicantDetailBody .mo-detail-resume-row .pill-btn:visited,
+#moApplicantDetailBody #moApplicantAcceptBtn.pill-btn:hover,
+#moApplicantDetailBody #moApplicantAcceptBtn.pill-btn:focus-visible,
+#moApplicantDetailBody #moApplicantAcceptBtn.pill-btn:active {
+    color: #fff;
 }
 
 /* 录用 / 拒绝：拒绝描边；二者悬停反馈 */
