@@ -50,12 +50,26 @@
     let brandTapTimer = null;
 
     function updateThemeText() {
-        const label = root.getAttribute('data-theme') === 'light' ? 'Light' : 'Dark';
-        themeText.textContent = label;
+        const isLight = root.getAttribute('data-theme') === 'light';
+        const label = isLight ? 'Light' : 'Dark';
+        if (themeText) {
+            themeText.textContent = label;
+        }
         const registerThemeText = document.getElementById('registerThemeText');
         if (registerThemeText) {
             registerThemeText.textContent = label;
         }
+        [themeToggle, registerThemeToggle].forEach(function (toggle) {
+            if (!toggle) {
+                return;
+            }
+            toggle.setAttribute('aria-label', isLight ? 'Switch to dark theme' : 'Switch to light theme');
+            toggle.setAttribute('title', isLight ? 'Switch to dark theme' : 'Switch to light theme');
+            const icon = toggle.querySelector('.theme-toggle-icon');
+            if (icon) {
+                icon.textContent = isLight ? '☀️' : '🌙';
+            }
+        });
     }
 
     function applyTheme(theme) {

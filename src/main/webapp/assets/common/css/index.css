@@ -125,6 +125,7 @@
             transform: translateY(0);
             transform-style: preserve-3d;
             transition: transform 0.4s ease, box-shadow 0.4s ease, background 0.35s ease, border-color 0.35s ease;
+            overflow: visible;
         }
 
         .card:hover {
@@ -140,57 +141,162 @@
             animation: cardFadeIn 0.4s ease forwards;
         }
 
-        /* 主题开关独占一行，与下方标题区上下排列，避免与长标题混叠 */
-        .card-toolbar {
-            display: flex;
-            justify-content: flex-end;
+        /* 主题切换按钮：保持卡片右上角位置，改为正圆形，图标保持居中 */
+        .theme-toggle {
+            position: absolute;
+            top: -12px;
+            right: -12px;
+            width: 48px;
+            height: 48px;
+            display: inline-flex;
             align-items: center;
-            margin-bottom: 14px;
+            justify-content: center;
+            padding: 0;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            background: linear-gradient(180deg, rgba(19, 28, 53, 0.96), rgba(10, 16, 34, 0.92));
+            color: var(--text);
+            cursor: pointer;
+            transition: transform 0.24s ease, box-shadow 0.24s ease, background 0.3s ease, border-color 0.3s ease;
+            box-shadow: 0 14px 26px rgba(3, 8, 20, 0.34), 0 1px 0 rgba(255, 255, 255, 0.08) inset;
+            z-index: 2;
+            overflow: visible;
         }
 
-        .theme-toggle {
-            position: static;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            padding: 6px 10px;
-            border-radius: 999px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            background: rgba(255, 255, 255, 0.08);
-            color: var(--text);
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.25s ease;
-            min-width: 88px;
-            flex-shrink: 0;
+        .theme-toggle::before {
+            content: '';
+            position: absolute;
+            inset: 3px;
+            border-radius: 50%;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.02) 58%, rgba(0, 0, 0, 0.12));
+            opacity: 0.55;
+            pointer-events: none;
+        }
+
+        .theme-toggle::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            opacity: 0.6;
+            pointer-events: none;
         }
 
         :root[data-theme='light'] .theme-toggle {
-            border-color: rgba(15, 20, 35, 0.18);
-            background: rgba(15, 25, 50, 0.06);
+            border-color: rgba(15, 20, 35, 0.16);
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(233, 239, 250, 0.96));
+            box-shadow: 0 14px 28px rgba(58, 109, 240, 0.16), 0 1px 0 rgba(255, 255, 255, 0.78) inset;
+        }
+
+        .theme-toggle:hover,
+        .theme-toggle:focus-visible {
+            transform: translate(4px, -4px) scale(1.04);
         }
 
         .theme-toggle:hover {
-            transform: translateY(-1px);
+            box-shadow: 0 20px 34px rgba(3, 8, 20, 0.42), 0 1px 0 rgba(255, 255, 255, 0.1) inset;
         }
 
-        .toggle-dot {
-            width: 16px;
-            height: 16px;
+        .theme-toggle:active {
+            transform: translate(3px, -3px) scale(0.96);
+        }
+
+        .theme-toggle:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(93, 214, 255, 0.22), 0 20px 34px rgba(3, 8, 20, 0.42);
+        }
+
+        :root[data-theme='light'] .theme-toggle:focus-visible {
+            box-shadow: 0 0 0 3px rgba(58, 109, 240, 0.18), 0 18px 30px rgba(58, 109, 240, 0.22);
+        }
+
+        .theme-toggle-icon {
+            position: relative;
+            z-index: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            font-size: 18px;
+            line-height: 1;
+            transform-origin: center;
+            transition: transform 0.32s ease, opacity 0.25s ease, filter 0.25s ease;
+            filter: drop-shadow(0 0 10px rgba(93, 214, 255, 0.35));
+        }
+
+        .theme-toggle:hover .theme-toggle-icon,
+        .theme-toggle:focus-visible .theme-toggle-icon {
+            transform: rotate(-18deg) scale(1.08);
+        }
+
+        :root[data-theme='light'] .theme-toggle .theme-toggle-icon {
+            filter: drop-shadow(0 0 10px rgba(250, 204, 21, 0.35));
+        }
+
+        .theme-toggle-pulse {
+            position: absolute;
+            right: 9px;
+            top: 9px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
-            background: var(--accent);
-            box-shadow: 0 0 10px rgba(93, 214, 255, 0.5);
-            transition: transform 0.25s ease, background 0.25s ease;
-            margin-left: auto;
-            transform: translateX(0);
+            background: radial-gradient(circle, rgba(93, 214, 255, 0.98), rgba(93, 214, 255, 0.18));
+            box-shadow: 0 0 0 0 rgba(93, 214, 255, 0.35);
+            animation: themePulse 2.4s ease-in-out infinite;
         }
 
-        :root[data-theme='light'] .toggle-dot {
-            background: rgba(58, 109, 240, 0.5);
-            transform: translateX(-2px);
-            box-shadow: 0 0 8px rgba(58, 109, 240, 0.25);
+        :root[data-theme='light'] .theme-toggle-pulse {
+            background: radial-gradient(circle, rgba(250, 204, 21, 0.96), rgba(250, 204, 21, 0.2));
+            box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.26);
         }
+
+        @keyframes themePulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(93, 214, 255, 0.34);
+            }
+            50% {
+                transform: scale(1.22);
+                box-shadow: 0 0 0 8px rgba(93, 214, 255, 0);
+            }
+        }
+
+        @media (max-width: 560px) {
+            .card {
+                padding-top: 32px;
+                padding-right: 38px;
+            }
+
+            .theme-toggle {
+                top: -10px;
+                right: -10px;
+                width: 42px;
+                height: 42px;
+            }
+
+            .theme-toggle:hover,
+            .theme-toggle:focus-visible {
+                transform: translate(3px, -3px) scale(1.03);
+            }
+
+            .theme-toggle:active {
+                transform: translate(2px, -2px) scale(0.96);
+            }
+
+            .theme-toggle-icon {
+                font-size: 16px;
+            }
+
+            .theme-toggle-pulse {
+                right: 7px;
+                top: 7px;
+                width: 6px;
+                height: 6px;
+            }
+        }
+
 
         .brand {
             display: flex;

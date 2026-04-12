@@ -3,7 +3,7 @@
     "schema": "mo",
     "entity": "profiles",
     "version": "1.0",
-    "updatedAt": "2026-04-08T02:24:15.858525500Z"
+    "updatedAt": "2026-04-12T04:10:55.302807600Z"
   },
   "items": [
     {
@@ -55,6 +55,16 @@
       "bio": "",
       "skills": [],
       "lastUpdatedAt": "2026-04-08T02:06:39.843943400Z"
+    },
+    {
+      "id": "PROFILE-MO-431AF0",
+      "moId": "MO-431AF0",
+      "avatar": "",
+      "title": "MO",
+      "contactEmail": "asd@zxc.c",
+      "bio": "",
+      "skills": [],
+      "lastUpdatedAt": "2026-04-12T03:46:12.298468700Z"
     }
   ]
 }
