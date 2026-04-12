@@ -3,7 +3,7 @@
     "schema": "mo",
     "entity": "mos",
     "version": "1.0",
-    "updatedAt": "2026-04-12T03:24:37.363798700Z"
+    "updatedAt": "2026-04-12T03:46:12.301054300Z"
   },
   "items": [
     {
@@ -54,7 +54,7 @@
         "passwordHash": "f842d3a01818414c004424c54a0d975c5e03cb04b8d9473bd4b6e083f24ae14f",
         "passwordSalt": "40741f1d-7ef8-43d7-9af7-4824b1efb107",
         "lastLoginAt": "2026-04-12T03:24:37.362797700Z",
-        "failedAttempts": 0
+        "failedAttempts": 0.0
       }
     },
     {
@@ -89,6 +89,23 @@
         "passwordSalt": "f4c1e423-a20b-43ea-98a6-567a9839bda5",
         "lastLoginAt": "2026-04-08T02:20:25.768626500Z",
         "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "MO-431AF0",
+      "name": "asdzxc",
+      "username": "asdzxc",
+      "email": "asd@zxc.c",
+      "phone": "13243245612",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-04-12T03:46:12.298468700Z",
+      "updatedAt": "2026-04-12T03:46:12.298468700Z",
+      "auth": {
+        "passwordHash": "73ea18a2653b3e00fcd3c31f4d82770c91fc5a8ff0911be5179a0af2f05b642d",
+        "passwordSalt": "cbc7cf0d-67a2-4d4d-8c10-66b5ffac5dde",
+        "lastLoginAt": "",
+        "failedAttempts": 0
       }
     }
   ]

@@ -3,7 +3,7 @@
     "schema": "mo",
     "entity": "settings",
     "version": "1.0",
-    "updatedAt": "2026-04-12T03:24:37.845801500Z"
+    "updatedAt": "2026-04-12T03:46:13.347828Z"
   },
   "items": [
     {
@@ -45,6 +45,14 @@
       "avatar": "",
       "createdAt": "2026-04-08T02:06:39.843943400Z",
       "updatedAt": "2026-04-08T02:06:39.843943400Z"
+    },
+    {
+      "id": "SETTING-MO-431AF0",
+      "moId": "MO-431AF0",
+      "theme": "dark",
+      "avatar": "",
+      "createdAt": "2026-04-12T03:46:12.298468700Z",
+      "updatedAt": "2026-04-12T03:46:12.298468700Z"
     }
   ]
 }
