@@ -6,7 +6,8 @@
     const loginForm = document.getElementById('loginForm');
     const registerForm = document.getElementById('registerForm');
     const roleInput = document.getElementById('roleInput');
-    const tabs = Array.from(document.querySelectorAll('.tab'));
+    const loginTabs = Array.from(document.querySelectorAll('#loginCard .tabs .tab'));
+    const registerTabs = Array.from(document.querySelectorAll('#registerCard .tabs .tab'));
     const loginError = document.getElementById('loginError');
     const registerError = document.getElementById('registerError');
     const adminError = document.getElementById('adminError');
@@ -42,13 +43,19 @@
     const registerSub = document.getElementById('registerSub');
     const registerIdLabel = document.getElementById('registerIdLabel');
     const loginIdentifierLabel = document.getElementById('loginIdentifierLabel');
+    const adminUnlockHint = document.getElementById('adminUnlockHint');
 
     const adminRevealThreshold = 5;
     let brandTapCount = 0;
     let brandTapTimer = null;
 
     function updateThemeText() {
-        themeText.textContent = root.getAttribute('data-theme') === 'light' ? 'Light' : 'Dark';
+        const label = root.getAttribute('data-theme') === 'light' ? 'Light' : 'Dark';
+        themeText.textContent = label;
+        const registerThemeText = document.getElementById('registerThemeText');
+        if (registerThemeText) {
+            registerThemeText.textContent = label;
+        }
     }
 
     function applyTheme(theme) {
@@ -111,16 +118,16 @@
     function updateLoginUI(role) {
         if (role === 'MO') {
             loginLogo.textContent = 'MO';
-            loginTitle.textContent = 'MO Recruitment System';
-            loginSub.textContent = 'Module Organizer 登录入口';
-            loginIdentifierLabel.textContent = 'MO ID / 用户名 / 邮箱 / 手机号';
-            loginUsername.placeholder = '请输入 MO ID、用户名、邮箱或手机号';
+            loginTitle.textContent = 'Teaching Assistant Recruitment';
+            loginSub.textContent = 'Module Organizer · Sign in';
+            loginIdentifierLabel.textContent = 'Username, email, or phone';
+            loginUsername.placeholder = 'Enter username, email, or phone';
         } else {
             loginLogo.textContent = 'TA';
-            loginTitle.textContent = 'TA Recruitment System';
-            loginSub.textContent = '请选择登录身份';
-            loginIdentifierLabel.textContent = '用户名 / 邮箱 / 手机号';
-            loginUsername.placeholder = '请输入用户名、邮箱或手机号';
+            loginTitle.textContent = 'Teaching Assistant Recruitment';
+            loginSub.textContent = 'Teaching Assistant · Sign in';
+            loginIdentifierLabel.textContent = 'Username, email, or phone';
+            loginUsername.placeholder = 'Enter username, email, or phone';
         }
     }
 
@@ -130,15 +137,100 @@
     function updateRegisterUI(role) {
         if (role === 'MO') {
             registerLogo.textContent = 'MO';
-            registerTitle.textContent = 'MO Registration';
-            registerSub.textContent = '成为课程负责人 Module Organizer';
-            registerIdLabel.textContent = 'MO ID 自动生成';
+            registerTitle.textContent = 'Sign up';
+            registerSub.textContent = 'Module Organizer';
+            registerIdLabel.textContent = 'Auto-generated account ID';
         } else {
             registerLogo.textContent = 'TA';
-            registerTitle.textContent = 'TA Registration';
-            registerSub.textContent = '成为助教 Teaching Assistant';
-            registerIdLabel.textContent = 'TA ID 自动生成';
+            registerTitle.textContent = 'Sign up';
+            registerSub.textContent = 'Teaching Assistant';
+            registerIdLabel.textContent = 'Auto-generated account ID';
         }
+    }
+
+    function syncRegisterRoleTabs(role) {
+        registerTabs.forEach(function (t) {
+            const r = t.getAttribute('data-role') || 'TA';
+            const on = r === role;
+            t.classList.toggle('active', on);
+            t.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+    }
+
+    /**
+     * 切换注册身份：保留已填表单项，按角色重新生成 ID。
+     */
+    function applyRegisterRole(role) {
+        const next = role === 'MO' ? 'MO' : 'TA';
+        if (registerRoleInput.value === next) {
+            return;
+        }
+        registerRoleInput.value = next;
+        registerId.value = next === 'TA' ? generateTaId() : generateMoId();
+        updateRegisterUI(next);
+        syncRegisterRoleTabs(next);
+        setInlineMessage(registerError, '');
+    }
+
+    /**
+     * 注册提交前：与登录页同风格的确认层（非浏览器原生 confirm）。
+     */
+    function showRegisterConfirm(role) {
+        return new Promise(function (resolve) {
+            const modal = document.getElementById('registerConfirmModal');
+            const msg = document.getElementById('registerConfirmMessage');
+            const okBtn = document.getElementById('registerConfirmOk');
+            const cancelBtn = document.getElementById('registerConfirmCancel');
+            if (!modal || !msg || !okBtn || !cancelBtn) {
+                resolve(true);
+                return;
+            }
+
+            msg.textContent =
+                role === 'MO'
+                    ? 'Create a Module Organizer (MO) account?'
+                    : 'Create a Teaching Assistant (TA) account?';
+
+            function finish(result) {
+                modal.classList.add('hidden');
+                modal.setAttribute('aria-hidden', 'true');
+                document.removeEventListener('keydown', onDocKey);
+                modal.removeEventListener('click', onBackdrop);
+                okBtn.removeEventListener('click', onOk);
+                cancelBtn.removeEventListener('click', onCancel);
+                resolve(result);
+                if (!result && registerSubmit && typeof registerSubmit.focus === 'function') {
+                    registerSubmit.focus();
+                }
+            }
+
+            function onOk() {
+                finish(true);
+            }
+            function onCancel() {
+                finish(false);
+            }
+            function onBackdrop(ev) {
+                if (ev.target === modal) {
+                    finish(false);
+                }
+            }
+            function onDocKey(ev) {
+                if (ev.key === 'Escape') {
+                    ev.preventDefault();
+                    finish(false);
+                }
+            }
+
+            okBtn.addEventListener('click', onOk);
+            cancelBtn.addEventListener('click', onCancel);
+            modal.addEventListener('click', onBackdrop);
+            document.addEventListener('keydown', onDocKey);
+
+            modal.classList.remove('hidden');
+            modal.setAttribute('aria-hidden', 'false');
+            okBtn.focus();
+        });
     }
 
     function saveTaUser(user) {
@@ -179,15 +271,22 @@
     applyTheme(savedTheme === 'light' ? 'light' : 'dark');
     setOverlayState(false);
 
-    tabs.forEach(function (tab) {
+    loginTabs.forEach(function (tab) {
         tab.addEventListener('click', function () {
-            tabs.forEach(function (item) {
+            loginTabs.forEach(function (item) {
                 item.classList.remove('active');
             });
             tab.classList.add('active');
             const selectedRole = tab.getAttribute('data-role') || 'TA';
             roleInput.value = selectedRole;
             updateLoginUI(selectedRole);
+        });
+    });
+
+    registerTabs.forEach(function (tab) {
+        tab.addEventListener('click', function () {
+            const selectedRole = tab.getAttribute('data-role') || 'TA';
+            applyRegisterRole(selectedRole);
         });
     });
 
@@ -207,6 +306,30 @@
             clearTimeout(brandTapTimer);
             brandTapTimer = null;
         }
+        if (adminUnlockHint) {
+            adminUnlockHint.textContent = '';
+            adminUnlockHint.hidden = true;
+        }
+    }
+
+    function updateAdminUnlockHint() {
+        if (!adminUnlockHint) return;
+        if (brandTapCount < 2) {
+            adminUnlockHint.textContent = '';
+            adminUnlockHint.hidden = true;
+            return;
+        }
+        if (brandTapCount >= adminRevealThreshold) {
+            adminUnlockHint.textContent = '';
+            adminUnlockHint.hidden = true;
+            return;
+        }
+        const remaining = adminRevealThreshold - brandTapCount;
+        adminUnlockHint.hidden = false;
+        adminUnlockHint.textContent =
+            remaining === 1
+                ? 'One more click on the title to unlock the admin entry.'
+                : remaining + ' more clicks on the title to unlock the admin entry.';
     }
 
     function handleBrandTap() {
@@ -221,7 +344,9 @@
         if (brandTapCount >= adminRevealThreshold) {
             revealAdminPanel();
             resetBrandTapCounter();
+            return;
         }
+        updateAdminUnlockHint();
     }
 
     brandTrigger.addEventListener('click', handleBrandTap);
@@ -232,11 +357,11 @@
         const adminPwd = document.getElementById('adminPassword').value;
 
         if (!adminAcc || !adminPwd) {
-            setInlineMessage(adminError, '请输入管理员账号和密码');
+            setInlineMessage(adminError, 'Enter admin username and password.');
             return;
         }
 
-        setLoading(adminLogin, '登录中...', true, '管理员登录');
+        setLoading(adminLogin, 'Signing in…', true, 'Admin Sign in');
 
         try {
             if (adminAcc === 'admin' && adminPwd === 'admin123') {
@@ -248,13 +373,13 @@
                 localStorage.setItem('admin-user', JSON.stringify(adminUser));
                 window.location.replace('pages/admin/admin-home.jsp');
             } else {
-                setInlineMessage(adminError, '账号或密码错误（测试账号: admin/admin123）');
+                setInlineMessage(adminError, 'Invalid credentials (demo: admin / admin123).');
             }
         } catch (error) {
             console.error("[JS] 管理员登录异常:", error);
-            setInlineMessage(adminError, '登录失败，请重试');
+            setInlineMessage(adminError, 'Unable to sign in. Try again.');
         } finally {
-            setLoading(adminLogin, '登录中...', false, '管理员登录');
+            setLoading(adminLogin, 'Signing in…', false, 'Admin Sign in');
         }
     });
 
@@ -262,7 +387,7 @@
         event.preventDefault();
         const selectedRole = roleInput.value;
         if (selectedRole !== 'TA' && selectedRole !== 'MO') {
-            setInlineMessage(loginError, '目前仅开放 TA 和 MO 角色注册哦！');
+            setInlineMessage(loginError, 'Only TA or MO registration is available.');
             return;
         }
 
@@ -276,6 +401,7 @@
         // 更新注册页面 UI
         registerRoleInput.value = selectedRole;
         updateRegisterUI(selectedRole);
+        syncRegisterRoleTabs(selectedRole);
 
         showCard(registerCard, loginCard);
     });
@@ -312,13 +438,13 @@
         console.groupEnd();
 
         if (!username || !password) {
-            setInlineMessage(loginError, '请输入用户名和密码');
+            setInlineMessage(loginError, 'Enter username and password.');
             return;
         }
 
         const loginUrl = role === 'MO' ? 'api/mo/login' : 'api/ta/login';
 
-        setLoading(loginSubmit, '登录中...', true, '进入系统');
+        setLoading(loginSubmit, 'Signing in…', true, 'Sign in');
 
         try {
             const response = await fetch(loginUrl, {
@@ -336,7 +462,7 @@
 
             if (response.status === 404) {
                 console.error("[JS] 错误：接口地址不存在 (404)");
-                setInlineMessage(loginError, '服务器接口未找到 (404)');
+                setInlineMessage(loginError, 'Server endpoint not found (404).');
                 return;
             }
 
@@ -344,7 +470,7 @@
             console.log("[JS] 解析后的响应体:", payload);
 
             if (!response.ok || !payload.success) {
-                setInlineMessage(loginError, payload.message || '登录失败');
+                setInlineMessage(loginError, payload.message || 'Unable to sign in.');
                 return;
             }
 
@@ -380,9 +506,9 @@
 
         } catch (error) {
             console.error("[JS] 网络请求异常:", error);
-            setInlineMessage(loginError, '连接服务器失败，请检查后端是否启动');
+            setInlineMessage(loginError, 'Could not reach the server. Is the backend running?');
         } finally {
-            setLoading(loginSubmit, '登录中...', false, '进入系统');
+            setLoading(loginSubmit, 'Signing in…', false, 'Sign in');
         }
     });
 
@@ -411,7 +537,7 @@
         const phonePattern = /^\+?\d{7,15}$/;
 
         if (!userId) {
-            setInlineMessage(registerError, (selectedRole === 'MO' ? 'MO ID' : 'TA ID') + ' 不能为空');
+            setInlineMessage(registerError, 'Account ID is missing.');
             return;
         }
 
@@ -420,36 +546,41 @@
             if (!username) markInvalid(registerUsername);
             if (!email) markInvalid(registerEmail);
             if (!phone) markInvalid(registerPhone);
-            setInlineMessage(registerError, '姓名、用户名、邮箱、手机号不能为空');
+            setInlineMessage(registerError, 'Name, username, email, and phone are required.');
             return;
         }
 
         if (!emailPattern.test(email)) {
             markInvalid(registerEmail);
-            setInlineMessage(registerError, '邮箱格式不正确');
+            setInlineMessage(registerError, 'Invalid email format.');
             return;
         }
 
         if (!phonePattern.test(phone)) {
             markInvalid(registerPhone);
-            setInlineMessage(registerError, '手机号格式不正确');
+            setInlineMessage(registerError, 'Invalid phone number.');
             return;
         }
 
         if (password.length < 6) {
             markInvalid(registerPassword);
-            setInlineMessage(registerError, '密码至少 6 位');
+            setInlineMessage(registerError, 'Password must be at least 6 characters.');
             return;
         }
 
         if (password !== confirmPassword) {
             markInvalid(registerPassword);
             markInvalid(registerConfirmPassword);
-            setInlineMessage(registerError, '两次输入的密码不一致');
+            setInlineMessage(registerError, 'Passwords do not match.');
             return;
         }
 
-        setLoading(registerSubmit, '注册中...', true, '完成注册并登录');
+        const confirmed = await showRegisterConfirm(selectedRole);
+        if (!confirmed) {
+            return;
+        }
+
+        setLoading(registerSubmit, 'Signing up…', true, 'Sign up');
 
         const registerUrl = selectedRole === 'MO' ? 'api/mo/register' : 'api/ta/register';
         const registerParamId = selectedRole === 'MO' ? 'moId' : 'taId';
@@ -480,17 +611,17 @@
 
             if (!response.ok || !payload.success) {
                 // 如果 ID 重复，重新生成
-                if (payload.message && payload.message.includes('已存在')) {
+                if (payload.message && (/already exists|already taken|already registered/i.test(payload.message) || payload.message.includes('已存在'))) {
                     if (selectedRole === 'TA') {
                         registerId.value = generateTaId();
                     } else {
                         registerId.value = generateMoId();
                     }
-                    setInlineMessage(registerError, (selectedRole === 'MO' ? 'MO ID' : 'TA ID') + ' 冲突，已重新生成，请重试');
-                    setLoading(registerSubmit, '注册中...', false, '完成注册并登录');
+                    setInlineMessage(registerError, 'Account ID conflict; a new ID was generated. Try again.');
+                    setLoading(registerSubmit, 'Signing up…', false, 'Sign up');
                     return;
                 }
-                setInlineMessage(registerError, payload.message || '注册失败，请检查信息后重试');
+                setInlineMessage(registerError, payload.message || 'Unable to complete registration. Check your details and try again.');
                 return;
             }
 
@@ -518,9 +649,9 @@
                 window.location.replace('pages/ta/ta-home.jsp');
             }
         } catch (error) {
-            setInlineMessage(registerError, '注册请求失败，请稍后再试');
+            setInlineMessage(registerError, 'Something went wrong. Please try again later.');
         } finally {
-            setLoading(registerSubmit, '注册中...', false, '完成注册并登录');
+            setLoading(registerSubmit, 'Signing up…', false, 'Sign up');
         }
     });
 })();
