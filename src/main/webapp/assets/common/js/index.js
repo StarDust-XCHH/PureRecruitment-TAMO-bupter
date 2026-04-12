@@ -67,7 +67,7 @@
             toggle.setAttribute('title', isLight ? 'Switch to dark theme' : 'Switch to light theme');
             const icon = toggle.querySelector('.theme-toggle-icon');
             if (icon) {
-                icon.textContent = isLight ? '☀' : '☾';
+                icon.textContent = isLight ? '☀️' : '🌙';
             }
         });
     }
