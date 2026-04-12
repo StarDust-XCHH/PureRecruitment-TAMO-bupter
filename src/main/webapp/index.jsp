@@ -15,12 +15,10 @@
 <div class="page-shell">
     <div class="auth-shell">
         <section class="card" id="loginCard">
-            <div class="card-toolbar">
-                <button class="theme-toggle" id="themeToggle" type="button">
-                    <span id="themeText">Theme</span>
-                    <span class="toggle-dot"></span>
-                </button>
-            </div>
+            <button class="theme-toggle theme-toggle-tag" id="themeToggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+                <span class="theme-toggle-icon" aria-hidden="true">☾</span>
+                <span class="theme-toggle-pulse" aria-hidden="true"></span>
+            </button>
 
             <div class="brand" id="brandTrigger">
                 <div class="logo" id="loginLogo">TA</div>
@@ -73,12 +71,10 @@
         </section>
 
         <section class="card hidden" id="registerCard">
-            <div class="card-toolbar">
-                <button class="theme-toggle" id="registerThemeToggle" type="button">
-                    <span id="registerThemeText">Theme</span>
-                    <span class="toggle-dot"></span>
-                </button>
-            </div>
+            <button class="theme-toggle theme-toggle-tag" id="registerThemeToggle" type="button" aria-label="Toggle theme" title="Toggle theme">
+                <span class="theme-toggle-icon" aria-hidden="true">☾</span>
+                <span class="theme-toggle-pulse" aria-hidden="true"></span>
+            </button>
 
             <div class="brand">
                 <div class="logo" id="registerLogo">TA</div>
