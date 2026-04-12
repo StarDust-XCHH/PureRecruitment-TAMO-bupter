@@ -4,7 +4,7 @@
 # 发布
 
 ## 预发布
-[![Version](https://img.shields.io/badge/version-v1.0.0_(Pre--release)-orange.svg)](https://github.com/StarDust-XCHH/PureRecruitment-TAMO-bupter/releases/tag/v1.0.0)
+[![Version](https://img.shields.io/badge/version-v1.0.1_(Pre--release)-orange.svg)](https://github.com/StarDust-XCHH/PureRecruitment-TAMO-bupter/releases/tag/v1.0.1)
 
 ## 正式发布
 
