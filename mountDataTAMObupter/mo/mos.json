@@ -3,7 +3,7 @@
     "schema": "mo",
     "entity": "mos",
     "version": "1.0",
-    "updatedAt": "2026-04-12T04:10:55.247186900Z"
+    "updatedAt": "2026-04-12T09:30:39.699933700Z"
   },
   "items": [
     {
@@ -49,12 +49,12 @@
       "department": "",
       "status": "active",
       "createdAt": "2026-04-05T15:46:28.695396100Z",
-      "updatedAt": "2026-04-12T04:10:55.246188100Z",
+      "updatedAt": "2026-04-12T09:17:58.667635600Z",
       "auth": {
         "passwordHash": "f842d3a01818414c004424c54a0d975c5e03cb04b8d9473bd4b6e083f24ae14f",
         "passwordSalt": "40741f1d-7ef8-43d7-9af7-4824b1efb107",
-        "lastLoginAt": "2026-04-12T04:10:55.246188100Z",
-        "failedAttempts": 0
+        "lastLoginAt": "2026-04-12T09:17:58.667635600Z",
+        "failedAttempts": 0.0
       }
     },
     {
@@ -106,6 +106,23 @@
         "passwordSalt": "cbc7cf0d-67a2-4d4d-8c10-66b5ffac5dde",
         "lastLoginAt": "",
         "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "MO-572HL8",
+      "name": "Ab",
+      "username": "ASJAJ",
+      "email": "ahdscm@163.com",
+      "phone": "1782321422",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-04-12T09:30:39.699933700Z",
+      "updatedAt": "2026-04-12T09:30:39.699933700Z",
+      "auth": {
+        "passwordHash": "3b9dbd233fd8a5e1275c4dc9085aadd28f5d175cdb51f43ed510c32ad9465378",
+        "passwordSalt": "a17417c8-872c-42bf-a3b7-54d49bdd64a8",
+        "lastLoginAt": "",
+        "failedAttempts": 0
       }
     }
   ]

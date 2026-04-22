@@ -3,7 +3,7 @@
     "schema": "mo",
     "entity": "settings",
     "version": "1.0",
-    "updatedAt": "2026-04-12T04:10:55.304821100Z"
+    "updatedAt": "2026-04-12T09:30:40.007357400Z"
   },
   "items": [
     {
@@ -53,6 +53,14 @@
       "avatar": "",
       "createdAt": "2026-04-12T03:46:12.298468700Z",
       "updatedAt": "2026-04-12T03:46:12.298468700Z"
+    },
+    {
+      "id": "SETTING-MO-572HL8",
+      "moId": "MO-572HL8",
+      "theme": "dark",
+      "avatar": "",
+      "createdAt": "2026-04-12T09:30:39.699933700Z",
+      "updatedAt": "2026-04-12T09:30:39.699933700Z"
     }
   ]
 }

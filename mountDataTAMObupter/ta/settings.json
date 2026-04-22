@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "settings",
     "version": "1.0",
-    "updatedAt": "2026-04-12T04:08:04.108732700Z"
+    "updatedAt": "2026-04-12T09:33:51.730183Z"
   },
   "items": [
     {
@@ -135,6 +135,19 @@
       "notifyRecommendation": true,
       "notifyInterview": true,
       "updatedAt": "2026-04-08T02:05:51.145318400Z"
+    },
+    {
+      "id": "SETTING-TA-64333",
+      "taId": "TA-64333",
+      "profileSaved": true,
+      "profileSavedAt": "2026-04-12T09:15:52.943840100Z",
+      "lastProfileSyncStatus": "success",
+      "lastProfileSyncMessage": "资料保存成功",
+      "avatar": "image/TA-64333_1775985317163_c7fba21f890e4b4c9c89101f29d89f71.png",
+      "notifyApplication": true,
+      "notifyRecommendation": true,
+      "notifyInterview": true,
+      "updatedAt": "2026-04-12T09:15:52.943840100Z"
     }
   ]
 }

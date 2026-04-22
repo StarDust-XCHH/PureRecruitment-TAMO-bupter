@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "profiles",
     "version": "1.0",
-    "updatedAt": "2026-04-12T04:08:04.103722300Z"
+    "updatedAt": "2026-04-12T09:33:51.726879400Z"
   },
   "items": [
     {
@@ -144,6 +144,23 @@
       "semester": "",
       "title": "TA",
       "lastUpdatedAt": "2026-04-08T02:05:51.145318400Z"
+    },
+    {
+      "id": "PROFILE-TA-64333",
+      "taId": "TA-64333",
+      "avatar": "image/TA-64333_1775985317163_c7fba21f890e4b4c9c89101f29d89f71.png",
+      "realName": "ABC",
+      "applicationIntent": "",
+      "studentId": "TA-64333",
+      "contactEmail": "ABC@fff.v",
+      "bio": "",
+      "skills": [
+        "java"
+      ],
+      "availabilityHoursPerWeek": 0.0,
+      "semester": "",
+      "title": "TA",
+      "lastUpdatedAt": "2026-04-12T09:15:52.943840100Z"
     }
   ]
 }
