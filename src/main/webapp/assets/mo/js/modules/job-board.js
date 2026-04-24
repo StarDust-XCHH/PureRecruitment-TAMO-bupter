@@ -110,7 +110,9 @@
         const openJobPublishModalBtn = document.getElementById('openJobPublishModalBtn');
         const publishForm = document.getElementById('jobPublishForm');
         const publishStatus = document.getElementById('publishJobStatus');
-        const moFixedSkillsPickerFlow = document.getElementById('moFixedSkillsPickerFlow');
+        const moFixedSkillsPickerFlow = document.getElementById('moFixedSkillsPickerFlow'); // legacy modal flow (kept for compatibility)
+        const publishFixedSkillsInlineFlow = document.getElementById('publishFixedSkillsInlineFlow');
+        const editFixedSkillsInlineFlow = document.getElementById('editFixedSkillsInlineFlow');
         const publishTeachingWeeksSummary = document.getElementById('publishTeachingWeeksSummary');
         const editTeachingWeeksSummary = document.getElementById('editTeachingWeeksSummary');
         const publishFixedSkillsSummary = document.getElementById('publishFixedSkillsSummary');
@@ -118,7 +120,7 @@
 
         const moTeachingWeeksPickerGrid = document.getElementById('moTeachingWeeksPickerGrid');
         const teachingWeeksModal = document.getElementById('moTeachingWeeksModal');
-        const fixedSkillsPickerModal = document.getElementById('moFixedSkillsPickerModal');
+        const fixedSkillsPickerModal = document.getElementById('moFixedSkillsPickerModal'); // legacy modal (no longer used)
         const moAssessmentWeeksGrid = document.getElementById('moAssessmentWeeksGrid');
 
         const publishAssessmentList = document.getElementById('publishAssessmentList');
@@ -360,51 +362,106 @@
             syncFixedSkillsPrimaryButtonLabels();
         }
 
-        function renderFixedSkillsPickerFlow() {
-            const container = moFixedSkillsPickerFlow;
+        function getInlineSkillState(target) {
+            const isEdit = target === 'edit';
+            return {
+                fixedSet: isEdit ? editFixedTags : publishFixedTags,
+                customArr: isEdit ? editCustomSkills : publishCustomSkills,
+                container: isEdit ? editFixedSkillsInlineFlow : publishFixedSkillsInlineFlow
+            };
+        }
+
+        function removeCustomSkillByName(target, name) {
+            const s = getInlineSkillState(target);
+            const key = String(name || '').trim().toLowerCase();
+            if (!key) return;
+            const next = (s.customArr || []).filter(function (r) {
+                const n = r && r.name != null ? String(r.name).trim().toLowerCase() : '';
+                return n && n !== key;
+            });
+            if (target === 'edit') editCustomSkills = next;
+            else publishCustomSkills = next;
+            if (target === 'edit') {
+                renderCompositeList(editCustomSkillList, editCustomSkills, editCustomSkillEmpty, 'custom', 'edit');
+                updateEditFixedSkillsSummary();
+            } else {
+                renderCompositeList(publishCustomSkillList, publishCustomSkills, publishCustomSkillEmpty, 'custom', 'publish');
+                updatePublishFixedSkillsSummary();
+            }
+            renderInlineFixedSkillsPicker(target);
+        }
+
+        function renderFixedSkillsPickerFlowInto(container, target) {
             if (!container) return;
+            const s = getInlineSkillState(target);
             container.innerHTML = '';
+
             (skillTagList || []).forEach(function (tag) {
-                const t = String(tag || '').trim();
-                if (!t) return;
+                const tagText = String(tag || '').trim();
+                if (!tagText) return;
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.className = 'mo-skill-chip' + (skillPickerWorkingSet.has(t) ? ' is-selected' : '');
-                btn.textContent = t;
-                btn.setAttribute('aria-pressed', skillPickerWorkingSet.has(t) ? 'true' : 'false');
+                btn.className = 'mo-skill-chip' + (s.fixedSet.has(tagText) ? ' is-selected' : '');
+                btn.textContent = tagText;
+                btn.setAttribute('aria-pressed', s.fixedSet.has(tagText) ? 'true' : 'false');
                 btn.addEventListener('click', function () {
-                    if (skillPickerWorkingSet.has(t)) skillPickerWorkingSet.delete(t);
-                    else skillPickerWorkingSet.add(t);
-                    renderFixedSkillsPickerFlow();
+                    if (s.fixedSet.has(tagText)) s.fixedSet.delete(tagText);
+                    else s.fixedSet.add(tagText);
+                    if (target === 'edit') updateEditFixedSkillsSummary();
+                    else updatePublishFixedSkillsSummary();
+                    renderInlineFixedSkillsPicker(target);
                 });
                 container.appendChild(btn);
             });
-            skillPickerPendingCustom.forEach(function (row, index) {
+
+            // custom pills keep the original order: right after fixed tags
+            (s.customArr || []).forEach(function (row) {
+                const name = row && row.name != null ? String(row.name).trim() : '';
+                if (!name) return;
                 const pill = document.createElement('button');
                 pill.type = 'button';
                 pill.className = 'mo-skill-chip mo-skill-chip--custom-pill';
                 const label = document.createElement('span');
                 label.className = 'mo-skill-chip__label';
-                label.textContent = row.name || '';
+                label.textContent = name;
                 pill.appendChild(label);
-                const tip = row.description ? (row.name + ' — ' + row.description) : row.name;
+                const desc = row && row.description != null ? String(row.description).trim() : '';
+                const tip = desc ? (name + ' — ' + desc) : name;
                 pill.setAttribute('title', tip);
-                pill.setAttribute('aria-label', t('点击移除「', 'Remove “') + (row.name || '') + t('」', '”'));
-                (function (idx) {
-                    pill.addEventListener('click', function () {
-                        skillPickerPendingCustom.splice(idx, 1);
-                        renderFixedSkillsPickerFlow();
-                    });
-                })(index);
+                pill.setAttribute('aria-label', t('点击移除「', 'Remove “') + name + t('」', '”'));
+                pill.addEventListener('click', function () {
+                    removeCustomSkillByName(target, name);
+                });
                 container.appendChild(pill);
             });
+
             const otherBtn = document.createElement('button');
             otherBtn.type = 'button';
             otherBtn.className = 'mo-skill-chip mo-skill-chip--other';
             otherBtn.textContent = 'Other';
             otherBtn.setAttribute('aria-label', t('添加其他技能', 'Add other skill'));
-            otherBtn.addEventListener('click', function () { openOtherSkillSubModal(); });
+            otherBtn.addEventListener('click', function () {
+                skillPickerTarget = target || 'publish';
+                openOtherSkillSubModal();
+            });
             container.appendChild(otherBtn);
+        }
+
+        function renderInlineFixedSkillsPicker(target) {
+            const t0 = target === 'edit' ? 'edit' : 'publish';
+            const s = getInlineSkillState(t0);
+            if (s.container) {
+                renderFixedSkillsPickerFlowInto(s.container, t0);
+            }
+            // keep legacy modal flow updated if present (but modal is no longer used)
+            if (moFixedSkillsPickerFlow) {
+                skillPickerTarget = t0;
+                skillPickerWorkingSet = new Set(s.fixedSet);
+                skillPickerPendingCustom = (s.customArr || []).map(function (x) {
+                    return { name: String(x.name || '').trim(), description: String(x.description || '').trim() };
+                }).filter(function (x) { return x.name; });
+                renderFixedSkillsPickerFlowInto(moFixedSkillsPickerFlow, t0);
+            }
         }
 
         function getFixedTagsArrayFromSet(set) {
@@ -647,6 +704,7 @@
         function openOtherSkillSubModal() {
             addingOtherForFixedPicker = true;
             editingCustomSkillIndex = null;
+            compositeTarget = skillPickerTarget || compositeTarget || 'publish';
             const nameEl = document.getElementById('moCustomSkillNameInput');
             const descEl = document.getElementById('moCustomSkillDescInput');
             if (nameEl) nameEl.value = '';
@@ -703,15 +761,23 @@
             const description = (document.getElementById('moCustomSkillDescInput').value || '').trim();
             const row = { name: name, description: description };
             if (addingOtherForFixedPicker) {
-                if (skillPickerPendingCustom.some(function (r) { return r.name === name; })) {
-                    return;
+                const target = skillPickerTarget === 'edit' ? 'edit' : 'publish';
+                const s = getInlineSkillState(target);
+                const key = name.toLowerCase();
+                if (Array.from(s.fixedSet).some(function (t) { return String(t || '').trim().toLowerCase() === key; })) return;
+                if ((s.customArr || []).some(function (r) { return r && r.name != null && String(r.name).trim().toLowerCase() === key; })) return;
+
+                if (target === 'edit') {
+                    editCustomSkills.push(row);
+                    renderCompositeList(editCustomSkillList, editCustomSkills, editCustomSkillEmpty, 'custom', 'edit');
+                    updateEditFixedSkillsSummary();
+                } else {
+                    publishCustomSkills.push(row);
+                    renderCompositeList(publishCustomSkillList, publishCustomSkills, publishCustomSkillEmpty, 'custom', 'publish');
+                    updatePublishFixedSkillsSummary();
                 }
-                if (skillPickerWorkingSet.has(name)) {
-                    return;
-                }
-                skillPickerPendingCustom.push(row);
                 closeModal(customSkillModal);
-                renderFixedSkillsPickerFlow();
+                renderInlineFixedSkillsPicker(target);
                 return;
             }
             if (editingCustomSkillIndex !== null && editingCustomSkillIndex >= 0) {
@@ -807,6 +873,7 @@
             updatePublishFixedSkillsSummary();
             renderCompositeList(publishAssessmentList, publishAssessments, publishAssessmentEmpty, 'assessment', 'publish');
             renderCompositeList(publishCustomSkillList, publishCustomSkills, publishCustomSkillEmpty, 'custom', 'publish');
+            renderInlineFixedSkillsPicker('publish');
             const ro = document.getElementById('recruitmentStatusOpen');
             const rc = document.getElementById('recruitmentStatusClosed');
             if (ro) ro.checked = true;
@@ -841,51 +908,24 @@
         }
 
         function openFixedSkillsPicker(target) {
+            // legacy entry-point: the picker is now inline in the publish/edit panel
             skillPickerTarget = target || 'publish';
-            const src = skillPickerTarget === 'edit' ? editFixedTags : publishFixedTags;
-            skillPickerWorkingSet = new Set(src);
-            const srcCustom = skillPickerTarget === 'edit' ? editCustomSkills : publishCustomSkills;
-            skillPickerPendingCustom = (srcCustom || []).map(function (x) {
-                return { name: String(x.name || '').trim(), description: String(x.description || '').trim() };
-            }).filter(function (x) { return x.name; });
-            renderFixedSkillsPickerFlow();
-            openModal(fixedSkillsPickerModal);
+            renderInlineFixedSkillsPicker(skillPickerTarget === 'edit' ? 'edit' : 'publish');
         }
 
         function confirmFixedSkillsPicker() {
-            if (skillPickerWorkingSet.size < 1) {
-                return;
+            // modal confirm is no longer used (inline selection applies immediately)
+            if (fixedSkillsPickerModal && !fixedSkillsPickerModal.hidden) {
+                closeModal(fixedSkillsPickerModal);
             }
-            const pending = skillPickerPendingCustom.map(function (r) {
-                return { name: r.name, description: r.description || '' };
-            });
-            if (skillPickerTarget === 'edit') {
-                editFixedTags.clear();
-                skillPickerWorkingSet.forEach(function (t) { editFixedTags.add(t); });
-                editCustomSkills = pending;
-                updateEditFixedSkillsSummary();
-                renderCompositeList(editCustomSkillList, editCustomSkills, editCustomSkillEmpty, 'custom', 'edit');
-            } else {
-                publishFixedTags.clear();
-                skillPickerWorkingSet.forEach(function (t) { publishFixedTags.add(t); });
-                publishCustomSkills = pending;
-                updatePublishFixedSkillsSummary();
-                renderCompositeList(publishCustomSkillList, publishCustomSkills, publishCustomSkillEmpty, 'custom', 'publish');
-            }
-            closeModal(fixedSkillsPickerModal);
         }
 
         function bindPickerModals() {
             document.querySelectorAll('[data-mo-close="teaching-weeks"]').forEach(function (n) {
                 n.addEventListener('click', function () { closeModal(teachingWeeksModal); });
             });
-            document.querySelectorAll('[data-mo-close="fixed-skills"]').forEach(function (n) {
-                n.addEventListener('click', function () { closeModal(fixedSkillsPickerModal); });
-            });
             const twOk = document.getElementById('moTeachingWeeksConfirmBtn');
-            const fsOk = document.getElementById('moFixedSkillsConfirmBtn');
             if (twOk) twOk.addEventListener('click', confirmTeachingWeeksPicker);
-            if (fsOk) fsOk.addEventListener('click', confirmFixedSkillsPicker);
 
             const pubW = document.getElementById('openPublishTeachingWeeksBtn');
             const clrW = document.getElementById('clearPublishTeachingWeeksBtn');
@@ -903,8 +943,22 @@
                 editTeachingWeeks = [];
                 updateEditTeachingWeeksSummary();
             });
-            if (pubF) pubF.addEventListener('click', function () { openFixedSkillsPicker('publish'); });
-            if (edF) edF.addEventListener('click', function () { openFixedSkillsPicker('edit'); });
+            if (pubF) pubF.addEventListener('click', function () {
+                skillPickerTarget = 'publish';
+                renderInlineFixedSkillsPicker('publish');
+                const el = publishFixedSkillsInlineFlow;
+                if (el && typeof el.scrollIntoView === 'function') {
+                    el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                }
+            });
+            if (edF) edF.addEventListener('click', function () {
+                skillPickerTarget = 'edit';
+                renderInlineFixedSkillsPicker('edit');
+                const el = editFixedSkillsInlineFlow;
+                if (el && typeof el.scrollIntoView === 'function') {
+                    el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+                }
+            });
 
             const clrPubSkills = document.getElementById('clearPublishFixedSkillsBtn');
             const clrEditSkills = document.getElementById('clearEditFixedSkillsBtn');
@@ -914,6 +968,7 @@
                 publishCustomSkills = [];
                 updatePublishFixedSkillsSummary();
                 renderCompositeList(publishCustomSkillList, publishCustomSkills, publishCustomSkillEmpty, 'custom', 'publish');
+                renderInlineFixedSkillsPicker('publish');
             });
             if (clrEditSkills) clrEditSkills.addEventListener('click', function () {
                 if (!window.confirm(t('确定清除所有已选技能标签及其他补充吗？', 'Clear all selected skill tags and custom entries?'))) return;
@@ -921,6 +976,7 @@
                 editCustomSkills = [];
                 updateEditFixedSkillsSummary();
                 renderCompositeList(editCustomSkillList, editCustomSkills, editCustomSkillEmpty, 'custom', 'edit');
+                renderInlineFixedSkillsPicker('edit');
             });
 
             document.querySelectorAll('#moTeachingWeeksModal [data-week-preset]').forEach(function (btn) {
@@ -1519,17 +1575,19 @@
                 if (typeof app.scrollPublishJobToSection === 'function') {
                     app.scrollPublishJobToSection('required-skills');
                 }
-                var pubSkBtn = document.getElementById('openPublishFixedSkillsBtn');
-                if (pubSkBtn && typeof pubSkBtn.focus === 'function') {
+                var pubFlow = document.getElementById('publishFixedSkillsInlineFlow');
+                if (pubFlow && typeof pubFlow.focus === 'function') {
                     requestAnimationFrame(function () {
                         requestAnimationFrame(function () {
                             try {
-                                pubSkBtn.focus({ preventScroll: true });
+                                pubFlow.focus({ preventScroll: true });
                             } catch (e) {
-                                pubSkBtn.focus();
+                                pubFlow.focus();
                             }
                         });
                     });
+                } else if (pubFlow && typeof pubFlow.scrollIntoView === 'function') {
+                    pubFlow.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
                 }
                 return;
             }
@@ -1638,6 +1696,7 @@
             }
             await loadSkillTagsFromApi();
             updateEditFixedSkillsSummary();
+            renderInlineFixedSkillsPicker('edit');
 
             setVal('editCourseDescInput', item.courseDescription || '');
             setVal('editRecruitmentBriefInput', item.recruitmentBrief || '');
@@ -1712,17 +1771,19 @@
                 if (typeof app.scrollEditCourseToSection === 'function') {
                     app.scrollEditCourseToSection('edit-required-skills');
                 }
-                var edSkBtn = document.getElementById('openEditFixedSkillsBtn');
-                if (edSkBtn && typeof edSkBtn.focus === 'function') {
+                var edFlow = document.getElementById('editFixedSkillsInlineFlow');
+                if (edFlow && typeof edFlow.focus === 'function') {
                     requestAnimationFrame(function () {
                         requestAnimationFrame(function () {
                             try {
-                                edSkBtn.focus({ preventScroll: true });
+                                edFlow.focus({ preventScroll: true });
                             } catch (e) {
-                                edSkBtn.focus();
+                                edFlow.focus();
                             }
                         });
                     });
+                } else if (edFlow && typeof edFlow.scrollIntoView === 'function') {
+                    edFlow.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
                 }
                 return;
             }
@@ -1821,6 +1882,7 @@
                 app.openModal('job-publish');
                 if (publishStatus) publishStatus.textContent = '';
                 clearPublishSkillsInlineError();
+                renderInlineFixedSkillsPicker('publish');
                 applySemesterToPickers(
                     '',
                     document.getElementById('semesterYearInput'),
@@ -1879,7 +1941,8 @@
             renderCompositeList(editAssessmentList, editAssessments, editAssessmentEmpty, 'assessment', 'edit');
             renderCompositeList(publishCustomSkillList, publishCustomSkills, publishCustomSkillEmpty, 'custom', 'publish');
             renderCompositeList(editCustomSkillList, editCustomSkills, editCustomSkillEmpty, 'custom', 'edit');
-            renderFixedSkillsPickerFlow();
+            renderInlineFixedSkillsPicker('publish');
+            renderInlineFixedSkillsPicker('edit');
             if (currentDetailJob) renderDetail(currentDetailJob);
             if (jobBoard) renderBoard();
         }
@@ -1893,6 +1956,8 @@
             updateEditFixedSkillsSummary();
             renderCompositeList(publishAssessmentList, publishAssessments, publishAssessmentEmpty, 'assessment', 'publish');
             renderCompositeList(publishCustomSkillList, publishCustomSkills, publishCustomSkillEmpty, 'custom', 'publish');
+            renderInlineFixedSkillsPicker('publish');
+            renderInlineFixedSkillsPicker('edit');
         });
 
         loadJobs();
