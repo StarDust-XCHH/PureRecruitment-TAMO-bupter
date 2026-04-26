@@ -1,0 +1,129 @@
+{
+  "meta": {
+    "schema": "mo",
+    "entity": "mos",
+    "version": "1.0",
+    "updatedAt": "2026-04-12T09:30:39.699933700Z"
+  },
+  "items": [
+    {
+      "id": "MO-195RR4",
+      "name": "TestName",
+      "username": "test1",
+      "email": "123456@email.com",
+      "phone": "12345678900",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-04-05T13:33:24.598425200Z",
+      "updatedAt": "2026-04-05T17:14:08.534956800Z",
+      "auth": {
+        "passwordHash": "3b5bb96704a9a79a140a26a2d9f9ca8d4704b140abceafe354a5c794eeb49f8a",
+        "passwordSalt": "4df702de-fb9d-40b5-bb3c-5ca993a9e7ff",
+        "lastLoginAt": "2026-04-05T17:14:08.534956800Z",
+        "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "MO-137J3E",
+      "name": "TestName2",
+      "username": "test2",
+      "email": "123457@email.com",
+      "phone": "12345678901",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-04-05T15:44:39.645789100Z",
+      "updatedAt": "2026-04-05T17:14:25.619311600Z",
+      "auth": {
+        "passwordHash": "a878ee07a5c5458cae8aadef76cead927cf9cef9e029679f6f087bbe5389d671",
+        "passwordSalt": "8d65e335-8db2-42f6-9680-65bf9cf0ab32",
+        "lastLoginAt": "2026-04-05T17:14:25.619311600Z",
+        "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "MO-6601L9",
+      "name": "testName3",
+      "username": "test3",
+      "email": "123458@email.com",
+      "phone": "12345678908",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-04-05T15:46:28.695396100Z",
+      "updatedAt": "2026-04-12T09:17:58.667635600Z",
+      "auth": {
+        "passwordHash": "f842d3a01818414c004424c54a0d975c5e03cb04b8d9473bd4b6e083f24ae14f",
+        "passwordSalt": "40741f1d-7ef8-43d7-9af7-4824b1efb107",
+        "lastLoginAt": "2026-04-12T09:17:58.667635600Z",
+        "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "MO-16888N",
+      "name": "亚尔丽塔",
+      "username": "571428",
+      "email": "2739407@qq.com",
+      "phone": "13255689447",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-04-06T15:00:58.364144400Z",
+      "updatedAt": "2026-04-06T15:00:58.364144400Z",
+      "auth": {
+        "passwordHash": "4a38d154e2451a356b79125838d9cd487e770f060ca84248b427d30b8a66ad38",
+        "passwordSalt": "ca48ca6a-9b38-47fc-a9c6-9864f11067f4",
+        "lastLoginAt": "",
+        "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "MO-650WCK",
+      "name": "123qwe",
+      "username": "123qwe",
+      "email": "123qwe@123.cp",
+      "phone": "123234543",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-04-08T02:06:39.843943400Z",
+      "updatedAt": "2026-04-08T02:20:25.768626500Z",
+      "auth": {
+        "passwordHash": "d039b5324c06343ff34f1403c3f8da02d7744576efa5593415a532dc3f19eb63",
+        "passwordSalt": "f4c1e423-a20b-43ea-98a6-567a9839bda5",
+        "lastLoginAt": "2026-04-08T02:20:25.768626500Z",
+        "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "MO-431AF0",
+      "name": "asdzxc",
+      "username": "asdzxc",
+      "email": "asd@zxc.c",
+      "phone": "13243245612",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-04-12T03:46:12.298468700Z",
+      "updatedAt": "2026-04-12T03:46:12.298468700Z",
+      "auth": {
+        "passwordHash": "73ea18a2653b3e00fcd3c31f4d82770c91fc5a8ff0911be5179a0af2f05b642d",
+        "passwordSalt": "cbc7cf0d-67a2-4d4d-8c10-66b5ffac5dde",
+        "lastLoginAt": "",
+        "failedAttempts": 0.0
+      }
+    },
+    {
+      "id": "MO-572HL8",
+      "name": "Ab",
+      "username": "ASJAJ",
+      "email": "ahdscm@163.com",
+      "phone": "1782321422",
+      "department": "",
+      "status": "active",
+      "createdAt": "2026-04-12T09:30:39.699933700Z",
+      "updatedAt": "2026-04-12T09:30:39.699933700Z",
+      "auth": {
+        "passwordHash": "3b9dbd233fd8a5e1275c4dc9085aadd28f5d175cdb51f43ed510c32ad9465378",
+        "passwordSalt": "a17417c8-872c-42bf-a3b7-54d49bdd64a8",
+        "lastLoginAt": "",
+        "failedAttempts": 0
+      }
+    }
+  ]
+}
