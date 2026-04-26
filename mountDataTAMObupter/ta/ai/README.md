@@ -1,1 +1,0 @@
-TA AI data root.
