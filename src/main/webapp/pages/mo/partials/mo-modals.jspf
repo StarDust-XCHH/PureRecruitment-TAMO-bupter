@@ -8,7 +8,7 @@
             </div>
             <div class="job-detail-modal__head-actions">
                 <button type="button" class="pill-btn job-detail-modal__edit-btn" id="toggleCourseEditBtn" data-i18n="modal.courseDetail.editModule" data-i18n-zh="修改课程信息" data-i18n-en="Edit module">修改课程信息</button>
-                <button class="pill-btn job-detail-modal__screening-btn" type="button" id="jumpToApplicantsBtn" data-i18n="modal.courseDetail.goScreening" data-i18n-zh="进入应聘筛选" data-i18n-en="Go to applicant screening">进入应聘筛选</button>
+                <button class="pill-btn job-detail-modal__screening-btn" type="button" id="jumpToApplicantsBtn" data-i18n="modal.courseDetail.goScreening" data-i18n-zh="进入人选投递" data-i18n-en="Go to candidate applications">进入人选投递</button>
             </div>
         </div>
         <div class="modal-body">
@@ -641,5 +641,17 @@
             <h2 id="moApplicantDetailTitle" data-i18n="applicants.detailTitle" data-i18n-zh="申请人详情" data-i18n-en="Details">申请人详情</h2>
         </div>
         <div class="mo-detail-modal__body" id="moApplicantDetailBody"></div>
+    </div>
+</div>
+
+<div id="moApplicantMessagesModal" class="mo-detail-modal" hidden aria-hidden="true">
+    <div class="mo-detail-modal__backdrop" data-close-mo-applicant-messages="1"></div>
+    <div class="mo-detail-modal__panel mo-applicant-messages-modal__panel" role="dialog" aria-modal="true" aria-labelledby="moApplicantMessagesTitle">
+        <button type="button" class="modal-close" id="moApplicantMessagesClose" aria-label="关闭" data-i18n-aria-label="common.close" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close">&times;</button>
+        <div class="mo-detail-modal__head">
+            <h2 id="moApplicantMessagesTitle" data-i18n="applicants.messagesTitle" data-i18n-zh="消息" data-i18n-en="Messages">消息</h2>
+            <p class="muted mo-applicant-messages-modal__sub" id="moApplicantMessagesSubtitle"></p>
+        </div>
+        <div class="mo-detail-modal__body" id="moApplicantMessagesBody"></div>
     </div>
 </div>

@@ -1017,4 +1017,60 @@ public class MoRecruitmentDao {
         return text.trim().replaceAll("[^A-Za-z0-9]+", "-").replaceAll("(^-|-$)", "");
     }
 
+    /**
+     * 列出当前 MO 的候选短名单（不改变 TA 申请状态）。
+     */
+    public synchronized JsonObject listApplicantShortlist(String moId) throws IOException {
+        String m = new MoAccountDao().resolveCanonicalMoId(moId);
+        if (m.isBlank()) {
+            throw new IllegalArgumentException("缺少 moId");
+        }
+        JsonArray rows = new MoApplicantShortlistDao().listForMo(m);
+        JsonObject payload = new JsonObject();
+        payload.addProperty("success", true);
+        payload.addProperty("count", rows.size());
+        payload.add("items", rows);
+        return payload;
+    }
+
+    /**
+     * 加入短名单：校验岗位归属与申请记录课程一致；不写 TA 侧数据。
+     */
+    public synchronized JsonObject addApplicantShortlistEntry(String moId, String courseCode, String applicationId, String taIdOpt, String nameOpt) throws IOException {
+        String cc = trim(courseCode);
+        String appId = trim(applicationId);
+        String m = assertMoOwnsCourse(moId, cc);
+        MoTaApplicationReadService readService = new MoTaApplicationReadService();
+        MoTaApplicationReadService.TaApplicationRecord rec = readService.getApplicationById(appId);
+        if (rec == null) {
+            throw new IllegalArgumentException("申请不存在");
+        }
+        if (!cc.equalsIgnoreCase(trim(rec.courseCode()))) {
+            throw new IllegalArgumentException("申请与课程编号不一致");
+        }
+        String taId = firstNonBlank(trim(taIdOpt), trim(rec.taId()));
+        String name = firstNonBlank(trim(nameOpt), firstNonBlank(trim(rec.taName()), trim(rec.taRealName())));
+        boolean inserted = new MoApplicantShortlistDao().addEntry(m, cc, appId, taId, name);
+        JsonObject payload = new JsonObject();
+        payload.addProperty("success", true);
+        payload.addProperty("inserted", inserted);
+        payload.addProperty("message", inserted ? "已加入短名单" : "已在短名单中");
+        return payload;
+    }
+
+    /**
+     * 从短名单移除一行。
+     */
+    public synchronized JsonObject removeApplicantShortlistEntry(String moId, String courseCode, String applicationId) throws IOException {
+        String cc = trim(courseCode);
+        String appId = trim(applicationId);
+        String m = assertMoOwnsCourse(moId, cc);
+        boolean removed = new MoApplicantShortlistDao().removeEntry(m, cc, appId);
+        JsonObject payload = new JsonObject();
+        payload.addProperty("success", true);
+        payload.addProperty("removed", removed);
+        payload.addProperty("message", removed ? "已移出短名单" : "记录不存在");
+        return payload;
+    }
+
 }

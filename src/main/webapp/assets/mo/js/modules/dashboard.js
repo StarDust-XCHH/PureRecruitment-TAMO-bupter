@@ -58,8 +58,8 @@
                 dashWorkflowHint.hidden = false;
                 dashWorkflowHint.textContent =
                     t(
-                        '当前有 ' + p + ' 条申请待决策，建议在总览下方入口或侧栏进入「应聘筛选」优先处理。',
-                        'There are ' + p + ' applications pending decision. Open Applicant Screening from the dashboard shortcuts or the sidebar.'
+                        '当前有 ' + p + ' 条申请待决策，建议在总览下方入口或侧栏进入「人选投递」优先处理。',
+                        'There are ' + p + ' applications pending decision. Open Candidate applications from the dashboard shortcuts or the sidebar.'
                     );
             } else {
                 dashWorkflowHint.hidden = true;
@@ -174,8 +174,8 @@
                 if (st.pending > 0) {
                     summaryEls.nextHint.textContent =
                         t(
-                            '建议：前往「应聘筛选」处理 ' + st.pending + ' 条待决策申请。',
-                            'Suggestion: go to Applicant Screening to process ' + st.pending + ' pending applications.'
+                            '建议：前往「人选投递」处理 ' + st.pending + ' 条待决策申请。',
+                            'Suggestion: go to Candidate applications to process ' + st.pending + ' pending applications.'
                         );
                 } else if (st.open === 0) {
                     summaryEls.nextHint.textContent =

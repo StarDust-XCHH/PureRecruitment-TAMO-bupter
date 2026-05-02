@@ -7,7 +7,7 @@
     modules.routeNav = function initRouteNav(app) {
         const navItems = Array.from(document.querySelectorAll('#moApp .nav-item'));
         const routes = Array.from(document.querySelectorAll('#moApp .routes .route'));
-        const routeOrder = ['dashboard', 'jobs', 'applicants'];
+        const routeOrder = ['dashboard', 'jobs', 'applicants', 'shortlist'];
 
         app.state = app.state || {};
         app.state.routeNav = {
@@ -38,6 +38,9 @@
             app.state.routeNav.currentFlowRoute = safe;
             if (!fromScroll && safe === 'applicants' && typeof app.onApplicantsRouteActivate === 'function') {
                 app.onApplicantsRouteActivate();
+            }
+            if (!fromScroll && safe === 'shortlist' && typeof app.onShortlistRouteActivate === 'function') {
+                app.onShortlistRouteActivate();
             }
             scrollMoWorkspaceTop();
         }

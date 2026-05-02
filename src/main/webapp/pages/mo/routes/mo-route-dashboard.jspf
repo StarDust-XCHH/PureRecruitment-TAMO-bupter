@@ -17,7 +17,7 @@
         <button type="button" class="mo-dash-module-shortcut mo-dash-module-shortcut--applicants" data-mo-go-route="applicants">
             <span class="mo-dash-module-shortcut__icon" aria-hidden="true">🧑‍🎓</span>
             <span class="mo-dash-module-shortcut__text">
-                <span class="mo-dash-module-shortcut__label" data-i18n="dashboard.gotoApplicants" data-i18n-zh="进入应聘筛选" data-i18n-en="Applicant screening">进入应聘筛选</span>
+                <span class="mo-dash-module-shortcut__label" data-i18n="dashboard.gotoApplicants" data-i18n-zh="进入人选投递" data-i18n-en="Candidate applications">进入人选投递</span>
                 <span class="mo-dash-module-shortcut__hint muted" data-i18n="dashboard.gotoApplicantsHint" data-i18n-zh="按课程查看投递并作出决策" data-i18n-en="Review applications and make decisions">按课程查看投递并作出决策</span>
             </span>
             <span class="mo-dash-module-shortcut__chev" aria-hidden="true">→</span>
