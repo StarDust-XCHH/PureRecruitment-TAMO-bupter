@@ -1274,6 +1274,7 @@ legend.mo-field-label:has(.mo-req) {
     border-color: rgba(15, 23, 42, 0.14);
 }
 
+/* 人选投递 · 表格整体最小宽度（过窄会出现横向滚动）；列比例在 applicants.js 的 colgroup */
 .mo-applicant-board-table {
     width: 100%;
     min-width: 960px;
@@ -1326,7 +1327,7 @@ legend.mo-field-label:has(.mo-req) {
     background: #f8fafc;
 }
 
-/* 列宽由 <colgroup> 控制，此处仅做对齐与省略 */
+/* 数据列对齐与省略；各列百分比宽度在 applicants.js → renderApplicants → colgroup */
 
 .mo-applicant-board-table td.mo-applicant-board-table__col-status {
     white-space: normal;
@@ -1367,7 +1368,10 @@ legend.mo-field-label:has(.mo-req) {
     font-variant-numeric: tabular-nums;
 }
 
-/* 表内操作：单行右对齐，按钮按文案宽窄（Details / CV 更紧凑） */
+/* 表内操作：单行右对齐。
+ * 各列占宽：applicants.js → colgroup。
+ * Details / CV 宽度：改下一选择器块的 padding / min-width。
+ * Shortlist / Shortlisted / Messages：再往下各自选择器。 */
 .mo-applicant-board-table__action-cell .mo-applicant-strip-btn {
     box-sizing: border-box;
     display: inline-flex;
@@ -1397,11 +1401,14 @@ legend.mo-field-label:has(.mo-req) {
         color 0.16s ease;
 }
 
+/* Details / CV：略宽于默认；仍窄于 Shortlist / Messages */
 .mo-applicant-board-table__action-cell .mo-applicant-strip-btn--detail,
 .mo-applicant-board-table__action-cell .mo-applicant-strip-btn--cv {
-    padding: 8px 10px;
+    padding: 8px 16px;
+    min-width: 5.25rem;
 }
 
+/* Shortlist：英文 Shortlisted / 中文「已在短名单」较长，用 min-width 保底 */
 .mo-applicant-board-table__action-cell .mo-applicant-strip-btn--shortlisted,
 .mo-applicant-board-table__action-cell .mo-applicant-strip-btn--shortlist {
     padding: 8px 12px;

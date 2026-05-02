@@ -456,6 +456,9 @@
             var table = document.createElement('table');
             table.className = 'mo-applicant-board-table';
 
+            // 人选投递表格列宽（与表头顺序一致，六项百分比须合计 100%）：
+            // 状态 | 课程编号 | TA姓名 | 学号 | 申请时间 | 操作列
+            // 改宽：在此调数字；若操作列按钮换行，可略减最后一项、加大「申请时间」等。
             var colgroup = document.createElement('colgroup');
             ['13%', '8%', '14%', '10%', '28%', '27%'].forEach(function (w) {
                 var col = document.createElement('col');
