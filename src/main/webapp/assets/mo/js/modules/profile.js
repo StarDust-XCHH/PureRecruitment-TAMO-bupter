@@ -296,6 +296,12 @@
                 setProfileSaveKind('saved');
                 selectedAvatarFile = null;
                 avatarChanged = false;
+                if (window.MoToast && typeof window.MoToast.show === 'function') {
+                    window.MoToast.show({
+                        type: 'success',
+                        message: t('个人资料已保存', 'Profile saved')
+                    });
+                }
                 setTimeout(function () {
                     setProfileSaveKind('loaded');
                 }, 3000);
@@ -364,6 +370,12 @@
                 document.getElementById('currentPasswordInput').value = '';
                 document.getElementById('newPasswordInput').value = '';
                 document.getElementById('confirmPasswordInput').value = '';
+                if (window.MoToast && typeof window.MoToast.show === 'function') {
+                    window.MoToast.show({
+                        type: 'success',
+                        message: t('密码已更新', 'Password updated')
+                    });
+                }
                 setTimeout(function () {
                     setPasswordStatusKind('idle');
                 }, 3000);

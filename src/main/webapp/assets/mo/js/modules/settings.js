@@ -192,6 +192,15 @@
             if (!app.state.settings) return;
             app.state.settings.currentLanguage = getCurrentLanguage() === 'en' ? 'zh' : 'en';
             applyLanguage('toggle');
+            if (window.MoToast && typeof window.MoToast.show === 'function') {
+                const nowEn = getCurrentLanguage() === 'en';
+                window.MoToast.show({
+                    type: 'info',
+                    message: nowEn
+                        ? t('界面语言已切换为 English', 'Display language: English')
+                        : t('界面语言已切换为中文', 'Display language: 中文')
+                });
+            }
         }
 
         function applyTheme(theme) {
@@ -210,6 +219,15 @@
         function toggleTheme() {
             const current = localStorage.getItem('mo-theme') || 'dark';
             applyTheme(current === 'light' ? 'dark' : 'light');
+            if (window.MoToast && typeof window.MoToast.show === 'function') {
+                const next = localStorage.getItem('mo-theme') || 'dark';
+                window.MoToast.show({
+                    type: 'info',
+                    message: next === 'light'
+                        ? t('已切换为浅色主题', 'Switched to light theme')
+                        : t('已切换为深色主题', 'Switched to dark theme')
+                });
+            }
         }
 
         function activateSettingsTab(target) {

@@ -90,6 +90,71 @@
             return typeof window.MoShortlistStore !== 'undefined' ? window.MoShortlistStore : null;
         }
 
+        function moToastShow(opts) {
+            if (window.MoToast && typeof window.MoToast.show === 'function') {
+                window.MoToast.show(opts);
+            }
+        }
+
+        /** 短名单数据变更后刷新角标、人选列表与短名单页表格 */
+        function refreshAfterShortlistMutation() {
+            updateShortlistNavBadge();
+            renderApplicants();
+            if (isShortlistRouteActive()) {
+                renderShortlistPanelBody();
+            }
+        }
+
+        function shortlistUndoEntryFromItem(item, courseCode) {
+            return {
+                applicationId: item.applicationId,
+                courseCode: String(courseCode || '').trim(),
+                taId: item.taId != null ? item.taId : '',
+                name: item.name != null ? item.name : ''
+            };
+        }
+
+        function maybeRefreshDetailAfterShortlistUndo(applicationId) {
+            var aid = String(applicationId || '').trim();
+            if (!aid || String(currentDetailApplicationId || '').trim() !== aid) return;
+            var cand = applicantListCache.filter(function (it) {
+                return it && String(it.applicationId).trim() === aid;
+            })[0];
+            if (cand) void openDetail(cand);
+        }
+
+        function showShortlistAddedToast(store, moId, entry) {
+            moToastShow({
+                type: 'success',
+                message: t('已加入短名单', 'Added to shortlist'),
+                undo: {
+                    label: t('撤回', 'Undo'),
+                    action: function () {
+                        return store.remove(moId, entry.courseCode, entry.applicationId).then(function () {
+                            refreshAfterShortlistMutation();
+                            maybeRefreshDetailAfterShortlistUndo(entry.applicationId);
+                        });
+                    }
+                }
+            });
+        }
+
+        function showShortlistRemovedToast(store, moId, entry) {
+            moToastShow({
+                type: 'success',
+                message: t('已从短名单移出', 'Removed from shortlist'),
+                undo: {
+                    label: t('撤回', 'Undo'),
+                    action: function () {
+                        return store.add(moId, entry).then(function () {
+                            refreshAfterShortlistMutation();
+                            maybeRefreshDetailAfterShortlistUndo(entry.applicationId);
+                        });
+                    }
+                }
+            });
+        }
+
         function isShortlistRouteActive() {
             return !!(routeShortlistEl && routeShortlistEl.classList.contains('active'));
         }
@@ -558,7 +623,7 @@
                         slBtn.disabled = true;
                         void (async function () {
                             try {
-                                await storeSl.toggle(moSl, {
+                                var result = await storeSl.toggle(moSl, {
                                     applicationId: item.applicationId,
                                     courseCode: ccForSl,
                                     taId: item.taId,
@@ -568,6 +633,12 @@
                                 syncSlBtnLabel();
                                 if (isShortlistRouteActive()) {
                                     renderShortlistPanelBody();
+                                }
+                                var slEntry = shortlistUndoEntryFromItem(item, ccForSl);
+                                if (result === 'added') {
+                                    showShortlistAddedToast(storeSl, moSl, slEntry);
+                                } else if (result === 'removed') {
+                                    showShortlistRemovedToast(storeSl, moSl, slEntry);
                                 }
                             } catch (err) {
                                 window.alert(err.message || t('短名单操作失败', 'Shortlist update failed'));
@@ -588,10 +659,12 @@
                         void (async function () {
                             try {
                                 if (!storeRm || !moRm || !ccRm || !item.applicationId) return;
+                                var rmEntry = shortlistUndoEntryFromItem(item, ccRm);
                                 await storeRm.remove(moRm, ccRm, item.applicationId);
                                 updateShortlistNavBadge();
                                 renderApplicants();
                                 renderShortlistPanelBody();
+                                showShortlistRemovedToast(storeRm, moRm, rmEntry);
                             } catch (err) {
                                 window.alert(err.message || t('移出失败', 'Remove failed'));
                             }
@@ -960,7 +1033,7 @@
                     shortlistToggleDetailBtn.addEventListener('click', function () {
                         void (async function () {
                             try {
-                                await storeSl2.toggle(moId, {
+                                var detailResult = await storeSl2.toggle(moId, {
                                     applicationId: item.applicationId,
                                     courseCode: ccShort,
                                     taId: item.taId || d.taId,
@@ -972,6 +1045,12 @@
                                     renderShortlistPanelBody();
                                 }
                                 await openDetail(item);
+                                var detailEntry = shortlistUndoEntryFromItem(item, ccShort);
+                                if (detailResult === 'added') {
+                                    showShortlistAddedToast(storeSl2, moId, detailEntry);
+                                } else if (detailResult === 'removed') {
+                                    showShortlistRemovedToast(storeSl2, moId, detailEntry);
+                                }
                             } catch (err) {
                                 window.alert(err.message || t('短名单操作失败', 'Shortlist update failed'));
                             }
@@ -1069,7 +1148,7 @@
         }
 
         /**
-         * @param {{ skipPrompt?: boolean, comment?: string }} [options] skipPrompt + comment 用于批量录用共用一个备注
+         * @param {{ skipPrompt?: boolean, comment?: string, skipToast?: boolean }} [options] skipPrompt + comment 用于批量录用；skipToast 用于批量时只显示汇总条
          * @returns {Promise<boolean>}
          */
         async function decide(item, decision, promptActionLabel, options) {
@@ -1113,6 +1192,12 @@
                     return false;
                 }
                 setStatus(t('已完成：' + actionText + ' ' + item.taId, 'Completed: ' + actionText + ' ' + item.taId));
+                if (!options.skipToast) {
+                    moToastShow({
+                        type: 'success',
+                        message: t('操作成功：' + actionText + '（' + String(item.taId || '') + '）', 'Done: ' + actionText + ' (' + String(item.taId || '') + ')')
+                    });
+                }
                 if (isShortlistRouteActive()) {
                     await loadApplicants({ allCourses: true, cacheUpdateOnly: true });
                     renderShortlistPanelBody();
@@ -1144,6 +1229,7 @@
             );
             if (pr === null) return;
             var sharedComment = pr || '';
+            var bulkHiredAny = false;
             for (var i = 0; i < entries.length; i++) {
                 var row = entries[i];
                 var cand = resolveApplicantForShortlist(row);
@@ -1155,8 +1241,9 @@
                     store.remove(moId, shortlistPanelCourse, row.applicationId);
                     continue;
                 }
-                var ok = await decide(cand, 'selected', null, { skipPrompt: true, comment: sharedComment });
+                var ok = await decide(cand, 'selected', null, { skipPrompt: true, comment: sharedComment, skipToast: true });
                 if (ok) {
+                    bulkHiredAny = true;
                     store.remove(moId, shortlistPanelCourse, row.applicationId);
                 } else {
                     break;
@@ -1177,6 +1264,12 @@
             }
             updateShortlistNavBadge();
             renderShortlistPanelBody();
+            if (bulkHiredAny) {
+                moToastShow({
+                    type: 'success',
+                    message: t('一键录用已完成，短名单已更新', 'Bulk hire completed; shortlist updated')
+                });
+            }
         }
 
         if (detailClose) detailClose.addEventListener('click', closeDetailModal);

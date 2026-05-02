@@ -1636,6 +1636,12 @@
                     return;
                 }
                 publishStatus.textContent = t('发布成功', 'Published');
+                if (window.MoToast && typeof window.MoToast.show === 'function') {
+                    window.MoToast.show({
+                        type: 'success',
+                        message: t('岗位发布成功', 'Opening published successfully')
+                    });
+                }
                 publishForm.reset();
                 resetPublishFormUi();
                 if (typeof app.closeAllModals === 'function') app.closeAllModals();
@@ -1832,6 +1838,12 @@
                     return;
                 }
                 if (courseEditStatus) courseEditStatus.textContent = t('已保存', 'Saved');
+                if (window.MoToast && typeof window.MoToast.show === 'function') {
+                    window.MoToast.show({
+                        type: 'success',
+                        message: t('课程信息已保存', 'Module details saved')
+                    });
+                }
                 if (payload.item) {
                     currentDetailJob = payload.item;
                     renderDetail(currentDetailJob);

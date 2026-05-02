@@ -3961,3 +3961,105 @@ html:not([data-theme="light"]) .job-detail-modal input[type="datetime-local"]::-
     width: 100%;
     justify-content: center;
 }
+
+/* ---------- MO 顶部 Toast（轻提示，不拦截页面点击） ---------- */
+.mo-toast-host {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1200;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.mo-toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    border-radius: 20px;
+    background: #fff;
+    color: #0f172a;
+    box-shadow:
+        0 12px 40px rgba(15, 23, 42, 0.12),
+        0 2px 10px rgba(15, 23, 42, 0.08);
+    font-size: 14px;
+    line-height: 1.45;
+    max-width: min(560px, calc(100vw - 32px));
+    opacity: 0;
+    transform: translateY(-10px);
+    transition:
+        opacity 0.28s ease,
+        transform 0.28s ease;
+}
+
+.mo-toast.mo-toast--in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.mo-toast.mo-toast--leave {
+    opacity: 0;
+    transform: translateY(-8px);
+}
+
+.mo-toast__icon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1;
+    color: #fff;
+}
+
+.mo-toast--success .mo-toast__icon {
+    background: #22c55e;
+}
+
+.mo-toast--info .mo-toast__icon {
+    background: #3b82f6;
+}
+
+.mo-toast__body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 10px;
+    min-width: 0;
+}
+
+.mo-toast__text {
+    font-weight: 500;
+}
+
+.mo-toast__undo {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    font-weight: 600;
+    color: #2563eb;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.mo-toast__undo:hover {
+    color: #1d4ed8;
+}
+
+.mo-toast__undo:focus-visible {
+    outline: 2px solid rgba(37, 99, 235, 0.55);
+    outline-offset: 2px;
+    border-radius: 4px;
+}
