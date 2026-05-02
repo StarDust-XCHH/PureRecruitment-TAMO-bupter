@@ -23,7 +23,8 @@
     <main class="main">
         <%@ include file="partials/mo-layout-topbar.jspf" %>
         <%@ include file="partials/mo-welcome-card.jspf" %>
-        <section class="routes">
+
+        <section class="routes" aria-label="MO workspace views" data-i18n-aria-label="routes.regionAria" data-i18n-aria-label-zh="MO 工作台主内容" data-i18n-aria-label-en="MO workspace main content">
             <%@ include file="routes/mo-route-dashboard.jspf" %>
             <%@ include file="routes/mo-route-jobs.jspf" %>
             <%@ include file="routes/mo-route-applicants.jspf" %>

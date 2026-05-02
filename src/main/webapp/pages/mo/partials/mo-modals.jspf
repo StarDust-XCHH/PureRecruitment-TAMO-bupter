@@ -159,12 +159,11 @@
                         <div class="mo-publish-section full" id="required-skills">
                             <div class="mo-publish-section-head">
                                 <h4 class="mo-publish-section-title" data-i18n-html="所需技能 <span class='mo-req' aria-hidden='true'>*</span>|Required skills <span class='mo-req' aria-hidden='true'>*</span>">所需技能 <span class="mo-req" aria-hidden="true">*</span></h4>
-                                <button type="button" class="pill-btn ghost mo-btn-sm" id="openPublishFixedSkillsBtn" data-i18n="modal.publish.addSkillTags" data-i18n-zh="＋ 添加技能标签" data-i18n-en="+ Add skill tags">＋ 添加技能标签</button>
                             </div>
                             <div class="mo-section-content">
-                                <p class="mo-hint" data-i18n-html="请至少选择一项技能标签。若列表中没有合适的，可在选择窗口中点 <strong>Other</strong> 自行填写。|Select at least one skill tag. If none fit, click <strong>Other</strong> in the picker to add your own.">请至少选择一项技能标签。若列表中没有合适的，可在选择窗口中点 <strong>Other</strong> 自行填写。</p>
+                                <p class="mo-hint" data-i18n-html="请至少选择一项技能标签。可在下方直接点选；若列表中没有合适的，可点 <strong>Other</strong> 自行填写。|Select at least one skill tag. Choose directly below; if none fit, click <strong>Other</strong> to add your own.">请至少选择一项技能标签。可在下方直接点选；若列表中没有合适的，可点 <strong>Other</strong> 自行填写。</p>
                                 <p id="publishSkillsFieldError" class="mo-inline-field-error" role="alert" hidden></p>
-                                <p class="mo-picker-summary" id="publishFixedSkillsSummary" data-i18n="modal.publish.skillsSummaryEmpty" data-i18n-zh="尚未选择技能，可点击上方「＋ 添加技能标签」按钮。" data-i18n-en="No skills selected yet. Use “+ Add skill tags” above.">尚未选择技能，可点击上方「＋ 添加技能标签」按钮。</p>
+                                <div class="mo-skill-chips mo-skill-chips--picker-flow" id="publishFixedSkillsInlineFlow" role="group" data-i18n-aria-label="modal.skillsPicker.flowAria" data-i18n-aria-label-zh="技能标签选择" data-i18n-aria-label-en="Skill tag selection" aria-label="技能标签选择"></div>
                                 <div class="mo-picker-actions">
                                     <button type="button" class="pill-btn ghost mo-btn-sm" id="clearPublishFixedSkillsBtn" data-i18n="modal.publish.clearAllTags" data-i18n-zh="清除所有标签" data-i18n-en="Clear all tags">清除所有标签</button>
                                 </div>
@@ -313,12 +312,11 @@
                         <div class="mo-publish-section full" id="edit-required-skills">
                             <div class="mo-publish-section-head">
                                 <h4 class="mo-publish-section-title" data-i18n-html="所需技能 <span class='mo-req' aria-hidden='true'>*</span>|Required skills <span class='mo-req' aria-hidden='true'>*</span>">所需技能 <span class="mo-req" aria-hidden="true">*</span></h4>
-                                <button type="button" class="pill-btn ghost mo-btn-sm" id="openEditFixedSkillsBtn" data-i18n="modal.publish.addSkillTags" data-i18n-zh="＋ 添加技能标签" data-i18n-en="+ Add skill tags">＋ 添加技能标签</button>
                             </div>
                             <div class="mo-section-content">
-                                <p class="mo-hint" data-i18n-html="请至少选择一项技能标签。若列表中没有合适的，可在选择窗口中点 <strong>Other</strong> 自行填写。|Select at least one skill tag. If none fit, click <strong>Other</strong> in the picker to add your own.">请至少选择一项技能标签。若列表中没有合适的，可在选择窗口中点 <strong>Other</strong> 自行填写。</p>
+                                <p class="mo-hint" data-i18n-html="请至少选择一项技能标签。可在下方直接点选；若列表中没有合适的，可点 <strong>Other</strong> 自行填写。|Select at least one skill tag. Choose directly below; if none fit, click <strong>Other</strong> to add your own.">请至少选择一项技能标签。可在下方直接点选；若列表中没有合适的，可点 <strong>Other</strong> 自行填写。</p>
                                 <p id="editSkillsFieldError" class="mo-inline-field-error" role="alert" hidden></p>
-                                <p class="mo-picker-summary" id="editFixedSkillsSummary" data-i18n="modal.publish.skillsSummaryEmpty" data-i18n-zh="尚未选择技能，可点击上方「＋ 添加技能标签」按钮。" data-i18n-en="No skills selected yet. Use “+ Add skill tags” above.">尚未选择技能，可点击上方「＋ 添加技能标签」按钮。</p>
+                                <div class="mo-skill-chips mo-skill-chips--picker-flow" id="editFixedSkillsInlineFlow" role="group" data-i18n-aria-label="modal.skillsPicker.flowAria" data-i18n-aria-label-zh="技能标签选择" data-i18n-aria-label-en="Skill tag selection" aria-label="技能标签选择"></div>
                                 <div class="mo-picker-actions">
                                     <button type="button" class="pill-btn ghost mo-btn-sm" id="clearEditFixedSkillsBtn" data-i18n="modal.publish.clearAllTags" data-i18n-zh="清除所有标签" data-i18n-en="Clear all tags">清除所有标签</button>
                                 </div>
@@ -632,5 +630,16 @@
                 <button type="button" class="pill-btn" id="moCompositeCustomSkillConfirmBtn" data-i18n="modal.composite.addToList" data-i18n-zh="加入列表" data-i18n-en="Add to list">加入列表</button>
             </div>
         </div>
+    </div>
+</div>
+
+<div id="moApplicantDetailModal" class="mo-detail-modal" hidden aria-hidden="true">
+    <div class="mo-detail-modal__backdrop" data-close-applicant-detail="1"></div>
+    <div class="mo-detail-modal__panel" role="dialog" aria-modal="true" aria-labelledby="moApplicantDetailTitle">
+        <button type="button" class="modal-close" id="moApplicantDetailClose" aria-label="关闭" data-i18n-aria-label="common.close" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close">&times;</button>
+        <div class="mo-detail-modal__head">
+            <h2 id="moApplicantDetailTitle" data-i18n="applicants.detailTitle" data-i18n-zh="申请人详情" data-i18n-en="Details">申请人详情</h2>
+        </div>
+        <div class="mo-detail-modal__body" id="moApplicantDetailBody"></div>
     </div>
 </div>
