@@ -1,38 +1,6 @@
 <div class="topbar">
     <div class="greeting">
         <h1 id="welcomeTitle" data-i18n="topbar.welcomeTitle" data-i18n-html="欢迎回来，<span id='welcomeName'>MO</span>|Welcome back, <span id='welcomeName'>MO</span>">Welcome back, <span id="welcomeName">MO</span></h1>
-
-        <!-- 招聘总览统计卡片（替换原来的描述文字） -->
-        <div class="mo-dashboard-stats-inline">
-            <div class="mo-stat-item">
-                <span class="mo-stat-icon">📌</span>
-                <div class="mo-stat-content">
-                    <span class="mo-stat-label">开放岗位</span>
-                    <span class="mo-stat-value" id="dashOpenJobs">--</span>
-                </div>
-            </div>
-            <div class="mo-stat-item">
-                <span class="mo-stat-icon">👥</span>
-                <div class="mo-stat-content">
-                    <span class="mo-stat-label">候选池</span>
-                    <span class="mo-stat-value" id="dashCandidates">--</span>
-                </div>
-            </div>
-            <div class="mo-stat-item">
-                <span class="mo-stat-icon">✅</span>
-                <div class="mo-stat-content">
-                    <span class="mo-stat-label">已录用</span>
-                    <span class="mo-stat-value" id="dashAccepted">--</span>
-                </div>
-            </div>
-            <div class="mo-stat-item">
-                <span class="mo-stat-icon">🕒</span>
-                <div class="mo-stat-content">
-                    <span class="mo-stat-label">待决策</span>
-                    <span class="mo-stat-value" id="dashPending">--</span>
-                </div>
-            </div>
-        </div>
     </div>
     <div class="topbar-actions">
         <button class="language-toggle" id="languageToggle" type="button" aria-label="Switch language" data-i18n-aria-label="topbar.languageToggleAria" data-i18n-aria-label-zh="切换语言" data-i18n-aria-label-en="Switch language">

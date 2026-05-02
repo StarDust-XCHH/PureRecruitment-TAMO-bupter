@@ -1,9 +1,34 @@
 <div class="route active" id="route-dashboard" data-route="dashboard">
+    <div class="mo-recruitment-overview-hero" role="region" aria-labelledby="moOverviewHeroTitle" data-i18n-aria-label="dashboard.heroRegionAria" data-i18n-aria-label-zh="招聘总览主区域" data-i18n-aria-label-en="Recruitment overview">
+        <div class="mo-recruitment-overview-hero__badge" data-i18n="dashboard.heroBadge" data-i18n-zh="当前视图 · 招聘总览" data-i18n-en="Current view · Recruitment overview">当前视图 · 招聘总览</div>
+        <h2 class="mo-recruitment-overview-hero__title" id="moOverviewHeroTitle" data-i18n="dashboard.heroTitle" data-i18n-zh="招聘总览" data-i18n-en="Recruitment overview">招聘总览</h2>
+        <p class="mo-recruitment-overview-hero__lead muted" data-i18n="dashboard.heroLead" data-i18n-zh="以下为实时数据快照。使用下方入口或左侧导航进入各业务页面。" data-i18n-en="Live metrics below. Use the shortcuts or the sidebar to open each workspace.">以下为实时数据快照。使用下方入口或左侧导航进入各业务页面。</p>
+    </div>
+
+    <div class="mo-dash-module-shortcuts" role="navigation" aria-label="Quick navigation" data-i18n-aria-label="dashboard.shortcutsAria" data-i18n-aria-label-zh="进入业务模块" data-i18n-aria-label-en="Go to workspace modules">
+        <button type="button" class="mo-dash-module-shortcut mo-dash-module-shortcut--jobs" data-mo-go-route="jobs">
+            <span class="mo-dash-module-shortcut__icon" aria-hidden="true">🧩</span>
+            <span class="mo-dash-module-shortcut__text">
+                <span class="mo-dash-module-shortcut__label" data-i18n="dashboard.gotoJobs" data-i18n-zh="进入课程管理" data-i18n-en="Module management">进入课程管理</span>
+                <span class="mo-dash-module-shortcut__hint muted" data-i18n="dashboard.gotoJobsHint" data-i18n-zh="发布与维护岗位、浏览课程列表" data-i18n-en="Post openings and browse your modules">发布与维护岗位、浏览课程列表</span>
+            </span>
+            <span class="mo-dash-module-shortcut__chev" aria-hidden="true">→</span>
+        </button>
+        <button type="button" class="mo-dash-module-shortcut mo-dash-module-shortcut--applicants" data-mo-go-route="applicants">
+            <span class="mo-dash-module-shortcut__icon" aria-hidden="true">🧑‍🎓</span>
+            <span class="mo-dash-module-shortcut__text">
+                <span class="mo-dash-module-shortcut__label" data-i18n="dashboard.gotoApplicants" data-i18n-zh="进入应聘筛选" data-i18n-en="Applicant screening">进入应聘筛选</span>
+                <span class="mo-dash-module-shortcut__hint muted" data-i18n="dashboard.gotoApplicantsHint" data-i18n-zh="按课程查看投递并作出决策" data-i18n-en="Review applications and make decisions">按课程查看投递并作出决策</span>
+            </span>
+            <span class="mo-dash-module-shortcut__chev" aria-hidden="true">→</span>
+        </button>
+    </div>
+
     <div class="card mo-dashboard-card">
         <div class="overview-top mo-dashboard-overview-top">
             <div class="mo-dashboard-lead">
-                <h1 data-i18n="dashboard.title" data-i18n-zh="MO 招聘总览" data-i18n-en="MO Recruitment Dashboard">MO 招聘总览</h1>
-                <p class="muted" data-i18n="dashboard.desc" data-i18n-zh="在此总览开放岗位、候选规模与录用进度；侧栏可进入课程管理与应聘筛选。" data-i18n-en="Review open modules, candidate volume, and hiring progress here. Use the sidebar to enter Module Management and Applicant Screening.">在此总览开放岗位、候选规模与录用进度；侧栏可进入课程管理与应聘筛选。</p>
+                <h1 data-i18n="dashboard.title" data-i18n-zh="数据总览" data-i18n-en="Metrics overview">数据总览</h1>
+                <p class="muted" data-i18n="dashboard.desc" data-i18n-zh="点击指标卡片可打开摘要与名单；与左侧导航中的「招聘总览」为同一数据源。" data-i18n-en="Tap a metric card for summaries and lists. Same data as Recruitment Dashboard in the sidebar.">点击指标卡片可打开摘要与名单；与左侧导航中的「招聘总览」为同一数据源。</p>
             </div>
             <div class="mo-dashboard-meta">
                 <div class="overview-badges mo-jobs-toolbar">

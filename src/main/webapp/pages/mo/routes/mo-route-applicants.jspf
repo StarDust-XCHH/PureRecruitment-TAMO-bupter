@@ -28,15 +28,4 @@
             <p data-i18n="applicants.emptyDesc" data-i18n-zh="暂无符合条件的投递记录；可切换上方课程筛选或前往课程管理发布岗位。" data-i18n-en="No applications match the current filter. Change the filter above or post an opening in Module Management.">暂无符合条件的投递记录；可切换上方课程筛选或前往课程管理发布岗位。</p>
         </div>
     </div>
-
-    <div id="moApplicantDetailModal" class="mo-detail-modal" hidden aria-hidden="true">
-        <div class="mo-detail-modal__backdrop" data-close-applicant-detail="1"></div>
-        <div class="mo-detail-modal__panel" role="dialog" aria-modal="true" aria-labelledby="moApplicantDetailTitle">
-            <button type="button" class="modal-close" id="moApplicantDetailClose" aria-label="关闭" data-i18n-aria-label="common.close" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close">&times;</button>
-            <div class="mo-detail-modal__head">
-                <h2 id="moApplicantDetailTitle" data-i18n="applicants.detailTitle" data-i18n-zh="申请人详情" data-i18n-en="Details">申请人详情</h2>
-            </div>
-            <div class="mo-detail-modal__body" id="moApplicantDetailBody"></div>
-        </div>
-    </div>
 </div>

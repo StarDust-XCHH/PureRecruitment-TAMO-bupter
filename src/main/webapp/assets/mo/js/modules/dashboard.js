@@ -58,8 +58,8 @@
                 dashWorkflowHint.hidden = false;
                 dashWorkflowHint.textContent =
                     t(
-                        '当前有 ' + p + ' 条申请待决策，建议在侧栏进入「应聘筛选」优先处理。',
-                        'There are ' + p + ' applications pending decision. Please prioritize them in Applicant Screening.'
+                        '当前有 ' + p + ' 条申请待决策，建议在总览下方入口或侧栏进入「应聘筛选」优先处理。',
+                        'There are ' + p + ' applications pending decision. Open Applicant Screening from the dashboard shortcuts or the sidebar.'
                     );
             } else {
                 dashWorkflowHint.hidden = true;
