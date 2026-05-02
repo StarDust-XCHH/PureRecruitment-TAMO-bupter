@@ -84,6 +84,11 @@ public final class DataMountPaths {
         return moDir().resolve("mo-application-comments.json");
     }
 
+    /** MO 端候选短名单（不改变 TA 申请状态；按 moId + courseCode + applicationId 去重）。 */
+    public static Path moApplicantShortlist() {
+        return moDir().resolve("mo-applicant-shortlist.json");
+    }
+
     public static Path taDir() {
         return root().resolve("ta");
     }

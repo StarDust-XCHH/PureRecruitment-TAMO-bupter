@@ -6,6 +6,7 @@ Jakarta servlets exposing JSON APIs for the Module Organizer (MO) workspace. The
 | --- | --- | --- |
 | `MoJobBoardServlet` | `/api/mo/jobs` | `GET` lists jobs **for the caller’s `moId`** (query `moId`, matches `items[].ownerMoId`); `POST` creates a job: **`ownerMoId` is taken from query/body `moId`**, not from client `ownerMoId`. |
 | `MoApplicantsServlet` | `/api/mo/applicants` | `GET` lists **submitted** applicants for a course; query **`courseCode`** and **`moId`** (must own the job via `ownerMoId`). Returns `items`, `count`, `unreadCount`. |
+| `MoApplicantShortlistServlet` | `/api/mo/applicants/shortlist` | `GET` **`moId`** — shortlist entries for that MO; `POST` JSON `moId`, `courseCode`, `applicationId`, optional `taId`/`name` — add (idempotent); `DELETE` query `moId`, `courseCode`, `applicationId` — remove. Persists to `mo-applicant-shortlist.json`. |
 | `MoApplicantDetailServlet` | `/api/mo/applicants/detail` | `GET` single-application detail: **`moId`**, **`applicationId`**. |
 | `MoApplicantsUnreadServlet` | `/api/mo/applicants/unread-count` | `GET` **`moId`** — unread count for sidebar badge. |
 | `MoApplicationMarkReadServlet` | `/api/mo/applications/mark-read` | `POST` JSON `moId`, `applicationId` — MO read + sync TA `applications.json` to `UNDER_REVIEW`. |
@@ -36,5 +37,6 @@ MO authentication data is stored in three JSON files under `mountDataTAMObupter/
 Applicant workflow also uses (see `docs/backend/mo-ta-interaction-log.md`):
 - `mo-application-read-state.json` — per `(moId, applicationId)` read timestamps
 - `mo-application-comments.json` — MO comment threads keyed by `applicationId`
+- `mo-applicant-shortlist.json` — MO shortlist entries (`moId`, `courseCode`, `applicationId`, …)
 
 All write operations are synchronized for thread safety.
