@@ -573,11 +573,18 @@
                     function syncSlBtnLabel() {
                         if (!storeSl || !moSl || !ccForSl) {
                             slBtn.disabled = true;
+                            slBtn.classList.remove('mo-applicant-strip-btn--shortlist', 'mo-applicant-strip-btn--shortlisted');
                             return;
                         }
+                        slBtn.disabled = false;
                         var on = storeSl.isShortlisted(moSl, ccForSl, item.applicationId);
-                        slBtn.textContent = on ? t('移出', 'Out') : t('短名单', 'Shortlist');
+                        slBtn.textContent = on ? t('已在短名单', 'Shortlisted') : t('短名单', 'Shortlist');
                         slBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+                        slBtn.setAttribute('aria-label', on
+                            ? t('已在短名单，点击移出', 'Shortlisted — click to remove from shortlist')
+                            : t('加入短名单', 'Add to shortlist'));
+                        slBtn.classList.remove('mo-applicant-strip-btn--shortlist', 'mo-applicant-strip-btn--shortlisted');
+                        slBtn.classList.add(on ? 'mo-applicant-strip-btn--shortlisted' : 'mo-applicant-strip-btn--shortlist');
                     }
                     syncSlBtnLabel();
                     slBtn.addEventListener('click', function (e) {
@@ -707,8 +714,13 @@
                 if (ccShort && item.applicationId) {
                     shortlistDetailRow =
                         '<div class="mo-applicant-shortlist-detail-row">' +
-                        '<button type="button" class="pill-btn ghost" id="moApplicantShortlistToggleBtn">' +
-                        (slDetailOn ? t('移出', 'Out') : t('短名单', 'Shortlist')) +
+                        '<button type="button" class="pill-btn mo-applicant-shortlist-toggle ' + (slDetailOn
+                            ? 'mo-applicant-shortlist-toggle--shortlisted'
+                            : 'mo-applicant-shortlist-toggle--add') + '" id="moApplicantShortlistToggleBtn" aria-label="'
+                        + escapeHtml(slDetailOn
+                            ? t('已在短名单，点击移出', 'Shortlisted — click to remove from shortlist')
+                            : t('加入短名单', 'Add to shortlist')) + '">' +
+                        (slDetailOn ? t('已在短名单', 'Shortlisted') : t('短名单', 'Shortlist')) +
                         '</button>' +
                         '<span class="muted mo-applicant-shortlist-hint">' +
                         t('（不改变投递状态、不通知 TA）', '(Does not change status or notify the TA)') +
