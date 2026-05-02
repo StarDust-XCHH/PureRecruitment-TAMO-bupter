@@ -417,32 +417,60 @@
 
             pageRows.forEach(function (item) {
                 const card = document.createElement('div');
-                card.className = 'mo-applicant-board-card job-card course-job-card';
+                card.className = 'mo-applicant-board-card mo-applicant-strip-card job-card course-job-card';
                 card.setAttribute('tabindex', '-1');
                 const unreadDot = item.unread ? '<span class="mo-unread-dot" title="' + t('未读', 'Unread') + '"></span>' : '';
+                const moRow = getMoId();
+                const hasResume = !!(moRow && item.applicationId);
+                const resumeUrl = hasResume
+                    ? (apiUrl('/api/mo/applications/resume') + '?moId=' + encodeURIComponent(moRow)
+                        + '&applicationId=' + encodeURIComponent(item.applicationId))
+                    : '#';
+                const courseCodeDisp = escapeHtml(item.courseCode || '—');
+                const taNameDisp = escapeHtml(item.name || item.taId || '—');
 
                 card.innerHTML =
-                    '<div class="course-card-topline">' +
-                    '<span class="job-code">' + escapeHtml(item.courseCode || '--') + '</span>' +
-                    '<span class="pill course-mo-badge">' + escapeHtml(item.taId || '--') + '</span>' +
-                    '<span class="mo-applicant-status-badge ' + applicantStatusClass(item.status) + '">' +
-                    escapeHtml(formatApplicantStatusDisplay(item.status)) + '</span>' +
-                    '</div>' +
-                    '<h4 class="course-card-title mo-applicant-card__title">' + escapeHtml(item.name || item.taId) + unreadDot + '</h4>' +
-                    '<p class="course-card-description">' +
-                    t('课程', 'Module') + ' · ' + escapeHtml(item.courseCode || '--') + ' · ' + escapeHtml(item.courseName || '--') +
-                    '</p>' +
-                    '<div class="course-card-hint mo-applicant-card__hint mo-applicant-card__hint--split">' +
-                    '<button type="button" class="pill-btn ghost mo-applicant-view-btn">' + t('查看详情', 'View details') + '</button>' +
-                    '<button type="button" class="pill-btn ghost mo-applicant-shortlist-btn" data-applicant-shortlist="1">' +
+                    '<button type="button" class="mo-applicant-strip__primary mo-applicant-open-detail" aria-label="'
+                    + escapeHtml(t('查看详情：', 'View details: ')
+                        + String(item.name || item.taId || '').trim() + ' · ' + String(item.courseCode || '').trim()) + '">' +
+                    '<span class="mo-applicant-strip__meta">' +
+                    '<span class="mo-applicant-strip__code">' + courseCodeDisp + '</span>' +
+                    '<span class="mo-applicant-strip__sep" aria-hidden="true">·</span>' +
+                    '<span class="mo-applicant-strip__name">' + taNameDisp + unreadDot + '</span>' +
+                    '</span>' +
+                    '</button>' +
+                    '<div class="mo-applicant-strip__tools">' +
+                    (hasResume
+                        ? ('<a class="pill-btn ghost mo-applicant-cv-link mo-applicant-strip-tool" href="' + resumeUrl
+                            + '" target="_blank" rel="noopener">' + t('查看简历', 'View CV') + '</a>')
+                        : ('<span class="pill-btn ghost mo-applicant-cv-link mo-applicant-strip-tool mo-applicant-strip-tool--disabled" aria-disabled="true">'
+                            + t('查看简历', 'View CV') + '</span>')) +
+                    '<button type="button" class="pill-btn ghost mo-applicant-messages-btn mo-applicant-strip-tool">' +
+                    t('消息', 'Messages') + '</button>' +
+                    '<button type="button" class="pill-btn ghost mo-applicant-shortlist-btn mo-applicant-strip-tool" data-applicant-shortlist="1">' +
                     t('加入 Shortlist', 'Shortlist') + '</button>' +
                     '</div>';
 
-                const viewBtn = card.querySelector('.mo-applicant-view-btn');
-                if (viewBtn) {
-                    viewBtn.addEventListener('click', function (e) {
+                const openDetailBtn = card.querySelector('.mo-applicant-open-detail');
+                if (openDetailBtn) {
+                    openDetailBtn.addEventListener('click', function (e) {
                         e.stopPropagation();
-                        openDetail(item);
+                        void openDetail(item);
+                    });
+                }
+
+                const messagesBtn = card.querySelector('.mo-applicant-messages-btn');
+                if (messagesBtn) {
+                    messagesBtn.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        void openDetail(item, { focusMessages: true });
+                    });
+                }
+
+                const cvLink = card.querySelector('.mo-applicant-cv-link[href]');
+                if (cvLink) {
+                    cvLink.addEventListener('click', function (e) {
+                        e.stopPropagation();
                     });
                 }
 
@@ -514,7 +542,11 @@
             } catch (e) { /* ignore */ }
         }
 
-        async function openDetail(item) {
+        /**
+         * @param {{ focusMessages?: boolean }} [detailOpts] focusMessages：打开后滚动到 MO 消息区
+         */
+        async function openDetail(item, detailOpts) {
+            detailOpts = detailOpts || {};
             const moId = getMoId();
             if (!detailModal || !detailBody || !moId || !item.applicationId) return;
             currentDetailApplicationId = item.applicationId;
@@ -543,9 +575,9 @@
                         + escapeHtml(ev.content || '') + '</div>';
                 });
 
-                let commentsHtml = '';
+                let messagesHtml = '';
                 (Array.isArray(d.comments) ? d.comments : []).forEach(function (c) {
-                    commentsHtml += '<div class="mo-comment-item"><span class="muted">' + escapeHtml(c.createdAt || '')
+                    messagesHtml += '<div class="mo-message-item mo-comment-item"><span class="muted">' + escapeHtml(c.createdAt || '')
                         + ' · ' + escapeHtml(c.moId || '') + '</span><br>' + escapeHtml(c.text || '') + '</div>';
                 });
 
@@ -611,13 +643,13 @@
                     '<div class="mo-applicant-actions mo-applicant-detail-actions mo-applicant-detail-actions--after-resume">' +
                     actionsDetailHtml +
                     '</div>' +
-                    '<section class="mo-detail-plate" aria-label="' + t('MO 评论', 'MO comments') + '">' +
-                    '<div class="mo-detail-section-title">' + t('MO 评论', 'MO comments') + '</div>' +
-                    '<div class="mo-comment-list" id="moCommentList">' + (commentsHtml || '<span class="muted">' + t('暂无', 'None') + '</span>') + '</div>' +
+                    '<section class="mo-detail-plate" id="moApplicantMessagesSection" aria-label="' + t('MO 消息', 'MO messages') + '">' +
+                    '<div class="mo-detail-section-title">' + t('MO 消息', 'MO messages') + '</div>' +
+                    '<div class="mo-message-list mo-comment-list" id="moCommentList">' + (messagesHtml || '<span class="muted">' + t('暂无', 'None') + '</span>') + '</div>' +
                     '<div class="mo-form-grid">' +
-                    '<label class="full">' + t('添加评论', 'Add comment') + '<textarea id="moNewCommentText" rows="2" placeholder="' + t('输入评论', 'Enter a comment') + '"></textarea></label>' +
+                    '<label class="full">' + t('添加消息', 'Add message') + '<textarea id="moNewCommentText" rows="2" placeholder="' + t('输入消息', 'Enter a message') + '"></textarea></label>' +
                     '</div>' +
-                    '<button type="button" class="pill-btn" id="moSubmitCommentBtn">' + t('提交评论', 'Submit comment') + '</button>' +
+                    '<button type="button" class="pill-btn" id="moSubmitCommentBtn">' + t('发送消息', 'Send message') + '</button>' +
                     '</section>' +
                     '<section class="mo-detail-plate" aria-label="' + t('流程事件', 'Workflow events') + '">' +
                     '<div class="mo-detail-section-title">' + t('流程事件', 'Workflow events') + '</div>' +
@@ -646,9 +678,9 @@
                                 return;
                             }
                             textarea.value = '';
-                            openDetail(item);
+                            void openDetail(item);
                         } catch (err) {
-                            window.alert(err.message || t('评论失败', 'Comment failed'));
+                            window.alert(err.message || t('消息发送失败', 'Message failed'));
                         }
                     });
                 }
@@ -699,6 +731,17 @@
                                 window.alert(err.message || t('短名单操作失败', 'Shortlist update failed'));
                             }
                         }());
+                    });
+                }
+
+                if (detailOpts.focusMessages) {
+                    requestAnimationFrame(function () {
+                        requestAnimationFrame(function () {
+                            var sec = document.getElementById('moApplicantMessagesSection');
+                            if (sec) {
+                                sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                            }
+                        });
                     });
                 }
 

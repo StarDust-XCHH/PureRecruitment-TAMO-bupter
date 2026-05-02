@@ -1264,6 +1264,111 @@ legend.mo-field-label:has(.mo-req) {
     cursor: default;
 }
 
+/* 人选投递：紧凑横条（双列网格不变，单格高度缩短） */
+.mo-applicant-list .mo-applicant-strip-card.course-job-card {
+    min-height: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    align-content: center;
+    gap: 8px;
+    padding: 10px 12px;
+    cursor: default;
+}
+
+.mo-applicant-strip-card .mo-applicant-strip__primary {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0;
+    padding: 6px 8px;
+    margin: 0;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.mo-applicant-strip-card .mo-applicant-strip__primary:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.mo-applicant-strip-card .mo-applicant-strip__primary:focus-visible {
+    outline: 2px solid rgba(99, 102, 241, 0.55);
+    outline-offset: 2px;
+}
+
+[data-theme="light"] .mo-applicant-strip-card .mo-applicant-strip__primary:hover {
+    background: rgba(15, 23, 42, 0.06);
+}
+
+.mo-applicant-strip__meta {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    gap: 6px;
+    flex: 1;
+}
+
+.mo-applicant-strip__code {
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    flex-shrink: 0;
+    color: var(--text);
+}
+
+.mo-applicant-strip__sep {
+    color: var(--muted);
+    flex-shrink: 0;
+    font-weight: 500;
+}
+
+.mo-applicant-strip__name {
+    font-size: 14px;
+    font-weight: 600;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text);
+}
+
+.mo-applicant-strip__tools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.mo-applicant-strip__tools .mo-applicant-strip-tool.pill-btn,
+.mo-applicant-strip__tools a.mo-applicant-cv-link.pill-btn,
+.mo-applicant-strip__tools span.mo-applicant-cv-link.pill-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 10px;
+    font-size: 12px;
+    line-height: 1.25;
+    white-space: nowrap;
+    text-decoration: none;
+}
+
+.mo-applicant-strip__tools .mo-applicant-strip-tool--disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
 .mo-applicant-board-card.job-card:focus {
     outline: none;
 }
