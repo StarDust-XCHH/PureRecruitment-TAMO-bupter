@@ -1253,9 +1253,11 @@ legend.mo-field-label:has(.mo-req) {
     justify-content: flex-end;
 }
 
-/* 与课程管理同一 course-board 双列；由 ta-jobs.css 提供网格与间距 */
+/* 人选投递：单列列表（课程管理仍用 course-board 双列，此处单独覆盖） */
 .mo-applicant-list.course-board {
     align-items: stretch;
+    grid-template-columns: 1fr;
+    gap: 12px;
 }
 
 /* 应聘列表卡片：复用 job-card / course-job-card 动效，略调高度与指针 */
@@ -1264,62 +1266,74 @@ legend.mo-field-label:has(.mo-req) {
     cursor: default;
 }
 
-/* 人选投递：紧凑横条（双列网格不变，单格高度缩短） */
+/* 人选投递：紧凑横条 + 单线外框（去掉 course-job-card 双层渐变描边） */
 .mo-applicant-list .mo-applicant-strip-card.course-job-card {
     min-height: 0;
     flex-direction: row;
     flex-wrap: wrap;
     align-items: center;
     align-content: center;
-    gap: 8px;
-    padding: 10px 12px;
+    gap: 12px 14px;
+    padding: 12px 14px;
     cursor: default;
+    isolation: auto;
+    transform: none;
+    filter: none;
+    box-shadow: none;
+    border: 1px solid rgba(148, 163, 184, 0.38);
+    background: rgba(255, 255, 255, 0.05);
 }
 
-.mo-applicant-strip-card .mo-applicant-strip__primary {
+.mo-applicant-list .mo-applicant-strip-card.course-job-card::before,
+.mo-applicant-list .mo-applicant-strip-card.course-job-card::after {
+    display: none !important;
+}
+
+.mo-applicant-list .mo-applicant-strip-card.job-card:hover,
+.mo-applicant-list .mo-applicant-strip-card.job-card:focus-visible {
+    transform: translateY(-2px);
+    filter: none;
+    box-shadow: 0 8px 22px rgba(2, 6, 23, 0.28);
+    border-color: rgba(148, 163, 184, 0.55);
+    outline: none;
+}
+
+.mo-applicant-list .mo-applicant-strip-card.job-card:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(2, 6, 23, 0.2);
+}
+
+[data-theme="light"] .mo-applicant-list .mo-applicant-strip-card.course-job-card {
+    background: #f8fafc;
+    border: 1px solid rgba(15, 23, 42, 0.14);
+    box-shadow: none;
+}
+
+[data-theme="light"] .mo-applicant-list .mo-applicant-strip-card.job-card:hover,
+[data-theme="light"] .mo-applicant-list .mo-applicant-strip-card.job-card:focus-visible {
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.1);
+    border-color: rgba(15, 23, 42, 0.22);
+}
+
+.mo-applicant-strip__lead {
     flex: 1;
     min-width: 0;
     display: flex;
-    flex-direction: row;
     align-items: center;
-    justify-content: flex-start;
-    gap: 0;
-    padding: 6px 8px;
-    margin: 0;
-    border: none;
-    border-radius: 10px;
-    background: transparent;
-    color: inherit;
-    font: inherit;
-    text-align: left;
-    cursor: pointer;
-    transition: background 0.15s ease;
-}
-
-.mo-applicant-strip-card .mo-applicant-strip__primary:hover {
-    background: rgba(255, 255, 255, 0.06);
-}
-
-.mo-applicant-strip-card .mo-applicant-strip__primary:focus-visible {
-    outline: 2px solid rgba(99, 102, 241, 0.55);
-    outline-offset: 2px;
-}
-
-[data-theme="light"] .mo-applicant-strip-card .mo-applicant-strip__primary:hover {
-    background: rgba(15, 23, 42, 0.06);
+    padding: 4px 0;
 }
 
 .mo-applicant-strip__meta {
     display: flex;
     align-items: center;
     min-width: 0;
-    gap: 6px;
+    gap: 8px;
     flex: 1;
 }
 
 .mo-applicant-strip__code {
     font-weight: 700;
-    font-size: 13px;
+    font-size: 15px;
     letter-spacing: 0.02em;
     flex-shrink: 0;
     color: var(--text);
@@ -1329,10 +1343,11 @@ legend.mo-field-label:has(.mo-req) {
     color: var(--muted);
     flex-shrink: 0;
     font-weight: 500;
+    font-size: 15px;
 }
 
 .mo-applicant-strip__name {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 600;
     min-width: 0;
     overflow: hidden;
@@ -1346,27 +1361,147 @@ legend.mo-field-label:has(.mo-req) {
     flex-wrap: wrap;
     align-items: center;
     justify-content: flex-end;
-    gap: 6px;
+    gap: 10px;
     flex-shrink: 0;
 }
 
-.mo-applicant-strip__tools .mo-applicant-strip-tool.pill-btn,
-.mo-applicant-strip__tools a.mo-applicant-cv-link.pill-btn,
-.mo-applicant-strip__tools span.mo-applicant-cv-link.pill-btn {
+/* 条上操作：大号实心按钮 + 悬停/按下 */
+.mo-applicant-strip__tools .mo-applicant-strip-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 4px 10px;
-    font-size: 12px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
     line-height: 1.25;
     white-space: nowrap;
     text-decoration: none;
+    border-radius: 10px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--text);
+    transition:
+        background 0.16s ease,
+        border-color 0.16s ease,
+        box-shadow 0.16s ease,
+        transform 0.12s ease,
+        color 0.16s ease;
 }
 
-.mo-applicant-strip__tools .mo-applicant-strip-tool--disabled {
-    opacity: 0.45;
+.mo-applicant-strip__tools .mo-applicant-strip-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(2, 6, 23, 0.35);
+}
+
+.mo-applicant-strip__tools .mo-applicant-strip-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(2, 6, 23, 0.25);
+}
+
+.mo-applicant-strip__tools .mo-applicant-strip-btn:focus-visible {
+    outline: 2px solid rgba(99, 102, 241, 0.65);
+    outline-offset: 2px;
+}
+
+.mo-applicant-strip-btn--detail {
+    background: rgba(148, 163, 184, 0.2);
+    border-color: rgba(148, 163, 184, 0.45);
+    color: #e2e8f0;
+}
+
+.mo-applicant-strip-btn--detail:hover {
+    background: rgba(148, 163, 184, 0.32);
+    border-color: rgba(186, 198, 214, 0.55);
+}
+
+.mo-applicant-strip-btn--cv {
+    background: rgba(6, 182, 212, 0.22);
+    border-color: rgba(34, 211, 238, 0.45);
+    color: #ecfeff;
+}
+
+.mo-applicant-strip-btn--cv:hover {
+    background: rgba(6, 182, 212, 0.38);
+    border-color: rgba(103, 232, 249, 0.65);
+}
+
+.mo-applicant-strip-btn--messages {
+    background: rgba(139, 92, 246, 0.24);
+    border-color: rgba(167, 139, 250, 0.5);
+    color: #f5f3ff;
+}
+
+.mo-applicant-strip-btn--messages:hover {
+    background: rgba(139, 92, 246, 0.4);
+    border-color: rgba(196, 181, 253, 0.65);
+}
+
+.mo-applicant-strip-btn--shortlist {
+    background: rgba(251, 191, 36, 0.16);
+    border-color: rgba(252, 211, 77, 0.45);
+    color: #fffbeb;
+}
+
+.mo-applicant-strip-btn--shortlist:hover {
+    background: rgba(251, 191, 36, 0.28);
+    border-color: rgba(253, 224, 71, 0.6);
+}
+
+.mo-applicant-strip__tools .mo-applicant-strip-btn--disabled {
+    opacity: 0.42;
     cursor: not-allowed;
     pointer-events: none;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+[data-theme="light"] .mo-applicant-strip-btn--detail {
+    background: #e2e8f0;
+    border-color: rgba(15, 23, 42, 0.14);
+    color: #1e293b;
+}
+
+[data-theme="light"] .mo-applicant-strip-btn--detail:hover {
+    background: #cbd5e1;
+    border-color: rgba(15, 23, 42, 0.2);
+}
+
+[data-theme="light"] .mo-applicant-strip-btn--cv {
+    background: #cffafe;
+    border-color: rgba(8, 145, 178, 0.35);
+    color: #0e7490;
+}
+
+[data-theme="light"] .mo-applicant-strip-btn--cv:hover {
+    background: #a5f3fc;
+    border-color: rgba(8, 145, 178, 0.5);
+}
+
+[data-theme="light"] .mo-applicant-strip-btn--messages {
+    background: #ede9fe;
+    border-color: rgba(109, 40, 217, 0.28);
+    color: #5b21b6;
+}
+
+[data-theme="light"] .mo-applicant-strip-btn--messages:hover {
+    background: #ddd6fe;
+    border-color: rgba(109, 40, 217, 0.4);
+}
+
+[data-theme="light"] .mo-applicant-strip-btn--shortlist {
+    background: #fef9c3;
+    border-color: rgba(161, 98, 7, 0.35);
+    color: #854d0e;
+}
+
+[data-theme="light"] .mo-applicant-strip-btn--shortlist:hover {
+    background: #fef08a;
+    border-color: rgba(161, 98, 7, 0.48);
+}
+
+[data-theme="light"] .mo-applicant-strip__tools .mo-applicant-strip-btn:hover {
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
 }
 
 .mo-applicant-board-card.job-card:focus {

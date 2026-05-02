@@ -430,24 +430,25 @@
                 const taNameDisp = escapeHtml(item.name || item.taId || '—');
 
                 card.innerHTML =
-                    '<button type="button" class="mo-applicant-strip__primary mo-applicant-open-detail" aria-label="'
-                    + escapeHtml(t('查看详情：', 'View details: ')
-                        + String(item.name || item.taId || '').trim() + ' · ' + String(item.courseCode || '').trim()) + '">' +
+                    '<div class="mo-applicant-strip__lead" aria-label="'
+                    + escapeHtml(String(item.name || item.taId || '').trim() + ' · ' + String(item.courseCode || '').trim()) + '">' +
                     '<span class="mo-applicant-strip__meta">' +
                     '<span class="mo-applicant-strip__code">' + courseCodeDisp + '</span>' +
                     '<span class="mo-applicant-strip__sep" aria-hidden="true">·</span>' +
                     '<span class="mo-applicant-strip__name">' + taNameDisp + unreadDot + '</span>' +
                     '</span>' +
-                    '</button>' +
+                    '</div>' +
                     '<div class="mo-applicant-strip__tools">' +
+                    '<button type="button" class="mo-applicant-strip-btn mo-applicant-strip-btn--detail mo-applicant-open-detail">' +
+                    t('查看详情', 'View details') + '</button>' +
                     (hasResume
-                        ? ('<a class="pill-btn ghost mo-applicant-cv-link mo-applicant-strip-tool" href="' + resumeUrl
+                        ? ('<a class="mo-applicant-strip-btn mo-applicant-strip-btn--cv mo-applicant-cv-link" href="' + resumeUrl
                             + '" target="_blank" rel="noopener">' + t('查看简历', 'View CV') + '</a>')
-                        : ('<span class="pill-btn ghost mo-applicant-cv-link mo-applicant-strip-tool mo-applicant-strip-tool--disabled" aria-disabled="true">'
+                        : ('<span class="mo-applicant-strip-btn mo-applicant-strip-btn--cv mo-applicant-cv-link mo-applicant-strip-btn--disabled" aria-disabled="true">'
                             + t('查看简历', 'View CV') + '</span>')) +
-                    '<button type="button" class="pill-btn ghost mo-applicant-messages-btn mo-applicant-strip-tool">' +
+                    '<button type="button" class="mo-applicant-strip-btn mo-applicant-strip-btn--messages mo-applicant-messages-btn">' +
                     t('消息', 'Messages') + '</button>' +
-                    '<button type="button" class="pill-btn ghost mo-applicant-shortlist-btn mo-applicant-strip-tool" data-applicant-shortlist="1">' +
+                    '<button type="button" class="mo-applicant-strip-btn mo-applicant-strip-btn--shortlist mo-applicant-shortlist-btn" data-applicant-shortlist="1">' +
                     t('加入 Shortlist', 'Shortlist') + '</button>' +
                     '</div>';
 
@@ -467,7 +468,7 @@
                     });
                 }
 
-                const cvLink = card.querySelector('.mo-applicant-cv-link[href]');
+                const cvLink = card.querySelector('a.mo-applicant-cv-link[href]');
                 if (cvLink) {
                     cvLink.addEventListener('click', function (e) {
                         e.stopPropagation();
