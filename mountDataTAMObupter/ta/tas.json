@@ -3,7 +3,7 @@
     "schema": "ta",
     "entity": "tas",
     "version": "1.0",
-    "updatedAt": "2026-04-12T09:33:51.583095400Z"
+    "updatedAt": "2026-04-23T04:01:05.242666900Z"
   },
   "items": [
     {
@@ -32,12 +32,12 @@
       "department": "",
       "status": "active",
       "createdAt": "2026-03-16T13:28:45.257077Z",
-      "updatedAt": "2026-04-12T09:33:51.581375900Z",
+      "updatedAt": "2026-04-07T08:11:15.313259500Z",
       "auth": {
         "passwordHash": "8b5361414eb8fa038ca9279a55be8b3b44791939d89475d1618d50230c01d65f",
         "passwordSalt": "cebb50b5-9797-4732-a22a-df78ae1c88da",
-        "lastLoginAt": "2026-04-12T09:33:51.581375900Z",
-        "failedAttempts": 0
+        "lastLoginAt": "2026-04-07T08:11:15.313259500Z",
+        "failedAttempts": 0.0
       }
     },
     {
@@ -117,12 +117,12 @@
       "department": "",
       "status": "active",
       "createdAt": "2026-03-21T13:12:54.282282500Z",
-      "updatedAt": "2026-04-01T18:18:41.187369500Z",
+      "updatedAt": "2026-04-23T04:01:05.241202800Z",
       "auth": {
         "passwordHash": "5ffe2b47aa70ecc089b7d9311ef3ff2fb72195411b1b98d210d2b686afaf5ee9",
         "passwordSalt": "08a2d292-32bc-46e7-936a-45a132381204",
-        "lastLoginAt": "2026-04-01T18:18:41.187369500Z",
-        "failedAttempts": 0.0
+        "lastLoginAt": "2026-04-23T04:01:05.241202800Z",
+        "failedAttempts": 0
       }
     },
     {
@@ -139,40 +139,6 @@
         "passwordHash": "b881cbb11750954af746ff9fe69d09ebc5b702dc4fd254a8f0fda89622d4bceb",
         "passwordSalt": "82d12154-65b6-487c-96d8-dbff5909efd8",
         "lastLoginAt": "2026-04-06T15:07:34.079953600Z",
-        "failedAttempts": 0.0
-      }
-    },
-    {
-      "id": "TA-91667",
-      "name": "123qwe",
-      "username": "123qwe",
-      "email": "123@123.com",
-      "phone": "123234423",
-      "department": "",
-      "status": "active",
-      "createdAt": "2026-04-08T02:05:51.145318400Z",
-      "updatedAt": "2026-04-08T02:05:51.145318400Z",
-      "auth": {
-        "passwordHash": "1600f104399674a46c5c33343684e3a03988abf297b5d25da1154e486ed22f72",
-        "passwordSalt": "150041c9-e31f-4995-909f-dde38b52ba97",
-        "lastLoginAt": "",
-        "failedAttempts": 0.0
-      }
-    },
-    {
-      "id": "TA-64333",
-      "name": "ABC",
-      "username": "ABC",
-      "email": "ABC@fff.v",
-      "phone": "456765678",
-      "department": "",
-      "status": "active",
-      "createdAt": "2026-04-12T09:14:18.786681600Z",
-      "updatedAt": "2026-04-12T09:28:24.721191Z",
-      "auth": {
-        "passwordHash": "b2581d989f7138ceba3ffb3a83ac205be11251327dec653ec7408d83310635b4",
-        "passwordSalt": "69720341-4969-4654-a5d4-9faea1f1be16",
-        "lastLoginAt": "2026-04-12T09:28:24.721191Z",
         "failedAttempts": 0.0
       }
     }
