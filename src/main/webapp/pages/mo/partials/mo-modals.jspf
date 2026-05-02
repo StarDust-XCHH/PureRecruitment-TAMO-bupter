@@ -643,3 +643,15 @@
         <div class="mo-detail-modal__body" id="moApplicantDetailBody"></div>
     </div>
 </div>
+
+<div id="moApplicantMessagesModal" class="mo-detail-modal" hidden aria-hidden="true">
+    <div class="mo-detail-modal__backdrop" data-close-mo-applicant-messages="1"></div>
+    <div class="mo-detail-modal__panel mo-applicant-messages-modal__panel" role="dialog" aria-modal="true" aria-labelledby="moApplicantMessagesTitle">
+        <button type="button" class="modal-close" id="moApplicantMessagesClose" aria-label="关闭" data-i18n-aria-label="common.close" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close">&times;</button>
+        <div class="mo-detail-modal__head">
+            <h2 id="moApplicantMessagesTitle" data-i18n="applicants.messagesTitle" data-i18n-zh="消息" data-i18n-en="Messages">消息</h2>
+            <p class="muted mo-applicant-messages-modal__sub" id="moApplicantMessagesSubtitle"></p>
+        </div>
+        <div class="mo-detail-modal__body" id="moApplicantMessagesBody"></div>
+    </div>
+</div>

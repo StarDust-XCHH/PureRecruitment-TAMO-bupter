@@ -23,6 +23,10 @@
         const detailModal = document.getElementById('moApplicantDetailModal');
         const detailBody = document.getElementById('moApplicantDetailBody');
         const detailClose = document.getElementById('moApplicantDetailClose');
+        const messagesModal = document.getElementById('moApplicantMessagesModal');
+        const messagesBody = document.getElementById('moApplicantMessagesBody');
+        const messagesClose = document.getElementById('moApplicantMessagesClose');
+        const messagesSubtitle = document.getElementById('moApplicantMessagesSubtitle');
         const navBadge = document.getElementById('navApplicantsBadge');
         const routeApplicantsEl = document.getElementById('route-applicants');
         const routeShortlistEl = document.getElementById('route-shortlist');
@@ -35,6 +39,7 @@
         const navShortlistBadge = document.getElementById('navShortlistBadge');
 
         let currentDetailApplicationId = '';
+        let currentMessagesApplicationId = '';
         /** Shortlist 面板当前选中的课程编码（与 MoShortlistStore 分桶一致） */
         let shortlistPanelCourse = '';
         function t(zh, en) {
@@ -565,7 +570,7 @@
                 if (messagesBtn) {
                     messagesBtn.addEventListener('click', function (e) {
                         e.stopPropagation();
-                        void openDetail(item, { focusMessages: true });
+                        void openApplicantMessagesModal(item);
                     });
                 }
 
@@ -633,11 +638,102 @@
             updateShortlistNavBadge();
         }
 
+        function closeApplicantMessagesModal() {
+            if (!messagesModal) return;
+            messagesModal.hidden = true;
+            messagesModal.setAttribute('aria-hidden', 'true');
+            currentMessagesApplicationId = '';
+            if (messagesBody) {
+                messagesBody.innerHTML = '';
+            }
+        }
+
         function closeDetailModal() {
             if (!detailModal) return;
             detailModal.hidden = true;
             detailModal.setAttribute('aria-hidden', 'true');
             currentDetailApplicationId = '';
+        }
+
+        /**
+         * 拉取详情中的 comments，仅渲染 MO 消息弹窗正文（不含详情其它块）。
+         */
+        async function loadApplicantMessagesBody(item) {
+            var moId = getMoId();
+            if (!messagesBody || !moId || !item || !item.applicationId) return;
+            try {
+                var res = await fetch(apiUrl('/api/mo/applicants/detail') + '?moId=' + encodeURIComponent(moId)
+                    + '&applicationId=' + encodeURIComponent(item.applicationId));
+                var d = await res.json();
+                if (!res.ok || d.success === false) {
+                    messagesBody.innerHTML = '<p class="mo-status-warn">' + escapeHtml(d.message || t('加载失败', 'Load failed')) + '</p>';
+                    return;
+                }
+                var messagesHtml = '';
+                (Array.isArray(d.comments) ? d.comments : []).forEach(function (c) {
+                    messagesHtml += '<div class="mo-message-item mo-comment-item"><span class="muted">' + escapeHtml(c.createdAt || '')
+                        + ' · ' + escapeHtml(c.moId || '') + '</span><br>' + escapeHtml(c.text || '') + '</div>';
+                });
+                messagesBody.innerHTML =
+                    '<section class="mo-detail-plate mo-applicant-messages-modal__section" aria-label="' + escapeHtml(t('MO 消息', 'MO messages')) + '">' +
+                    '<div class="mo-message-list mo-comment-list" id="moApplicantMessagesList">' + (messagesHtml || '<span class="muted">' + t('暂无', 'None') + '</span>') + '</div>' +
+                    '<div class="mo-form-grid">' +
+                    '<label class="full">' + t('添加消息', 'Add message') + '<textarea id="moApplicantNewMessageText" rows="3" placeholder="' + escapeHtml(t('输入消息', 'Enter a message')) + '"></textarea></label>' +
+                    '</div>' +
+                    '<button type="button" class="pill-btn" id="moApplicantMessageSubmitBtn">' + t('发送消息', 'Send message') + '</button>' +
+                    '</section>';
+
+                var submitBtn = document.getElementById('moApplicantMessageSubmitBtn');
+                var textarea = document.getElementById('moApplicantNewMessageText');
+                if (submitBtn && textarea) {
+                    submitBtn.addEventListener('click', async function () {
+                        var text = (textarea.value || '').trim();
+                        if (!text) return;
+                        try {
+                            var cr = await fetch(apiUrl('/api/mo/applications/comment'), {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+                                body: JSON.stringify({
+                                    moId: moId,
+                                    applicationId: item.applicationId,
+                                    text: text
+                                })
+                            });
+                            var cp = await cr.json();
+                            if (!cr.ok || cp.success === false) {
+                                window.alert(cp.message || t('失败', 'Failed'));
+                                return;
+                            }
+                            textarea.value = '';
+                            await loadApplicantMessagesBody(item);
+                        } catch (err) {
+                            window.alert(err.message || t('消息发送失败', 'Message failed'));
+                        }
+                    });
+                }
+            } catch (err) {
+                messagesBody.innerHTML = '<p class="mo-status-warn">' + escapeHtml(err.message || t('加载失败', 'Load failed')) + '</p>';
+            }
+        }
+
+        async function openApplicantMessagesModal(item) {
+            if (!messagesModal || !messagesBody || !item || !item.applicationId) return;
+            var moId = getMoId();
+            if (!moId) return;
+            closeDetailModal();
+            currentMessagesApplicationId = String(item.applicationId);
+            if (messagesSubtitle) {
+                var parts = [];
+                if (item.courseCode) parts.push(String(item.courseCode).trim());
+                if (item.name || item.taId) parts.push(String(item.name || item.taId || '').trim());
+                parts.push('#' + String(item.applicationId).trim());
+                messagesSubtitle.textContent = parts.join(' · ');
+            }
+            messagesBody.innerHTML = '<p class="muted">' + t('加载中…', 'Loading...') + '</p>';
+            messagesModal.hidden = false;
+            messagesModal.setAttribute('aria-hidden', 'false');
+            await markRead(item.applicationId);
+            await loadApplicantMessagesBody(item);
         }
 
         async function markRead(applicationId) {
@@ -655,13 +751,10 @@
             } catch (e) { /* ignore */ }
         }
 
-        /**
-         * @param {{ focusMessages?: boolean }} [detailOpts] focusMessages：打开后滚动到 MO 消息区
-         */
-        async function openDetail(item, detailOpts) {
-            detailOpts = detailOpts || {};
+        async function openDetail(item) {
             const moId = getMoId();
             if (!detailModal || !detailBody || !moId || !item.applicationId) return;
+            closeApplicantMessagesModal();
             currentDetailApplicationId = item.applicationId;
             detailBody.innerHTML = '<p class="muted">' + t('加载中…', 'Loading...') + '</p>';
             detailModal.hidden = false;
@@ -686,12 +779,6 @@
                     eventsHtml += '<div class="mo-comment-item"><strong>' + escapeHtml(ev.label || ev.eventType) + '</strong> '
                         + '<span class="muted">' + escapeHtml(ev.time || '') + '</span><br>'
                         + escapeHtml(ev.content || '') + '</div>';
-                });
-
-                let messagesHtml = '';
-                (Array.isArray(d.comments) ? d.comments : []).forEach(function (c) {
-                    messagesHtml += '<div class="mo-message-item mo-comment-item"><span class="muted">' + escapeHtml(c.createdAt || '')
-                        + ' · ' + escapeHtml(c.moId || '') + '</span><br>' + escapeHtml(c.text || '') + '</div>';
                 });
 
                 const statusText = (function () {
@@ -761,47 +848,10 @@
                     '<div class="mo-applicant-actions mo-applicant-detail-actions mo-applicant-detail-actions--after-resume">' +
                     actionsDetailHtml +
                     '</div>' +
-                    '<section class="mo-detail-plate" id="moApplicantMessagesSection" aria-label="' + t('MO 消息', 'MO messages') + '">' +
-                    '<div class="mo-detail-section-title">' + t('MO 消息', 'MO messages') + '</div>' +
-                    '<div class="mo-message-list mo-comment-list" id="moCommentList">' + (messagesHtml || '<span class="muted">' + t('暂无', 'None') + '</span>') + '</div>' +
-                    '<div class="mo-form-grid">' +
-                    '<label class="full">' + t('添加消息', 'Add message') + '<textarea id="moNewCommentText" rows="2" placeholder="' + t('输入消息', 'Enter a message') + '"></textarea></label>' +
-                    '</div>' +
-                    '<button type="button" class="pill-btn" id="moSubmitCommentBtn">' + t('发送消息', 'Send message') + '</button>' +
-                    '</section>' +
                     '<section class="mo-detail-plate" aria-label="' + t('流程事件', 'Workflow events') + '">' +
                     '<div class="mo-detail-section-title">' + t('流程事件', 'Workflow events') + '</div>' +
                     '<div class="mo-comment-list">' + (eventsHtml || '<span class="muted">' + t('暂无', 'None') + '</span>') + '</div>' +
                     '</section>';
-
-                const submitBtn = document.getElementById('moSubmitCommentBtn');
-                const textarea = document.getElementById('moNewCommentText');
-                if (submitBtn && textarea) {
-                    submitBtn.addEventListener('click', async function () {
-                        const text = (textarea.value || '').trim();
-                        if (!text) return;
-                        try {
-                            const cr = await fetch(apiUrl('/api/mo/applications/comment'), {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-                                body: JSON.stringify({
-                                    moId: moId,
-                                    applicationId: item.applicationId,
-                                    text: text
-                                })
-                            });
-                            const cp = await cr.json();
-                            if (!cr.ok || cp.success === false) {
-                                window.alert(cp.message || t('失败', 'Failed'));
-                                return;
-                            }
-                            textarea.value = '';
-                            void openDetail(item);
-                        } catch (err) {
-                            window.alert(err.message || t('消息发送失败', 'Message failed'));
-                        }
-                    });
-                }
 
                 const acceptDetailBtn = document.getElementById('moApplicantAcceptBtn');
                 const rejectDetailBtn = document.getElementById('moApplicantRejectBtn');
@@ -849,17 +899,6 @@
                                 window.alert(err.message || t('短名单操作失败', 'Shortlist update failed'));
                             }
                         }());
-                    });
-                }
-
-                if (detailOpts.focusMessages) {
-                    requestAnimationFrame(function () {
-                        requestAnimationFrame(function () {
-                            var sec = document.getElementById('moApplicantMessagesSection');
-                            if (sec) {
-                                sec.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                            }
-                        });
                     });
                 }
 
@@ -1072,6 +1111,17 @@
             });
         }
 
+        if (messagesClose) {
+            messagesClose.addEventListener('click', closeApplicantMessagesModal);
+        }
+        if (messagesModal) {
+            messagesModal.addEventListener('click', function (e) {
+                if (e.target && e.target.getAttribute('data-close-mo-applicant-messages')) {
+                    closeApplicantMessagesModal();
+                }
+            });
+        }
+
         if (shortlistBulkHireBtn) {
             shortlistBulkHireBtn.addEventListener('click', function () {
                 void bulkHireShortlistForPanelCourse();
@@ -1197,10 +1247,11 @@
             if (typeof app.closeAllModals === 'function') {
                 app.closeAllModals();
             }
+            closeApplicantMessagesModal();
             if (typeof app.activateRoute === 'function') {
                 app.activateRoute('applicants');
             }
-            openDetail(item);
+            void openDetail(item);
         };
 
         refreshBtn.addEventListener('click', function () {
@@ -1236,6 +1287,16 @@
                 })[0];
                 if (found) {
                     void openDetail(found);
+                }
+            }
+            if (currentMessagesApplicationId && messagesModal && !messagesModal.hidden) {
+                var foundM = applicantListCache.filter(function (it) {
+                    return it && String(it.applicationId) === String(currentMessagesApplicationId);
+                })[0];
+                if (foundM) {
+                    void loadApplicantMessagesBody(foundM);
+                } else {
+                    closeApplicantMessagesModal();
                 }
             }
             var moL = getMoId();

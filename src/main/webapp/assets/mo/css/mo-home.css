@@ -2077,6 +2077,34 @@ legend.mo-field-label:has(.mo-req) {
     margin-top: 14px;
 }
 
+/* MO 消息独立弹窗（与申请人详情分离） */
+.mo-applicant-messages-modal__panel {
+    width: min(520px, 100%);
+}
+
+.mo-applicant-messages-modal__sub {
+    margin: 0.35rem 0 0;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+#moApplicantMessagesBody {
+    max-height: min(58vh, 480px);
+    overflow-y: auto;
+}
+
+#moApplicantMessagesBody .mo-detail-plate .mo-form-grid {
+    margin-top: 18px;
+}
+
+#moApplicantMessagesBody .mo-detail-plate #moApplicantMessageSubmitBtn {
+    margin-top: 14px;
+}
+
+[data-theme="light"] #moApplicantMessagesBody .mo-comment-list {
+    background: rgba(0, 0, 0, 0.04);
+}
+
 .mo-detail-kv {
     display: grid;
     grid-template-columns: 110px 1fr;
