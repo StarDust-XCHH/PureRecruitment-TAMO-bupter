@@ -359,6 +359,37 @@
             }
         }
 
+        function applicantListLocaleTag() {
+            return (typeof app.getCurrentLanguage === 'function' && app.getCurrentLanguage() === 'en') ? 'en-GB' : 'zh-CN';
+        }
+
+        /** ISO / 时间戳字符串 → 排序用毫秒（无效为 0） */
+        function submittedAtSortKey(v) {
+            if (v == null || v === '') return 0;
+            var ms = Date.parse(String(v).trim());
+            return isNaN(ms) ? 0 : ms;
+        }
+
+        /** 列表「申请时间」列：按浏览器本地时区展示 */
+        function formatSubmittedAtLocal(v) {
+            var ms = submittedAtSortKey(v);
+            if (!ms) return '—';
+            try {
+                var loc = applicantListLocaleTag();
+                return new Date(ms).toLocaleString(loc, {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: loc.indexOf('en') === 0
+                });
+            } catch (e) {
+                return new Date(ms).toLocaleString();
+            }
+        }
+
         /**
          * @param {Array|undefined} items 传入时表示新数据并重置到第 1 页；不传则仅按当前页从缓存重绘（用于翻页）
          */
@@ -412,47 +443,106 @@
                 return;
             }
 
+            var sorted = applicantListCache.slice().sort(function (a, b) {
+                return submittedAtSortKey(b.submittedAt) - submittedAtSortKey(a.submittedAt);
+            });
+
             var start = (applicantPageIndex - 1) * APPLICANT_PAGE_SIZE;
-            var pageRows = applicantListCache.slice(start, start + APPLICANT_PAGE_SIZE);
+            var pageRows = sorted.slice(start, start + APPLICANT_PAGE_SIZE);
+
+            var wrap = document.createElement('div');
+            wrap.className = 'mo-applicant-board-table-wrap';
+
+            var table = document.createElement('table');
+            table.className = 'mo-applicant-board-table';
+
+            var thead = document.createElement('thead');
+            var trHead = document.createElement('tr');
+            function appendTh(text, className, ariaLabel) {
+                var th = document.createElement('th');
+                th.scope = 'col';
+                th.textContent = text;
+                if (className) {
+                    th.className = className;
+                }
+                if (ariaLabel) {
+                    th.setAttribute('aria-label', ariaLabel);
+                }
+                trHead.appendChild(th);
+            }
+            appendTh(t('状态', 'Status'), 'mo-applicant-board-table__col-status');
+            appendTh(t('课程编号', 'Module code'), 'mo-applicant-board-table__col-code');
+            appendTh(t('TA姓名', 'TA name'), 'mo-applicant-board-table__col-name');
+            appendTh(t('学号', 'Student ID'), 'mo-applicant-board-table__col-sid');
+            appendTh(t('申请时间', 'Submitted'), 'mo-applicant-board-table__col-time');
+            appendTh('', 'mo-applicant-board-table__actions', t('操作列：详情、简历、短名单、消息', 'Actions: Details, CV, Shortlist, Messages'));
+            thead.appendChild(trHead);
+            table.appendChild(thead);
+
+            var tbody = document.createElement('tbody');
 
             pageRows.forEach(function (item) {
-                const card = document.createElement('div');
-                card.className = 'mo-applicant-board-card mo-applicant-strip-card job-card course-job-card';
-                card.setAttribute('tabindex', '-1');
-                const unreadDot = item.unread ? '<span class="mo-unread-dot" title="' + t('未读', 'Unread') + '"></span>' : '';
-                const moRow = getMoId();
-                const hasResume = !!(moRow && item.applicationId);
-                const resumeUrl = hasResume
+                var tr = document.createElement('tr');
+                tr.className = 'mo-applicant-board-row';
+
+                var unreadDot = item.unread ? '<span class="mo-unread-dot" title="' + escapeHtml(t('未读', 'Unread')) + '"></span> ' : '';
+                var moRow = getMoId();
+                var hasResume = !!(moRow && item.applicationId);
+                var resumeUrl = hasResume
                     ? (apiUrl('/api/mo/applications/resume') + '?moId=' + encodeURIComponent(moRow)
                         + '&applicationId=' + encodeURIComponent(item.applicationId))
                     : '#';
-                const courseCodeDisp = escapeHtml(item.courseCode || '—');
-                const taNameDisp = escapeHtml(item.name || item.taId || '—');
+                var sidRaw = item.studentId != null ? String(item.studentId).trim() : '';
+                var statusLabel = escapeHtml(formatApplicantStatusDisplay(item.status));
 
-                card.innerHTML =
-                    '<div class="mo-applicant-strip__lead" aria-label="'
-                    + escapeHtml(String(item.name || item.taId || '').trim() + ' · ' + String(item.courseCode || '').trim()) + '">' +
-                    '<span class="mo-applicant-strip__meta">' +
-                    '<span class="mo-applicant-strip__code">' + courseCodeDisp + '</span>' +
-                    '<span class="mo-applicant-strip__sep" aria-hidden="true">·</span>' +
-                    '<span class="mo-applicant-strip__name">' + taNameDisp + unreadDot + '</span>' +
-                    '</span>' +
-                    '</div>' +
-                    '<div class="mo-applicant-strip__tools">' +
+                var tdStatus = document.createElement('td');
+                tdStatus.className = 'mo-applicant-board-table__col-status';
+                tdStatus.innerHTML = unreadDot + '<span class="mo-applicant-status-badge '
+                    + applicantStatusClass(item.status) + '">' + statusLabel + '</span>';
+
+                var tdCode = document.createElement('td');
+                tdCode.className = 'mo-applicant-board-table__col-code mo-applicant-board-table__cell-mono';
+                tdCode.textContent = item.courseCode != null && String(item.courseCode).trim() !== '' ? String(item.courseCode).trim() : '—';
+
+                var tdName = document.createElement('td');
+                tdName.className = 'mo-applicant-board-table__col-name';
+                tdName.textContent = item.name != null && String(item.name).trim() !== ''
+                    ? String(item.name).trim()
+                    : (item.taId != null ? String(item.taId).trim() : '—');
+
+                var tdSid = document.createElement('td');
+                tdSid.className = 'mo-applicant-board-table__col-sid mo-applicant-board-table__cell-mono';
+                tdSid.textContent = sidRaw || '—';
+
+                var tdTime = document.createElement('td');
+                tdTime.className = 'mo-applicant-board-table__col-time mo-applicant-board-table__cell-mono';
+                tdTime.textContent = formatSubmittedAtLocal(item.submittedAt);
+
+                var tdAct = document.createElement('td');
+                tdAct.className = 'mo-applicant-board-table__actions';
+                tdAct.innerHTML =
+                    '<div class="mo-applicant-board-table__action-cell">' +
                     '<button type="button" class="mo-applicant-strip-btn mo-applicant-strip-btn--detail mo-applicant-open-detail">' +
-                    t('查看详情', 'View details') + '</button>' +
+                    t('详情', 'Details') + '</button>' +
                     (hasResume
                         ? ('<a class="mo-applicant-strip-btn mo-applicant-strip-btn--cv mo-applicant-cv-link" href="' + resumeUrl
-                            + '" target="_blank" rel="noopener">' + t('查看简历', 'View CV') + '</a>')
+                            + '" target="_blank" rel="noopener">' + t('简历', 'CV') + '</a>')
                         : ('<span class="mo-applicant-strip-btn mo-applicant-strip-btn--cv mo-applicant-cv-link mo-applicant-strip-btn--disabled" aria-disabled="true">'
-                            + t('查看简历', 'View CV') + '</span>')) +
+                            + t('简历', 'CV') + '</span>')) +
+                    '<button type="button" class="mo-applicant-strip-btn mo-applicant-strip-btn--shortlist mo-applicant-shortlist-btn" data-applicant-shortlist="1">' +
+                    t('短名单', 'Shortlist') + '</button>' +
                     '<button type="button" class="mo-applicant-strip-btn mo-applicant-strip-btn--messages mo-applicant-messages-btn">' +
                     t('消息', 'Messages') + '</button>' +
-                    '<button type="button" class="mo-applicant-strip-btn mo-applicant-strip-btn--shortlist mo-applicant-shortlist-btn" data-applicant-shortlist="1">' +
-                    t('加入 Shortlist', 'Shortlist') + '</button>' +
                     '</div>';
 
-                const openDetailBtn = card.querySelector('.mo-applicant-open-detail');
+                tr.appendChild(tdStatus);
+                tr.appendChild(tdCode);
+                tr.appendChild(tdName);
+                tr.appendChild(tdSid);
+                tr.appendChild(tdTime);
+                tr.appendChild(tdAct);
+
+                var openDetailBtn = tr.querySelector('.mo-applicant-open-detail');
                 if (openDetailBtn) {
                     openDetailBtn.addEventListener('click', function (e) {
                         e.stopPropagation();
@@ -460,7 +550,7 @@
                     });
                 }
 
-                const messagesBtn = card.querySelector('.mo-applicant-messages-btn');
+                var messagesBtn = tr.querySelector('.mo-applicant-messages-btn');
                 if (messagesBtn) {
                     messagesBtn.addEventListener('click', function (e) {
                         e.stopPropagation();
@@ -468,14 +558,14 @@
                     });
                 }
 
-                const cvLink = card.querySelector('a.mo-applicant-cv-link[href]');
+                var cvLink = tr.querySelector('a.mo-applicant-cv-link[href]');
                 if (cvLink) {
                     cvLink.addEventListener('click', function (e) {
                         e.stopPropagation();
                     });
                 }
 
-                const slBtn = card.querySelector('.mo-applicant-shortlist-btn');
+                var slBtn = tr.querySelector('.mo-applicant-shortlist-btn');
                 if (slBtn) {
                     var ccForSl = String(item.courseCode || '').trim();
                     var storeSl = shortlistStore();
@@ -486,7 +576,7 @@
                             return;
                         }
                         var on = storeSl.isShortlisted(moSl, ccForSl, item.applicationId);
-                        slBtn.textContent = on ? t('移出 Shortlist', 'Remove from shortlist') : t('加入 Shortlist', 'Add to shortlist');
+                        slBtn.textContent = on ? t('移出', 'Out') : t('短名单', 'Shortlist');
                         slBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
                     }
                     syncSlBtnLabel();
@@ -516,8 +606,12 @@
                     });
                 }
 
-                list.appendChild(card);
+                tbody.appendChild(tr);
             });
+
+            table.appendChild(tbody);
+            wrap.appendChild(table);
+            list.appendChild(wrap);
             updateShortlistNavBadge();
         }
 
@@ -614,7 +708,7 @@
                     shortlistDetailRow =
                         '<div class="mo-applicant-shortlist-detail-row">' +
                         '<button type="button" class="pill-btn ghost" id="moApplicantShortlistToggleBtn">' +
-                        (slDetailOn ? t('移出 Shortlist', 'Remove from shortlist') : t('加入 Shortlist', 'Add to shortlist')) +
+                        (slDetailOn ? t('移出', 'Out') : t('短名单', 'Shortlist')) +
                         '</button>' +
                         '<span class="muted mo-applicant-shortlist-hint">' +
                         t('（不改变投递状态、不通知 TA）', '(Does not change status or notify the TA)') +
@@ -638,7 +732,7 @@
                     '</dl>' +
                     '<div class="mo-detail-block mo-detail-block--resume">' +
                     '<div class="mo-detail-section-title">' + t('简历', 'CV') + '</div>' +
-                    '<div class="mo-detail-resume-row"><a class="pill-btn" href="' + resumeUrl + '" target="_blank" rel="noopener">' + t('查看简历', 'View CV') + '</a></div>' +
+                    '<div class="mo-detail-resume-row"><a class="pill-btn" href="' + resumeUrl + '" target="_blank" rel="noopener">' + t('简历', 'CV') + '</a></div>' +
                     '</div>' +
                     shortlistDetailRow +
                     '<div class="mo-applicant-actions mo-applicant-detail-actions mo-applicant-detail-actions--after-resume">' +
