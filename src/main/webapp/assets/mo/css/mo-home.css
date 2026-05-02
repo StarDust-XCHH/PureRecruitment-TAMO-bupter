@@ -1263,7 +1263,9 @@ legend.mo-field-label:has(.mo-req) {
     width: 100%;
     border: 1px solid rgba(148, 163, 184, 0.38);
     border-radius: 14px;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
     background: rgba(255, 255, 255, 0.04);
 }
 
@@ -1274,6 +1276,7 @@ legend.mo-field-label:has(.mo-req) {
 
 .mo-applicant-board-table {
     width: 100%;
+    min-width: 960px;
     border-collapse: collapse;
     table-layout: fixed;
     font-size: 14px;
@@ -1281,7 +1284,7 @@ legend.mo-field-label:has(.mo-req) {
 
 .mo-applicant-board-table thead th {
     text-align: left;
-    padding: 11px 12px;
+    padding: 11px 6px;
     font-weight: 700;
     font-size: 13px;
     letter-spacing: 0.02em;
@@ -1298,7 +1301,7 @@ legend.mo-field-label:has(.mo-req) {
 }
 
 .mo-applicant-board-table tbody td {
-    padding: 11px 12px;
+    padding: 11px 6px;
     vertical-align: middle;
     border-bottom: 1px solid rgba(148, 163, 184, 0.22);
     overflow: hidden;
@@ -1323,59 +1326,58 @@ legend.mo-field-label:has(.mo-req) {
     background: #f8fafc;
 }
 
-.mo-applicant-board-table__col-status {
-    width: 11%;
-}
+/* 列宽由 <colgroup> 控制，此处仅做对齐与省略 */
 
 .mo-applicant-board-table td.mo-applicant-board-table__col-status {
     white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
 }
 
-.mo-applicant-board-table__col-code {
-    width: 9%;
-}
-
-.mo-applicant-board-table__col-name {
-    width: 18%;
-}
-
-.mo-applicant-board-table__col-sid {
-    width: 12%;
-}
-
-.mo-applicant-board-table__col-time {
-    width: 18%;
+.mo-applicant-board-table td.mo-applicant-board-table__col-time {
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
 }
 
 .mo-applicant-board-table__actions,
 .mo-applicant-board-table th.mo-applicant-board-table__actions {
-    width: 32%;
     text-align: right;
+    vertical-align: middle;
 }
 
 .mo-applicant-board-table td.mo-applicant-board-table__actions {
     overflow: visible;
-    white-space: normal;
+    white-space: nowrap;
+    vertical-align: middle;
 }
 
 .mo-applicant-board-table__action-cell {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     align-items: center;
     justify-content: flex-end;
-    gap: 8px;
+    gap: 5px;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .mo-applicant-board-table__cell-mono {
     font-variant-numeric: tabular-nums;
 }
 
-/* 表内操作按钮（与 refresh pill 同圆角） */
+/* 表内操作：单行右对齐，按钮按文案宽窄（Details / CV 更紧凑） */
 .mo-applicant-board-table__action-cell .mo-applicant-strip-btn {
+    box-sizing: border-box;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 8px 18px;
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    padding: 8px 14px;
     min-height: 36px;
     font-size: 14px;
     font-weight: 600;
@@ -1393,6 +1395,22 @@ legend.mo-field-label:has(.mo-req) {
         box-shadow 0.16s ease,
         transform 0.12s ease,
         color 0.16s ease;
+}
+
+.mo-applicant-board-table__action-cell .mo-applicant-strip-btn--detail,
+.mo-applicant-board-table__action-cell .mo-applicant-strip-btn--cv {
+    padding: 8px 10px;
+}
+
+.mo-applicant-board-table__action-cell .mo-applicant-strip-btn--shortlisted,
+.mo-applicant-board-table__action-cell .mo-applicant-strip-btn--shortlist {
+    padding: 8px 12px;
+    min-width: 7.75rem;
+}
+
+.mo-applicant-board-table__action-cell .mo-applicant-strip-btn--messages {
+    padding: 8px 12px;
+    min-width: 5.25rem;
 }
 
 .mo-applicant-board-table__action-cell .mo-applicant-strip-btn:hover {

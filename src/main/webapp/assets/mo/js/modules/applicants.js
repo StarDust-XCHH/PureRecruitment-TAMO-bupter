@@ -456,6 +456,14 @@
             var table = document.createElement('table');
             table.className = 'mo-applicant-board-table';
 
+            var colgroup = document.createElement('colgroup');
+            ['13%', '8%', '14%', '10%', '28%', '27%'].forEach(function (w) {
+                var col = document.createElement('col');
+                col.style.width = w;
+                colgroup.appendChild(col);
+            });
+            table.appendChild(colgroup);
+
             var thead = document.createElement('thead');
             var trHead = document.createElement('tr');
             function appendTh(text, className, ariaLabel) {
