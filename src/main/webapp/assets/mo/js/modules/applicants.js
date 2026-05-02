@@ -184,39 +184,68 @@
             });
 
             var list = store.listForCourse(moId, shortlistPanelCourse);
-            var ul = document.createElement('ul');
-            ul.className = 'mo-shortlist-ul';
-            list.forEach(function (row) {
-                var li = document.createElement('li');
-                li.className = 'mo-shortlist-li';
-                var label = escapeHtml((row.name || row.taId || row.applicationId || '').trim() || '—');
-                var sub = escapeHtml(String(row.taId || '').trim() || '—') + ' · ' + escapeHtml(String(row.applicationId || '').trim());
-                li.innerHTML =
-                    '<div class="mo-shortlist-li__main">' +
-                    '<div class="mo-shortlist-li__name">' + label + '</div>' +
-                    '<div class="mo-shortlist-li__sub muted">' + sub + '</div>' +
-                    '</div>' +
-                    '<button type="button" class="pill-btn ghost mo-shortlist-li__remove" data-sl-aid="' + escapeHtml(String(row.applicationId)) + '">' +
-                    t('移出', 'Remove') + '</button>';
-                var rm = li.querySelector('.mo-shortlist-li__remove');
-                if (rm) {
-                    rm.addEventListener('click', function () {
-                        void (async function () {
-                            try {
-                                await store.remove(moId, shortlistPanelCourse, row.applicationId);
-                                updateShortlistNavBadge();
-                                renderApplicants();
-                                renderShortlistPanelBody();
-                            } catch (err) {
-                                window.alert(err.message || t('移出失败', 'Remove failed'));
-                            }
-                        }());
-                    });
-                }
-                ul.appendChild(li);
+
+            function mergeShortlistRowForTable(row) {
+                var cand = resolveApplicantForShortlist(row) || {};
+                return {
+                    applicationId: row.applicationId,
+                    courseCode: shortlistPanelCourse,
+                    taId: (cand.taId != null && String(cand.taId).trim() !== '') ? String(cand.taId).trim() : String(row.taId || '').trim(),
+                    name: (cand.name != null && String(cand.name).trim() !== '') ? String(cand.name).trim() : String(row.name || '').trim(),
+                    studentId: cand.studentId,
+                    status: cand.status,
+                    submittedAt: cand.submittedAt,
+                    addedAt: row.addedAt,
+                    unread: !!cand.unread
+                };
+            }
+
+            var listSorted = list.slice().sort(function (a, b) {
+                var ma = mergeShortlistRowForTable(a);
+                var mb = mergeShortlistRowForTable(b);
+                var ta = ma.submittedAt != null && String(ma.submittedAt).trim() !== '' ? ma.submittedAt : ma.addedAt;
+                var tb = mb.submittedAt != null && String(mb.submittedAt).trim() !== '' ? mb.submittedAt : mb.addedAt;
+                return submittedAtSortKey(tb) - submittedAtSortKey(ta);
             });
+
+            var wrapSl = document.createElement('div');
+            wrapSl.className = 'mo-applicant-board-table-wrap mo-shortlist-board-table-wrap';
+            var tableSl = document.createElement('table');
+            tableSl.className = 'mo-applicant-board-table mo-shortlist-board-table';
+            var colgroupSl = document.createElement('colgroup');
+            ['13%', '8%', '14%', '10%', '28%', '27%'].forEach(function (w) {
+                var col = document.createElement('col');
+                col.style.width = w;
+                colgroupSl.appendChild(col);
+            });
+            tableSl.appendChild(colgroupSl);
+            var theadSl = document.createElement('thead');
+            var trHSl = document.createElement('tr');
+            function shTh(text, cls, aria) {
+                var th = document.createElement('th');
+                th.scope = 'col';
+                th.textContent = text;
+                if (cls) th.className = cls;
+                if (aria) th.setAttribute('aria-label', aria);
+                trHSl.appendChild(th);
+            }
+            shTh(t('状态', 'Status'), 'mo-applicant-board-table__col-status');
+            shTh(t('课程编号', 'Module code'), 'mo-applicant-board-table__col-code');
+            shTh(t('TA姓名', 'TA name'), 'mo-applicant-board-table__col-name');
+            shTh(t('学号', 'Student ID'), 'mo-applicant-board-table__col-sid');
+            shTh(t('申请时间', 'Submitted'), 'mo-applicant-board-table__col-time');
+            shTh('', 'mo-applicant-board-table__actions', t('操作列：详情、简历、消息、移出', 'Actions: Details, CV, Messages, remove'));
+            theadSl.appendChild(trHSl);
+            tableSl.appendChild(theadSl);
+
+            var tbodySl = document.createElement('tbody');
+            listSorted.forEach(function (row) {
+                tbodySl.appendChild(renderMoApplicantTableRow(mergeShortlistRowForTable(row), 'shortlist'));
+            });
+            tableSl.appendChild(tbodySl);
+            wrapSl.appendChild(tableSl);
             shortlistListWrap.innerHTML = '';
-            shortlistListWrap.appendChild(ul);
+            shortlistListWrap.appendChild(wrapSl);
 
             var remaining = getRemainingSlotsForCourse(shortlistPanelCourse);
             var n = list.length;
@@ -396,6 +425,185 @@
         }
 
         /**
+         * 人选投递表与「候选短名单」表共用的数据行。
+         * @param {'applicants'|'shortlist'} actionMode applicants：短名单切换钮；shortlist：移出短名单钮（无短名单切换）。
+         */
+        function renderMoApplicantTableRow(item, actionMode) {
+            actionMode = actionMode || 'applicants';
+            var tr = document.createElement('tr');
+            tr.className = 'mo-applicant-board-row';
+
+            var unreadDot = item.unread ? '<span class="mo-unread-dot" title="' + escapeHtml(t('未读', 'Unread')) + '"></span> ' : '';
+            var moRow = getMoId();
+            var hasResume = !!(moRow && item.applicationId);
+            var resumeUrl = hasResume
+                ? (apiUrl('/api/mo/applications/resume') + '?moId=' + encodeURIComponent(moRow)
+                    + '&applicationId=' + encodeURIComponent(item.applicationId))
+                : '#';
+            var sidRaw = item.studentId != null ? String(item.studentId).trim() : '';
+            var statusLabel = escapeHtml(formatApplicantStatusDisplay(item.status));
+
+            var tdStatus = document.createElement('td');
+            tdStatus.className = 'mo-applicant-board-table__col-status';
+            tdStatus.innerHTML = unreadDot + '<span class="mo-applicant-status-badge '
+                + applicantStatusClass(item.status) + '">' + statusLabel + '</span>';
+
+            var tdCode = document.createElement('td');
+            tdCode.className = 'mo-applicant-board-table__col-code mo-applicant-board-table__cell-mono';
+            tdCode.textContent = item.courseCode != null && String(item.courseCode).trim() !== '' ? String(item.courseCode).trim() : '—';
+
+            var tdName = document.createElement('td');
+            tdName.className = 'mo-applicant-board-table__col-name';
+            tdName.textContent = item.name != null && String(item.name).trim() !== ''
+                ? String(item.name).trim()
+                : (item.taId != null ? String(item.taId).trim() : '—');
+
+            var tdSid = document.createElement('td');
+            tdSid.className = 'mo-applicant-board-table__col-sid mo-applicant-board-table__cell-mono';
+            tdSid.textContent = sidRaw || '—';
+
+            var tdTime = document.createElement('td');
+            tdTime.className = 'mo-applicant-board-table__col-time mo-applicant-board-table__cell-mono';
+            var timeSrc = item.submittedAt != null && String(item.submittedAt).trim() !== '' ? item.submittedAt : item.addedAt;
+            tdTime.textContent = formatSubmittedAtLocal(timeSrc);
+
+            var tdAct = document.createElement('td');
+            tdAct.className = 'mo-applicant-board-table__actions';
+            var cellInner;
+            if (actionMode === 'shortlist') {
+                cellInner =
+                    '<button type="button" class="mo-applicant-strip-btn mo-applicant-strip-btn--detail mo-applicant-open-detail">' +
+                    t('详情', 'Details') + '</button>' +
+                    (hasResume
+                        ? ('<a class="mo-applicant-strip-btn mo-applicant-strip-btn--cv mo-applicant-cv-link" href="' + resumeUrl
+                            + '" target="_blank" rel="noopener">' + t('简历', 'CV') + '</a>')
+                        : ('<span class="mo-applicant-strip-btn mo-applicant-strip-btn--cv mo-applicant-cv-link mo-applicant-strip-btn--disabled" aria-disabled="true">'
+                            + t('简历', 'CV') + '</span>')) +
+                    '<button type="button" class="mo-applicant-strip-btn mo-applicant-strip-btn--messages mo-applicant-messages-btn">' +
+                    t('消息', 'Messages') + '</button>' +
+                    '<button type="button" class="mo-applicant-strip-btn mo-applicant-strip-btn--remove-shortlist mo-shortlist-row-remove">' +
+                    t('移出', 'Remove') + '</button>';
+            } else {
+                cellInner =
+                    '<button type="button" class="mo-applicant-strip-btn mo-applicant-strip-btn--detail mo-applicant-open-detail">' +
+                    t('详情', 'Details') + '</button>' +
+                    (hasResume
+                        ? ('<a class="mo-applicant-strip-btn mo-applicant-strip-btn--cv mo-applicant-cv-link" href="' + resumeUrl
+                            + '" target="_blank" rel="noopener">' + t('简历', 'CV') + '</a>')
+                        : ('<span class="mo-applicant-strip-btn mo-applicant-strip-btn--cv mo-applicant-cv-link mo-applicant-strip-btn--disabled" aria-disabled="true">'
+                            + t('简历', 'CV') + '</span>')) +
+                    '<button type="button" class="mo-applicant-strip-btn mo-applicant-strip-btn--shortlist mo-applicant-shortlist-btn" data-applicant-shortlist="1">' +
+                    t('短名单', 'Shortlist') + '</button>' +
+                    '<button type="button" class="mo-applicant-strip-btn mo-applicant-strip-btn--messages mo-applicant-messages-btn">' +
+                    t('消息', 'Messages') + '</button>';
+            }
+            tdAct.innerHTML = '<div class="mo-applicant-board-table__action-cell">' + cellInner + '</div>';
+
+            tr.appendChild(tdStatus);
+            tr.appendChild(tdCode);
+            tr.appendChild(tdName);
+            tr.appendChild(tdSid);
+            tr.appendChild(tdTime);
+            tr.appendChild(tdAct);
+
+            var openDetailBtn = tr.querySelector('.mo-applicant-open-detail');
+            if (openDetailBtn) {
+                openDetailBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    void openDetail(item);
+                });
+            }
+
+            var messagesBtn = tr.querySelector('.mo-applicant-messages-btn');
+            if (messagesBtn) {
+                messagesBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    void openApplicantMessagesModal(item);
+                });
+            }
+
+            var cvLink = tr.querySelector('a.mo-applicant-cv-link[href]');
+            if (cvLink) {
+                cvLink.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                });
+            }
+
+            if (actionMode === 'applicants') {
+                var slBtn = tr.querySelector('.mo-applicant-shortlist-btn');
+                if (slBtn) {
+                    var ccForSl = String(item.courseCode || '').trim();
+                    var storeSl = shortlistStore();
+                    var moSl = getMoId();
+                    function syncSlBtnLabel() {
+                        if (!storeSl || !moSl || !ccForSl) {
+                            slBtn.disabled = true;
+                            slBtn.classList.remove('mo-applicant-strip-btn--shortlist', 'mo-applicant-strip-btn--shortlisted');
+                            return;
+                        }
+                        slBtn.disabled = false;
+                        var on = storeSl.isShortlisted(moSl, ccForSl, item.applicationId);
+                        slBtn.textContent = on ? t('已在短名单', 'Shortlisted') : t('短名单', 'Shortlist');
+                        slBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+                        slBtn.setAttribute('aria-label', on
+                            ? t('已在短名单，点击移出', 'Shortlisted — click to remove from shortlist')
+                            : t('加入短名单', 'Add to shortlist'));
+                        slBtn.classList.remove('mo-applicant-strip-btn--shortlist', 'mo-applicant-strip-btn--shortlisted');
+                        slBtn.classList.add(on ? 'mo-applicant-strip-btn--shortlisted' : 'mo-applicant-strip-btn--shortlist');
+                    }
+                    syncSlBtnLabel();
+                    slBtn.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        if (!storeSl || !moSl || !ccForSl || !item.applicationId) return;
+                        slBtn.disabled = true;
+                        void (async function () {
+                            try {
+                                await storeSl.toggle(moSl, {
+                                    applicationId: item.applicationId,
+                                    courseCode: ccForSl,
+                                    taId: item.taId,
+                                    name: item.name
+                                });
+                                updateShortlistNavBadge();
+                                syncSlBtnLabel();
+                                if (isShortlistRouteActive()) {
+                                    renderShortlistPanelBody();
+                                }
+                            } catch (err) {
+                                window.alert(err.message || t('短名单操作失败', 'Shortlist update failed'));
+                            } finally {
+                                slBtn.disabled = false;
+                            }
+                        }());
+                    });
+                }
+            } else {
+                var rmBtn = tr.querySelector('.mo-shortlist-row-remove');
+                if (rmBtn) {
+                    var storeRm = shortlistStore();
+                    var moRm = getMoId();
+                    var ccRm = String(item.courseCode || '').trim();
+                    rmBtn.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        void (async function () {
+                            try {
+                                if (!storeRm || !moRm || !ccRm || !item.applicationId) return;
+                                await storeRm.remove(moRm, ccRm, item.applicationId);
+                                updateShortlistNavBadge();
+                                renderApplicants();
+                                renderShortlistPanelBody();
+                            } catch (err) {
+                                window.alert(err.message || t('移出失败', 'Remove failed'));
+                            }
+                        }());
+                    });
+                }
+            }
+
+            return tr;
+        }
+
+        /**
          * @param {Array|undefined} items 传入时表示新数据并重置到第 1 页；不传则仅按当前页从缓存重绘（用于翻页）
          */
         function renderApplicants(items) {
@@ -498,138 +706,7 @@
             var tbody = document.createElement('tbody');
 
             pageRows.forEach(function (item) {
-                var tr = document.createElement('tr');
-                tr.className = 'mo-applicant-board-row';
-
-                var unreadDot = item.unread ? '<span class="mo-unread-dot" title="' + escapeHtml(t('未读', 'Unread')) + '"></span> ' : '';
-                var moRow = getMoId();
-                var hasResume = !!(moRow && item.applicationId);
-                var resumeUrl = hasResume
-                    ? (apiUrl('/api/mo/applications/resume') + '?moId=' + encodeURIComponent(moRow)
-                        + '&applicationId=' + encodeURIComponent(item.applicationId))
-                    : '#';
-                var sidRaw = item.studentId != null ? String(item.studentId).trim() : '';
-                var statusLabel = escapeHtml(formatApplicantStatusDisplay(item.status));
-
-                var tdStatus = document.createElement('td');
-                tdStatus.className = 'mo-applicant-board-table__col-status';
-                tdStatus.innerHTML = unreadDot + '<span class="mo-applicant-status-badge '
-                    + applicantStatusClass(item.status) + '">' + statusLabel + '</span>';
-
-                var tdCode = document.createElement('td');
-                tdCode.className = 'mo-applicant-board-table__col-code mo-applicant-board-table__cell-mono';
-                tdCode.textContent = item.courseCode != null && String(item.courseCode).trim() !== '' ? String(item.courseCode).trim() : '—';
-
-                var tdName = document.createElement('td');
-                tdName.className = 'mo-applicant-board-table__col-name';
-                tdName.textContent = item.name != null && String(item.name).trim() !== ''
-                    ? String(item.name).trim()
-                    : (item.taId != null ? String(item.taId).trim() : '—');
-
-                var tdSid = document.createElement('td');
-                tdSid.className = 'mo-applicant-board-table__col-sid mo-applicant-board-table__cell-mono';
-                tdSid.textContent = sidRaw || '—';
-
-                var tdTime = document.createElement('td');
-                tdTime.className = 'mo-applicant-board-table__col-time mo-applicant-board-table__cell-mono';
-                tdTime.textContent = formatSubmittedAtLocal(item.submittedAt);
-
-                var tdAct = document.createElement('td');
-                tdAct.className = 'mo-applicant-board-table__actions';
-                tdAct.innerHTML =
-                    '<div class="mo-applicant-board-table__action-cell">' +
-                    '<button type="button" class="mo-applicant-strip-btn mo-applicant-strip-btn--detail mo-applicant-open-detail">' +
-                    t('详情', 'Details') + '</button>' +
-                    (hasResume
-                        ? ('<a class="mo-applicant-strip-btn mo-applicant-strip-btn--cv mo-applicant-cv-link" href="' + resumeUrl
-                            + '" target="_blank" rel="noopener">' + t('简历', 'CV') + '</a>')
-                        : ('<span class="mo-applicant-strip-btn mo-applicant-strip-btn--cv mo-applicant-cv-link mo-applicant-strip-btn--disabled" aria-disabled="true">'
-                            + t('简历', 'CV') + '</span>')) +
-                    '<button type="button" class="mo-applicant-strip-btn mo-applicant-strip-btn--shortlist mo-applicant-shortlist-btn" data-applicant-shortlist="1">' +
-                    t('短名单', 'Shortlist') + '</button>' +
-                    '<button type="button" class="mo-applicant-strip-btn mo-applicant-strip-btn--messages mo-applicant-messages-btn">' +
-                    t('消息', 'Messages') + '</button>' +
-                    '</div>';
-
-                tr.appendChild(tdStatus);
-                tr.appendChild(tdCode);
-                tr.appendChild(tdName);
-                tr.appendChild(tdSid);
-                tr.appendChild(tdTime);
-                tr.appendChild(tdAct);
-
-                var openDetailBtn = tr.querySelector('.mo-applicant-open-detail');
-                if (openDetailBtn) {
-                    openDetailBtn.addEventListener('click', function (e) {
-                        e.stopPropagation();
-                        void openDetail(item);
-                    });
-                }
-
-                var messagesBtn = tr.querySelector('.mo-applicant-messages-btn');
-                if (messagesBtn) {
-                    messagesBtn.addEventListener('click', function (e) {
-                        e.stopPropagation();
-                        void openApplicantMessagesModal(item);
-                    });
-                }
-
-                var cvLink = tr.querySelector('a.mo-applicant-cv-link[href]');
-                if (cvLink) {
-                    cvLink.addEventListener('click', function (e) {
-                        e.stopPropagation();
-                    });
-                }
-
-                var slBtn = tr.querySelector('.mo-applicant-shortlist-btn');
-                if (slBtn) {
-                    var ccForSl = String(item.courseCode || '').trim();
-                    var storeSl = shortlistStore();
-                    var moSl = getMoId();
-                    function syncSlBtnLabel() {
-                        if (!storeSl || !moSl || !ccForSl) {
-                            slBtn.disabled = true;
-                            slBtn.classList.remove('mo-applicant-strip-btn--shortlist', 'mo-applicant-strip-btn--shortlisted');
-                            return;
-                        }
-                        slBtn.disabled = false;
-                        var on = storeSl.isShortlisted(moSl, ccForSl, item.applicationId);
-                        slBtn.textContent = on ? t('已在短名单', 'Shortlisted') : t('短名单', 'Shortlist');
-                        slBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
-                        slBtn.setAttribute('aria-label', on
-                            ? t('已在短名单，点击移出', 'Shortlisted — click to remove from shortlist')
-                            : t('加入短名单', 'Add to shortlist'));
-                        slBtn.classList.remove('mo-applicant-strip-btn--shortlist', 'mo-applicant-strip-btn--shortlisted');
-                        slBtn.classList.add(on ? 'mo-applicant-strip-btn--shortlisted' : 'mo-applicant-strip-btn--shortlist');
-                    }
-                    syncSlBtnLabel();
-                    slBtn.addEventListener('click', function (e) {
-                        e.stopPropagation();
-                        if (!storeSl || !moSl || !ccForSl || !item.applicationId) return;
-                        slBtn.disabled = true;
-                        void (async function () {
-                            try {
-                                await storeSl.toggle(moSl, {
-                                    applicationId: item.applicationId,
-                                    courseCode: ccForSl,
-                                    taId: item.taId,
-                                    name: item.name
-                                });
-                                updateShortlistNavBadge();
-                                syncSlBtnLabel();
-                                if (isShortlistRouteActive()) {
-                                    renderShortlistPanelBody();
-                                }
-                            } catch (err) {
-                                window.alert(err.message || t('短名单操作失败', 'Shortlist update failed'));
-                            } finally {
-                                slBtn.disabled = false;
-                            }
-                        }());
-                    });
-                }
-
-                tbody.appendChild(tr);
+                tbody.appendChild(renderMoApplicantTableRow(item, 'applicants'));
             });
 
             table.appendChild(tbody);
