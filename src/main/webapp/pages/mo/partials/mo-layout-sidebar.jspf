@@ -16,7 +16,12 @@
     </button>
     <button class="nav-item" type="button" data-route="applicants" aria-current="false">
         <span>🧑‍🎓</span>
-        <span class="mo-nav-label" data-i18n="sidebar.applicants" data-i18n-zh="应聘筛选" data-i18n-en="Applicant Screening">Applicant Screening</span>
+        <span class="mo-nav-label" data-i18n="sidebar.applicants" data-i18n-zh="人选投递" data-i18n-en="Candidate applications">人选投递</span>
         <span class="mo-nav-badge" id="navApplicantsBadge" hidden aria-label="Unread applications" data-i18n-aria-label="sidebar.unreadApplicants" data-i18n-aria-label-zh="未读申请" data-i18n-aria-label-en="Unread applications">●</span>
+    </button>
+    <button class="nav-item" type="button" data-route="shortlist" aria-current="false">
+        <span>⭐</span>
+        <span class="mo-nav-label" data-i18n="sidebar.shortlist" data-i18n-zh="候选短名单" data-i18n-en="Shortlist">候选短名单</span>
+        <span class="mo-nav-badge mo-nav-badge--shortlist" id="navShortlistBadge" hidden aria-live="polite" aria-label="Shortlist count" data-i18n-aria-label="sidebar.shortlistBadgeAria" data-i18n-aria-label-zh="短名单人数" data-i18n-aria-label-en="Shortlist count">0</span>
     </button>
 </nav>

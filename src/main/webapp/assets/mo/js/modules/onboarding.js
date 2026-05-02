@@ -39,7 +39,7 @@
                 },
                 {
                     title: t('筛选应聘者并做出决策', 'Screen applicants and decide'),
-                    desc: t('在「应聘筛选」查看申请者资料，并完成录用或拒绝。', 'In Applicant Screening, review profiles and submit hire or reject decisions.'),
+                    desc: t('在「人选投递」查看资料并完成录用或拒绝；意向人选可在「候选短名单」管理。', 'In Candidate applications, review profiles and hire or reject. Use Shortlist for your shortlist.'),
                     selector: '.nav-item[data-route="applicants"]',
                     route: 'applicants'
                 },

@@ -1,0 +1,26 @@
+<div class="route" id="route-shortlist" data-route="shortlist">
+    <div class="card jobs-hall-card">
+        <div class="overview-top">
+            <div>
+                <h1 data-i18n="shortlist.pageTitle" data-i18n-zh="候选短名单" data-i18n-en="Shortlist">候选短名单</h1>
+                <p class="muted" data-i18n="shortlist.pageDesc" data-i18n-zh="管理各课程下的意向人选；加入短名单不会修改投递状态，也不会通知 TA。可在「人选投递」中继续筛选与操作。" data-i18n-en="Manage shortlisted candidates per module. Adding them does not change application status or notify TAs. Use Candidate applications to screen and act.">管理各课程下的意向人选；加入短名单不会修改投递状态，也不会通知 TA。可在「人选投递」中继续筛选与操作。</p>
+            </div>
+            <div class="overview-badges mo-jobs-toolbar">
+                <button type="button" class="refresh-btn pill" id="moShortlistRefreshBtn" data-i18n-aria-label="shortlist.refreshAria" data-i18n-aria-label-zh="刷新名单与名额数据" data-i18n-aria-label-en="Refresh shortlist and openings data">
+                    <span class="refresh-icon">↻</span>
+                    <span class="refresh-text" data-i18n="shortlist.refresh" data-i18n-zh="刷新" data-i18n-en="Refresh">刷新</span>
+                </button>
+            </div>
+        </div>
+        <p class="muted mo-shortlist-page__note" data-i18n="shortlist.serverNote" data-i18n-zh="名单已保存在服务器，换设备登录同一 MO 账号后仍可查看。" data-i18n-en="Your shortlist is stored on the server and is available when you sign in with the same MO account on another device.">名单已保存在服务器，换设备登录同一 MO 账号后仍可查看。</p>
+        <p class="muted mo-shortlist-page__status" id="moShortlistPageStatus" aria-live="polite"></p>
+        <div class="mo-shortlist-page">
+            <div class="mo-shortlist-tabs" id="moShortlistTabs" role="tablist" data-i18n-aria-label="shortlist.tabsAria" data-i18n-aria-label-zh="按课程查看短名单" data-i18n-aria-label-en="Shortlist by module"></div>
+            <div id="moShortlistListWrap" class="mo-shortlist-list-wrap"></div>
+            <p class="muted mo-shortlist-meta" id="moShortlistMeta" aria-live="polite"></p>
+            <div class="mo-shortlist-page__footer">
+                <button type="button" class="pill-btn" id="moShortlistBulkHireBtn" disabled data-i18n="shortlist.bulkHire" data-i18n-zh="一键录用本课程 Shortlist" data-i18n-en="Hire everyone on this module shortlist">一键录用本课程 Shortlist</button>
+            </div>
+        </div>
+    </div>
+</div>

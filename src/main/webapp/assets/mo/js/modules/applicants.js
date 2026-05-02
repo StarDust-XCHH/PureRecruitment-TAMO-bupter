@@ -25,8 +25,18 @@
         const detailClose = document.getElementById('moApplicantDetailClose');
         const navBadge = document.getElementById('navApplicantsBadge');
         const routeApplicantsEl = document.getElementById('route-applicants');
+        const routeShortlistEl = document.getElementById('route-shortlist');
+        const shortlistTabs = document.getElementById('moShortlistTabs');
+        const shortlistListWrap = document.getElementById('moShortlistListWrap');
+        const shortlistMeta = document.getElementById('moShortlistMeta');
+        const shortlistBulkHireBtn = document.getElementById('moShortlistBulkHireBtn');
+        const shortlistRefreshBtn = document.getElementById('moShortlistRefreshBtn');
+        const shortlistPageStatus = document.getElementById('moShortlistPageStatus');
+        const navShortlistBadge = document.getElementById('navShortlistBadge');
 
         let currentDetailApplicationId = '';
+        /** Shortlist 面板当前选中的课程编码（与 MoShortlistStore 分桶一致） */
+        let shortlistPanelCourse = '';
         function t(zh, en) {
             return typeof app.t === 'function' ? app.t(zh, en) : zh;
         }
@@ -69,6 +79,155 @@
 
         function setStatus(text) {
             if (statusText) statusText.textContent = text || '';
+        }
+
+        function shortlistStore() {
+            return typeof window.MoShortlistStore !== 'undefined' ? window.MoShortlistStore : null;
+        }
+
+        function isShortlistRouteActive() {
+            return !!(routeShortlistEl && routeShortlistEl.classList.contains('active'));
+        }
+
+        function updateShortlistNavBadge() {
+            if (!navShortlistBadge) return;
+            var store = shortlistStore();
+            var moId = getMoId();
+            var n = store && moId ? store.totalCount(moId) : 0;
+            navShortlistBadge.textContent = String(n);
+            navShortlistBadge.hidden = n === 0;
+        }
+
+        function getJobForCourseCode(courseCode) {
+            var code = String(courseCode || '').trim();
+            if (!code) return null;
+            var jobs = typeof app.getJobs === 'function' ? app.getJobs() : [];
+            for (var i = 0; i < jobs.length; i++) {
+                if (jobOptionValue(jobs[i]) === code) return jobs[i];
+            }
+            return null;
+        }
+
+        function countHiredForCourseInCache(courseCode) {
+            var code = String(courseCode || '').trim();
+            if (!code) return 0;
+            return applicantListCache.filter(function (x) {
+                return x && String(x.courseCode || '').trim() === code && x.status === '已录用';
+            }).length;
+        }
+
+        function getRemainingSlotsForCourse(courseCode) {
+            var job = getJobForCourseCode(courseCode);
+            var cap = job && job.taRecruitCount != null && Number(job.taRecruitCount) >= 0
+                ? Number(job.taRecruitCount)
+                : 0;
+            var hired = countHiredForCourseInCache(courseCode);
+            return Math.max(0, cap - hired);
+        }
+
+        function resolveApplicantForShortlist(entry) {
+            if (!entry) return null;
+            var aid = String(entry.applicationId || '').trim();
+            if (!aid) return null;
+            var fromCache = applicantListCache.filter(function (it) {
+                return it && String(it.applicationId) === aid;
+            })[0];
+            if (fromCache) return fromCache;
+            return {
+                applicationId: aid,
+                courseCode: entry.courseCode,
+                taId: entry.taId,
+                name: entry.name,
+                status: ''
+            };
+        }
+
+        function renderShortlistPanelBody() {
+            var store = shortlistStore();
+            var moId = getMoId();
+            if (!store || !moId || !shortlistTabs || !shortlistListWrap || !shortlistMeta || !shortlistBulkHireBtn) return;
+
+            var courses = store.coursesWithEntries(moId);
+            if (!courses.length) {
+                shortlistTabs.innerHTML = '';
+                shortlistListWrap.innerHTML = '<p class="muted">' + t('Shortlist 为空。在候选人卡片或详情中点击加入。', 'Shortlist is empty. Add candidates from cards or the detail view.') + '</p>';
+                shortlistMeta.textContent = '';
+                shortlistBulkHireBtn.disabled = true;
+                shortlistPanelCourse = '';
+                return;
+            }
+
+            if (!shortlistPanelCourse || courses.indexOf(shortlistPanelCourse) === -1) {
+                var pref = (courseSelect && courseSelect.value || '').trim();
+                shortlistPanelCourse = pref && courses.indexOf(pref) !== -1 ? pref : courses[0];
+            }
+
+            shortlistTabs.innerHTML = '';
+            courses.forEach(function (cc) {
+                var tab = document.createElement('button');
+                tab.type = 'button';
+                tab.className = 'mo-shortlist-tab' + (cc === shortlistPanelCourse ? ' active' : '');
+                tab.setAttribute('role', 'tab');
+                tab.setAttribute('aria-selected', cc === shortlistPanelCourse ? 'true' : 'false');
+                var rows = store.listForCourse(moId, cc);
+                tab.textContent = cc + ' (' + rows.length + ')';
+                tab.addEventListener('click', function () {
+                    shortlistPanelCourse = cc;
+                    renderShortlistPanelBody();
+                });
+                shortlistTabs.appendChild(tab);
+            });
+
+            var list = store.listForCourse(moId, shortlistPanelCourse);
+            var ul = document.createElement('ul');
+            ul.className = 'mo-shortlist-ul';
+            list.forEach(function (row) {
+                var li = document.createElement('li');
+                li.className = 'mo-shortlist-li';
+                var label = escapeHtml((row.name || row.taId || row.applicationId || '').trim() || '—');
+                var sub = escapeHtml(String(row.taId || '').trim() || '—') + ' · ' + escapeHtml(String(row.applicationId || '').trim());
+                li.innerHTML =
+                    '<div class="mo-shortlist-li__main">' +
+                    '<div class="mo-shortlist-li__name">' + label + '</div>' +
+                    '<div class="mo-shortlist-li__sub muted">' + sub + '</div>' +
+                    '</div>' +
+                    '<button type="button" class="pill-btn ghost mo-shortlist-li__remove" data-sl-aid="' + escapeHtml(String(row.applicationId)) + '">' +
+                    t('移出', 'Remove') + '</button>';
+                var rm = li.querySelector('.mo-shortlist-li__remove');
+                if (rm) {
+                    rm.addEventListener('click', function () {
+                        void (async function () {
+                            try {
+                                await store.remove(moId, shortlistPanelCourse, row.applicationId);
+                                updateShortlistNavBadge();
+                                renderApplicants();
+                                renderShortlistPanelBody();
+                            } catch (err) {
+                                window.alert(err.message || t('移出失败', 'Remove failed'));
+                            }
+                        }());
+                    });
+                }
+                ul.appendChild(li);
+            });
+            shortlistListWrap.innerHTML = '';
+            shortlistListWrap.appendChild(ul);
+
+            var remaining = getRemainingSlotsForCourse(shortlistPanelCourse);
+            var n = list.length;
+            var bulkOk = n > 0 && n <= remaining;
+            shortlistBulkHireBtn.disabled = !bulkOk;
+            var jobRow = getJobForCourseCode(shortlistPanelCourse);
+            var capStr = jobRow && jobRow.taRecruitCount != null ? String(jobRow.taRecruitCount) : '—';
+            var hiredN = countHiredForCourseInCache(shortlistPanelCourse);
+            shortlistMeta.textContent =
+                t(
+                    '本课程岗位 TA 名额 ' + capStr + '，已录用 ' + hiredN + '，剩余名额 ' + remaining + '；Shortlist ' + n + ' 人。',
+                    'TA openings for this module: ' + capStr + ', hired ' + hiredN + ', remaining ' + remaining + '; shortlist ' + n + '.'
+                );
+            if (!bulkOk && n > 0) {
+                shortlistMeta.textContent += ' ' + t('仅当 Shortlist 人数 ≤ 剩余名额时可一键录用。', 'Bulk hire is available only when shortlist size is ≤ remaining openings.');
+            }
         }
 
         function updateClearCourseFilterButton() {
@@ -249,6 +408,7 @@
             }
 
             if (total === 0) {
+                updateShortlistNavBadge();
                 return;
             }
 
@@ -272,8 +432,10 @@
                     '<p class="course-card-description">' +
                     t('课程', 'Module') + ' · ' + escapeHtml(item.courseCode || '--') + ' · ' + escapeHtml(item.courseName || '--') +
                     '</p>' +
-                    '<div class="course-card-hint mo-applicant-card__hint">' +
+                    '<div class="course-card-hint mo-applicant-card__hint mo-applicant-card__hint--split">' +
                     '<button type="button" class="pill-btn ghost mo-applicant-view-btn">' + t('查看详情', 'View details') + '</button>' +
+                    '<button type="button" class="pill-btn ghost mo-applicant-shortlist-btn" data-applicant-shortlist="1">' +
+                    t('加入 Shortlist', 'Shortlist') + '</button>' +
                     '</div>';
 
                 const viewBtn = card.querySelector('.mo-applicant-view-btn');
@@ -284,8 +446,50 @@
                     });
                 }
 
+                const slBtn = card.querySelector('.mo-applicant-shortlist-btn');
+                if (slBtn) {
+                    var ccForSl = String(item.courseCode || '').trim();
+                    var storeSl = shortlistStore();
+                    var moSl = getMoId();
+                    function syncSlBtnLabel() {
+                        if (!storeSl || !moSl || !ccForSl) {
+                            slBtn.disabled = true;
+                            return;
+                        }
+                        var on = storeSl.isShortlisted(moSl, ccForSl, item.applicationId);
+                        slBtn.textContent = on ? t('移出 Shortlist', 'Remove from shortlist') : t('加入 Shortlist', 'Add to shortlist');
+                        slBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+                    }
+                    syncSlBtnLabel();
+                    slBtn.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        if (!storeSl || !moSl || !ccForSl || !item.applicationId) return;
+                        slBtn.disabled = true;
+                        void (async function () {
+                            try {
+                                await storeSl.toggle(moSl, {
+                                    applicationId: item.applicationId,
+                                    courseCode: ccForSl,
+                                    taId: item.taId,
+                                    name: item.name
+                                });
+                                updateShortlistNavBadge();
+                                syncSlBtnLabel();
+                                if (isShortlistRouteActive()) {
+                                    renderShortlistPanelBody();
+                                }
+                            } catch (err) {
+                                window.alert(err.message || t('短名单操作失败', 'Shortlist update failed'));
+                            } finally {
+                                slBtn.disabled = false;
+                            }
+                        }());
+                    });
+                }
+
                 list.appendChild(card);
             });
+            updateShortlistNavBadge();
         }
 
         function closeDetailModal() {
@@ -369,6 +573,22 @@
                         + '<button type="button" class="pill-btn ghost" id="moApplicantRejectBtn">' + t('拒绝', 'Reject') + '</button>';
                 }
 
+                var ccShort = String((d.courseCode || item.courseCode || '')).trim();
+                var storeSl2 = shortlistStore();
+                var slDetailOn = !!(storeSl2 && moId && ccShort && item.applicationId && storeSl2.isShortlisted(moId, ccShort, item.applicationId));
+                var shortlistDetailRow = '';
+                if (ccShort && item.applicationId) {
+                    shortlistDetailRow =
+                        '<div class="mo-applicant-shortlist-detail-row">' +
+                        '<button type="button" class="pill-btn ghost" id="moApplicantShortlistToggleBtn">' +
+                        (slDetailOn ? t('移出 Shortlist', 'Remove from shortlist') : t('加入 Shortlist', 'Add to shortlist')) +
+                        '</button>' +
+                        '<span class="muted mo-applicant-shortlist-hint">' +
+                        t('（不改变投递状态、不通知 TA）', '(Does not change status or notify the TA)') +
+                        '</span>' +
+                        '</div>';
+                }
+
                 detailBody.innerHTML =
                     '<dl class="mo-detail-kv">' +
                     '<dt>' + t('申请 ID', 'Application ID') + '</dt><dd>' + escapeHtml(d.applicationId) + '</dd>' +
@@ -387,6 +607,7 @@
                     '<div class="mo-detail-section-title">' + t('简历', 'CV') + '</div>' +
                     '<div class="mo-detail-resume-row"><a class="pill-btn" href="' + resumeUrl + '" target="_blank" rel="noopener">' + t('查看简历', 'View CV') + '</a></div>' +
                     '</div>' +
+                    shortlistDetailRow +
                     '<div class="mo-applicant-actions mo-applicant-detail-actions mo-applicant-detail-actions--after-resume">' +
                     actionsDetailHtml +
                     '</div>' +
@@ -456,6 +677,31 @@
                         decide(item, 'withdrawn', '撤回拒绝');
                     });
                 }
+
+                const shortlistToggleDetailBtn = document.getElementById('moApplicantShortlistToggleBtn');
+                if (shortlistToggleDetailBtn && storeSl2 && moId && ccShort && item.applicationId) {
+                    shortlistToggleDetailBtn.addEventListener('click', function () {
+                        void (async function () {
+                            try {
+                                await storeSl2.toggle(moId, {
+                                    applicationId: item.applicationId,
+                                    courseCode: ccShort,
+                                    taId: item.taId || d.taId,
+                                    name: item.name
+                                });
+                                updateShortlistNavBadge();
+                                renderApplicants();
+                                if (isShortlistRouteActive()) {
+                                    renderShortlistPanelBody();
+                                }
+                                await openDetail(item);
+                            } catch (err) {
+                                window.alert(err.message || t('短名单操作失败', 'Shortlist update failed'));
+                            }
+                        }());
+                    });
+                }
+
                 if (statusText === '审核中') {
                     await refreshNavUnreadBadge();
                     setTimeout(function () {
@@ -477,15 +723,23 @@
             }
         }
 
-        async function loadApplicants() {
-            const code = (courseSelect.value || '').trim();
+        /**
+         * @param {{ allCourses?: boolean, cacheUpdateOnly?: boolean }} [opts] cacheUpdateOnly：仅更新 applicantListCache（不刷新人选投递列表 UI），用于短名单页名额计算
+         */
+        async function loadApplicants(opts) {
+            opts = opts || {};
+            const code = opts.allCourses ? '' : (courseSelect.value || '').trim();
             const moId = getMoId();
             if (!moId) {
-                setStatus(t('未登录或会话已失效，请刷新页面后重试', 'Session expired or not logged in. Please refresh and try again.'));
-                renderApplicants([]);
+                if (!opts.cacheUpdateOnly) {
+                    setStatus(t('未登录或会话已失效，请刷新页面后重试', 'Session expired or not logged in. Please refresh and try again.'));
+                    renderApplicants([]);
+                }
                 return;
             }
-            setStatus(t('加载中...', 'Loading...'));
+            if (!opts.cacheUpdateOnly) {
+                setStatus(t('加载中...', 'Loading...'));
+            }
             try {
                 var url = apiUrl('/api/mo/applicants') + '?moId=' + encodeURIComponent(moId);
                 if (code) {
@@ -494,11 +748,28 @@
                 const res = await fetch(url);
                 const payload = await res.json();
                 if (!res.ok || payload.success === false) {
-                    setStatus(payload.message || t('加载失败', 'Load failed'));
-                    renderApplicants([]);
+                    if (!opts.cacheUpdateOnly) {
+                        setStatus(payload.message || t('加载失败', 'Load failed'));
+                        renderApplicants([]);
+                    } else if (shortlistPageStatus) {
+                        shortlistPageStatus.textContent = payload.message || t('同步失败', 'Sync failed');
+                    }
                     return;
                 }
                 const items = Array.isArray(payload.items) ? payload.items : [];
+                if (opts.cacheUpdateOnly) {
+                    applicantListCache = items;
+                    if (typeof app.onApplicantsLoaded === 'function') app.onApplicantsLoaded(items);
+                    await refreshNavUnreadBadge();
+                    if (shortlistPageStatus) {
+                        shortlistPageStatus.textContent =
+                            t(
+                                '已同步 ' + items.length + ' 条投递（全部课程），用于短名单名额计算。',
+                                'Synced ' + items.length + ' applications (all modules) for shortlist slot counts.'
+                            );
+                    }
+                    return;
+                }
                 renderApplicants(items);
                 const unread = typeof payload.unreadCount === 'number' ? payload.unreadCount : 0;
                 var scopeHint = code ? '' : t('（全部课程）', ' (All modules)');
@@ -511,26 +782,41 @@
                 if (typeof app.onApplicantsLoaded === 'function') app.onApplicantsLoaded(items);
                 await refreshNavUnreadBadge();
             } catch (err) {
-                setStatus(err.message || t('加载失败', 'Load failed'));
-                renderApplicants([]);
+                if (!opts.cacheUpdateOnly) {
+                    setStatus(err.message || t('加载失败', 'Load failed'));
+                    renderApplicants([]);
+                } else if (shortlistPageStatus) {
+                    shortlistPageStatus.textContent = err.message || t('同步失败', 'Sync failed');
+                }
             }
         }
 
-        async function decide(item, decision, promptActionLabel) {
+        /**
+         * @param {{ skipPrompt?: boolean, comment?: string }} [options] skipPrompt + comment 用于批量录用共用一个备注
+         * @returns {Promise<boolean>}
+         */
+        async function decide(item, decision, promptActionLabel, options) {
+            options = options || {};
             const code = (item && item.courseCode ? String(item.courseCode) : '').trim() || (courseSelect.value || '').trim();
             const moId = getMoId();
             const actionText = promptActionLabel
                 ? String(promptActionLabel)
                 : (decision === 'selected' ? '录用'
                     : decision === 'withdrawn' ? t('撤回录用', 'Withdraw hire') : t('拒绝', 'Reject'));
-            const comment = window.prompt(
-                t('请输入' + actionText + '备注（可选）', 'Please enter a note for "' + actionText + '" (optional)'),
-                ''
-            );
-            if (comment === null) return;
+            var comment = '';
+            if (options.skipPrompt) {
+                comment = options.comment != null ? String(options.comment) : '';
+            } else {
+                var pr = window.prompt(
+                    t('请输入' + actionText + '备注（可选）', 'Please enter a note for "' + actionText + '" (optional)'),
+                    ''
+                );
+                if (pr === null) return false;
+                comment = pr;
+            }
             if (!code) {
                 setStatus(t('缺少课程编号，无法提交', 'Missing module code. Unable to submit.'));
-                return;
+                return false;
             }
             try {
                 const res = await fetch(apiUrl('/api/mo/applications/select'), {
@@ -547,17 +833,73 @@
                 const payload = await res.json();
                 if (!res.ok || payload.success === false) {
                     setStatus(payload.message || t('操作失败', 'Operation failed'));
-                    return;
+                    return false;
                 }
                 setStatus(t('已完成：' + actionText + ' ' + item.taId, 'Completed: ' + actionText + ' ' + item.taId));
-                await loadApplicants();
+                if (isShortlistRouteActive()) {
+                    await loadApplicants({ allCourses: true, cacheUpdateOnly: true });
+                    renderShortlistPanelBody();
+                } else {
+                    await loadApplicants();
+                }
                 if (typeof app.loadDashboard === 'function') app.loadDashboard();
                 if (currentDetailApplicationId === item.applicationId && detailModal && !detailModal.hidden) {
                     openDetail(item);
                 }
+                return true;
             } catch (err) {
                 setStatus(err.message || t('保存失败', 'Save failed'));
+                return false;
             }
+        }
+
+        async function bulkHireShortlistForPanelCourse() {
+            var store = shortlistStore();
+            var moId = getMoId();
+            if (!store || !moId || !shortlistPanelCourse) return;
+            var entries = store.listForCourse(moId, shortlistPanelCourse);
+            var remaining = getRemainingSlotsForCourse(shortlistPanelCourse);
+            if (!entries.length || entries.length > remaining) return;
+            var actionText = t('一键录用 Shortlist', 'Bulk hire shortlist');
+            var pr = window.prompt(
+                t('请输入录用备注（将应用于本课程 Shortlist 中每位候选人，可选）', 'Enter a hire note applied to each shortlist candidate (optional)'),
+                ''
+            );
+            if (pr === null) return;
+            var sharedComment = pr || '';
+            for (var i = 0; i < entries.length; i++) {
+                var row = entries[i];
+                var cand = resolveApplicantForShortlist(row);
+                if (!cand || !cand.taId) {
+                    setStatus(t('跳过：缺少 TA ID ', 'Skipped: missing TA ID ') + String(row.applicationId));
+                    continue;
+                }
+                if (cand.status === '已录用') {
+                    store.remove(moId, shortlistPanelCourse, row.applicationId);
+                    continue;
+                }
+                var ok = await decide(cand, 'selected', null, { skipPrompt: true, comment: sharedComment });
+                if (ok) {
+                    store.remove(moId, shortlistPanelCourse, row.applicationId);
+                } else {
+                    break;
+                }
+            }
+            updateShortlistNavBadge();
+            if (isShortlistRouteActive()) {
+                await loadApplicants({ allCourses: true, cacheUpdateOnly: true });
+            } else {
+                renderApplicants();
+            }
+            var moB = getMoId();
+            var stB = shortlistStore();
+            if (moB && stB && typeof stB.syncFromServer === 'function') {
+                try {
+                    await stB.syncFromServer(moB);
+                } catch (e) { /* ignore */ }
+            }
+            updateShortlistNavBadge();
+            renderShortlistPanelBody();
         }
 
         if (detailClose) detailClose.addEventListener('click', closeDetailModal);
@@ -565,6 +907,19 @@
             detailModal.addEventListener('click', function (e) {
                 if (e.target && e.target.getAttribute('data-close-applicant-detail')) {
                     closeDetailModal();
+                }
+            });
+        }
+
+        if (shortlistBulkHireBtn) {
+            shortlistBulkHireBtn.addEventListener('click', function () {
+                void bulkHireShortlistForPanelCourse();
+            });
+        }
+        if (shortlistRefreshBtn) {
+            shortlistRefreshBtn.addEventListener('click', function () {
+                if (typeof app.onShortlistRouteActivate === 'function') {
+                    void app.onShortlistRouteActivate();
                 }
             });
         }
@@ -592,11 +947,31 @@
             if (app.state && app.state.moBulkRefreshInProgress) return;
             loadApplicants();
             if (typeof app.loadDashboard === 'function') app.loadDashboard();
+            var moJ = getMoId();
+            var stJ = shortlistStore();
+            if (moJ && stJ && typeof stJ.syncFromServer === 'function') {
+                void stJ.syncFromServer(moJ).then(function () {
+                    updateShortlistNavBadge();
+                    if (isShortlistRouteActive()) {
+                        renderShortlistPanelBody();
+                    }
+                }).catch(function () { updateShortlistNavBadge(); });
+            } else if (isShortlistRouteActive()) {
+                renderShortlistPanelBody();
+            }
         };
 
         /** 进入「应聘筛选」或需强制同步岗位列表时调用（与课程管理同一数据源） */
         app.onApplicantsRouteActivate = function () {
-            refreshCourseOptionsFromApi().then(function () {
+            refreshCourseOptionsFromApi().then(async function () {
+                var moSync = getMoId();
+                var st = shortlistStore();
+                if (moSync && st && typeof st.syncFromServer === 'function') {
+                    try {
+                        await st.syncFromServer(moSync);
+                    } catch (e) { /* 短名单同步失败不阻塞人选投递 */ }
+                    updateShortlistNavBadge();
+                }
                 if (pendingApplicantCourseCode) {
                     var preset = pendingApplicantCourseCode;
                     pendingApplicantCourseCode = null;
@@ -605,6 +980,28 @@
                     loadApplicants();
                 }
             });
+        };
+
+        /** 进入「候选短名单」：同步岗位下拉 + 全量投递缓存（不刷新人选投递页列表），用于名额与候选人解析 */
+        app.onShortlistRouteActivate = async function () {
+            if (shortlistPageStatus) {
+                shortlistPageStatus.textContent = t('正在同步投递与岗位数据…', 'Syncing applications and openings…');
+            }
+            await refreshCourseOptionsFromApi();
+            await loadApplicants({ allCourses: true, cacheUpdateOnly: true });
+            var moSl = getMoId();
+            var st = shortlistStore();
+            if (moSl && st && typeof st.syncFromServer === 'function') {
+                try {
+                    await st.syncFromServer(moSl);
+                } catch (e) {
+                    if (shortlistPageStatus) {
+                        shortlistPageStatus.textContent = e.message || t('短名单同步失败', 'Shortlist sync failed');
+                    }
+                }
+            }
+            updateShortlistNavBadge();
+            renderShortlistPanelBody();
         };
 
         /** 关闭弹窗后跳转应聘筛选并选中指定课程（先于 activateRoute 写入 pending，避免与异步下拉竞态） */
@@ -680,10 +1077,40 @@
                     void openDetail(found);
                 }
             }
+            var moL = getMoId();
+            var stL = shortlistStore();
+            if (moL && stL && typeof stL.syncFromServer === 'function') {
+                void stL.syncFromServer(moL).then(function () {
+                    updateShortlistNavBadge();
+                    if (isShortlistRouteActive()) {
+                        renderShortlistPanelBody();
+                    }
+                }).catch(function () {
+                    updateShortlistNavBadge();
+                });
+            } else {
+                updateShortlistNavBadge();
+                if (isShortlistRouteActive()) {
+                    renderShortlistPanelBody();
+                }
+            }
         };
 
         refreshNavUnreadBadge();
         refreshCourseOptionsFromApi();
         updateClearCourseFilterButton();
+        updateShortlistNavBadge();
+        (function syncShortlistBoot() {
+            var m0 = getMoId();
+            var s0 = shortlistStore();
+            if (m0 && s0 && typeof s0.syncFromServer === 'function') {
+                void s0.syncFromServer(m0).then(function () {
+                    updateShortlistNavBadge();
+                    if (isShortlistRouteActive()) {
+                        renderShortlistPanelBody();
+                    }
+                }).catch(function () { /* 离线或未登录 */ });
+            }
+        }());
     };
 })();

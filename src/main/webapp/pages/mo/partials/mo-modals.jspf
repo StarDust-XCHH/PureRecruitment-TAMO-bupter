@@ -8,7 +8,7 @@
             </div>
             <div class="job-detail-modal__head-actions">
                 <button type="button" class="pill-btn job-detail-modal__edit-btn" id="toggleCourseEditBtn" data-i18n="modal.courseDetail.editModule" data-i18n-zh="修改课程信息" data-i18n-en="Edit module">修改课程信息</button>
-                <button class="pill-btn job-detail-modal__screening-btn" type="button" id="jumpToApplicantsBtn" data-i18n="modal.courseDetail.goScreening" data-i18n-zh="进入应聘筛选" data-i18n-en="Go to applicant screening">进入应聘筛选</button>
+                <button class="pill-btn job-detail-modal__screening-btn" type="button" id="jumpToApplicantsBtn" data-i18n="modal.courseDetail.goScreening" data-i18n-zh="进入人选投递" data-i18n-en="Go to candidate applications">进入人选投递</button>
             </div>
         </div>
         <div class="modal-body">
