@@ -12,8 +12,9 @@
 | `MoTaApplicationReadService` | 新增 `getApplicationsForCourseScopedToJob(courseCode, jobId)`：在课程编号一致的前提下，用快照中的 `jobId` 收窄到当前岗位实例（快照无 `jobId` 时仍保留，兼容旧数据）。 |
 | `MoTaApplicationStatusMatcher` | 统一规则：`applicationId` 一致，或 `jobId` 一致；或（仅历史）MO 行无 `applicationId`/`jobId` 且 **TA 快照中也无 `jobId`** 时，才用同 `courseCode` 回退，避免新数据误挂旧 MO 行。 |
 | `MoRecruitmentDao` | 申请人列表、统计、详情、录用决策时，合并 `application-status.json` 与 TA 申请均走上述 ID 规则；决策写入的 MO 状态行会带上 `jobId`。 |
-| `TaAccountDao` | TA 申请列表合并 MO 状态时，不再用 `jobSlug`/`courseName` 与 MO 行对齐。 |
-| `MoTaApplicationsMutationDao` | `findApplicationByTaAndCourse` 支持按 `jobId` 选对申请；`refreshCourseSnapshotsForCourseCode` 在能解析出岗位 `jobId` 时，避免误更新「同课号、不同岗位」的快照。 |
+| `TaAccountDao` | TA 申请列表合并 MO 状态时，不再用 `jobSlug`/`courseName` 与 MO 行对齐；**投递**使用含 `jobId` 的 `uniqueKey` 与分层判重，允许不同学期（不同 `jobId`）同课号多次投递（见 §7）。 |
+| `TaApplicationUniqueKeys` | 规范键 `TAID::COURSECODE::JOBID`；历史键 `TAID::COURSECODE` 用于与旧数据对齐判重。 |
+| `MoTaApplicationsMutationDao` | `findApplicationByTaAndCourse` 支持按 `jobId` 选对申请，且 `uniqueKey` 匹配与 §7 一致；`refreshCourseSnapshotsForCourseCode` 在能解析出岗位 `jobId` 时，避免误更新「同课号、不同岗位」的快照。 |
 
 ---
 
@@ -37,11 +38,12 @@
 ### 实现度
 
 - **新投递**：`courseSnapshot` 会包含 `jobId`（来自当时解析的岗位），便于后续学期或并开岗位区分实例。
+- **同课号、多学期 / 多岗位实例投递**：`uniqueKey` 已扩展为「TA + 课号 + `jobId`」（见 §7），在能拿到不同 `jobId` 的前提下允许分别保留有效申请；与 MO 决策、快照刷新等逻辑一致。
 - **申请列表展示状态**：与 MO 侧 `application-status` 合并时，与 MO 端使用同一套 ID 优先规则，不再依赖课名或 slug 的弱匹配。
 
 ### 仍存在的问题与边界
 
-- **投递唯一性仍以 `uniqueKey`（TA + 课号）等既有逻辑为准**：若业务上允许「同一课号、不同 `jobId`」多次投递，需要后续在**非本次「匹配」范围**内调整去重与目录策略；当前未改 TA 投递与去重逻辑。
+- **投递入口仍按 `courseCode` 解析岗位**：与 §2 相同，`findNormalizedJobByCourseCode` 在岗位板存在多条同课号时只命中一条；若需**并发**两条同课号岗位分别投递，请求侧需将来能指明 `jobId`（或等价入口），否则业务上仍只能投中解析到的那一条。
 - **历史申请**：无 `jobId` 的快照在 MO 侧列表中仍可能被同一 `courseCode` 视图包含，直到快照被 MO 刷新或相关维护逻辑更新。
 
 ---
@@ -64,7 +66,7 @@
 | 端 | 多学期 / 多岗位实例适配 | 主要剩余风险 |
 |----|-------------------------|--------------|
 | MO | ID 合并与列表收窄已加强；决策与状态行可带 `jobId` | 请求仍常只带 `courseCode` 时，`findNormalizedJobByCourseCode` 对重复课号只能解析一条 |
-| TA | 新快照含 `jobId`；状态合并走 ID | 旧快照无 `jobId`；课号级去重未扩展为多岗 |
+| TA | 新快照含 `jobId`；状态合并走 ID；**投递**按 `jobId` 区分同课号多实例（§7） | 入参仅课号时仍只解析一条岗位；旧快照无 `jobId` |
 | Admin | 无行为变更 | 管理脚本若只用课号，多岗场景需人工区分或改用 `jobId` |
 
 建议在后续迭代中（若允许动接口或前端）：为 MO 与决策类接口增加 **`jobId`（或 `applicationId`）显式参数**，并与岗位板唯一主键对齐，以从入口上消除「同课号多岗」的歧义。
@@ -87,3 +89,46 @@
 
 - 若多条 MO 历史行均为「仅课号、无 ID」，且 TA 快照也无 `jobId`，仍可能命中多条中的**最新 `updatedAt`** 一条；该情形仅存在于早期数据，风险面已缩小。
 - `getApplicationsForCourseScopedToJob` 对「快照无 `jobId`」的保留策略未改，以便 MO 列表仍能展示旧投递；与上条收紧配合后，**状态合并**侧对已带 `jobId` 的投递更保守、更安全。
+
+---
+
+## 7. 业务侧：允许 TA 投递「不同学期、同课号」及风险控制
+
+### 目标
+
+在保留旧数据行为的前提下，允许同一 TA 对**相同 `courseCode`、不同岗位实例（不同 `jobId`，通常对应不同学期或并开岗位）**分别发起有效投递，并避免与既有 MO/统计/决策逻辑冲突。
+
+### 实现要点
+
+1. **`uniqueKey`（`TaApplicationUniqueKeys`）**  
+   - **新写入**：`TAID::COURSECODE::JOBID`（`jobId` 取自投递时解析到的规范化岗位 JSON）。  
+   - **历史**：仍为 `TAID::COURSECODE` 的记录保留不动；新投递与之通过下面规则区分是否「同一岗位实例」。
+
+2. **重复投递（409）规则（`TaAccountDao#createApplication`）**  
+   - 若已存在**活跃**申请且其 `uniqueKey` 与本次规范键**完全相同** → 视为重复。  
+   - 若已存在活跃申请且 `uniqueKey` 为**历史** `TAID::COURSECODE`：  
+     - 仅当旧快照**无** `jobId` 且本次岗位也**无** `jobId`（极少见）→ 判重（与旧行为一致）。  
+     - 若旧快照有 `jobId` 且与本次岗位 `jobId` **相同** → 判重。  
+     - 若旧快照无 `jobId` 但本次岗位有 `jobId`（新学期、新实例）→ **不**判重，允许新投。  
+     - 若旧快照有 `jobId` 与本次不同 → **不**判重。  
+
+3. **`applicationId`**  
+   - 当岗位带 `jobId` 时，在原有 `APP-{taId}-{courseCode}-{时间}` 形态中插入经净化的 **`jobId` 片段**，降低秒级时间戳碰撞概率，并便于日志区分实例。
+
+4. **简历目录**  
+   - 仍使用 `taResumeCourseDir(taId, courseCode)`；同一课号多申请依赖**不同的 `applicationId` 文件名**区分文件，**未**改为按 `jobId` 分目录（最小改动；若日后文件量或合规要求提高，可再拆目录）。
+
+5. **MO 侧按 TA+课号查找申请（`MoTaApplicationsMutationDao#findApplicationByTaAndCourse`）**  
+   - `uniqueKey` 匹配逻辑与规范键 / 历史键一致，便于在传入 `jobId` 时选中正确活跃申请。
+
+### 风险与缓解
+
+| 风险 | 说明 | 缓解 |
+|------|------|------|
+| 同课号多岗**并发**、请求只带课号 | 投递时仍通过 `findNormalizedJobByCourseCode` 解析**单条**岗位，无法在无额外参数时选中「第二条同课号岗」 | 文档化；后续在 TA 入参或前端增加 `jobId`（或专用接口） |
+| 旧 `uniqueKey` 无 `jobId` 与新学期同学号 | 已通过「历史键 + 快照 `jobId`」组合判重区分 | §7 与 §2；必要时运维对旧数据补 `courseSnapshot.jobId` 或依赖 MO 刷新快照 |
+| 简历同目录 | 多申请共享课号目录 | 依赖 `applicationId` 唯一文件名；见上 |
+
+### 与 §6 的关系
+
+§6 解决的是 **MO 状态行 ↔ TA 申请** 合并时「新快照有 `jobId` 勿误挂无 ID 旧 MO 行」。§7 解决的是 **TA 能否对多实例分别投递** 及 **与 MO 查找一致**。二者互补，旧数据在无 `jobId` 时仍走兼容分支。

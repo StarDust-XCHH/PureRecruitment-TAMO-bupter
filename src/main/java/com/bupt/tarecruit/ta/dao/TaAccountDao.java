@@ -4,6 +4,7 @@ import com.bupt.tarecruit.common.config.DataMountPaths;
 import com.bupt.tarecruit.common.dao.RecruitmentCoursesDao;
 import com.bupt.tarecruit.common.util.AuthUtils;
 import com.bupt.tarecruit.common.util.MoTaApplicationStatusMatcher;
+import com.bupt.tarecruit.common.util.TaApplicationUniqueKeys;
 import com.bupt.tarecruit.mo.dao.MoRecruitmentDao;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -441,18 +442,19 @@ public class TaAccountDao {
 
         String taId = trim(input.taId());
         String courseCode = trim(input.courseCode()).toUpperCase(Locale.ROOT);
-        String uniqueKey = buildUniqueKey(taId, courseCode);
+        String jobId = trim(getAsString(course, "jobId"));
+        String uniqueKey = TaApplicationUniqueKeys.canonical(taId, courseCode, jobId);
         for (JsonElement element : applicationItems) {
             if (!element.isJsonObject()) {
                 continue;
             }
             JsonObject existing = element.getAsJsonObject();
-            if (uniqueKey.equalsIgnoreCase(getAsString(existing, "uniqueKey")) && getAsBoolean(existing, "active", true)) {
+            if (conflictsWithExistingApplication(existing, taId, courseCode, jobId, uniqueKey)) {
                 return ApplicationSubmitResult.failure(409, "你已申请过该课程，请勿重复投递");
             }
         }
 
-        String applicationId = buildApplicationId(taId, courseCode);
+        String applicationId = buildApplicationId(taId, courseCode, jobId);
         String submittedAt = Instant.now().toString();
         String extension = normalizeResumeExtension(input.originalFileName(), input.contentType());
         Path courseDir = DataMountPaths.taResumeCourseDir(taId, courseCode);
@@ -832,12 +834,47 @@ public class TaAccountDao {
         }
     }
 
-    private String buildApplicationId(String taId, String courseCode) {
-        return "APP-" + taId + "-" + courseCode + "-" + APPLICATION_TIME_FORMATTER.format(Instant.now());
+    private String buildApplicationId(String taId, String courseCode, String jobId) {
+        String time = APPLICATION_TIME_FORMATTER.format(Instant.now());
+        String j = trim(jobId);
+        if (j.isEmpty()) {
+            return "APP-" + taId + "-" + courseCode + "-" + time;
+        }
+        String jobSeg = j.replaceAll("[^A-Za-z0-9]+", "-").replaceAll("(^-|-$)", "");
+        if (jobSeg.length() > 40) {
+            jobSeg = jobSeg.substring(0, 40);
+        }
+        return "APP-" + taId + "-" + courseCode + "-" + jobSeg + "-" + time;
     }
 
-    private String buildUniqueKey(String taId, String courseCode) {
-        return taId.toUpperCase(Locale.ROOT) + "::" + courseCode.toUpperCase(Locale.ROOT);
+    /**
+     * 与 {@link TaApplicationUniqueKeys} 一致：同规范 {@code uniqueKey} 视为同一岗位实例的重复投递；
+     * 对历史 {@code TA::CC} 记录，仅在无法区分岗位或快照中 {@code jobId} 与本次一致时判重。
+     */
+    private boolean conflictsWithExistingApplication(
+            JsonObject existing,
+            String taId,
+            String courseCode,
+            String newJobId,
+            String newCanonicalKey) {
+        if (!getAsBoolean(existing, "active", true)) {
+            return false;
+        }
+        String uk = trim(getAsString(existing, "uniqueKey")).toUpperCase(Locale.ROOT);
+        if (newCanonicalKey.equalsIgnoreCase(uk)) {
+            return true;
+        }
+        JsonObject snap = existing.has("courseSnapshot") && existing.get("courseSnapshot").isJsonObject()
+                ? existing.getAsJsonObject("courseSnapshot")
+                : new JsonObject();
+        String exJob = trim(getAsString(snap, "jobId"));
+        if (!TaApplicationUniqueKeys.legacyKey(taId, courseCode).equalsIgnoreCase(uk)) {
+            return false;
+        }
+        if (newJobId.isBlank() && exJob.isBlank()) {
+            return true;
+        }
+        return !newJobId.isBlank() && !exJob.isBlank() && newJobId.equalsIgnoreCase(exJob);
     }
 
     private String normalizeResumeExtension(String fileName, String contentType) {

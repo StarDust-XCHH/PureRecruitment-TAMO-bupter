@@ -2,6 +2,7 @@ package com.bupt.tarecruit.mo.dao;
 
 import com.bupt.tarecruit.common.config.DataMountPaths;
 import com.bupt.tarecruit.common.dao.RecruitmentCoursesDao;
+import com.bupt.tarecruit.common.util.TaApplicationUniqueKeys;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -69,7 +70,8 @@ public final class MoTaApplicationsMutationDao {
         }
         JsonObject root = loadRoot();
         JsonArray items = root.getAsJsonArray("items");
-        String uniqueKey = t.toUpperCase(Locale.ROOT) + "::" + c;
+        String canonicalKey = TaApplicationUniqueKeys.canonical(t, c, j);
+        String legacyKey = TaApplicationUniqueKeys.legacyKey(t, c);
         JsonObject latest = null;
         String latestUpdated = "";
         for (JsonElement element : items) {
@@ -91,7 +93,10 @@ public final class MoTaApplicationsMutationDao {
             }
             String cc = trim(getAsString(item, "courseCode")).toUpperCase(Locale.ROOT);
             String uk = trim(getAsString(item, "uniqueKey")).toUpperCase(Locale.ROOT);
-            if (!c.equals(cc) && !uniqueKey.equalsIgnoreCase(uk)) {
+            boolean keyOrCodeMatch = c.equals(cc)
+                    || canonicalKey.equalsIgnoreCase(uk)
+                    || legacyKey.equalsIgnoreCase(uk);
+            if (!keyOrCodeMatch) {
                 continue;
             }
             boolean active = !item.has("active") || item.get("active").isJsonNull() || item.get("active").getAsBoolean();
