@@ -161,26 +161,16 @@ public final class RecruitmentCoursesDao {
                 if (!needle.equalsIgnoreCase(trim(getAsString(raw, "courseCode")))) {
                     continue;
                 }
-                raw.addProperty("applicationsTotal", Math.max(0, applicationsTotal));
-                raw.addProperty("applicationsPending", Math.max(0, applicationsPending));
-                raw.addProperty("applicationsAccepted", Math.max(0, applicationsAccepted));
-                raw.addProperty("applicationsRejected", Math.max(0, applicationsRejected));
-                raw.addProperty("recruitedCount", Math.max(0, recruitedCount));
-                if (la.isEmpty()) {
-                    raw.remove("lastApplicationAt");
-                } else {
-                    raw.addProperty("lastApplicationAt", la);
-                }
-                if (ls.isEmpty()) {
-                    raw.remove("lastSelectionAt");
-                } else {
-                    raw.addProperty("lastSelectionAt", ls);
-                }
-                if (syncAt.isEmpty()) {
-                    raw.remove("lastSyncedAt");
-                } else {
-                    raw.addProperty("lastSyncedAt", syncAt);
-                }
+                applyApplicationStatsToRawRow(
+                        raw,
+                        applicationsTotal,
+                        applicationsPending,
+                        applicationsAccepted,
+                        applicationsRejected,
+                        recruitedCount,
+                        la,
+                        ls,
+                        syncAt);
                 raw.addProperty("updatedAt", Instant.now().toString());
                 updateMeta(root, JOB_BOARD_SCHEMA, JOB_BOARD_ENTITY, JOB_BOARD_VERSION);
                 syncJobBoardFileEnvelope(root, items);
@@ -188,6 +178,92 @@ public final class RecruitmentCoursesDao {
                 return true;
             }
             return false;
+        }
+    }
+
+    /**
+     * Overwrites TA/MO-derived application aggregate fields on the on-disk row for {@code jobId} (ignore case).
+     *
+     * @return {@code true} if a matching row was found and persisted
+     */
+    public static boolean syncPublishedJobApplicationStatsByJobId(
+            String jobId,
+            int applicationsTotal,
+            int applicationsPending,
+            int applicationsAccepted,
+            int applicationsRejected,
+            int recruitedCount,
+            String lastApplicationAt,
+            String lastSelectionAt,
+            String lastSyncedAt) throws IOException {
+        String needle = trim(jobId);
+        if (needle.isEmpty()) {
+            return false;
+        }
+        String la = trim(lastApplicationAt);
+        String ls = trim(lastSelectionAt);
+        String syncAt = trim(lastSyncedAt);
+        synchronized (FILE_LOCK) {
+            JsonObject root = ensureJobBoardRoot();
+            JsonArray items = root.getAsJsonArray("items");
+            for (int i = 0; i < items.size(); i++) {
+                JsonElement el = items.get(i);
+                if (el == null || !el.isJsonObject()) {
+                    continue;
+                }
+                JsonObject raw = el.getAsJsonObject();
+                if (!needle.equalsIgnoreCase(trim(getAsString(raw, "jobId")))) {
+                    continue;
+                }
+                applyApplicationStatsToRawRow(
+                        raw,
+                        applicationsTotal,
+                        applicationsPending,
+                        applicationsAccepted,
+                        applicationsRejected,
+                        recruitedCount,
+                        la,
+                        ls,
+                        syncAt);
+                raw.addProperty("updatedAt", Instant.now().toString());
+                updateMeta(root, JOB_BOARD_SCHEMA, JOB_BOARD_ENTITY, JOB_BOARD_VERSION);
+                syncJobBoardFileEnvelope(root, items);
+                writeJson(root);
+                return true;
+            }
+            return false;
+        }
+    }
+
+    private static void applyApplicationStatsToRawRow(
+            JsonObject raw,
+            int applicationsTotal,
+            int applicationsPending,
+            int applicationsAccepted,
+            int applicationsRejected,
+            int recruitedCount,
+            String lastApplicationAt,
+            String lastSelectionAt,
+            String lastSyncedAt) {
+        raw.addProperty("applicationsTotal", Math.max(0, applicationsTotal));
+        raw.addProperty("applicationsPending", Math.max(0, applicationsPending));
+        raw.addProperty("applicationsAccepted", Math.max(0, applicationsAccepted));
+        raw.addProperty("applicationsRejected", Math.max(0, applicationsRejected));
+        raw.addProperty("recruitedCount", Math.max(0, recruitedCount));
+        if (lastApplicationAt == null || lastApplicationAt.isEmpty()) {
+            raw.remove("lastApplicationAt");
+        } else {
+            raw.addProperty("lastApplicationAt", lastApplicationAt);
+        }
+        if (lastSelectionAt == null || lastSelectionAt.isEmpty()) {
+            raw.remove("lastSelectionAt");
+        } else {
+            raw.addProperty("lastSelectionAt", lastSelectionAt);
+        }
+        if (lastSyncedAt == null || lastSyncedAt.isEmpty()) {
+            raw.remove("lastSyncedAt");
+        } else {
+            raw.addProperty("lastSyncedAt", lastSyncedAt);
         }
     }
 

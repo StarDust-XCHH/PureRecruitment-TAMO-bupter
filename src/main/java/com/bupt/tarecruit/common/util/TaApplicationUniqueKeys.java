@@ -24,11 +24,4 @@ public final class TaApplicationUniqueKeys {
         }
         return t + "::" + c + "::" + j;
     }
-
-    /**
-     * 历史键，仅含 TA 与课号（与改造前写入的 {@code uniqueKey} 一致）。
-     */
-    public static String legacyKey(String taId, String courseCode) {
-        return trim(taId).toUpperCase(Locale.ROOT) + "::" + trim(courseCode).toUpperCase(Locale.ROOT);
-    }
 }

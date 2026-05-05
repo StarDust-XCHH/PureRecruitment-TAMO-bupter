@@ -38,6 +38,39 @@
   python tools/genMoCourses.py 12 --mode 1
   ```
 
+- [`test_dual_job_same_course.py`](test_dual_job_same_course.py)（Python 3 + `requests`）
+
+  外部自动化验证“**同课号双岗位**（jobId-first）”关键链路：
+
+  1. 创建两个相同 `courseCode` 的岗位（不同 `jobId`）  
+  2. 同一 TA 分别投递两个岗位  
+  3. MO 按 `jobId` 拉取 applicants，验证不串岗  
+  4. MO 对其中一个岗位做决策，验证另一个岗位不受影响  
+  5. MO shortlist 按 `jobId` / `applicationId` 校验增删行为
+
+  ```bash
+  pip install requests
+  # 无参数：终端交互选择 run / cleanup
+  python tools/test_dual_job_same_course.py
+
+  # 显式 run
+  python tools/test_dual_job_same_course.py \
+    --mode run \
+    --base-url http://127.0.0.1:8080/PureRecruitment-TAMO-bupter
+
+  # cleanup：按 marker 前缀清理历史测试数据（岗位/申请/状态/事件/shortlist/评论/已读）
+  python tools/test_dual_job_same_course.py --mode cleanup
+
+  # 可显式指定账号（否则从 mountData 自动取首个）
+  python tools/test_dual_job_same_course.py \
+    --mode run \
+    --mo-id MO-10001 --ta-id TA-10001
+  ```
+
+  - `--marker-prefix`（默认 `EXTDUAL`）：  
+    - `run` 模式会将此前缀写入测试岗位名称/说明。  
+    - `cleanup` 模式按此前缀识别并清理该工具历史产生的数据。
+
 ## 设计原则
 
 1. 工具独立于主站运行，不依赖 servlet 生命周期

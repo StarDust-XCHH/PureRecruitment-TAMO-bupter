@@ -331,6 +331,10 @@
                 if (app && typeof app.setAppliedCourseCodes === 'function') {
                     app.setAppliedCourseCodes(state.appliedCourseCodes);
                 }
+                const appliedJobIds = normalizeArray(payload.appliedJobIds).map((id) => safeText(id)).filter(Boolean);
+                if (app && typeof app.setAppliedJobIds === 'function') {
+                    app.setAppliedJobIds(appliedJobIds);
+                }
 
                 renderTimeline(items);
                 renderSummary(payload.summary);
@@ -361,6 +365,9 @@
                 state.appliedCourseCodes = [];
                 if (app && typeof app.setAppliedCourseCodes === 'function') {
                     app.setAppliedCourseCodes([]);
+                }
+                if (app && typeof app.setAppliedJobIds === 'function') {
+                    app.setAppliedJobIds([]);
                 }
                 if (emptyState) emptyState.hidden = false;
                 setStatusMessage(error.message || t('申请状态加载失败', 'Failed to load application status'), 'error');

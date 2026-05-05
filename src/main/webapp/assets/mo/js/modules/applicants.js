@@ -40,8 +40,8 @@
 
         let currentDetailApplicationId = '';
         let currentMessagesApplicationId = '';
-        /** Shortlist 面板当前选中的课程编码（与 MoShortlistStore 分桶一致） */
-        let shortlistPanelCourse = '';
+        /** Shortlist 面板当前选中的岗位 jobId（与 MoShortlistStore 分桶一致） */
+        let shortlistPanelJobId = '';
         function t(zh, en) {
             return typeof app.t === 'function' ? app.t(zh, en) : zh;
         }
@@ -56,7 +56,7 @@
         let applicantListCache = [];
         let applicantPageIndex = 1;
         /** 从课程详情「进入应聘筛选」预选的课程编码，在岗位下拉加载后再应用 */
-        let pendingApplicantCourseCode = null;
+        let pendingApplicantJobId = null;
 
         function getMoId() {
             const u = typeof app.getMoUser === 'function' ? app.getMoUser() : null;
@@ -66,9 +66,8 @@
 
         function jobOptionValue(job) {
             if (!job) return '';
-            return job.courseCode != null && String(job.courseCode).trim() !== ''
-                ? String(job.courseCode).trim()
-                : (job.jobId != null ? String(job.jobId).trim() : '');
+            var jid = job.jobId != null && String(job.jobId).trim() !== '' ? String(job.jobId).trim() : '';
+            return jid;
         }
 
         function jobOptionLabel(job) {
@@ -105,10 +104,11 @@
             }
         }
 
-        function shortlistUndoEntryFromItem(item, courseCode) {
+        function shortlistUndoEntryFromItem(item, jobId) {
             return {
                 applicationId: item.applicationId,
-                courseCode: String(courseCode || '').trim(),
+                jobId: String(jobId || '').trim(),
+                courseCode: item.courseCode != null ? String(item.courseCode).trim() : '',
                 taId: item.taId != null ? item.taId : '',
                 name: item.name != null ? item.name : ''
             };
@@ -130,7 +130,7 @@
                 undo: {
                     label: t('撤回', 'Undo'),
                     action: function () {
-                        return store.remove(moId, entry.courseCode, entry.applicationId).then(function () {
+                        return store.remove(moId, entry.applicationId).then(function () {
                             refreshAfterShortlistMutation();
                             maybeRefreshDetailAfterShortlistUndo(entry.applicationId);
                         });
@@ -168,30 +168,42 @@
             navShortlistBadge.hidden = n === 0;
         }
 
-        function getJobForCourseCode(courseCode) {
-            var code = String(courseCode || '').trim();
-            if (!code) return null;
+        function getJobByJobId(jobId) {
+            var id = String(jobId || '').trim();
+            if (!id) return null;
             var jobs = typeof app.getJobs === 'function' ? app.getJobs() : [];
-            for (var i = 0; i < jobs.length; i++) {
-                if (jobOptionValue(jobs[i]) === code) return jobs[i];
+            var i;
+            for (i = 0; i < jobs.length; i++) {
+                var j = jobs[i];
+                if (!j) continue;
+                var jid = j.jobId != null && String(j.jobId).trim() !== '' ? String(j.jobId).trim() : '';
+                if (jid && jid === id) return j;
             }
             return null;
         }
 
-        function countHiredForCourseInCache(courseCode) {
-            var code = String(courseCode || '').trim();
-            if (!code) return 0;
+        function shortlistTabLabel(jobId) {
+            var j = getJobByJobId(jobId);
+            if (!j) return jobId || '—';
+            var code = j.courseCode != null && String(j.courseCode).trim() !== '' ? String(j.courseCode).trim() : jobId;
+            var name = j.courseName != null && String(j.courseName).trim() !== '' ? String(j.courseName).trim() : '';
+            return name ? code + ' · ' + name : code;
+        }
+
+        function countHiredForJobInCache(jid) {
+            var id = String(jid || '').trim();
+            if (!id) return 0;
             return applicantListCache.filter(function (x) {
-                return x && String(x.courseCode || '').trim() === code && x.status === '已录用';
+                return x && String(x.jobId || '').trim() === id && x.status === '已录用';
             }).length;
         }
 
-        function getRemainingSlotsForCourse(courseCode) {
-            var job = getJobForCourseCode(courseCode);
+        function getRemainingSlotsForJob(jobId) {
+            var job = getJobByJobId(jobId);
             var cap = job && job.taRecruitCount != null && Number(job.taRecruitCount) >= 0
                 ? Number(job.taRecruitCount)
                 : 0;
-            var hired = countHiredForCourseInCache(courseCode);
+            var hired = countHiredForJobInCache(jobId);
             return Math.max(0, cap - hired);
         }
 
@@ -205,6 +217,7 @@
             if (fromCache) return fromCache;
             return {
                 applicationId: aid,
+                jobId: entry.jobId != null ? String(entry.jobId).trim() : '',
                 courseCode: entry.courseCode,
                 taId: entry.taId,
                 name: entry.name,
@@ -217,44 +230,48 @@
             var moId = getMoId();
             if (!store || !moId || !shortlistTabs || !shortlistListWrap || !shortlistMeta || !shortlistBulkHireBtn) return;
 
-            var courses = store.coursesWithEntries(moId);
-            if (!courses.length) {
+            var jobIds = store.jobIdsWithEntries(moId);
+            if (!jobIds.length) {
                 shortlistTabs.innerHTML = '';
                 shortlistListWrap.innerHTML = '<p class="muted">' + t('Shortlist 为空。在候选人卡片或详情中点击加入。', 'Shortlist is empty. Add candidates from cards or the detail view.') + '</p>';
                 shortlistMeta.textContent = '';
                 shortlistBulkHireBtn.disabled = true;
-                shortlistPanelCourse = '';
+                shortlistPanelJobId = '';
                 return;
             }
 
-            if (!shortlistPanelCourse || courses.indexOf(shortlistPanelCourse) === -1) {
+            if (!shortlistPanelJobId || jobIds.indexOf(shortlistPanelJobId) === -1) {
                 var pref = (courseSelect && courseSelect.value || '').trim();
-                shortlistPanelCourse = pref && courses.indexOf(pref) !== -1 ? pref : courses[0];
+                shortlistPanelJobId = pref && jobIds.indexOf(pref) !== -1 ? pref : jobIds[0];
             }
 
             shortlistTabs.innerHTML = '';
-            courses.forEach(function (cc) {
+            jobIds.forEach(function (jid) {
                 var tab = document.createElement('button');
                 tab.type = 'button';
-                tab.className = 'mo-shortlist-tab' + (cc === shortlistPanelCourse ? ' active' : '');
+                tab.className = 'mo-shortlist-tab' + (jid === shortlistPanelJobId ? ' active' : '');
                 tab.setAttribute('role', 'tab');
-                tab.setAttribute('aria-selected', cc === shortlistPanelCourse ? 'true' : 'false');
-                var rows = store.listForCourse(moId, cc);
-                tab.textContent = cc + ' (' + rows.length + ')';
+                tab.setAttribute('aria-selected', jid === shortlistPanelJobId ? 'true' : 'false');
+                var rows = store.listForJob(moId, jid);
+                tab.textContent = shortlistTabLabel(jid) + ' (' + rows.length + ')';
                 tab.addEventListener('click', function () {
-                    shortlistPanelCourse = cc;
+                    shortlistPanelJobId = jid;
                     renderShortlistPanelBody();
                 });
                 shortlistTabs.appendChild(tab);
             });
 
-            var list = store.listForCourse(moId, shortlistPanelCourse);
+            var list = store.listForJob(moId, shortlistPanelJobId);
 
             function mergeShortlistRowForTable(row) {
                 var cand = resolveApplicantForShortlist(row) || {};
+                var displayCc = (cand.courseCode != null && String(cand.courseCode).trim() !== '')
+                    ? String(cand.courseCode).trim()
+                    : (row.courseCode != null ? String(row.courseCode).trim() : '');
                 return {
                     applicationId: row.applicationId,
-                    courseCode: shortlistPanelCourse,
+                    jobId: shortlistPanelJobId,
+                    courseCode: displayCc,
                     taId: (cand.taId != null && String(cand.taId).trim() !== '') ? String(cand.taId).trim() : String(row.taId || '').trim(),
                     name: (cand.name != null && String(cand.name).trim() !== '') ? String(cand.name).trim() : String(row.name || '').trim(),
                     studentId: cand.studentId,
@@ -312,13 +329,13 @@
             shortlistListWrap.innerHTML = '';
             shortlistListWrap.appendChild(wrapSl);
 
-            var remaining = getRemainingSlotsForCourse(shortlistPanelCourse);
+            var remaining = getRemainingSlotsForJob(shortlistPanelJobId);
             var n = list.length;
             var bulkOk = n > 0 && n <= remaining;
             shortlistBulkHireBtn.disabled = !bulkOk;
-            var jobRow = getJobForCourseCode(shortlistPanelCourse);
+            var jobRow = getJobByJobId(shortlistPanelJobId);
             var capStr = jobRow && jobRow.taRecruitCount != null ? String(jobRow.taRecruitCount) : '—';
-            var hiredN = countHiredForCourseInCache(shortlistPanelCourse);
+            var hiredN = countHiredForJobInCache(shortlistPanelJobId);
             shortlistMeta.textContent =
                 t(
                     '本课程岗位 TA 名额 ' + capStr + '，已录用 ' + hiredN + '，剩余名额 ' + remaining + '；Shortlist ' + n + ' 人。',
@@ -597,17 +614,17 @@
             if (actionMode === 'applicants') {
                 var slBtn = tr.querySelector('.mo-applicant-shortlist-btn');
                 if (slBtn) {
-                    var ccForSl = String(item.courseCode || '').trim();
+                    var jidForSl = String(item.jobId || '').trim();
                     var storeSl = shortlistStore();
                     var moSl = getMoId();
                     function syncSlBtnLabel() {
-                        if (!storeSl || !moSl || !ccForSl) {
+                        if (!storeSl || !moSl || !jidForSl) {
                             slBtn.disabled = true;
                             slBtn.classList.remove('mo-applicant-strip-btn--shortlist', 'mo-applicant-strip-btn--shortlisted');
                             return;
                         }
                         slBtn.disabled = false;
-                        var on = storeSl.isShortlisted(moSl, ccForSl, item.applicationId);
+                        var on = storeSl.isShortlisted(moSl, jidForSl, item.applicationId);
                         slBtn.textContent = on ? t('已在短名单', 'Shortlisted') : t('短名单', 'Shortlist');
                         slBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
                         slBtn.setAttribute('aria-label', on
@@ -619,13 +636,13 @@
                     syncSlBtnLabel();
                     slBtn.addEventListener('click', function (e) {
                         e.stopPropagation();
-                        if (!storeSl || !moSl || !ccForSl || !item.applicationId) return;
+                        if (!storeSl || !moSl || !jidForSl || !item.applicationId) return;
                         slBtn.disabled = true;
                         void (async function () {
                             try {
                                 var result = await storeSl.toggle(moSl, {
                                     applicationId: item.applicationId,
-                                    courseCode: ccForSl,
+                                    jobId: jidForSl,
                                     taId: item.taId,
                                     name: item.name
                                 });
@@ -634,7 +651,7 @@
                                 if (isShortlistRouteActive()) {
                                     renderShortlistPanelBody();
                                 }
-                                var slEntry = shortlistUndoEntryFromItem(item, ccForSl);
+                                var slEntry = shortlistUndoEntryFromItem(item, jidForSl);
                                 if (result === 'added') {
                                     showShortlistAddedToast(storeSl, moSl, slEntry);
                                 } else if (result === 'removed') {
@@ -653,14 +670,13 @@
                 if (rmBtn) {
                     var storeRm = shortlistStore();
                     var moRm = getMoId();
-                    var ccRm = String(item.courseCode || '').trim();
                     rmBtn.addEventListener('click', function (e) {
                         e.stopPropagation();
                         void (async function () {
                             try {
-                                if (!storeRm || !moRm || !ccRm || !item.applicationId) return;
-                                var rmEntry = shortlistUndoEntryFromItem(item, ccRm);
-                                await storeRm.remove(moRm, ccRm, item.applicationId);
+                                if (!storeRm || !moRm || !item.applicationId) return;
+                                var rmEntry = shortlistUndoEntryFromItem(item, String(item.jobId || '').trim());
+                                await storeRm.remove(moRm, item.applicationId);
                                 updateShortlistNavBadge();
                                 renderApplicants();
                                 renderShortlistPanelBody();
@@ -956,10 +972,14 @@
                 }
 
                 var ccShort = String((d.courseCode || item.courseCode || '')).trim();
+                var snapJ = d.courseSnapshot && typeof d.courseSnapshot === 'object' && d.courseSnapshot.jobId != null
+                    ? String(d.courseSnapshot.jobId).trim()
+                    : '';
+                var jidShort = String((item.jobId || snapJ || '')).trim();
                 var storeSl2 = shortlistStore();
-                var slDetailOn = !!(storeSl2 && moId && ccShort && item.applicationId && storeSl2.isShortlisted(moId, ccShort, item.applicationId));
+                var slDetailOn = !!(storeSl2 && moId && jidShort && item.applicationId && storeSl2.isShortlisted(moId, jidShort, item.applicationId));
                 var shortlistDetailRow = '';
-                if (ccShort && item.applicationId) {
+                if (jidShort && item.applicationId) {
                     shortlistDetailRow =
                         '<div class="mo-applicant-shortlist-detail-row">' +
                         '<button type="button" class="pill-btn mo-applicant-shortlist-toggle ' + (slDetailOn
@@ -1029,13 +1049,13 @@
                 }
 
                 const shortlistToggleDetailBtn = document.getElementById('moApplicantShortlistToggleBtn');
-                if (shortlistToggleDetailBtn && storeSl2 && moId && ccShort && item.applicationId) {
+                if (shortlistToggleDetailBtn && storeSl2 && moId && jidShort && item.applicationId) {
                     shortlistToggleDetailBtn.addEventListener('click', function () {
                         void (async function () {
                             try {
                                 var detailResult = await storeSl2.toggle(moId, {
                                     applicationId: item.applicationId,
-                                    courseCode: ccShort,
+                                    jobId: jidShort,
                                     taId: item.taId || d.taId,
                                     name: item.name
                                 });
@@ -1045,7 +1065,7 @@
                                     renderShortlistPanelBody();
                                 }
                                 await openDetail(item);
-                                var detailEntry = shortlistUndoEntryFromItem(item, ccShort);
+                                var detailEntry = shortlistUndoEntryFromItem(item, jidShort);
                                 if (detailResult === 'added') {
                                     showShortlistAddedToast(storeSl2, moId, detailEntry);
                                 } else if (detailResult === 'removed') {
@@ -1099,7 +1119,11 @@
             try {
                 var url = apiUrl('/api/mo/applicants') + '?moId=' + encodeURIComponent(moId);
                 if (code) {
-                    url += '&courseCode=' + encodeURIComponent(code);
+                    url += '&jobId=' + encodeURIComponent(code);
+                    var jobRow = getJobByJobId(code);
+                    if (jobRow && jobRow.courseCode != null && String(jobRow.courseCode).trim() !== '') {
+                        url += '&courseCode=' + encodeURIComponent(String(jobRow.courseCode).trim());
+                    }
                 }
                 const res = await fetch(url);
                 const payload = await res.json();
@@ -1153,8 +1177,12 @@
          */
         async function decide(item, decision, promptActionLabel, options) {
             options = options || {};
-            const code = (item && item.courseCode ? String(item.courseCode) : '').trim() || (courseSelect.value || '').trim();
             const moId = getMoId();
+            var selJob = getJobByJobId(courseSelect.value || '');
+            var jobId = (item && item.jobId ? String(item.jobId) : '').trim();
+            if (!jobId && selJob && selJob.jobId) jobId = String(selJob.jobId).trim();
+            var code = (item && item.courseCode ? String(item.courseCode) : '').trim()
+                || (selJob && selJob.courseCode ? String(selJob.courseCode).trim() : '');
             const actionText = promptActionLabel
                 ? String(promptActionLabel)
                 : (decision === 'selected' ? '录用'
@@ -1170,8 +1198,8 @@
                 if (pr === null) return false;
                 comment = pr;
             }
-            if (!code) {
-                setStatus(t('缺少课程编号，无法提交', 'Missing module code. Unable to submit.'));
+            if (!jobId) {
+                setStatus(t('缺少岗位 jobId，无法提交', 'Missing jobId. Unable to submit.'));
                 return false;
             }
             try {
@@ -1179,6 +1207,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json;charset=UTF-8' },
                     body: JSON.stringify({
+                        jobId: jobId,
                         courseCode: code,
                         taId: item.taId,
                         moId: moId,
@@ -1218,9 +1247,9 @@
         async function bulkHireShortlistForPanelCourse() {
             var store = shortlistStore();
             var moId = getMoId();
-            if (!store || !moId || !shortlistPanelCourse) return;
-            var entries = store.listForCourse(moId, shortlistPanelCourse);
-            var remaining = getRemainingSlotsForCourse(shortlistPanelCourse);
+            if (!store || !moId || !shortlistPanelJobId) return;
+            var entries = store.listForJob(moId, shortlistPanelJobId);
+            var remaining = getRemainingSlotsForJob(shortlistPanelJobId);
             if (!entries.length || entries.length > remaining) return;
             var actionText = t('一键录用 Shortlist', 'Bulk hire shortlist');
             var pr = window.prompt(
@@ -1238,13 +1267,13 @@
                     continue;
                 }
                 if (cand.status === '已录用') {
-                    store.remove(moId, shortlistPanelCourse, row.applicationId);
+                    store.remove(moId, row.applicationId);
                     continue;
                 }
                 var ok = await decide(cand, 'selected', null, { skipPrompt: true, comment: sharedComment, skipToast: true });
                 if (ok) {
                     bulkHiredAny = true;
-                    store.remove(moId, shortlistPanelCourse, row.applicationId);
+                    store.remove(moId, row.applicationId);
                 } else {
                     break;
                 }
@@ -1353,9 +1382,9 @@
                     } catch (e) { /* 短名单同步失败不阻塞人选投递 */ }
                     updateShortlistNavBadge();
                 }
-                if (pendingApplicantCourseCode) {
-                    var preset = pendingApplicantCourseCode;
-                    pendingApplicantCourseCode = null;
+                if (pendingApplicantJobId) {
+                    var preset = pendingApplicantJobId;
+                    pendingApplicantJobId = null;
                     app.setApplicantCourse(preset);
                 } else {
                     loadApplicants();
@@ -1386,20 +1415,35 @@
         };
 
         /** 关闭弹窗后跳转应聘筛选并选中指定课程（先于 activateRoute 写入 pending，避免与异步下拉竞态） */
-        app.navigateToApplicantsWithCourse = function (courseCode) {
-            var c = courseCode == null ? '' : String(courseCode).trim();
-            pendingApplicantCourseCode = c || null;
+        app.navigateToApplicantsWithCourse = function (jobId) {
+            var c = jobId == null ? '' : String(jobId).trim();
+            pendingApplicantJobId = c || null;
             if (typeof app.activateRoute === 'function') {
                 app.activateRoute('applicants');
             }
         };
 
-        app.setApplicantCourse = function (courseCode) {
-            if (!courseCode) return;
-            const raw = String(courseCode).trim();
+        app.setApplicantCourse = function (jobId) {
+            if (!jobId) return;
+            const raw = String(jobId).trim();
             if (!raw) return;
-            if (Array.from(courseSelect.options).some(function (o) { return o.value === raw; })) {
-                courseSelect.value = raw;
+            var jobs = typeof app.getJobs === 'function' ? app.getJobs() : [];
+            var optVal = '';
+            var ji;
+            for (ji = 0; ji < jobs.length; ji++) {
+                var j = jobs[ji];
+                if (!j) continue;
+                var jid = j.jobId != null && String(j.jobId).trim() !== '' ? String(j.jobId).trim() : '';
+                if (jid && jid === raw) {
+                    optVal = jid;
+                    break;
+                }
+            }
+            if (!optVal && Array.from(courseSelect.options).some(function (o) { return o.value === raw; })) {
+                optVal = raw;
+            }
+            if (optVal && Array.from(courseSelect.options).some(function (o) { return o.value === optVal; })) {
+                courseSelect.value = optVal;
             } else {
                 courseSelect.value = '';
             }

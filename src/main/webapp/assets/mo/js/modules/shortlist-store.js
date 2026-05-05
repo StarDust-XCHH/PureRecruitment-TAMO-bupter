@@ -20,12 +20,13 @@
         return norm(a).toLowerCase() === norm(b).toLowerCase();
     }
 
-    function sameCourse(a, b) {
+    function sameJobId(a, b) {
         return norm(a).toLowerCase() === norm(b).toLowerCase();
     }
 
     /**
      * MB-35：候选短名单由服务端 `mo-applicant-shortlist.json` 持久化；不修改 TA 申请状态。
+     * 分桶与 API 以 {@code jobId} 为准（同课号多岗位）。
      */
     window.MoShortlistStore = {
         /**
@@ -49,6 +50,7 @@
             _items = Array.isArray(payload.items) ? payload.items.map(function (row) {
                 return {
                     moId: row.moId,
+                    jobId: row.jobId,
                     courseCode: row.courseCode,
                     applicationId: row.applicationId,
                     taId: row.taId,
@@ -58,15 +60,17 @@
             }) : [];
         },
 
-        listForCourse: function (moId, courseCode) {
+        /** 某 MO 下、某 {@code jobId} 岗位上的短名单行 */
+        listForJob: function (moId, jobId) {
             var m = norm(moId);
-            var cc = norm(courseCode);
-            if (!m || !cc) return [];
+            var j = norm(jobId);
+            if (!m || !j) return [];
             return _items.filter(function (row) {
-                return sameMo(row.moId, m) && sameCourse(row.courseCode, cc);
+                return sameMo(row.moId, m) && sameJobId(row.jobId, j);
             }).map(function (r) {
                 return {
                     applicationId: r.applicationId,
+                    jobId: r.jobId,
                     courseCode: r.courseCode,
                     taId: r.taId,
                     name: r.name,
@@ -75,16 +79,17 @@
             });
         },
 
-        coursesWithEntries: function (moId) {
+        /** 有短名单条目的岗位 {@code jobId} 列表（排序） */
+        jobIdsWithEntries: function (moId) {
             var m = norm(moId);
             var seen = {};
             _items.forEach(function (row) {
                 if (!sameMo(row.moId, m)) return;
-                var cc = norm(row.courseCode);
-                if (cc) seen[cc] = true;
+                var jid = norm(row.jobId);
+                if (jid) seen[jid] = true;
             });
             return Object.keys(seen).sort(function (a, b) {
-                return a.localeCompare(b, 'zh-CN');
+                return a.localeCompare(b, undefined, { sensitivity: 'base' });
             });
         },
 
@@ -96,25 +101,26 @@
             }).length;
         },
 
-        isShortlisted: function (moId, courseCode, applicationId) {
+        isShortlisted: function (moId, jobId, applicationId) {
             var aid = norm(applicationId);
-            if (!aid) return false;
-            return window.MoShortlistStore.listForCourse(moId, courseCode).some(function (r) {
+            var j = norm(jobId);
+            if (!aid || !j) return false;
+            return window.MoShortlistStore.listForJob(moId, j).some(function (r) {
                 return norm(r.applicationId) === aid;
             });
         },
 
         add: async function (moId, entry) {
             var m = norm(moId);
-            var cc = norm(entry && entry.courseCode);
+            var jid = norm(entry && entry.jobId);
             var aid = norm(entry && entry.applicationId);
-            if (!m || !cc || !aid) return false;
+            if (!m || !jid || !aid) return false;
             var res = await fetch(apiUrl('/api/mo/applicants/shortlist'), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json;charset=UTF-8' },
                 body: JSON.stringify({
                     moId: m,
-                    courseCode: cc,
+                    jobId: jid,
                     applicationId: aid,
                     taId: norm(entry.taId),
                     name: norm(entry.name)
@@ -128,14 +134,12 @@
             return true;
         },
 
-        remove: async function (moId, courseCode, applicationId) {
+        remove: async function (moId, applicationId) {
             var m = norm(moId);
-            var cc = norm(courseCode);
             var aid = norm(applicationId);
-            if (!m || !cc || !aid) return false;
+            if (!m || !aid) return false;
             var q =
                 '?moId=' + encodeURIComponent(m)
-                + '&courseCode=' + encodeURIComponent(cc)
                 + '&applicationId=' + encodeURIComponent(aid);
             var res = await fetch(apiUrl('/api/mo/applicants/shortlist') + q, {
                 method: 'DELETE',
@@ -153,10 +157,10 @@
          * @returns {Promise<'added'|'removed'>}
          */
         toggle: async function (moId, entry) {
-            var cc = norm(entry && entry.courseCode);
+            var jid = norm(entry && entry.jobId);
             var aid = norm(entry && entry.applicationId);
-            if (window.MoShortlistStore.isShortlisted(moId, cc, aid)) {
-                await window.MoShortlistStore.remove(moId, cc, aid);
+            if (window.MoShortlistStore.isShortlisted(moId, jid, aid)) {
+                await window.MoShortlistStore.remove(moId, aid);
                 return 'removed';
             }
             await window.MoShortlistStore.add(moId, entry);

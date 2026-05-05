@@ -68,7 +68,7 @@ public class MoTaApplicationReadService {
     /**
      * 在 {@link #getApplicationsByCourseCode(String)} 基础上，按已发布岗位的 {@code jobId} 收窄到同一岗位实例。
      * 若 {@code jobId} 为空，则行为与 {@code getApplicationsByCourseCode} 相同。
-     * 若 TA 申请快照中缺少 {@code jobId}，仍视为可能属于当前岗位（兼容旧数据）。
+     * 若 {@code jobId} 非空，则 TA 申请快照中的 {@code jobId} 须存在且与之一致（忽略大小写）。
      */
     public List<TaApplicationRecord> getApplicationsForCourseScopedToJob(String courseCode, String jobId) throws IOException {
         String normalizedCourseCode = normalizeUpper(courseCode);
@@ -83,10 +83,7 @@ public class MoTaApplicationReadService {
                         return true;
                     }
                     String snapJobId = trimToEmpty(getAsString(record.courseSnapshot(), "jobId"));
-                    if (snapJobId.isBlank()) {
-                        return true;
-                    }
-                    return normalizedJobId.equalsIgnoreCase(snapJobId);
+                    return !snapJobId.isBlank() && normalizedJobId.equalsIgnoreCase(snapJobId);
                 })
                 .sorted(APPLICATION_ORDER)
                 .toList();

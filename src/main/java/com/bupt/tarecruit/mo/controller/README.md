@@ -1,42 +1,96 @@
-# MO servlets (`com.bupt.tarecruit.mo.controller`)
+﻿# MO servlets (`com.bupt.tarecruit.mo.controller`)
 
-Jakarta servlets exposing JSON APIs for the Module Organizer (MO) workspace. They delegate persistence to `MoRecruitmentDao` and `MoAccountDao` unless noted.
+JSON servlet endpoints for the Module Organizer (MO) workspace.
 
 | Servlet | URL pattern | Role |
 | --- | --- | --- |
-| `MoJobBoardServlet` | `/api/mo/jobs` | `GET` lists jobs **for the caller’s `moId`** (query `moId`, matches `items[].ownerMoId`); `POST` creates a job: **`ownerMoId` is taken from query/body `moId`**, not from client `ownerMoId`. |
-| `MoApplicantsServlet` | `/api/mo/applicants` | `GET` lists **submitted** applicants for a course; query **`courseCode`** and **`moId`** (must own the job via `ownerMoId`). Returns `items`, `count`, `unreadCount`. |
-| `MoApplicantShortlistServlet` | `/api/mo/applicants/shortlist` | `GET` **`moId`** — shortlist entries for that MO; `POST` JSON `moId`, `courseCode`, `applicationId`, optional `taId`/`name` — add (idempotent); `DELETE` query `moId`, `courseCode`, `applicationId` — remove. Persists to `mo-applicant-shortlist.json`. |
-| `MoApplicantDetailServlet` | `/api/mo/applicants/detail` | `GET` single-application detail: **`moId`**, **`applicationId`**. |
-| `MoApplicantsUnreadServlet` | `/api/mo/applicants/unread-count` | `GET` **`moId`** — unread count for sidebar badge. |
-| `MoApplicationMarkReadServlet` | `/api/mo/applications/mark-read` | `POST` JSON `moId`, `applicationId` — MO read + sync TA `applications.json` to `UNDER_REVIEW`. |
-| `MoApplicationCommentServlet` | `/api/mo/applications/comment` | `POST` JSON `moId`, `applicationId`, `text` — append MO-only comment thread. |
-| `MoApplicantResumeServlet` | `/api/mo/applications/resume` | `GET` **`moId`**, **`applicationId`** — stream resume after ownership check. |
-| `MoApplicationDecisionServlet` | `/api/mo/applications/select` | `POST` JSON `courseCode`, `taId`, **`moId`**, `decision` (`selected` \| `rejected`), optional `comment` → `application-status.json`. |
-| `MoSkillTagsServlet` | `/api/mo/skill-tags`, `/api/common/skill-tags` | `GET` returns a fixed list of skill tag strings for job publish UI (also exposed under `common` for reuse). |
-| `MoLoginServlet` | `/api/mo/login` | `POST` authenticates MO users with identifier (MO ID/username/email/phone) and password; returns user profile on success. |
-| `MoRegisterServlet` | `/api/mo/register` | `POST` registers new MO account with validation (moId, name, username, email, phone, password); auto-initializes account, profile, and settings JSON files. |
-| `MoProfileSettingsServlet` | `/api/mo/profile-settings`, `/mo-assets/*` | `GET`/`POST` profile and password; static avatar assets under `/mo-assets`. |
+| `MoJobBoardServlet` | `/api/mo/jobs` | `GET` lists jobs for caller `moId`; `POST` creates a job with owner resolved from `moId`. |
+| `MoApplicantsServlet` | `/api/mo/applicants` | `GET` requires `moId`. No `jobId`: merged applicants for all owned jobs. With `jobId` (+ optional `courseCode` cross-check): one opening. `courseCode` alone returns 400. |
+| `MoApplicantShortlistServlet` | `/api/mo/applicants/shortlist` | `GET` by `moId`; `POST` with `moId`, `jobId`, `applicationId` (optional `taId`/`name`) adds shortlist entry; `DELETE` with `moId`, `applicationId` removes entry. Rows persist `jobId` + `courseCode`. |
+| `MoApplicantDetailServlet` | `/api/mo/applicants/detail` | `GET` single-application detail (`moId`, `applicationId`). |
+| `MoApplicantsUnreadServlet` | `/api/mo/applicants/unread-count` | `GET` unread count for MO sidebar badge. |
+| `MoApplicationMarkReadServlet` | `/api/mo/applications/mark-read` | `POST` marks read and syncs TA application to `UNDER_REVIEW`. |
+| `MoApplicationCommentServlet` | `/api/mo/applications/comment` | `POST` appends MO-only comments. |
+| `MoApplicantResumeServlet` | `/api/mo/applications/resume` | `GET` streams resume after ownership checks. |
+| `MoApplicationDecisionServlet` | `/api/mo/applications/select` | `POST` decision endpoint (`jobId` required, `moId` required). |
+| `MoSkillTagsServlet` | `/api/mo/skill-tags`, `/api/common/skill-tags` | `GET` returns fixed skill-tag dictionary. |
+| `MoLoginServlet` | `/api/mo/login` | `POST` MO login. |
+| `MoRegisterServlet` | `/api/mo/register` | `POST` MO registration. |
+| `MoProfileSettingsServlet` | `/api/mo/profile-settings`, `/mo-assets/*` | `GET`/`POST` profile and password; static avatar assets. |
 
-Responses use UTF-8 JSON. Error bodies for the job board follow the v2 envelope (`schema`, `version`, `success`, `message`, `items`).
+## Notes
 
-## Authentication Flow
+- Applicant ownership-sensitive operations use job-level identity (`jobId`) to avoid ambiguity when one `courseCode` has multiple openings.
+- MO shortlist persistence file: `mountDataTAMObupter/mo/mo-applicant-shortlist.json`.
+# MO servlets (`com.bupt.tarecruit.mo.controller`)
 
-1. **Registration**: MO users register via `/api/mo/register` with required fields
-2. **Login**: Authenticated via `/api/mo/login` using any identifier (MO ID, username, email, or phone)
-3. **Session**: Client stores returned user data for subsequent API calls
-4. **Security**: Passwords are hashed with SHA-256 and random salt before storage
+JSON servlet endpoints for the Module Organizer (MO) workspace.
 
-## Data Files
+| Servlet | URL pattern | Role |
+| --- | --- | --- |
+| `MoJobBoardServlet` | `/api/mo/jobs` | `GET` lists jobs for caller `moId`; `POST` creates a job with owner resolved from `moId`. |
+| `MoApplicantsServlet` | `/api/mo/applicants` | `GET` requires `moId`. No `jobId`: merged applicants for all owned jobs. With `jobId` (+ optional `courseCode` cross-check): one opening. `courseCode` alone returns 400. |
+| `MoApplicantShortlistServlet` | `/api/mo/applicants/shortlist` | `GET` by `moId`; `POST` with `moId`, `jobId`, `applicationId` (optional `taId`/`name`) adds shortlist entry; `DELETE` with `moId`, `applicationId` removes entry. Rows persist `jobId` + `courseCode`. |
+| `MoApplicantDetailServlet` | `/api/mo/applicants/detail` | `GET` single-application detail (`moId`, `applicationId`). |
+| `MoApplicantsUnreadServlet` | `/api/mo/applicants/unread-count` | `GET` unread count for MO sidebar badge. |
+| `MoApplicationMarkReadServlet` | `/api/mo/applications/mark-read` | `POST` marks read and syncs TA application to `UNDER_REVIEW`. |
+| `MoApplicationCommentServlet` | `/api/mo/applications/comment` | `POST` appends MO-only comments. |
+| `MoApplicantResumeServlet` | `/api/mo/applications/resume` | `GET` streams resume after ownership checks. |
+| `MoApplicationDecisionServlet` | `/api/mo/applications/select` | `POST` decision endpoint (`jobId` required, `moId` required). |
+| `MoSkillTagsServlet` | `/api/mo/skill-tags`, `/api/common/skill-tags` | `GET` returns fixed skill-tag dictionary. |
+| `MoLoginServlet` | `/api/mo/login` | `POST` MO login. |
+| `MoRegisterServlet` | `/api/mo/register` | `POST` MO registration. |
+| `MoProfileSettingsServlet` | `/api/mo/profile-settings`, `/mo-assets/*` | `GET`/`POST` profile and password; static avatar assets. |
 
-MO authentication data is stored in three JSON files under `mountDataTAMObupter/mo/`:
-- `mos.json` - Main account records with credentials
-- `profiles.json` - User profiles (real name, bio, skills)
-- `settings.json` - System preferences (theme, avatar)
+## Notes
 
-Applicant workflow also uses (see `docs/backend/mo-ta-interaction-log.md`):
-- `mo-application-read-state.json` — per `(moId, applicationId)` read timestamps
-- `mo-application-comments.json` — MO comment threads keyed by `applicationId`
-- `mo-applicant-shortlist.json` — MO shortlist entries (`moId`, `courseCode`, `applicationId`, …)
+- Applicant ownership-sensitive operations use job-level identity (`jobId`) to avoid ambiguity when one `courseCode` has multiple openings.
+- MO shortlist persistence file: `mountDataTAMObupter/mo/mo-applicant-shortlist.json`.
+# MO servlets (`com.bupt.tarecruit.mo.controller`)
 
-All write operations are synchronized for thread safety.
+JSON servlet endpoints for the Module Organizer (MO) workspace.
+
+| Servlet | URL pattern | Role |
+| --- | --- | --- |
+| `MoJobBoardServlet` | `/api/mo/jobs` | `GET` lists jobs for caller `moId`; `POST` creates a job with owner resolved from `moId`. |
+| `MoApplicantsServlet` | `/api/mo/applicants` | `GET` requires `moId`. No `jobId`: merged applicants for all owned jobs. With `jobId` (+ optional `courseCode` cross-check): one opening. `courseCode` alone returns 400. |
+| `MoApplicantShortlistServlet` | `/api/mo/applicants/shortlist` | `GET` by `moId`; `POST` with `moId`, `jobId`, `applicationId` (optional `taId`/`name`) adds shortlist entry; `DELETE` with `moId`, `applicationId` removes entry. Rows persist `jobId` + `courseCode`. |
+| `MoApplicantDetailServlet` | `/api/mo/applicants/detail` | `GET` single-application detail (`moId`, `applicationId`). |
+| `MoApplicantsUnreadServlet` | `/api/mo/applicants/unread-count` | `GET` unread count for MO sidebar badge. |
+| `MoApplicationMarkReadServlet` | `/api/mo/applications/mark-read` | `POST` marks read and syncs TA application to `UNDER_REVIEW`. |
+| `MoApplicationCommentServlet` | `/api/mo/applications/comment` | `POST` appends MO-only comments. |
+| `MoApplicantResumeServlet` | `/api/mo/applications/resume` | `GET` streams resume after ownership checks. |
+| `MoApplicationDecisionServlet` | `/api/mo/applications/select` | `POST` decision endpoint (`jobId` required, `moId` required). |
+| `MoSkillTagsServlet` | `/api/mo/skill-tags`, `/api/common/skill-tags` | `GET` returns fixed skill-tag dictionary. |
+| `MoLoginServlet` | `/api/mo/login` | `POST` MO login. |
+| `MoRegisterServlet` | `/api/mo/register` | `POST` MO registration. |
+| `MoProfileSettingsServlet` | `/api/mo/profile-settings`, `/mo-assets/*` | `GET`/`POST` profile and password; static avatar assets. |
+
+## Notes
+
+- Applicant ownership-sensitive operations are jobId-based to avoid ambiguity when one `courseCode` has multiple openings.
+- MO shortlist file: `mountDataTAMObupter/mo/mo-applicant-shortlist.json`.
+# MO servlets (`com.bupt.tarecruit.mo.controller`)
+
+Jakarta servlets exposing JSON APIs for the Module Organizer (MO) workspace.
+
+| Servlet | URL pattern | Role |
+| --- | --- | --- |
+| `MoJobBoardServlet` | `/api/mo/jobs` | `GET` lists jobs for caller `moId`; `POST` creates a job with owner resolved from `moId`. |
+| `MoApplicantsServlet` | `/api/mo/applicants` | `GET` requires `moId`. No `jobId`: merged applicants for all owned jobs. With `jobId` (+ optional `courseCode` cross-check): one opening. `courseCode` alone returns 400. |
+| `MoApplicantShortlistServlet` | `/api/mo/applicants/shortlist` | `GET` by `moId`; `POST` with `moId`, `jobId`, `applicationId` (optional `taId`/`name`) adds shortlist entry; `DELETE` with `moId`, `applicationId` removes entry. Rows persist `jobId` + `courseCode`. |
+| `MoApplicantDetailServlet` | `/api/mo/applicants/detail` | `GET` single-application detail (`moId`, `applicationId`). |
+| `MoApplicantsUnreadServlet` | `/api/mo/applicants/unread-count` | `GET` unread count for MO sidebar badge. |
+| `MoApplicationMarkReadServlet` | `/api/mo/applications/mark-read` | `POST` marks read and syncs TA application to `UNDER_REVIEW`. |
+| `MoApplicationCommentServlet` | `/api/mo/applications/comment` | `POST` appends MO-only comments. |
+| `MoApplicantResumeServlet` | `/api/mo/applications/resume` | `GET` streams resume after ownership checks. |
+| `MoApplicationDecisionServlet` | `/api/mo/applications/select` | `POST` decision endpoint (`jobId` required, `moId` required). |
+| `MoSkillTagsServlet` | `/api/mo/skill-tags`, `/api/common/skill-tags` | `GET` returns fixed skill-tag dictionary. |
+| `MoLoginServlet` | `/api/mo/login` | `POST` MO login. |
+| `MoRegisterServlet` | `/api/mo/register` | `POST` MO registration. |
+| `MoProfileSettingsServlet` | `/api/mo/profile-settings`, `/mo-assets/*` | `GET`/`POST` profile and password; static avatar assets. |
+
+## Notes
+
+- Applicant ownership-sensitive operations use job-level identity (`jobId`) to avoid ambiguity when one `courseCode` has multiple openings.
+- MO shortlist persistence file: `mountDataTAMObupter/mo/mo-applicant-shortlist.json`.

@@ -17,7 +17,7 @@
 
         let courseJobCards = [];
         let courseDetailState = {};
-        let activeCourseCode = null;
+        let activeOpeningKey = null;
         let currentJobsPage = '1';
         let isJobFetching = false;
         let hasLoadedJobs = false;
@@ -36,8 +36,19 @@
             return [];
         }
 
-        function isAppliedCourse(courseCode) {
-            const normalized = String(courseCode || '').trim().toUpperCase();
+        function getAppliedJobIds() {
+            if (typeof app.getAppliedJobIds === 'function') {
+                return app.getAppliedJobIds();
+            }
+            return [];
+        }
+
+        function isAppliedToOpening(item) {
+            const jid = String(item?.jobId || '').trim();
+            if (jid) {
+                return getAppliedJobIds().some((x) => String(x || '').trim() === jid);
+            }
+            const normalized = String(item?.courseCode || '').trim().toUpperCase();
             if (!normalized) return false;
             return getAppliedCourseCodes().some((code) => String(code || '').trim().toUpperCase() === normalized);
         }
@@ -95,6 +106,8 @@
                 resumeInput.value = '';
                 resumeInput.dataset.courseCode = course.code;
                 resumeInput.dataset.courseName = course.name;
+                resumeInput.dataset.jobId = course.jobId || '';
+                resumeInput.dataset.openingKey = course.openingKey || '';
             }
             if (resumeMeta) resumeMeta.hidden = true;
             if (resumeFileName) resumeFileName.textContent = t('未选择', 'Not selected');
@@ -103,20 +116,25 @@
             if (submitBtn) {
                 submitBtn.textContent = t('提交课程申请', 'Submit Application');
                 submitBtn.dataset.courseCode = course.code;
+                submitBtn.dataset.jobId = course.jobId || '';
+                submitBtn.dataset.openingKey = course.openingKey || '';
                 submitBtn.disabled = false;
             }
             if (aiOptimizeBtn) {
                 aiOptimizeBtn.textContent = t('AI优化后再发送', 'Optimize with AI Before Sending');
                 aiOptimizeBtn.dataset.courseCode = course.code;
                 aiOptimizeBtn.dataset.courseName = course.name;
+                aiOptimizeBtn.dataset.jobId = course.jobId || '';
+                aiOptimizeBtn.dataset.openingKey = course.openingKey || '';
                 aiOptimizeBtn.disabled = false;
             }
         }
 
-        function renderCourseDetail(courseCode) {
-            const course = courseDetailState[courseCode];
+        function renderCourseDetail(openingKey) {
+            const key = String(openingKey || '').trim();
+            const course = courseDetailState[key];
             if (!course) return;
-            activeCourseCode = courseCode;
+            activeOpeningKey = key;
 
             const jobDetailCode = document.getElementById('jobDetailCode');
             const jobDetailName = document.getElementById('jobDetailName');
@@ -158,6 +176,8 @@
                 jobDetailApplyBtn.classList.remove('applied');
                 jobDetailApplyBtn.textContent = jobDetailApplyBtn.dataset.applyLabelDefault || t('申请该课程', 'Apply for this course');
                 jobDetailApplyBtn.dataset.courseCode = course.code;
+                jobDetailApplyBtn.dataset.jobId = course.jobId || '';
+                jobDetailApplyBtn.dataset.openingKey = course.openingKey || key;
                 jobDetailApplyBtn.disabled = false;
             }
 
@@ -186,8 +206,8 @@
                 const openCardDetail = (event) => {
                     event?.preventDefault();
                     event?.stopPropagation();
-                    const courseCode = card.dataset.courseCode;
-                    renderCourseDetail(courseCode);
+                    const key = String(card.dataset.openingKey || card.dataset.courseCode || '').trim();
+                    renderCourseDetail(key);
                     if (typeof app.openModal === 'function') app.openModal('course-detail');
                 };
 
@@ -388,16 +408,19 @@
             });
         }
 
-        async function submitCourseApplication(courseCode, selectedFile) {
+        async function submitCourseApplication(courseCode, jobId, selectedFile) {
             const taId = getCurrentTaId();
             if (!taId) throw new Error(t('当前未获取到 TA 身份，请重新登录后再试。', 'TA identity is missing. Please log in again.'));
             if (!courseCode) throw new Error(t('缺少课程编号，无法提交申请。', 'Missing course code. Unable to submit the application.'));
+            const jid = String(jobId || '').trim();
+            if (!jid) throw new Error(t('缺少岗位 jobId，无法提交申请。', 'Missing jobId. Unable to submit the application.'));
             if (!selectedFile) throw new Error(t('请先选择简历文件。', 'Please choose a resume file first.'));
             if (!isAllowedResumeFile(selectedFile)) throw new Error(t('仅支持上传 PDF / DOC / DOCX 简历文件。', 'Only PDF / DOC / DOCX resume files are supported.'));
             if (selectedFile.size > 10 * 1024 * 1024) throw new Error(t('简历文件大小不能超过 10MB。', 'The resume file must be smaller than 10MB.'));
 
             const formData = new FormData();
             formData.append('taId', taId);
+            formData.append('jobId', jid);
             formData.append('courseCode', courseCode);
             formData.append('resumeFile', selectedFile, selectedFile.name);
 
@@ -445,9 +468,7 @@
                     return;
                 }
 
-                const appliedCourseCodes = getAppliedCourseCodes();
-                const appliedCourseSet = new Set(appliedCourseCodes.map((code) => String(code || '').trim().toUpperCase()).filter(Boolean));
-                const visibleItems = getSortedJobItems(data.items).filter((item) => !appliedCourseSet.has(String(item.courseCode || '').trim().toUpperCase()));
+                const visibleItems = getSortedJobItems(data.items).filter((item) => !isAppliedToOpening(item));
 
                 const countBadge = document.getElementById('openCoursesCount');
                 if (countBadge) {
@@ -471,8 +492,11 @@
                         ? item.recruitmentStatus.trim().toUpperCase()
                         : t('待确定', 'TBD');
                     const statusPriority = (recruitmentStatus === 'CLOSE' || recruitmentStatus === 'CLOSED') ? 1 : 0;
+                    const openingKey = String(item.jobId || item.courseCode || '').trim();
 
-                    courseDetailState[item.courseCode] = {
+                    courseDetailState[openingKey] = {
+                        openingKey: openingKey,
+                        jobId: String(item.jobId || '').trim(),
                         code: item.courseCode,
                         name: item.courseName,
                         mo: courseMoName,
@@ -491,7 +515,7 @@
                     }).join('');
 
                     newCardsHTML.push(
-                        '<div class="job-card course-job-card" tabindex="0" role="button" aria-label="' + t('查看 ', 'View ') + item.courseName + t(' 详情', ' details') + '" data-job-detail-card data-course-code="' + item.courseCode + '" data-status-priority="' + statusPriority + '" data-original-order="' + newCardsHTML.length + '">' +
+                        '<div class="job-card course-job-card" tabindex="0" role="button" aria-label="' + t('查看 ', 'View ') + item.courseName + t(' 详情', ' details') + '" data-job-detail-card data-opening-key="' + String(openingKey).replace(/"/g, '') + '" data-course-code="' + String(item.courseCode || '').replace(/"/g, '') + '" data-status-priority="' + statusPriority + '" data-original-order="' + newCardsHTML.length + '">' +
                         '<div class="course-card-topline">' +
                         '<span class="job-code">' + item.courseCode + '</span>' +
                         '<span class="course-status-badge course-status-badge-' + recruitmentStatus.toLowerCase() + '">' + recruitmentStatus + '</span>' +
@@ -528,7 +552,7 @@
                     currentJobBoard.innerHTML = newCardsHTML.join('');
                 }
 
-                activeCourseCode = null;
+                activeOpeningKey = null;
                 hasLoadedJobs = true;
                 bindCardEvents();
                 currentJobsPage = '1';
@@ -563,9 +587,9 @@
         const jobDetailApplyBtn = document.getElementById('jobDetailApplyBtn');
         jobDetailApplyBtn?.addEventListener('click', (event) => {
             event.preventDefault();
-            const courseCode = jobDetailApplyBtn.dataset.courseCode || activeCourseCode;
-            const course = courseDetailState[courseCode];
-            if (!course || isAppliedCourse(courseCode)) return;
+            const openingKey = String(jobDetailApplyBtn.dataset.openingKey || activeOpeningKey || '').trim();
+            const course = courseDetailState[openingKey] || courseDetailState[jobDetailApplyBtn.dataset.courseCode || ''];
+            if (!course || isAppliedToOpening({ jobId: course.jobId, courseCode: course.code })) return;
             syncApplyModal(course);
             if (typeof app.openModal === 'function') app.openModal('course-apply');
         });
@@ -603,7 +627,10 @@
             event.preventDefault();
             const resumeInput = document.getElementById('jobResumeFileInput');
             const selectedFile = resumeInput?.files && resumeInput.files[0];
-            const courseCode = (jobResumeSubmitBtn.dataset.courseCode || resumeInput?.dataset.courseCode || activeCourseCode || '').trim();
+            const openingKey = String(jobResumeSubmitBtn.dataset.openingKey || resumeInput?.dataset.openingKey || activeOpeningKey || '').trim();
+            const course = courseDetailState[openingKey] || courseDetailState[String(resumeInput?.dataset.courseCode || '').trim()];
+            const courseCode = (course && course.code) || (jobResumeSubmitBtn.dataset.courseCode || resumeInput?.dataset.courseCode || '').trim();
+            const jobId = (course && course.jobId) || (jobResumeSubmitBtn.dataset.jobId || resumeInput?.dataset.jobId || '').trim();
             if (!selectedFile) {
                 resumeInput?.click();
                 return;
@@ -614,7 +641,7 @@
             jobResumeSubmitBtn.textContent = t('提交中...', 'Submitting...');
 
             try {
-                const result = await submitCourseApplication(courseCode, selectedFile);
+                const result = await submitCourseApplication(courseCode, jobId, selectedFile);
                 jobResumeSubmitBtn.textContent = t('已提交', 'Submitted');
 
                 if (jobDetailApplyBtn) {
@@ -627,6 +654,9 @@
                 if (resumeTrigger) resumeTrigger.textContent = t('已上传', 'Uploaded');
                 if (typeof app.setAppliedCourseCodes === 'function') {
                     app.setAppliedCourseCodes(getAppliedCourseCodes().concat([courseCode]));
+                }
+                if (result.jobId && typeof app.appendAppliedJobId === 'function') {
+                    app.appendAppliedJobId(result.jobId);
                 }
                 focusSubmittedApplication(result, courseCode);
                 if (typeof app.dismissModalStack === 'function') {
@@ -661,8 +691,10 @@
             event.preventDefault();
             const resumeInput = document.getElementById('jobResumeFileInput');
             const selectedFile = resumeInput?.files && resumeInput.files[0];
-            const courseCode = (jobResumeAiOptimizeBtn.dataset.courseCode || resumeInput?.dataset.courseCode || activeCourseCode || '').trim();
-            const courseName = (jobResumeAiOptimizeBtn.dataset.courseName || resumeInput?.dataset.courseName || '').trim();
+            const openingKeyAi = String(jobResumeAiOptimizeBtn.dataset.openingKey || resumeInput?.dataset.openingKey || activeOpeningKey || '').trim();
+            const courseAi = courseDetailState[openingKeyAi] || courseDetailState[String(resumeInput?.dataset.courseCode || '').trim()];
+            const courseCode = (courseAi && courseAi.code) || (jobResumeAiOptimizeBtn.dataset.courseCode || resumeInput?.dataset.courseCode || '').trim();
+            const courseName = (courseAi && courseAi.name) || (jobResumeAiOptimizeBtn.dataset.courseName || resumeInput?.dataset.courseName || '').trim();
             if (!selectedFile) {
                 resumeInput?.click();
                 return;
@@ -699,7 +731,10 @@
         renderJobPagination(0);
         fetchAndRefreshJobs();
 
-        app.activeCourseCode = () => activeCourseCode;
+        app.activeCourseCode = function () {
+            if (!activeOpeningKey || !courseDetailState[activeOpeningKey]) return '';
+            return courseDetailState[activeOpeningKey].code || '';
+        };
         app.refreshJobBoard = fetchAndRefreshJobs;
         Object.defineProperty(app, 'jobDetailApplyBtn', {
             get: () => document.getElementById('jobDetailApplyBtn')

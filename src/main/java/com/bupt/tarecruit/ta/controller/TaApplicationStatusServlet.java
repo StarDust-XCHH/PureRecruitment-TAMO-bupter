@@ -70,6 +70,7 @@ public class TaApplicationStatusServlet extends HttpServlet {
         payload.add("messages", notifications.deepCopy());
         payload.add("details", buildDetailsMap(enrichedItems));
         payload.add("appliedCourseCodes", buildAppliedCourseCodes(enrichedItems));
+        payload.add("appliedJobIds", buildAppliedJobIds(enrichedItems));
         return gson.toJson(payload);
     }
 
@@ -83,6 +84,7 @@ public class TaApplicationStatusServlet extends HttpServlet {
         payload.add("messages", new JsonArray());
         payload.add("details", new JsonObject());
         payload.add("appliedCourseCodes", new JsonArray());
+        payload.add("appliedJobIds", new JsonArray());
         return gson.toJson(payload);
     }
 
@@ -197,6 +199,27 @@ public class TaApplicationStatusServlet extends HttpServlet {
             }
         }
         return courseCodes;
+    }
+
+    private JsonArray buildAppliedJobIds(JsonArray items) {
+        JsonArray jobIds = new JsonArray();
+        if (items == null) {
+            return jobIds;
+        }
+        java.util.LinkedHashSet<String> seen = new java.util.LinkedHashSet<>();
+        for (int i = 0; i < items.size(); i++) {
+            if (!items.get(i).isJsonObject()) {
+                continue;
+            }
+            JsonObject item = items.get(i).getAsJsonObject();
+            String jobId = trim(item.has("jobId") && !item.get("jobId").isJsonNull()
+                    ? item.get("jobId").getAsString()
+                    : "");
+            if (!jobId.isEmpty() && seen.add(jobId)) {
+                jobIds.add(jobId);
+            }
+        }
+        return jobIds;
     }
 
     private JsonObject buildDetailsMap(JsonArray items) {

@@ -54,16 +54,16 @@ public class MoApplicantShortlistServlet extends HttpServlet {
         try {
             JsonObject body = JsonParser.parseReader(req.getReader()).getAsJsonObject();
             String moId = readString(body, "moId");
-            String courseCode = readString(body, "courseCode");
+            String jobId = readString(body, "jobId");
             String applicationId = readString(body, "applicationId");
             String taId = readString(body, "taId");
             String name = readString(body, "name");
-            if (moId.isEmpty() || courseCode.isEmpty() || applicationId.isEmpty()) {
+            if (moId.isEmpty() || jobId.isEmpty() || applicationId.isEmpty()) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                resp.getWriter().write(gson.toJson(ApiResponse.failure("缺少 moId、courseCode 或 applicationId")));
+                resp.getWriter().write(gson.toJson(ApiResponse.failure("缺少 moId、jobId 或 applicationId")));
                 return;
             }
-            JsonObject result = recruitmentDao.addApplicantShortlistEntry(moId, courseCode, applicationId, taId, name);
+            JsonObject result = recruitmentDao.addApplicantShortlistEntry(moId, jobId, applicationId, taId, name);
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().write(gson.toJson(result));
         } catch (IllegalArgumentException ex) {
@@ -81,15 +81,14 @@ public class MoApplicantShortlistServlet extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
         resp.setContentType("application/json;charset=UTF-8");
         String moId = trim(req.getParameter("moId"));
-        String courseCode = trim(req.getParameter("courseCode"));
         String applicationId = trim(req.getParameter("applicationId"));
-        if (moId.isEmpty() || courseCode.isEmpty() || applicationId.isEmpty()) {
+        if (moId.isEmpty() || applicationId.isEmpty()) {
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().write(gson.toJson(ApiResponse.failure("缺少 moId、courseCode 或 applicationId 查询参数")));
+            resp.getWriter().write(gson.toJson(ApiResponse.failure("缺少 moId 或 applicationId 查询参数")));
             return;
         }
         try {
-            JsonObject result = recruitmentDao.removeApplicantShortlistEntry(moId, courseCode, applicationId);
+            JsonObject result = recruitmentDao.removeApplicantShortlistEntry(moId, applicationId);
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().write(gson.toJson(result));
         } catch (IllegalArgumentException ex) {

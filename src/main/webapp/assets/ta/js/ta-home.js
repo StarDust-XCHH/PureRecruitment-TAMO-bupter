@@ -11,6 +11,9 @@
     taApp.state.appliedCourseCodes = Array.isArray(taApp.state.appliedCourseCodes)
         ? taApp.state.appliedCourseCodes
         : [];
+    taApp.state.appliedJobIds = Array.isArray(taApp.state.appliedJobIds)
+        ? taApp.state.appliedJobIds
+        : [];
     taApp.state.statusFocus = taApp.state.statusFocus && typeof taApp.state.statusFocus === 'object'
         ? taApp.state.statusFocus
         : null;
@@ -29,6 +32,30 @@
         return Array.isArray(taApp.state.appliedCourseCodes)
             ? taApp.state.appliedCourseCodes.slice()
             : [];
+    };
+
+    taApp.setAppliedJobIds = function setAppliedJobIds(jobIds) {
+        const normalized = Array.isArray(jobIds)
+            ? jobIds.map((id) => String(id || '').trim()).filter(Boolean)
+            : [];
+        taApp.state.appliedJobIds = Array.from(new Set(normalized));
+        if (typeof taApp.refreshJobBoard === 'function') {
+            taApp.refreshJobBoard();
+        }
+    };
+
+    taApp.getAppliedJobIds = function getAppliedJobIds() {
+        return Array.isArray(taApp.state.appliedJobIds)
+            ? taApp.state.appliedJobIds.slice()
+            : [];
+    };
+
+    taApp.appendAppliedJobId = function appendAppliedJobId(jobId) {
+        const j = String(jobId || '').trim();
+        if (!j) return;
+        const next = taApp.getAppliedJobIds();
+        next.push(j);
+        taApp.setAppliedJobIds(next);
     };
 
     taApp.setStatusFocus = function setStatusFocus(statusFocus) {

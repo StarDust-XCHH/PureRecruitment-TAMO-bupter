@@ -59,7 +59,8 @@ public final class MoTaApplicationsMutationDao {
     }
 
     /**
-     * 在 TA+课程编号基础上，可选按 {@code courseSnapshot.jobId} 与岗位 {@code jobId} 对齐，避免同一 {@code courseCode} 多学期岗位时误选。
+     * 在 TA+课程编号基础上，可选按 {@code courseSnapshot.jobId} 与岗位 {@code jobId} 对齐。
+     * 当 {@code jobId} 非空时，快照中须带有相同 {@code jobId}，且不与仅含历史 {@code uniqueKey} 的记录混淆。
      */
     public synchronized JsonObject findApplicationByTaAndCourse(String taId, String courseCode, String jobId) throws IOException {
         String t = trim(taId);
@@ -71,7 +72,7 @@ public final class MoTaApplicationsMutationDao {
         JsonObject root = loadRoot();
         JsonArray items = root.getAsJsonArray("items");
         String canonicalKey = TaApplicationUniqueKeys.canonical(t, c, j);
-        String legacyKey = TaApplicationUniqueKeys.legacyKey(t, c);
+        String canonicalCourseOnly = TaApplicationUniqueKeys.canonical(t, c, "");
         JsonObject latest = null;
         String latestUpdated = "";
         for (JsonElement element : items) {
@@ -82,20 +83,24 @@ public final class MoTaApplicationsMutationDao {
             if (!t.equalsIgnoreCase(getAsString(item, "taId"))) {
                 continue;
             }
+            JsonObject snap = item.has("courseSnapshot") && item.get("courseSnapshot").isJsonObject()
+                    ? item.getAsJsonObject("courseSnapshot")
+                    : new JsonObject();
+            String snapJob = trim(getAsString(snap, "jobId"));
             if (!j.isEmpty()) {
-                JsonObject snap = item.has("courseSnapshot") && item.get("courseSnapshot").isJsonObject()
-                        ? item.getAsJsonObject("courseSnapshot")
-                        : new JsonObject();
-                String snapJob = trim(getAsString(snap, "jobId"));
-                if (!snapJob.isEmpty() && !j.equalsIgnoreCase(snapJob)) {
+                if (snapJob.isEmpty() || !j.equalsIgnoreCase(snapJob)) {
                     continue;
                 }
             }
             String cc = trim(getAsString(item, "courseCode")).toUpperCase(Locale.ROOT);
             String uk = trim(getAsString(item, "uniqueKey")).toUpperCase(Locale.ROOT);
-            boolean keyOrCodeMatch = c.equals(cc)
-                    || canonicalKey.equalsIgnoreCase(uk)
-                    || legacyKey.equalsIgnoreCase(uk);
+            boolean keyOrCodeMatch;
+            if (!j.isEmpty()) {
+                keyOrCodeMatch = c.equals(cc) && canonicalKey.equalsIgnoreCase(uk);
+            } else {
+                keyOrCodeMatch = c.equals(cc)
+                        && (canonicalCourseOnly.equalsIgnoreCase(uk));
+            }
             if (!keyOrCodeMatch) {
                 continue;
             }

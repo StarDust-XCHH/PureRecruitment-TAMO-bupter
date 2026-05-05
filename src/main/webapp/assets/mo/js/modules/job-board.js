@@ -1328,13 +1328,15 @@
             const jumpBtn = document.getElementById('jumpToApplicantsBtn');
             if (jumpBtn) {
                 jumpBtn.onclick = function () {
-                    var code = item.courseCode || item.jobId;
+                    var preset = item.jobId != null && String(item.jobId).trim() !== ''
+                        ? String(item.jobId).trim()
+                        : '';
                     if (typeof app.closeAllModals === 'function') app.closeAllModals();
                     if (typeof app.navigateToApplicantsWithCourse === 'function') {
-                        app.navigateToApplicantsWithCourse(code);
+                        app.navigateToApplicantsWithCourse(preset);
                     } else if (typeof app.activateRoute === 'function') {
                         app.activateRoute('applicants');
-                        if (typeof app.setApplicantCourse === 'function') app.setApplicantCourse(code);
+                        if (typeof app.setApplicantCourse === 'function') app.setApplicantCourse(preset);
                     }
                 };
             }
