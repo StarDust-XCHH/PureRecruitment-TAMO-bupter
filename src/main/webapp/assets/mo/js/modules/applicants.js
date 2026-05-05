@@ -307,9 +307,8 @@
 
         function updateApplicantFiltersResetVisibility() {
             if (!clearFiltersBtn) return;
-            var show = anyApplicantFilterActive();
-            clearFiltersBtn.hidden = !show;
-            clearFiltersBtn.setAttribute('aria-hidden', show ? 'false' : 'true');
+            var active = anyApplicantFilterActive();
+            clearFiltersBtn.disabled = !active;
         }
 
         function onApplicantFilterChange() {
@@ -1601,6 +1600,7 @@
         }
         if (clearFiltersBtn) {
             clearFiltersBtn.addEventListener('click', function () {
+                if (clearFiltersBtn.disabled) return;
                 clearAllApplicantFilters();
             });
         }

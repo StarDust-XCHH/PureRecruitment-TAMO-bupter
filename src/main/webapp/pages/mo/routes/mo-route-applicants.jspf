@@ -14,39 +14,38 @@
         </div>
 
         <div class="mo-applicants-toolbar mo-applicants-toolbar--stacked" role="search" aria-label="Applicant filters" data-i18n-aria-label="applicants.filtersRegionAria" data-i18n-aria-label-zh="人选投递筛选" data-i18n-aria-label-en="Applicant filters">
-            <div class="mo-applicants-filters-header">
-                <button type="button" class="mo-applicants-toolbar__clear mo-applicants-filters-header__reset" id="clearApplicantFiltersBtn" hidden
-                    data-i18n="applicants.resetFilters" data-i18n-zh="重置筛选" data-i18n-en="Reset filters"
-                    data-i18n-aria-label="applicants.resetFiltersAria" data-i18n-aria-label-zh="清除全部筛选条件" data-i18n-aria-label-en="Clear all filters">重置筛选</button>
-            </div>
-            <div class="mo-applicants-filters">
-                <div class="mo-applicants-filters__row">
-                    <div class="mo-applicants-filter-field">
-                        <label for="applicantCourseSelect" data-i18n="applicants.filterLabel" data-i18n-zh="课程岗位" data-i18n-en="Module">课程岗位</label>
-                        <select id="applicantCourseSelect"></select>
-                    </div>
-                    <div class="mo-applicants-filter-field">
-                        <label for="applicantStatusSelect" data-i18n="applicants.filterStatus" data-i18n-zh="状态" data-i18n-en="Status">状态</label>
-                        <select id="applicantStatusSelect"></select>
-                    </div>
-                    <div class="mo-applicants-filter-field">
-                        <label for="applicantSemesterSelect" data-i18n="applicants.filterSemester" data-i18n-zh="学期" data-i18n-en="Term">学期</label>
-                        <select id="applicantSemesterSelect"></select>
-                    </div>
+            <div class="mo-applicants-filters mo-applicants-filters--layout">
+                <div class="mo-applicants-filter-field mo-applicants-filter-field--module">
+                    <label for="applicantCourseSelect" data-i18n="applicants.filterLabel" data-i18n-zh="课程岗位" data-i18n-en="Module">课程岗位</label>
+                    <select id="applicantCourseSelect"></select>
                 </div>
-                <div class="mo-applicants-filters__row mo-applicants-filters__row--secondary">
-                    <div class="mo-applicants-filter-field mo-applicants-filter-field--search">
-                        <label for="applicantSearchInput" data-i18n="applicants.filterSearch" data-i18n-zh="搜索" data-i18n-en="Search">搜索</label>
-                        <input type="search" id="applicantSearchInput" class="mo-applicants-filter-search" autocomplete="off"
-                            data-i18n-placeholder="applicants.filterSearchPh" data-i18n-placeholder-zh="姓名、TA ID、课程编号或名称…" data-i18n-placeholder-en="Name, TA ID, module code or title…"
-                            placeholder="姓名、TA ID、课程编号或名称…" />
-                    </div>
-                    <div class="mo-applicants-filter-field mo-applicants-filter-field--checks">
-                        <label class="mo-applicants-filter-check">
-                            <input type="checkbox" id="applicantUnreadOnly" />
-                            <span data-i18n="applicants.filterUnreadOnly" data-i18n-zh="仅未读" data-i18n-en="Unread only">仅未读</span>
-                        </label>
-                    </div>
+                <div class="mo-applicants-filter-field mo-applicants-filter-field--status">
+                    <label for="applicantStatusSelect" data-i18n="applicants.filterStatus" data-i18n-zh="状态" data-i18n-en="Status">状态</label>
+                    <select id="applicantStatusSelect"></select>
+                </div>
+                <div class="mo-applicants-filter-field mo-applicants-filter-field--term">
+                    <label for="applicantSemesterSelect" data-i18n="applicants.filterSemester" data-i18n-zh="学期" data-i18n-en="Term">学期</label>
+                    <select id="applicantSemesterSelect"></select>
+                </div>
+                <div class="mo-applicants-filter-field mo-applicants-filter-field--reset">
+                    <span class="mo-applicants-filter-field__label-spacer" aria-hidden="true">&nbsp;</span>
+                    <button type="button" class="mo-applicants-toolbar__clear mo-applicants-filter-field__reset-btn" id="clearApplicantFiltersBtn" disabled
+                        data-i18n="applicants.resetFilters" data-i18n-zh="重置筛选" data-i18n-en="Reset filters"
+                        data-i18n-aria-label="applicants.resetFiltersAria" data-i18n-aria-label-zh="清除全部筛选条件" data-i18n-aria-label-en="Clear all filters">重置筛选</button>
+                </div>
+
+                <div class="mo-applicants-filter-field mo-applicants-filter-field--search mo-applicants-filter-field--search-span">
+                    <label for="applicantSearchInput" data-i18n="applicants.filterSearch" data-i18n-zh="搜索" data-i18n-en="Search">搜索</label>
+                    <input type="search" id="applicantSearchInput" class="mo-applicants-filter-search" autocomplete="off"
+                        data-i18n-placeholder="applicants.filterSearchPh" data-i18n-placeholder-zh="姓名、TA ID、课程编号或名称…" data-i18n-placeholder-en="Name, TA ID, module code or title…"
+                        placeholder="姓名、TA ID、课程编号或名称…" />
+                </div>
+                <div class="mo-applicants-filter-field mo-applicants-filter-field--checks mo-applicants-filter-field--unread-col">
+                    <span class="mo-applicants-filter-field__label-spacer" aria-hidden="true">&nbsp;</span>
+                    <label class="mo-applicants-filter-check">
+                        <input type="checkbox" id="applicantUnreadOnly" />
+                        <span data-i18n="applicants.filterUnreadOnly" data-i18n-zh="仅未读" data-i18n-en="Unread only">仅未读</span>
+                    </label>
                 </div>
             </div>
             <span class="muted mo-applicants-toolbar__status" id="applicantsStatusText"></span>
