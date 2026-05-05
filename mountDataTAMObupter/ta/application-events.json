@@ -1,22 +1,5 @@
 {
   "schema": "ta-application-events.v1",
   "version": 1,
-  "items": [
-    {
-      "eventId": "APP-TA-24341-EBT0009-20260423T035006Z-EVT-20260423T035006Z",
-      "applicationId": "APP-TA-24341-EBT0009-20260423T035006Z",
-      "taId": "TA-24341",
-      "eventType": "SUBMITTED",
-      "label": "已投递申请",
-      "content": "系统已记录你的岗位申请与简历文件。",
-      "time": "2026-04-23T03:50:06.302972200Z",
-      "done": true
-    }
-  ],
-  "meta": {
-    "schema": "ta",
-    "entity": "application-events",
-    "version": "1.0",
-    "updatedAt": "2026-04-23T03:50:06.302972200Z"
-  }
+  "items": []
 }

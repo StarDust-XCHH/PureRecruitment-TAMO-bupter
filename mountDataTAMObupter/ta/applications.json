@@ -1,55 +1,5 @@
 {
   "schema": "ta-applications.v1",
   "version": 1,
-  "items": [
-    {
-      "applicationId": "APP-TA-24341-EBT0009-20260423T035006Z",
-      "uniqueKey": "TA-24341::EBT0009",
-      "taId": "TA-24341",
-      "courseCode": "EBT0009",
-      "courseSnapshot": {
-        "courseCode": "EBT0009",
-        "courseName": "Introduction to Machine Learning 340",
-        "ownerMoName": "testName3",
-        "semester": "2025-Fall",
-        "campus": "Shahe",
-        "studentCount": ""
-      },
-      "taSnapshot": {
-        "taId": "TA-24341",
-        "realName": "Ton",
-        "studentId": "TA-24341",
-        "contactEmail": "12334@a.com",
-        "phone": "12339989999",
-        "department": "",
-        "applicationIntent": "",
-        "skills": [],
-        "bio": "",
-        "avatar": ""
-      },
-      "resume": {
-        "originalFileName": "SE_keywords考点自整理.pdf",
-        "storedFileName": "APP-TA-24341-EBT0009-20260423T035006Z_resume.pdf",
-        "relativePath": "resume/TA-24341/EBT0009/APP-TA-24341-EBT0009-20260423T035006Z_resume.pdf",
-        "extension": "pdf",
-        "mimeType": "application/pdf",
-        "size": 181233,
-        "sha256": "bd1e0865c339db82cfdc1209788f14e8e776fa7d584640a5d9119f6e5372a72b"
-      },
-      "status": "UNDER_REVIEW",
-      "statusLabel": "审核中",
-      "statusTone": "warn",
-      "summary": "课程负责人已查看你的申请，正在审核中。",
-      "nextAction": "请等待课程负责人查看简历结果。",
-      "active": true,
-      "submittedAt": "2026-04-23T03:50:06.302972200Z",
-      "updatedAt": "2026-04-23T04:21:27.812590Z"
-    }
-  ],
-  "meta": {
-    "schema": "ta",
-    "entity": "applications",
-    "version": "1.0",
-    "updatedAt": "2026-04-23T04:21:27.812590Z"
-  }
+  "items": []
 }
