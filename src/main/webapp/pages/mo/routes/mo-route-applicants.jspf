@@ -1,19 +1,24 @@
 <div class="route" id="route-applicants" data-route="applicants">
     <div class="card jobs-hall-card">
-        <div class="overview-top">
-            <div>
-                <h1 data-i18n="applicants.title" data-i18n-zh="人选投递" data-i18n-en="Candidate applications">人选投递</h1>
-                <p class="muted" data-i18n="applicants.desc" data-i18n-zh="查看投递、资料与流程状态，并作出录用或拒绝；候选人将看到与您操作一致的最新状态。意向人选请使用侧栏「候选短名单」。列表始终加载本人全部课程投递，可使用下方筛选组合缩小范围。" data-i18n-en="Review submissions, profiles, and workflow status, then hire or reject. Candidates see updates matching your actions. Use Shortlist in the sidebar for your shortlist. All of your modules load at once; narrow the table with the filters below.">查看投递、资料与流程状态，并作出录用或拒绝；候选人将看到与您操作一致的最新状态。意向人选请使用侧栏「候选短名单」。列表始终加载本人全部课程投递，可使用下方筛选组合缩小范围。</p>
-            </div>
-            <div class="overview-badges mo-jobs-toolbar mo-applicants-header-tools">
-                <button id="refreshApplicantsBtn" class="refresh-btn pill" type="button" data-i18n-aria-label="applicants.refreshAria" data-i18n-aria-label-zh="刷新列表" data-i18n-aria-label-en="Refresh">
-                    <span class="refresh-icon">↻</span>
-                    <span class="refresh-text" data-i18n="applicants.refresh" data-i18n-zh="刷新列表" data-i18n-en="Refresh">刷新列表</span>
-                </button>
+        <div class="overview-top mo-applicants-overview-top">
+            <div class="mo-applicants-overview-top__inner">
+                <div class="mo-applicants-overview-top__title-row">
+                    <h1 data-i18n="applicants.title" data-i18n-zh="人选投递" data-i18n-en="Candidate applications">人选投递</h1>
+                    <button id="refreshApplicantsBtn" class="refresh-btn pill" type="button" data-i18n-aria-label="applicants.refreshAria" data-i18n-aria-label-zh="刷新列表" data-i18n-aria-label-en="Refresh">
+                        <span class="refresh-icon">↻</span>
+                        <span class="refresh-text" data-i18n="applicants.refresh" data-i18n-zh="刷新列表" data-i18n-en="Refresh">刷新列表</span>
+                    </button>
+                </div>
+                <p class="muted mo-applicants-overview-top__desc" data-i18n="applicants.desc" data-i18n-zh="在此筛选并处理投递；侧栏可管理短名单。" data-i18n-en="Filter and act on applications here. Use the sidebar for your shortlist.">在此筛选并处理投递；侧栏可管理短名单。</p>
             </div>
         </div>
 
         <div class="mo-applicants-toolbar mo-applicants-toolbar--stacked" role="search" aria-label="Applicant filters" data-i18n-aria-label="applicants.filtersRegionAria" data-i18n-aria-label-zh="人选投递筛选" data-i18n-aria-label-en="Applicant filters">
+            <div class="mo-applicants-filters-header">
+                <button type="button" class="mo-applicants-toolbar__clear mo-applicants-filters-header__reset" id="clearApplicantFiltersBtn" hidden
+                    data-i18n="applicants.resetFilters" data-i18n-zh="重置筛选" data-i18n-en="Reset filters"
+                    data-i18n-aria-label="applicants.resetFiltersAria" data-i18n-aria-label-zh="清除全部筛选条件" data-i18n-aria-label-en="Clear all filters">重置筛选</button>
+            </div>
             <div class="mo-applicants-filters">
                 <div class="mo-applicants-filters__row">
                     <div class="mo-applicants-filter-field">
@@ -41,11 +46,6 @@
                             <input type="checkbox" id="applicantUnreadOnly" />
                             <span data-i18n="applicants.filterUnreadOnly" data-i18n-zh="仅未读" data-i18n-en="Unread only">仅未读</span>
                         </label>
-                    </div>
-                    <div class="mo-applicants-filter-field mo-applicants-filter-field--actions">
-                        <button type="button" class="mo-applicants-toolbar__clear" id="clearApplicantFiltersBtn" hidden
-                            data-i18n="applicants.resetFilters" data-i18n-zh="重置筛选" data-i18n-en="Reset filters"
-                            data-i18n-aria-label="applicants.resetFiltersAria" data-i18n-aria-label-zh="清除全部筛选条件" data-i18n-aria-label-en="Clear all filters">重置筛选</button>
                     </div>
                 </div>
             </div>
