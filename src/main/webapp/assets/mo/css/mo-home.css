@@ -1380,13 +1380,117 @@ legend.mo-field-label:has(.mo-req) {
     gap: 10px;
 }
 
-.mo-applicants-toolbar select {
-    min-width: 220px;
+.mo-applicants-toolbar--stacked {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+}
+
+.mo-applicants-filters {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+}
+
+.mo-applicants-filters__row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px 14px;
+    align-items: end;
+}
+
+.mo-applicants-filters__row--secondary {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    align-items: end;
+}
+
+@media (max-width: 900px) {
+    .mo-applicants-filters__row--secondary {
+        grid-template-columns: 1fr;
+    }
+}
+
+.mo-applicants-filter-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.mo-applicants-filter-field label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.02em;
+}
+
+.mo-applicants-filter-field--search {
+    min-width: 0;
+}
+
+.mo-applicants-filter-field--checks {
+    justify-content: center;
+    padding-bottom: 4px;
+}
+
+.mo-applicants-filter-field--actions {
+    display: flex;
+    justify-content: flex-end;
+    padding-bottom: 2px;
+}
+
+.mo-applicants-filter-check {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text);
+    cursor: pointer;
+    user-select: none;
+}
+
+.mo-applicants-filter-check input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary, #6366f1);
+}
+
+.mo-applicants-filter-search {
+    width: 100%;
+    min-width: 0;
     border-radius: 10px;
     border: 1px solid var(--card-border);
     background: rgba(0, 0, 0, 0.2);
     color: var(--text);
     padding: 8px 10px;
+    font-size: 14px;
+}
+
+[data-theme="light"] .mo-applicants-filter-search {
+    background: rgba(255, 255, 255, 0.85);
+}
+
+.mo-applicants-toolbar select,
+.mo-applicants-filters select {
+    min-width: 0;
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid var(--card-border);
+    background: rgba(0, 0, 0, 0.2);
+    color: var(--text);
+    padding: 8px 10px;
+}
+
+[data-theme="light"] .mo-applicants-toolbar select,
+[data-theme="light"] .mo-applicants-filters select {
+    background: rgba(255, 255, 255, 0.85);
+}
+
+.mo-applicants-toolbar__status {
+    margin-left: 0;
+    align-self: flex-end;
+    font-size: 13px;
 }
 
 .mo-applicants-toolbar__clear {
@@ -1428,9 +1532,6 @@ legend.mo-field-label:has(.mo-req) {
     border-color: rgba(15, 23, 42, 0.22);
 }
 
-.mo-applicants-toolbar #applicantsStatusText {
-    margin-left: auto;
-}
 
 .mo-applicants-header-tools {
     justify-content: flex-end;

@@ -14,7 +14,11 @@
         }
 
         const courseSelect = document.getElementById('applicantCourseSelect');
-        const clearCourseFilterBtn = document.getElementById('clearApplicantCourseFilterBtn');
+        const statusSelect = document.getElementById('applicantStatusSelect');
+        const semesterSelect = document.getElementById('applicantSemesterSelect');
+        const searchInput = document.getElementById('applicantSearchInput');
+        const unreadOnly = document.getElementById('applicantUnreadOnly');
+        const clearFiltersBtn = document.getElementById('clearApplicantFiltersBtn');
         const refreshBtn = document.getElementById('refreshApplicantsBtn');
         const statusText = document.getElementById('applicantsStatusText');
         const list = document.getElementById('applicantList');
@@ -178,6 +182,153 @@
             return null;
         }
 
+        /** 与总览 dashboard 一致：未录用且未拒绝视为待决策 */
+        function isPendingDecisionStatus(raw) {
+            var s = (raw == null ? '' : String(raw)).trim();
+            return s !== '已录用' && s !== '未录用';
+        }
+
+        function semesterForApplicantItem(item) {
+            var cc = item && item.courseCode != null ? String(item.courseCode).trim() : '';
+            if (!cc) return '';
+            var job = getJobForCourseCode(cc);
+            if (job && job.semester != null && String(job.semester).trim() !== '') {
+                return String(job.semester).trim();
+            }
+            return '';
+        }
+
+        function buildStatusFilterOptions() {
+            if (!statusSelect) return;
+            var prev = statusSelect.value;
+            statusSelect.innerHTML = '';
+            function addOpt(value, zh, en) {
+                var o = document.createElement('option');
+                o.value = value;
+                o.textContent = t(zh, en);
+                statusSelect.appendChild(o);
+            }
+            addOpt('', '全部状态', 'All statuses');
+            addOpt('__pending__', '待决策（未录用且未拒绝）', 'Pending decision (not hired / not rejected)');
+            addOpt('已录用', '已录用', 'Hired');
+            addOpt('未录用', '未录用', 'Not hired');
+            addOpt('审核中', '审核中', 'Under review');
+            addOpt('待审核', '待审核', 'Pending review');
+            addOpt('已投递', '已投递', 'Submitted');
+            if (Array.from(statusSelect.options).some(function (o) { return o.value === prev; })) {
+                statusSelect.value = prev;
+            } else {
+                statusSelect.value = '';
+            }
+        }
+
+        function rebuildSemesterFilterOptions(jobs) {
+            if (!semesterSelect) return;
+            var prev = semesterSelect.value;
+            var seen = {};
+            (jobs || []).forEach(function (j) {
+                var s = j.semester != null && String(j.semester).trim() !== '' ? String(j.semester).trim() : '';
+                if (s) seen[s] = true;
+            });
+            semesterSelect.innerHTML = '';
+            var opt0 = document.createElement('option');
+            opt0.value = '';
+            opt0.textContent = t('全部学期', 'All terms');
+            semesterSelect.appendChild(opt0);
+            Object.keys(seen).sort(function (a, b) { return a.localeCompare(b, 'zh-CN'); }).forEach(function (sem) {
+                var o = document.createElement('option');
+                o.value = sem;
+                o.textContent = sem;
+                semesterSelect.appendChild(o);
+            });
+            if (Array.from(semesterSelect.options).some(function (o) { return o.value === prev; })) {
+                semesterSelect.value = prev;
+            } else {
+                semesterSelect.value = '';
+            }
+        }
+
+        function getFilteredApplicants() {
+            var items = applicantListCache.slice();
+            if (!courseSelect || !statusSelect || !semesterSelect) return items;
+
+            var cc = (courseSelect.value || '').trim();
+            if (cc) {
+                items = items.filter(function (it) {
+                    return String(it.courseCode || '').trim() === cc;
+                });
+            }
+
+            var st = (statusSelect.value || '').trim();
+            if (st === '__pending__') {
+                items = items.filter(function (it) {
+                    return isPendingDecisionStatus(it.status);
+                });
+            } else if (st) {
+                items = items.filter(function (it) {
+                    return String(it.status || '').trim() === st;
+                });
+            }
+
+            var sem = (semesterSelect.value || '').trim();
+            if (sem) {
+                items = items.filter(function (it) {
+                    return semesterForApplicantItem(it) === sem;
+                });
+            }
+
+            if (unreadOnly && unreadOnly.checked) {
+                items = items.filter(function (it) { return !!it.unread; });
+            }
+
+            var q = (searchInput && searchInput.value || '').trim().toLowerCase();
+            if (q) {
+                items = items.filter(function (it) {
+                    var hay = [
+                        it.name, it.taId, it.courseCode, it.courseName, it.studentId,
+                        it.intent, it.skills, it.comment, it.email, it.phone, it.applicationId
+                    ].map(function (x) {
+                        return x == null ? '' : String(x).toLowerCase();
+                    }).join('\n');
+                    return hay.indexOf(q) !== -1;
+                });
+            }
+            return items;
+        }
+
+        function anyApplicantFilterActive() {
+            if (courseSelect && (courseSelect.value || '').trim()) return true;
+            if (statusSelect && (statusSelect.value || '').trim()) return true;
+            if (semesterSelect && (semesterSelect.value || '').trim()) return true;
+            if (searchInput && (searchInput.value || '').trim()) return true;
+            if (unreadOnly && unreadOnly.checked) return true;
+            return false;
+        }
+
+        function updateApplicantFiltersResetVisibility() {
+            if (!clearFiltersBtn) return;
+            var show = anyApplicantFilterActive();
+            clearFiltersBtn.hidden = !show;
+            clearFiltersBtn.setAttribute('aria-hidden', show ? 'false' : 'true');
+        }
+
+        function onApplicantFilterChange() {
+            applicantPageIndex = 1;
+            updateApplicantFiltersResetVisibility();
+            renderApplicants();
+        }
+
+        function clearAllApplicantFilters() {
+            if (courseSelect) courseSelect.value = '';
+            if (statusSelect) statusSelect.value = '';
+            if (semesterSelect) semesterSelect.value = '';
+            if (searchInput) searchInput.value = '';
+            if (unreadOnly) unreadOnly.checked = false;
+            updateApplicantFiltersResetVisibility();
+            applicantPageIndex = 1;
+            renderApplicants();
+        }
+
         function countHiredForCourseInCache(courseCode) {
             var code = String(courseCode || '').trim();
             if (!code) return 0;
@@ -329,13 +480,6 @@
             }
         }
 
-        function updateClearCourseFilterButton() {
-            if (!clearCourseFilterBtn || !courseSelect) return;
-            const hasFilter = (courseSelect.value || '').trim() !== '';
-            clearCourseFilterBtn.hidden = !hasFilter;
-            clearCourseFilterBtn.setAttribute('aria-hidden', hasFilter ? 'false' : 'true');
-        }
-
         function renderCourses(jobs) {
             const prev = courseSelect.value;
             courseSelect.innerHTML = '';
@@ -356,7 +500,8 @@
             } else {
                 courseSelect.value = '';
             }
-            updateClearCourseFilterButton();
+            rebuildSemesterFilterOptions(jobs);
+            updateApplicantFiltersResetVisibility();
         }
 
         async function refreshNavUnreadBadge() {
@@ -686,7 +831,8 @@
             }
 
             list.innerHTML = '';
-            var total = applicantListCache.length;
+            var filtered = getFilteredApplicants();
+            var total = filtered.length;
             emptyState.hidden = total > 0;
 
             var totalPages = Math.max(1, Math.ceil(total / APPLICANT_PAGE_SIZE));
@@ -725,11 +871,12 @@
             }
 
             if (total === 0) {
+                updateApplicantFiltersResetVisibility();
                 updateShortlistNavBadge();
                 return;
             }
 
-            var sorted = applicantListCache.slice().sort(function (a, b) {
+            var sorted = filtered.slice().sort(function (a, b) {
                 return submittedAtSortKey(b.submittedAt) - submittedAtSortKey(a.submittedAt);
             });
 
@@ -785,6 +932,7 @@
             table.appendChild(tbody);
             wrap.appendChild(table);
             list.appendChild(wrap);
+            updateApplicantFiltersResetVisibility();
             updateShortlistNavBadge();
         }
 
@@ -1080,11 +1228,10 @@
         }
 
         /**
-         * @param {{ allCourses?: boolean, cacheUpdateOnly?: boolean }} [opts] cacheUpdateOnly：仅更新 applicantListCache（不刷新人选投递列表 UI），用于短名单页名额计算
+         * @param {{ cacheUpdateOnly?: boolean }} [opts] cacheUpdateOnly：仅更新 applicantListCache（不刷新人选投递列表 UI），用于短名单页名额计算
          */
         async function loadApplicants(opts) {
             opts = opts || {};
-            const code = opts.allCourses ? '' : (courseSelect.value || '').trim();
             const moId = getMoId();
             if (!moId) {
                 if (!opts.cacheUpdateOnly) {
@@ -1098,9 +1245,6 @@
             }
             try {
                 var url = apiUrl('/api/mo/applicants') + '?moId=' + encodeURIComponent(moId);
-                if (code) {
-                    url += '&courseCode=' + encodeURIComponent(code);
-                }
                 const res = await fetch(url);
                 const payload = await res.json();
                 if (!res.ok || payload.success === false) {
@@ -1128,11 +1272,13 @@
                 }
                 renderApplicants(items);
                 const unread = typeof payload.unreadCount === 'number' ? payload.unreadCount : 0;
-                var scopeHint = code ? '' : t('（全部课程）', ' (All modules)');
+                var filteredN = getFilteredApplicants().length;
+                var filterHintZh = filteredN !== items.length ? ' · 筛选后 ' + filteredN + ' 条' : '';
+                var filterHintEn = filteredN !== items.length ? ' · ' + filteredN + ' after filters' : '';
                 setStatus(
                     t(
-                        '已加载 ' + items.length + ' 名申请人' + scopeHint + (unread > 0 ? ' · 未读 ' + unread + ' 条' : ''),
-                        'Loaded ' + items.length + ' applicants' + scopeHint + (unread > 0 ? ' · ' + unread + ' unread' : '')
+                        '已加载 ' + items.length + ' 条投递（全部课程）' + filterHintZh + (unread > 0 ? ' · 未读 ' + unread + ' 条' : ''),
+                        'Loaded ' + items.length + ' applications (all modules)' + filterHintEn + (unread > 0 ? ' · ' + unread + ' unread' : '')
                     )
                 );
                 if (typeof app.onApplicantsLoaded === 'function') app.onApplicantsLoaded(items);
@@ -1199,7 +1345,7 @@
                     });
                 }
                 if (isShortlistRouteActive()) {
-                    await loadApplicants({ allCourses: true, cacheUpdateOnly: true });
+                    await loadApplicants({ cacheUpdateOnly: true });
                     renderShortlistPanelBody();
                 } else {
                     await loadApplicants();
@@ -1251,7 +1397,7 @@
             }
             updateShortlistNavBadge();
             if (isShortlistRouteActive()) {
-                await loadApplicants({ allCourses: true, cacheUpdateOnly: true });
+                await loadApplicants({ cacheUpdateOnly: true });
             } else {
                 renderApplicants();
             }
@@ -1369,7 +1515,7 @@
                 shortlistPageStatus.textContent = t('正在同步投递与岗位数据…', 'Syncing applications and openings…');
             }
             await refreshCourseOptionsFromApi();
-            await loadApplicants({ allCourses: true, cacheUpdateOnly: true });
+            await loadApplicants({ cacheUpdateOnly: true });
             var moSl = getMoId();
             var st = shortlistStore();
             if (moSl && st && typeof st.syncFromServer === 'function') {
@@ -1403,8 +1549,13 @@
             } else {
                 courseSelect.value = '';
             }
-            updateClearCourseFilterButton();
-            loadApplicants();
+            applicantPageIndex = 1;
+            updateApplicantFiltersResetVisibility();
+            if (applicantListCache.length) {
+                renderApplicants();
+            } else {
+                loadApplicants();
+            }
         };
         app.refreshMoApplicantUnreadBadge = refreshNavUnreadBadge;
         app.runLoadApplicants = function () {
@@ -1433,21 +1584,31 @@
                 loadApplicants();
             });
         });
-        courseSelect.addEventListener('change', function () {
-            updateClearCourseFilterButton();
-            loadApplicants();
-        });
-        if (clearCourseFilterBtn) {
-            clearCourseFilterBtn.addEventListener('click', function () {
-                courseSelect.value = '';
-                updateClearCourseFilterButton();
-                loadApplicants();
+        if (courseSelect) {
+            courseSelect.addEventListener('change', onApplicantFilterChange);
+        }
+        if (statusSelect) {
+            statusSelect.addEventListener('change', onApplicantFilterChange);
+        }
+        if (semesterSelect) {
+            semesterSelect.addEventListener('change', onApplicantFilterChange);
+        }
+        if (searchInput) {
+            searchInput.addEventListener('input', onApplicantFilterChange);
+        }
+        if (unreadOnly) {
+            unreadOnly.addEventListener('change', onApplicantFilterChange);
+        }
+        if (clearFiltersBtn) {
+            clearFiltersBtn.addEventListener('click', function () {
+                clearAllApplicantFilters();
             });
         }
 
         app.formatApplicantStatusDisplay = formatApplicantStatusDisplay;
 
         app.refreshApplicantsLanguage = function () {
+            buildStatusFilterOptions();
             if (applicantListCache.length) {
                 renderApplicants();
             }
@@ -1489,8 +1650,9 @@
         };
 
         refreshNavUnreadBadge();
+        buildStatusFilterOptions();
         refreshCourseOptionsFromApi();
-        updateClearCourseFilterButton();
+        updateApplicantFiltersResetVisibility();
         updateShortlistNavBadge();
         (function syncShortlistBoot() {
             var m0 = getMoId();
