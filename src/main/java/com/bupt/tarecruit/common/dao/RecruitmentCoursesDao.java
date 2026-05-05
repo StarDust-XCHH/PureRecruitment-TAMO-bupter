@@ -573,6 +573,7 @@ public final class RecruitmentCoursesDao {
         if (normalizedJob == null) {
             return snapshot;
         }
+        snapshot.addProperty("jobId", getAsString(normalizedJob, "jobId"));
         snapshot.addProperty("courseCode", getAsString(normalizedJob, "courseCode"));
         snapshot.addProperty("courseName", getAsString(normalizedJob, "courseName"));
         snapshot.addProperty("ownerMoName", getAsString(normalizedJob, "ownerMoName"));

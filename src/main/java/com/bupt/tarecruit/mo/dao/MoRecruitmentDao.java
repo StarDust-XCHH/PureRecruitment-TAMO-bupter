@@ -2,6 +2,7 @@ package com.bupt.tarecruit.mo.dao;
 
 import com.bupt.tarecruit.common.config.DataMountPaths;
 import com.bupt.tarecruit.common.dao.RecruitmentCoursesDao;
+import com.bupt.tarecruit.common.util.MoTaApplicationStatusMatcher;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -356,9 +357,10 @@ public class MoRecruitmentDao {
         JsonArray moStatusItems = appStatusRoot.getAsJsonArray("items");
         MoApplicationReadStateDao readStateDao = new MoApplicationReadStateDao();
 
-        String targetSlug = normalizeSlug(normalizedCourseCode);
+        JsonObject publishedJob = RecruitmentCoursesDao.findNormalizedJobByCourseCode(normalizedCourseCode);
+        String scopeJobId = publishedJob != null ? getAsString(publishedJob, "jobId") : "";
         List<MoTaApplicationReadService.TaApplicationRecord> applications =
-                readService.getApplicationsByCourseCode(normalizedCourseCode);
+                readService.getApplicationsForCourseScopedToJob(normalizedCourseCode, scopeJobId);
 
         JsonArray rows = new JsonArray();
         int unreadCount = 0;
@@ -366,7 +368,12 @@ public class MoRecruitmentDao {
             if (!rec.active()) {
                 continue;
             }
-            JsonObject moRow = findLatestApplicationForCourse(moStatusItems, rec.taId(), normalizedCourseCode, targetSlug);
+            JsonObject moRow = findLatestMoStatusForApplication(
+                    moStatusItems,
+                    rec.taId(),
+                    rec.applicationId(),
+                    trim(getAsString(rec.courseSnapshot(), "jobId")),
+                    normalizedCourseCode);
             String displayStatus = resolveApplicantDisplayStatus(rec, moRow);
             String commentPreview = firstNonBlank(
                     firstNonBlank(
@@ -504,8 +511,12 @@ public class MoRecruitmentDao {
         assertMoOwnsCourse(moId, rec.courseCode());
 
         JsonObject appStatusRoot = ensureTaApplicationStatusRoot();
-        String targetSlug = normalizeSlug(rec.courseCode());
-        JsonObject moRow = findLatestApplicationForCourse(appStatusRoot.getAsJsonArray("items"), rec.taId(), rec.courseCode(), targetSlug);
+        JsonObject moRow = findLatestMoStatusForApplication(
+                appStatusRoot.getAsJsonArray("items"),
+                rec.taId(),
+                rec.applicationId(),
+                trim(getAsString(rec.courseSnapshot(), "jobId")),
+                rec.courseCode());
 
         MoApplicationCommentsDao commentsDao = new MoApplicationCommentsDao();
         JsonArray comments = commentsDao.listComments(applicationId);
@@ -663,9 +674,10 @@ public class MoRecruitmentDao {
         MoTaApplicationReadService readService = new MoTaApplicationReadService();
         JsonObject appStatusRoot = ensureTaApplicationStatusRoot();
         JsonArray moStatusItems = appStatusRoot.getAsJsonArray("items");
-        String targetSlug = normalizeSlug(normalizedCourseCode);
+        JsonObject publishedJob = RecruitmentCoursesDao.findNormalizedJobByCourseCode(normalizedCourseCode);
+        String scopeJobId = publishedJob != null ? getAsString(publishedJob, "jobId") : "";
         List<MoTaApplicationReadService.TaApplicationRecord> applications =
-                readService.getApplicationsByCourseCode(normalizedCourseCode);
+                readService.getApplicationsForCourseScopedToJob(normalizedCourseCode, scopeJobId);
 
         int total = 0;
         int accepted = 0;
@@ -678,7 +690,12 @@ public class MoRecruitmentDao {
                 continue;
             }
             total++;
-            JsonObject moRow = findLatestApplicationForCourse(moStatusItems, rec.taId(), normalizedCourseCode, targetSlug);
+            JsonObject moRow = findLatestMoStatusForApplication(
+                    moStatusItems,
+                    rec.taId(),
+                    rec.applicationId(),
+                    trim(getAsString(rec.courseSnapshot(), "jobId")),
+                    normalizedCourseCode);
             String displayStatus = resolveApplicantDisplayStatus(rec, moRow);
             if (isAcceptedDecisionText(displayStatus)) {
                 accepted++;
@@ -810,12 +827,15 @@ public class MoRecruitmentDao {
             throw new IllegalArgumentException("decision 仅支持 selected、rejected 或 withdrawn（撤回录用）");
         }
 
+        JsonObject course = RecruitmentCoursesDao.findNormalizedJobByCourseCode(normalizedCourseCode);
         MoTaApplicationsMutationDao mutationDao = new MoTaApplicationsMutationDao();
-        JsonObject taApplication = mutationDao.findApplicationByTaAndCourse(normalizedTaId, normalizedCourseCode);
+        JsonObject taApplication = mutationDao.findApplicationByTaAndCourse(
+                normalizedTaId,
+                normalizedCourseCode,
+                course != null ? getAsString(course, "jobId") : "");
 
         JsonObject appRoot = ensureTaApplicationStatusRoot();
         JsonArray appItems = appRoot.getAsJsonArray("items");
-        JsonObject course = RecruitmentCoursesDao.findNormalizedJobByCourseCode(normalizedCourseCode);
 
         String now = Instant.now().toString();
         String statusText;
@@ -832,7 +852,10 @@ public class MoRecruitmentDao {
         }
         String summaryText = normalizedComment.isBlank() ? defaultSummary : normalizedComment;
 
-        JsonObject target = findLatestApplicationForCourse(appItems, normalizedTaId, normalizedCourseCode, normalizeSlug(normalizedCourseCode));
+        String ctxAppId = taApplication != null ? getAsString(taApplication, "applicationId") : "";
+        String ctxJobId = course != null ? getAsString(course, "jobId") : "";
+        JsonObject target = findLatestMoStatusForApplication(
+                appItems, normalizedTaId, ctxAppId, ctxJobId, normalizedCourseCode);
         JsonArray preservedComments = new JsonArray();
         if (target != null && target.has("comments") && target.get("comments").isJsonArray()) {
             preservedComments = target.getAsJsonArray("comments").deepCopy();
@@ -884,6 +907,12 @@ public class MoRecruitmentDao {
         if (course != null && getAsString(target, "courseName").isBlank()) {
             target.addProperty("courseName", getAsString(course, "courseName"));
         }
+        if (course != null) {
+            String publishedJobId = trim(getAsString(course, "jobId"));
+            if (!publishedJobId.isBlank()) {
+                target.addProperty("jobId", publishedJobId);
+            }
+        }
 
         touchTaApplicationStatusMeta(appRoot);
         writeJson(TA_APPLICATION_STATUS, appRoot);
@@ -912,24 +941,19 @@ public class MoRecruitmentDao {
         return payload;
     }
 
-    private JsonObject findLatestApplicationForCourse(JsonArray apps, String taId, String courseCode, String courseSlug) {
+    private JsonObject findLatestMoStatusForApplication(
+            JsonArray apps,
+            String taId,
+            String applicationId,
+            String jobId,
+            String courseCode) {
         JsonObject latest = null;
         for (JsonElement element : apps) {
             if (!element.isJsonObject()) {
                 continue;
             }
             JsonObject app = element.getAsJsonObject();
-            if (!taId.equalsIgnoreCase(getAsString(app, "taId"))) {
-                continue;
-            }
-            String appSlug = normalizeSlug(getAsString(app, "jobSlug"));
-            String appCourseName = getAsString(app, "courseName");
-            String appCourseCode = trim(getAsString(app, "courseCode")).toUpperCase(Locale.ROOT);
-            String codeUpper = trim(courseCode).toUpperCase(Locale.ROOT);
-            boolean matched = appSlug.equals(courseSlug)
-                    || (!appCourseCode.isBlank() && appCourseCode.equals(codeUpper))
-                    || (!appCourseName.isBlank() && appCourseName.toLowerCase(Locale.ROOT).contains(courseCode.toLowerCase(Locale.ROOT)));
-            if (!matched) {
+            if (!MoTaApplicationStatusMatcher.moStatusRowMatchesTaContext(app, taId, applicationId, jobId, courseCode)) {
                 continue;
             }
             if (latest == null || getAsString(app, "updatedAt").compareTo(getAsString(latest, "updatedAt")) > 0) {

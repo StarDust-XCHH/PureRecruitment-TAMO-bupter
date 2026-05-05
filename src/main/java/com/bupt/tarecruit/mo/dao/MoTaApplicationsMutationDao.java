@@ -54,8 +54,16 @@ public final class MoTaApplicationsMutationDao {
     }
 
     public synchronized JsonObject findApplicationByTaAndCourse(String taId, String courseCode) throws IOException {
+        return findApplicationByTaAndCourse(taId, courseCode, "");
+    }
+
+    /**
+     * 在 TA+课程编号基础上，可选按 {@code courseSnapshot.jobId} 与岗位 {@code jobId} 对齐，避免同一 {@code courseCode} 多学期岗位时误选。
+     */
+    public synchronized JsonObject findApplicationByTaAndCourse(String taId, String courseCode, String jobId) throws IOException {
         String t = trim(taId);
         String c = trim(courseCode).toUpperCase(Locale.ROOT);
+        String j = trim(jobId);
         if (t.isEmpty() || c.isEmpty()) {
             return null;
         }
@@ -71,6 +79,15 @@ public final class MoTaApplicationsMutationDao {
             JsonObject item = element.getAsJsonObject();
             if (!t.equalsIgnoreCase(getAsString(item, "taId"))) {
                 continue;
+            }
+            if (!j.isEmpty()) {
+                JsonObject snap = item.has("courseSnapshot") && item.get("courseSnapshot").isJsonObject()
+                        ? item.getAsJsonObject("courseSnapshot")
+                        : new JsonObject();
+                String snapJob = trim(getAsString(snap, "jobId"));
+                if (!snapJob.isEmpty() && !j.equalsIgnoreCase(snapJob)) {
+                    continue;
+                }
             }
             String cc = trim(getAsString(item, "courseCode")).toUpperCase(Locale.ROOT);
             String uk = trim(getAsString(item, "uniqueKey")).toUpperCase(Locale.ROOT);
@@ -137,6 +154,7 @@ public final class MoTaApplicationsMutationDao {
         if (job == null) {
             return;
         }
+        String needleJobId = trim(getAsString(job, "jobId"));
         if (!Files.exists(PATH)) {
             return;
         }
@@ -152,6 +170,15 @@ public final class MoTaApplicationsMutationDao {
             String ic = trim(getAsString(item, "courseCode")).toUpperCase(Locale.ROOT);
             if (!c.equals(ic)) {
                 continue;
+            }
+            if (!needleJobId.isEmpty()) {
+                JsonObject prevSnap = item.has("courseSnapshot") && item.get("courseSnapshot").isJsonObject()
+                        ? item.getAsJsonObject("courseSnapshot")
+                        : new JsonObject();
+                String prevJob = trim(getAsString(prevSnap, "jobId"));
+                if (!prevJob.isEmpty() && !needleJobId.equalsIgnoreCase(prevJob)) {
+                    continue;
+                }
             }
             item.add("courseSnapshot", snapshot.deepCopy());
             changed = true;

@@ -3,6 +3,7 @@ package com.bupt.tarecruit.ta.dao;
 import com.bupt.tarecruit.common.config.DataMountPaths;
 import com.bupt.tarecruit.common.dao.RecruitmentCoursesDao;
 import com.bupt.tarecruit.common.util.AuthUtils;
+import com.bupt.tarecruit.common.util.MoTaApplicationStatusMatcher;
 import com.bupt.tarecruit.mo.dao.MoRecruitmentDao;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -769,24 +770,18 @@ public class TaAccountDao {
             return null;
         }
         String taId = getAsString(applicationItem, "taId");
+        String applicationId = getAsString(applicationItem, "applicationId");
         String courseCode = getAsString(applicationItem, "courseCode");
         JsonObject courseSnapshot = applicationItem.has("courseSnapshot") && applicationItem.get("courseSnapshot").isJsonObject()
                 ? applicationItem.getAsJsonObject("courseSnapshot") : new JsonObject();
-        String courseName = getAsString(courseSnapshot, "courseName");
+        String jobId = getAsString(courseSnapshot, "jobId");
         JsonObject latest = null;
         for (JsonElement element : moStatusItems) {
             if (!element.isJsonObject()) {
                 continue;
             }
             JsonObject item = element.getAsJsonObject();
-            if (!taId.equalsIgnoreCase(getAsString(item, "taId"))) {
-                continue;
-            }
-            String jobSlug = trimToEmpty(getAsString(item, "jobSlug")).toLowerCase(Locale.ROOT);
-            String courseCodeSlug = trimToEmpty(courseCode).toLowerCase(Locale.ROOT);
-            boolean matched = (!courseCodeSlug.isBlank() && jobSlug.equals(courseCodeSlug))
-                    || (!courseName.isBlank() && courseName.equalsIgnoreCase(getAsString(item, "courseName")));
-            if (!matched) {
+            if (!MoTaApplicationStatusMatcher.moStatusRowMatchesTaContext(item, taId, applicationId, jobId, courseCode)) {
                 continue;
             }
             if (latest == null || getAsString(item, "updatedAt").compareTo(getAsString(latest, "updatedAt")) > 0) {
