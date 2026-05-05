@@ -23,10 +23,12 @@
     <main class="main">
         <%@ include file="partials/mo-layout-topbar.jspf" %>
         <%@ include file="partials/mo-welcome-card.jspf" %>
-        <section class="routes">
+
+        <section class="routes" aria-label="MO workspace views" data-i18n-aria-label="routes.regionAria" data-i18n-aria-label-zh="MO 工作台主内容" data-i18n-aria-label-en="MO workspace main content">
             <%@ include file="routes/mo-route-dashboard.jspf" %>
             <%@ include file="routes/mo-route-jobs.jspf" %>
             <%@ include file="routes/mo-route-applicants.jspf" %>
+            <%@ include file="routes/mo-route-shortlist.jspf" %>
         </section>
     </main>
 </div>
@@ -36,10 +38,12 @@
 
 <script>window.__APP_CONTEXT_PATH__ = '${pageContext.request.contextPath}';</script>
 <script src="${pageContext.request.contextPath}/assets/mo/js/mo-api-prefix.js"></script>
+<script src="${pageContext.request.contextPath}/assets/mo/js/modules/mo-toast.js"></script>
 <script src="${pageContext.request.contextPath}/assets/mo/js/modules/settings.js"></script>
 <script src="${pageContext.request.contextPath}/assets/mo/js/modules/route-nav.js"></script>
 <script src="${pageContext.request.contextPath}/assets/mo/js/modules/modal.js"></script>
 <script src="${pageContext.request.contextPath}/assets/mo/js/modules/job-board.js"></script>
+<script src="${pageContext.request.contextPath}/assets/mo/js/modules/shortlist-store.js"></script>
 <script src="${pageContext.request.contextPath}/assets/mo/js/modules/applicants.js"></script>
 <script src="${pageContext.request.contextPath}/assets/mo/js/modules/dashboard.js"></script>
 <script src="${pageContext.request.contextPath}/assets/mo/js/modules/profile.js"></script>

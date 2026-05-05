@@ -21,7 +21,8 @@
         const settingsPanels = Array.from(document.querySelectorAll('.settings-panel'));
         const profileAvatarBox = document.getElementById('profileAvatarBox');
         const avatarFileInput = document.getElementById('avatarFile');
-        const storedLanguage = localStorage.getItem('mo-language');
+        // Language should not persist across logins; keep it per-session only.
+        const storedLanguage = sessionStorage.getItem('mo-language');
 
         app.state = app.state || {};
 
@@ -43,7 +44,7 @@
         }
 
         function getCurrentLanguage() {
-            /** MO 默认英文；仅当用户曾手动选中文（localStorage mo-language=zh）时为 zh */
+            /** MO 默认英文；语言仅在本次会话内保存（sessionStorage mo-language=zh） */
             return app.state.settings && app.state.settings.currentLanguage === 'zh' ? 'zh' : 'en';
         }
 
@@ -166,7 +167,7 @@
             document.querySelectorAll('[data-i18n], [data-i18n-html], [data-i18n-placeholder], [data-i18n-aria-label], [data-i18n-title]').forEach(function (el) {
                 applyI18nToElement(el, lang);
             });
-            localStorage.setItem('mo-language', lang);
+            sessionStorage.setItem('mo-language', lang);
             applyWelcomeTitle();
             if (typeof app.refreshProfileLanguage === 'function') {
                 app.refreshProfileLanguage(reason || 'language');
@@ -191,6 +192,15 @@
             if (!app.state.settings) return;
             app.state.settings.currentLanguage = getCurrentLanguage() === 'en' ? 'zh' : 'en';
             applyLanguage('toggle');
+            if (window.MoToast && typeof window.MoToast.show === 'function') {
+                const nowEn = getCurrentLanguage() === 'en';
+                window.MoToast.show({
+                    type: 'info',
+                    message: nowEn
+                        ? t('界面语言已切换为 English', 'Display language: English')
+                        : t('界面语言已切换为中文', 'Display language: 中文')
+                });
+            }
         }
 
         function applyTheme(theme) {
@@ -209,6 +219,15 @@
         function toggleTheme() {
             const current = localStorage.getItem('mo-theme') || 'dark';
             applyTheme(current === 'light' ? 'dark' : 'light');
+            if (window.MoToast && typeof window.MoToast.show === 'function') {
+                const next = localStorage.getItem('mo-theme') || 'dark';
+                window.MoToast.show({
+                    type: 'info',
+                    message: next === 'light'
+                        ? t('已切换为浅色主题', 'Switched to light theme')
+                        : t('已切换为深色主题', 'Switched to dark theme')
+                });
+            }
         }
 
         function activateSettingsTab(target) {
@@ -245,6 +264,9 @@
             logoutBtn.addEventListener('click', function () {
                 if (!window.confirm(t('确认退出登录吗？', 'Are you sure you want to log out?'))) return;
                 setUserData(null);
+                // Ensure next login always starts in English (clear any persisted legacy key too).
+                sessionStorage.removeItem('mo-language');
+                localStorage.removeItem('mo-language');
                 window.location.replace('../../index.jsp');
             });
         }

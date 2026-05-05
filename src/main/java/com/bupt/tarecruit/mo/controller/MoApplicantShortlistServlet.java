@@ -1,0 +1,114 @@
+package com.bupt.tarecruit.mo.controller;
+
+import com.bupt.tarecruit.common.model.ApiResponse;
+import com.bupt.tarecruit.mo.dao.MoRecruitmentDao;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.io.IOException;
+
+/**
+ * MO 候选短名单：GET 列表；POST 添加；DELETE 移除（查询参数）。不改变 TA 申请状态。
+ */
+@WebServlet(name = "moApplicantShortlistServlet", value = "/api/mo/applicants/shortlist")
+public class MoApplicantShortlistServlet extends HttpServlet {
+
+    private final MoRecruitmentDao recruitmentDao = new MoRecruitmentDao();
+    private final Gson gson = new Gson();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json;charset=UTF-8");
+        String moId = trim(req.getParameter("moId"));
+        if (moId.isEmpty()) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write(gson.toJson(ApiResponse.failure("缺少 moId")));
+            return;
+        }
+        try {
+            JsonObject payload = recruitmentDao.listApplicantShortlist(moId);
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.getWriter().write(gson.toJson(payload));
+        } catch (IllegalArgumentException ex) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write(gson.toJson(ApiResponse.failure(ex.getMessage())));
+        } catch (Exception ex) {
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().write(gson.toJson(ApiResponse.failure("读取短名单失败: " + ex.getMessage())));
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json;charset=UTF-8");
+        try {
+            JsonObject body = JsonParser.parseReader(req.getReader()).getAsJsonObject();
+            String moId = readString(body, "moId");
+            String courseCode = readString(body, "courseCode");
+            String applicationId = readString(body, "applicationId");
+            String taId = readString(body, "taId");
+            String name = readString(body, "name");
+            if (moId.isEmpty() || courseCode.isEmpty() || applicationId.isEmpty()) {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.getWriter().write(gson.toJson(ApiResponse.failure("缺少 moId、courseCode 或 applicationId")));
+                return;
+            }
+            JsonObject result = recruitmentDao.addApplicantShortlistEntry(moId, courseCode, applicationId, taId, name);
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.getWriter().write(gson.toJson(result));
+        } catch (IllegalArgumentException ex) {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            resp.getWriter().write(gson.toJson(ApiResponse.failure(ex.getMessage())));
+        } catch (Exception ex) {
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().write(gson.toJson(ApiResponse.failure("保存短名单失败: " + ex.getMessage())));
+        }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        req.setCharacterEncoding("UTF-8");
+        resp.setCharacterEncoding("UTF-8");
+        resp.setContentType("application/json;charset=UTF-8");
+        String moId = trim(req.getParameter("moId"));
+        String courseCode = trim(req.getParameter("courseCode"));
+        String applicationId = trim(req.getParameter("applicationId"));
+        if (moId.isEmpty() || courseCode.isEmpty() || applicationId.isEmpty()) {
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.getWriter().write(gson.toJson(ApiResponse.failure("缺少 moId、courseCode 或 applicationId 查询参数")));
+            return;
+        }
+        try {
+            JsonObject result = recruitmentDao.removeApplicantShortlistEntry(moId, courseCode, applicationId);
+            resp.setStatus(HttpServletResponse.SC_OK);
+            resp.getWriter().write(gson.toJson(result));
+        } catch (IllegalArgumentException ex) {
+            resp.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            resp.getWriter().write(gson.toJson(ApiResponse.failure(ex.getMessage())));
+        } catch (Exception ex) {
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.getWriter().write(gson.toJson(ApiResponse.failure("删除短名单失败: " + ex.getMessage())));
+        }
+    }
+
+    private static String readString(JsonObject body, String key) {
+        if (body == null || !body.has(key) || body.get(key).isJsonNull()) {
+            return "";
+        }
+        return body.get(key).getAsString().trim();
+    }
+
+    private static String trim(String s) {
+        return s == null ? "" : s.trim();
+    }
+}

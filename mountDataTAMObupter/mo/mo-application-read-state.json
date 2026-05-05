@@ -3,7 +3,13 @@
     "schema": "mo",
     "entity": "mo-application-read-state",
     "version": "1.0",
-    "updatedAt": "2026-04-22T09:48:06.160098400Z"
+    "updatedAt": "2026-04-23T04:21:27.815893400Z"
   },
-  "items": []
+  "items": [
+    {
+      "moId": "MO-6601L9",
+      "applicationId": "APP-TA-24341-EBT0009-20260423T035006Z",
+      "lastReadAt": "2026-04-23T04:21:27.815893400Z"
+    }
+  ]
 }

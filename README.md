@@ -2,10 +2,7 @@
 
 - 当前项目已公开，切入进行主分支保护
 # 发布
-[![Version](https://img.shields.io/badge/version-v1.0.1_(release)-orange.svg)](https://github.com/StarDust-XCHH/PureRecruitment-TAMO-bupter/releases/tag/v1.0.1)
-
-## 预发布
-[![Version](https://img.shields.io/badge/version-v1.0.0_(Pre--release)-orange.svg)](https://github.com/StarDust-XCHH/PureRecruitment-TAMO-bupter/releases/tag/v1.0.0)
+[![Version](https://img.shields.io/badge/version-v2.0.0_(release)-orange.svg)](https://github.com/StarDust-XCHH/PureRecruitment-TAMO-bupter/releases/tag/v2.0.0)
 
 ## 正式发布
 

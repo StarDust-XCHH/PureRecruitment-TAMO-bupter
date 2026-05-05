@@ -3,7 +3,7 @@
     "schema": "mo",
     "entity": "settings",
     "version": "1.0",
-    "updatedAt": "2026-04-12T09:30:40.007357400Z"
+    "updatedAt": "2026-04-25T15:27:42.568197600Z"
   },
   "items": [
     {
@@ -39,28 +39,24 @@
       "updatedAt": "2026-04-06T15:00:58.364144400Z"
     },
     {
-      "id": "SETTING-MO-650WCK",
-      "moId": "MO-650WCK",
+      "id": "SETTING-MO-635L1K",
+      "moId": "MO-635L1K",
       "theme": "dark",
       "avatar": "",
-      "createdAt": "2026-04-08T02:06:39.843943400Z",
-      "updatedAt": "2026-04-08T02:06:39.843943400Z"
+      "createdAt": "2026-04-08T10:53:33.587434500Z",
+      "updatedAt": "2026-04-08T10:53:33.587434500Z"
     },
     {
-      "id": "SETTING-MO-431AF0",
-      "moId": "MO-431AF0",
+      "id": "SETTING-MO-354ZUT",
+      "moId": "MO-354ZUT",
       "theme": "dark",
-      "avatar": "",
-      "createdAt": "2026-04-12T03:46:12.298468700Z",
-      "updatedAt": "2026-04-12T03:46:12.298468700Z"
-    },
-    {
-      "id": "SETTING-MO-572HL8",
-      "moId": "MO-572HL8",
-      "theme": "dark",
-      "avatar": "",
-      "createdAt": "2026-04-12T09:30:39.699933700Z",
-      "updatedAt": "2026-04-12T09:30:39.699933700Z"
+      "avatar": "image/MO-354ZUT_1775741324317_cbf86203e8594563ac1f40ed7a5a501b.png",
+      "createdAt": "2026-04-08T10:57:19.070607200Z",
+      "updatedAt": "2026-04-09T13:28:44.819975500Z",
+      "profileSaved": true,
+      "profileSavedAt": "2026-04-09T13:28:44.819975500Z",
+      "lastProfileSyncStatus": "success",
+      "lastProfileSyncMessage": "资料保存成功"
     }
   ]
 }

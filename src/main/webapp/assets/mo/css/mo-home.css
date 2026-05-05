@@ -1253,15 +1253,336 @@ legend.mo-field-label:has(.mo-req) {
     justify-content: flex-end;
 }
 
-/* 与课程管理同一 course-board 双列；由 ta-jobs.css 提供网格与间距 */
+/* 人选投递：表格式单列（与课程管理 course-board 网格分离） */
 .mo-applicant-list.course-board {
-    align-items: stretch;
+    display: block;
+    padding: 18px 12px 14px;
 }
 
-/* 应聘列表卡片：复用 job-card / course-job-card 动效，略调高度与指针 */
-.mo-applicant-board-card.course-job-card {
-    min-height: 0;
-    cursor: default;
+.mo-applicant-board-table-wrap {
+    width: 100%;
+    border: 1px solid rgba(148, 163, 184, 0.38);
+    border-radius: 14px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="light"] .mo-applicant-board-table-wrap {
+    background: #fff;
+    border-color: rgba(15, 23, 42, 0.14);
+}
+
+/* 人选投递 · 表格整体最小宽度（过窄会出现横向滚动）；列比例在 applicants.js 的 colgroup */
+.mo-applicant-board-table {
+    width: 100%;
+    min-width: 960px;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 14px;
+}
+
+.mo-applicant-board-table thead th {
+    text-align: left;
+    padding: 11px 6px;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    color: var(--muted);
+    text-transform: none;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.35);
+    background: rgba(0, 0, 0, 0.18);
+}
+
+[data-theme="light"] .mo-applicant-board-table thead th {
+    background: #f1f5f9;
+    color: #475569;
+    border-bottom-color: rgba(15, 23, 42, 0.12);
+}
+
+.mo-applicant-board-table tbody td {
+    padding: 11px 6px;
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--text);
+}
+
+[data-theme="light"] .mo-applicant-board-table tbody td {
+    border-bottom-color: rgba(15, 23, 42, 0.08);
+}
+
+.mo-applicant-board-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.mo-applicant-board-table tbody tr:hover td {
+    background: rgba(255, 255, 255, 0.04);
+}
+
+[data-theme="light"] .mo-applicant-board-table tbody tr:hover td {
+    background: #f8fafc;
+}
+
+/* 数据列对齐与省略；各列百分比宽度在 applicants.js → renderApplicants → colgroup */
+
+.mo-applicant-board-table td.mo-applicant-board-table__col-status {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+.mo-applicant-board-table td.mo-applicant-board-table__col-time {
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: clip;
+}
+
+.mo-applicant-board-table__actions,
+.mo-applicant-board-table th.mo-applicant-board-table__actions {
+    text-align: right;
+    vertical-align: middle;
+}
+
+.mo-applicant-board-table td.mo-applicant-board-table__actions {
+    overflow: visible;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+.mo-applicant-board-table__action-cell {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 5px;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.mo-applicant-board-table__cell-mono {
+    font-variant-numeric: tabular-nums;
+}
+
+/* 表内操作：单行右对齐。
+ * 各列占宽：applicants.js → colgroup。
+ * Details / CV 宽度：改下一选择器块的 padding / min-width。
+ * Shortlist / Shortlisted / Messages：再往下各自选择器。 */
+.mo-applicant-board-table__action-cell .mo-applicant-strip-btn {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    padding: 8px 14px;
+    min-height: 36px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.25;
+    white-space: nowrap;
+    text-decoration: none;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    font-family: inherit;
+    color: var(--text);
+    transition:
+        background 0.16s ease,
+        border-color 0.16s ease,
+        box-shadow 0.16s ease,
+        transform 0.12s ease,
+        color 0.16s ease;
+}
+
+/* Details / CV：略宽于默认；仍窄于 Shortlist / Messages */
+.mo-applicant-board-table__action-cell .mo-applicant-strip-btn--detail,
+.mo-applicant-board-table__action-cell .mo-applicant-strip-btn--cv {
+    padding: 8px 16px;
+    min-width: 5.25rem;
+}
+
+/* Shortlist：英文 Shortlisted / 中文「已在短名单」较长，用 min-width 保底 */
+.mo-applicant-board-table__action-cell .mo-applicant-strip-btn--shortlisted,
+.mo-applicant-board-table__action-cell .mo-applicant-strip-btn--shortlist {
+    padding: 8px 12px;
+    min-width: 7.75rem;
+}
+
+.mo-applicant-board-table__action-cell .mo-applicant-strip-btn--messages {
+    padding: 8px 12px;
+    min-width: 5.25rem;
+}
+
+.mo-applicant-board-table__action-cell .mo-applicant-strip-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(2, 6, 23, 0.35);
+}
+
+.mo-applicant-board-table__action-cell .mo-applicant-strip-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 6px rgba(2, 6, 23, 0.25);
+}
+
+.mo-applicant-board-table__action-cell .mo-applicant-strip-btn:focus-visible {
+    outline: 2px solid rgba(99, 102, 241, 0.65);
+    outline-offset: 2px;
+}
+
+.mo-applicant-strip-btn--detail {
+    background: rgba(148, 163, 184, 0.2);
+    border-color: rgba(148, 163, 184, 0.45);
+    color: #e2e8f0;
+}
+
+.mo-applicant-strip-btn--detail:hover {
+    background: rgba(148, 163, 184, 0.32);
+    border-color: rgba(186, 198, 214, 0.55);
+}
+
+.mo-applicant-strip-btn--cv {
+    background: rgba(6, 182, 212, 0.22);
+    border-color: rgba(34, 211, 238, 0.45);
+    color: #ecfeff;
+}
+
+.mo-applicant-strip-btn--cv:hover {
+    background: rgba(6, 182, 212, 0.38);
+    border-color: rgba(103, 232, 249, 0.65);
+}
+
+.mo-applicant-strip-btn--messages {
+    background: rgba(139, 92, 246, 0.24);
+    border-color: rgba(167, 139, 250, 0.5);
+    color: #f5f3ff;
+}
+
+.mo-applicant-strip-btn--messages:hover {
+    background: rgba(139, 92, 246, 0.4);
+    border-color: rgba(196, 181, 253, 0.65);
+}
+
+.mo-applicant-strip-btn--shortlist {
+    background: rgba(251, 191, 36, 0.16);
+    border-color: rgba(252, 211, 77, 0.45);
+    color: #fffbeb;
+}
+
+.mo-applicant-strip-btn--shortlist:hover {
+    background: rgba(251, 191, 36, 0.28);
+    border-color: rgba(253, 224, 71, 0.6);
+}
+
+/* 已在短名单：绿色系，与「待加入」琥珀区分；点击仍为 toggle 移出 */
+.mo-applicant-strip-btn--shortlisted {
+    background: rgba(34, 197, 94, 0.22);
+    border-color: rgba(74, 222, 128, 0.52);
+    color: #ecfdf5;
+}
+
+.mo-applicant-strip-btn--shortlisted:hover {
+    background: rgba(34, 197, 94, 0.38);
+    border-color: rgba(134, 239, 172, 0.72);
+}
+
+.mo-applicant-board-table__action-cell .mo-applicant-strip-btn--remove-shortlist {
+    padding: 8px 12px;
+    min-width: 4.75rem;
+}
+
+.mo-applicant-strip-btn--remove-shortlist {
+    background: rgba(248, 113, 113, 0.18);
+    border-color: rgba(252, 165, 165, 0.45);
+    color: #fef2f2;
+}
+
+.mo-applicant-strip-btn--remove-shortlist:hover {
+    background: rgba(248, 113, 113, 0.32);
+    border-color: rgba(254, 202, 202, 0.65);
+}
+
+.mo-applicant-board-table__action-cell .mo-applicant-strip-btn--disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+    pointer-events: none;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+[data-theme="light"] .mo-applicant-strip-btn--detail {
+    background: #e2e8f0;
+    border-color: rgba(15, 23, 42, 0.14);
+    color: #1e293b;
+}
+
+[data-theme="light"] .mo-applicant-strip-btn--detail:hover {
+    background: #cbd5e1;
+    border-color: rgba(15, 23, 42, 0.2);
+}
+
+[data-theme="light"] .mo-applicant-strip-btn--cv {
+    background: #cffafe;
+    border-color: rgba(8, 145, 178, 0.35);
+    color: #0e7490;
+}
+
+[data-theme="light"] .mo-applicant-strip-btn--cv:hover {
+    background: #a5f3fc;
+    border-color: rgba(8, 145, 178, 0.5);
+}
+
+[data-theme="light"] .mo-applicant-strip-btn--messages {
+    background: #ede9fe;
+    border-color: rgba(109, 40, 217, 0.28);
+    color: #5b21b6;
+}
+
+[data-theme="light"] .mo-applicant-strip-btn--messages:hover {
+    background: #ddd6fe;
+    border-color: rgba(109, 40, 217, 0.4);
+}
+
+[data-theme="light"] .mo-applicant-strip-btn--shortlist {
+    background: #fef9c3;
+    border-color: rgba(161, 98, 7, 0.35);
+    color: #854d0e;
+}
+
+[data-theme="light"] .mo-applicant-strip-btn--shortlist:hover {
+    background: #fef08a;
+    border-color: rgba(161, 98, 7, 0.48);
+}
+
+[data-theme="light"] .mo-applicant-strip-btn--shortlisted {
+    background: #d1fae5;
+    border-color: rgba(5, 150, 105, 0.42);
+    color: #047857;
+}
+
+[data-theme="light"] .mo-applicant-strip-btn--shortlisted:hover {
+    background: #a7f3d0;
+    border-color: rgba(4, 120, 87, 0.45);
+}
+
+[data-theme="light"] .mo-applicant-strip-btn--remove-shortlist {
+    background: #fee2e2;
+    border-color: rgba(185, 28, 28, 0.35);
+    color: #991b1b;
+}
+
+[data-theme="light"] .mo-applicant-strip-btn--remove-shortlist:hover {
+    background: #fecaca;
+    border-color: rgba(185, 28, 28, 0.48);
+}
+
+[data-theme="light"] .mo-applicant-board-table__action-cell .mo-applicant-strip-btn:hover {
+    box-shadow: 0 6px 14px rgba(15, 23, 42, 0.12);
 }
 
 .mo-applicant-board-card.job-card:focus {
@@ -1781,6 +2102,34 @@ legend.mo-field-label:has(.mo-req) {
 
 #moApplicantDetailBody .mo-detail-plate #moSubmitCommentBtn {
     margin-top: 14px;
+}
+
+/* MO 消息独立弹窗（与申请人详情分离） */
+.mo-applicant-messages-modal__panel {
+    width: min(520px, 100%);
+}
+
+.mo-applicant-messages-modal__sub {
+    margin: 0.35rem 0 0;
+    font-size: 13px;
+    line-height: 1.45;
+}
+
+#moApplicantMessagesBody {
+    max-height: min(58vh, 480px);
+    overflow-y: auto;
+}
+
+#moApplicantMessagesBody .mo-detail-plate .mo-form-grid {
+    margin-top: 18px;
+}
+
+#moApplicantMessagesBody .mo-detail-plate #moApplicantMessageSubmitBtn {
+    margin-top: 14px;
+}
+
+[data-theme="light"] #moApplicantMessagesBody .mo-comment-list {
+    background: rgba(0, 0, 0, 0.04);
 }
 
 .mo-detail-kv {
@@ -3256,4 +3605,461 @@ html:not([data-theme="light"]) .job-detail-modal input[type="datetime-local"]::-
         align-items: flex-start;
         gap: 2px;
     }
+}
+
+
+/* MO workspace (#moApp): one route visible at a time (Admin-style) */
+#moApp > .main { flex: 1; min-height: 0; }
+#moApp .routes { flex: 1; min-height: 0; overflow-y: auto; }
+#moApp .routes > .route { display: none; }
+#moApp .routes > .route.active { display: block; }
+
+.mo-recruitment-overview-hero {
+    position: relative;
+    margin-bottom: 20px;
+    padding: 22px 24px 20px;
+    border-radius: 18px;
+    border: 2px solid var(--primary);
+    background: linear-gradient(135deg, rgba(0, 242, 254, 0.12), rgba(139, 92, 246, 0.1));
+    box-shadow: 0 0 0 1px var(--primary-glow), 0 20px 48px var(--shadow);
+}
+[data-theme="light"] .mo-recruitment-overview-hero {
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(139, 92, 246, 0.08));
+}
+
+.mo-recruitment-overview-hero__badge {
+    display: inline-block;
+ font-size: 11px;
+ font-weight: 800;
+ letter-spacing: 0.06em;
+ text-transform: uppercase;
+ color: var(--primary);
+ margin-bottom: 10px;
+ padding: 4px 10px;
+ border-radius: 999px;
+ border: 1px solid var(--primary-glow);
+ background: rgba(0, 0, 0, 0.2);
+}
+[data-theme="light"] .mo-recruitment-overview-hero__badge {
+    background: rgba(255, 255, 255, 0.65);
+}
+.mo-recruitment-overview-hero__title {
+ margin: 0 0 8px;
+ font-size: clamp(1.6rem, 3vw, 2.1rem);
+ font-weight: 800;
+ line-height: 1.15;
+ color: var(--text);
+}
+.mo-recruitment-overview-hero__lead { margin: 0; max-width: 52rem; font-size: 14px; line-height: 1.55; }
+
+.mo-dash-module-shortcuts {
+ display: grid;
+ grid-template-columns: repeat(2, minmax(0, 1fr));
+ gap: 14px;
+ margin-bottom: 22px;
+}
+@media (max-width: 768px) { .mo-dash-module-shortcuts { grid-template-columns: 1fr; } }
+
+.mo-dash-module-shortcut {
+ display: flex;
+ align-items: center;
+ gap: 14px;
+ width: 100%;
+ text-align: left;
+ padding: 16px 18px;
+ border-radius: 16px;
+ border: 1px solid var(--card-border);
+ background: var(--card);
+ color: var(--text);
+ cursor: pointer;
+ transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+ box-shadow: 0 12px 28px var(--shadow);
+}
+.mo-dash-module-shortcut:hover {
+ border-color: var(--primary);
+ box-shadow: 0 0 0 1px var(--primary-glow), 0 16px 36px var(--shadow);
+ transform: translateY(-2px);
+}
+.mo-dash-module-shortcut:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+.mo-dash-module-shortcut__icon { font-size: 28px; line-height: 1; flex-shrink: 0; }
+.mo-dash-module-shortcut__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.mo-dash-module-shortcut__label { font-size: 16px; font-weight: 700; color: var(--text); }
+.mo-dash-module-shortcut__hint { font-size: 12px; line-height: 1.4; }
+.mo-dash-module-shortcut__chev { font-size: 20px; font-weight: 700; color: var(--primary); flex-shrink: 0; }
+
+/* MB-35 Shortlist（MO 应聘筛选） */
+.mo-applicant-card__hint--split {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.mo-shortlist-open-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.mo-shortlist-open-btn__count {
+    min-width: 1.25rem;
+    padding: 0 6px;
+    height: 22px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 242, 254, 0.2);
+    border: 1px solid var(--primary-glow);
+    color: var(--primary);
+}
+
+.mo-shortlist-open-btn__count[hidden] {
+    display: none;
+}
+
+.mo-shortlist-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1250;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.mo-shortlist-overlay[hidden] {
+    display: none !important;
+}
+
+.mo-shortlist-overlay__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.mo-shortlist-overlay__sheet {
+    position: relative;
+    z-index: 1;
+    width: min(520px, 100%);
+    max-height: min(86vh, 720px);
+    overflow: auto;
+    border-radius: 16px;
+    border: 1px solid var(--card-border);
+    background: var(--card-bg, rgba(20, 20, 28, 0.96));
+    padding: 16px 18px 18px;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="light"] .mo-shortlist-overlay__sheet {
+    background: rgba(255, 255, 255, 0.98);
+}
+
+.mo-shortlist-overlay__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.mo-shortlist-overlay__title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 800;
+    padding-right: 2.5rem;
+}
+
+.mo-shortlist-overlay__note {
+    font-size: 12px;
+    line-height: 1.5;
+    margin: 0 0 12px;
+}
+
+.mo-shortlist-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.mo-shortlist-tab {
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid var(--card-border);
+    background: rgba(0, 0, 0, 0.15);
+    color: var(--text);
+    cursor: pointer;
+}
+
+.mo-shortlist-tab.active {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 1px var(--primary-glow);
+    color: var(--primary);
+}
+
+.mo-shortlist-list-wrap {
+    min-height: 120px;
+    margin-bottom: 10px;
+}
+
+.mo-shortlist-list-wrap .mo-shortlist-board-table-wrap {
+    margin-bottom: 0;
+}
+
+.mo-shortlist-ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.mo-shortlist-li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    background: rgba(0, 0, 0, 0.12);
+}
+
+[data-theme="light"] .mo-shortlist-li {
+    background: rgba(0, 0, 0, 0.04);
+}
+
+.mo-shortlist-li__name {
+    font-weight: 700;
+    font-size: 14px;
+}
+
+.mo-shortlist-li__sub {
+    font-size: 12px;
+    margin-top: 2px;
+}
+
+.mo-shortlist-li__remove {
+    flex-shrink: 0;
+}
+
+.mo-shortlist-meta {
+    font-size: 12px;
+    margin: 0 0 12px;
+    line-height: 1.45;
+}
+
+.mo-shortlist-overlay__footer {
+    display: flex;
+    justify-content: stretch;
+}
+
+.mo-shortlist-overlay__footer .pill-btn {
+    width: 100%;
+    justify-content: center;
+}
+
+.mo-applicant-shortlist-detail-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 14px;
+    margin-top: 4px;
+}
+
+#moApplicantDetailBody .mo-applicant-shortlist-toggle--add.pill-btn {
+    font-weight: 600;
+    border-radius: 999px;
+    background: rgba(251, 191, 36, 0.18);
+    border: 1px solid rgba(252, 211, 77, 0.45);
+    color: #fffbeb;
+}
+
+#moApplicantDetailBody .mo-applicant-shortlist-toggle--add.pill-btn:hover,
+#moApplicantDetailBody .mo-applicant-shortlist-toggle--add.pill-btn:focus-visible {
+    background: rgba(251, 191, 36, 0.3);
+    border-color: rgba(253, 224, 71, 0.65);
+}
+
+#moApplicantDetailBody .mo-applicant-shortlist-toggle--shortlisted.pill-btn {
+    font-weight: 600;
+    border-radius: 999px;
+    background: rgba(34, 197, 94, 0.22);
+    border: 1px solid rgba(74, 222, 128, 0.52);
+    color: #ecfdf5;
+}
+
+#moApplicantDetailBody .mo-applicant-shortlist-toggle--shortlisted.pill-btn:hover,
+#moApplicantDetailBody .mo-applicant-shortlist-toggle--shortlisted.pill-btn:focus-visible {
+    background: rgba(34, 197, 94, 0.38);
+    border-color: rgba(134, 239, 172, 0.72);
+}
+
+[data-theme="light"] #moApplicantDetailBody .mo-applicant-shortlist-toggle--add.pill-btn {
+    background: #fef9c3;
+    border-color: rgba(161, 98, 7, 0.35);
+    color: #854d0e;
+}
+
+[data-theme="light"] #moApplicantDetailBody .mo-applicant-shortlist-toggle--add.pill-btn:hover,
+[data-theme="light"] #moApplicantDetailBody .mo-applicant-shortlist-toggle--add.pill-btn:focus-visible {
+    background: #fef08a;
+}
+
+[data-theme="light"] #moApplicantDetailBody .mo-applicant-shortlist-toggle--shortlisted.pill-btn {
+    background: #d1fae5;
+    border-color: rgba(5, 150, 105, 0.42);
+    color: #047857;
+}
+
+[data-theme="light"] #moApplicantDetailBody .mo-applicant-shortlist-toggle--shortlisted.pill-btn:hover,
+[data-theme="light"] #moApplicantDetailBody .mo-applicant-shortlist-toggle--shortlisted.pill-btn:focus-visible {
+    background: #a7f3d0;
+}
+
+.mo-applicant-shortlist-hint {
+    font-size: 12px;
+}
+
+.mo-nav-badge--shortlist {
+    background: linear-gradient(135deg, #0ea5e9, #6366f1);
+    color: #fff;
+}
+
+.mo-shortlist-page__note {
+    font-size: 12px;
+    margin: 0 0 8px;
+    line-height: 1.5;
+}
+
+.mo-shortlist-page__status {
+    font-size: 12px;
+    margin: 0 0 12px;
+    min-height: 1.2em;
+}
+
+.mo-shortlist-page {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.mo-shortlist-page__footer {
+    display: flex;
+    justify-content: stretch;
+}
+
+.mo-shortlist-page__footer .pill-btn {
+    width: 100%;
+    justify-content: center;
+}
+
+/* ---------- MO 顶部 Toast（轻提示，不拦截页面点击） ---------- */
+.mo-toast-host {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1200;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.mo-toast {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    border-radius: 20px;
+    background: #fff;
+    color: #0f172a;
+    box-shadow:
+        0 12px 40px rgba(15, 23, 42, 0.12),
+        0 2px 10px rgba(15, 23, 42, 0.08);
+    font-size: 14px;
+    line-height: 1.45;
+    max-width: min(560px, calc(100vw - 32px));
+    opacity: 0;
+    transform: translateY(-10px);
+    transition:
+        opacity 0.28s ease,
+        transform 0.28s ease;
+}
+
+.mo-toast.mo-toast--in {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.mo-toast.mo-toast--leave {
+    opacity: 0;
+    transform: translateY(-8px);
+}
+
+.mo-toast__icon {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1;
+    color: #fff;
+}
+
+.mo-toast--success .mo-toast__icon {
+    background: #22c55e;
+}
+
+.mo-toast--info .mo-toast__icon {
+    background: #3b82f6;
+}
+
+.mo-toast__body {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 10px;
+    min-width: 0;
+}
+
+.mo-toast__text {
+    font-weight: 500;
+}
+
+.mo-toast__undo {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    font: inherit;
+    font-weight: 600;
+    color: #2563eb;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.mo-toast__undo:hover {
+    color: #1d4ed8;
+}
+
+.mo-toast__undo:focus-visible {
+    outline: 2px solid rgba(37, 99, 235, 0.55);
+    outline-offset: 2px;
+    border-radius: 4px;
 }

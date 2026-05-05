@@ -2,8 +2,8 @@
     <div class="card jobs-hall-card">
         <div class="overview-top">
             <div>
-                <h1 data-i18n="applicants.title" data-i18n-zh="应聘筛选" data-i18n-en="Applicant Screening">应聘筛选</h1>
-                <p class="muted" data-i18n="applicants.desc" data-i18n-zh="查看申请者资料并作出录用或拒绝；申请人将看到与您操作一致的最新状态。" data-i18n-en="Review applicant profiles and make hire/reject decisions. Applicants will see the latest status based on your action.">查看申请者资料并作出录用或拒绝；申请人将看到与您操作一致的最新状态。</p>
+                <h1 data-i18n="applicants.title" data-i18n-zh="人选投递" data-i18n-en="Candidate applications">人选投递</h1>
+                <p class="muted" data-i18n="applicants.desc" data-i18n-zh="查看投递、资料与流程状态，并作出录用或拒绝；候选人将看到与您操作一致的最新状态。意向人选请使用侧栏「候选短名单」。" data-i18n-en="Review submissions, profiles, and workflow status, then hire or reject. Candidates see updates matching your actions. Use Shortlist in the sidebar for your shortlist.">查看投递、资料与流程状态，并作出录用或拒绝；候选人将看到与您操作一致的最新状态。意向人选请使用侧栏「候选短名单」。</p>
             </div>
             <div class="overview-badges mo-jobs-toolbar mo-applicants-header-tools">
                 <button id="refreshApplicantsBtn" class="refresh-btn pill" type="button" data-i18n-aria-label="applicants.refreshAria" data-i18n-aria-label-zh="刷新列表" data-i18n-aria-label-en="Refresh">
@@ -26,17 +26,6 @@
             <div class="empty-state__icon">🗂️</div>
             <h3 data-i18n="applicants.emptyTitle" data-i18n-zh="暂无候选人" data-i18n-en="No applicants">暂无候选人</h3>
             <p data-i18n="applicants.emptyDesc" data-i18n-zh="暂无符合条件的投递记录；可切换上方课程筛选或前往课程管理发布岗位。" data-i18n-en="No applications match the current filter. Change the filter above or post an opening in Module Management.">暂无符合条件的投递记录；可切换上方课程筛选或前往课程管理发布岗位。</p>
-        </div>
-    </div>
-
-    <div id="moApplicantDetailModal" class="mo-detail-modal" hidden aria-hidden="true">
-        <div class="mo-detail-modal__backdrop" data-close-applicant-detail="1"></div>
-        <div class="mo-detail-modal__panel" role="dialog" aria-modal="true" aria-labelledby="moApplicantDetailTitle">
-            <button type="button" class="modal-close" id="moApplicantDetailClose" aria-label="关闭" data-i18n-aria-label="common.close" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close">&times;</button>
-            <div class="mo-detail-modal__head">
-                <h2 id="moApplicantDetailTitle" data-i18n="applicants.detailTitle" data-i18n-zh="申请人详情" data-i18n-en="Details">申请人详情</h2>
-            </div>
-            <div class="mo-detail-modal__body" id="moApplicantDetailBody"></div>
         </div>
     </div>
 </div>

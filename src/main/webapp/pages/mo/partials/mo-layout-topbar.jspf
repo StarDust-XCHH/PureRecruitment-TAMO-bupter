@@ -1,7 +1,6 @@
 <div class="topbar">
     <div class="greeting">
         <h1 id="welcomeTitle" data-i18n="topbar.welcomeTitle" data-i18n-html="欢迎回来，<span id='welcomeName'>MO</span>|Welcome back, <span id='welcomeName'>MO</span>">Welcome back, <span id="welcomeName">MO</span></h1>
-        <p data-i18n="topbar.greetingDesc" data-i18n-zh="从招聘总览掌握态势，在课程管理中维护岗位，并在应聘筛选中完成录用决策。" data-i18n-en="Dashboard overview, Module Management, and Applicant Screening.">Dashboard overview, Module Management, and Applicant Screening.</p>
     </div>
     <div class="topbar-actions">
         <button class="language-toggle" id="languageToggle" type="button" aria-label="Switch language" data-i18n-aria-label="topbar.languageToggleAria" data-i18n-aria-label-zh="切换语言" data-i18n-aria-label-en="Switch language">
