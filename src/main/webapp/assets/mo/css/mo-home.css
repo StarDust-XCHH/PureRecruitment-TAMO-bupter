@@ -756,8 +756,77 @@ legend.mo-field-label:has(.mo-req) {
 }
 
 /* --------------------------------------------------------------------------
-   MO 招聘总览：标题区、快捷操作、待决策卡片跳转
+   MO 招聘总览：合并 masthead + 指标卡内模块入口
    -------------------------------------------------------------------------- */
+.mo-dashboard-card.mo-dashboard-card--unified {
+    padding-top: 20px;
+}
+
+.mo-dashboard-masthead {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px 20px;
+    margin-bottom: 6px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--card-border);
+}
+
+.mo-dashboard-masthead__lead {
+    flex: 1 1 min(100%, 360px);
+    min-width: 0;
+}
+
+.mo-dashboard-masthead__badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--primary);
+    margin-bottom: 10px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--primary-glow);
+    background: rgba(0, 0, 0, 0.2);
+}
+[data-theme="light"] .mo-dashboard-masthead__badge {
+    background: rgba(255, 255, 255, 0.65);
+}
+
+.mo-dashboard-masthead__title {
+    margin: 0 0 4px;
+    font-size: clamp(1.45rem, 2.6vw, 1.85rem);
+    font-weight: 800;
+    line-height: 1.15;
+    color: var(--text);
+}
+
+.mo-dashboard-masthead__subtitle {
+    margin: 0 0 10px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.mo-dashboard-masthead__desc {
+    margin: 0;
+    max-width: 52rem;
+    font-size: 13px;
+    line-height: 1.55;
+}
+
+.mo-dashboard-masthead__actions {
+    flex: 0 1 auto;
+    padding-top: 0.15rem;
+}
+
+.mo-dashboard-stat-wrap {
+    margin-top: 4px;
+}
+
 .mo-dashboard-card .overview-top.mo-dashboard-overview-top {
     display: flex;
     flex-wrap: wrap;
@@ -803,6 +872,120 @@ legend.mo-field-label:has(.mo-req) {
 }
 .mo-dashboard-card .mo-dashboard-stat-grid .insight-card .insight-core-number {
     align-self: end;
+}
+
+/* 带底部模块入口的指标卡：上半区打开弹窗，底部为独立路由按钮 */
+.mo-dashboard-card .mo-dashboard-insight-card {
+    display: flex;
+    flex-direction: column;
+    grid-template-rows: none;
+    cursor: default;
+    gap: 0;
+    padding-bottom: 14px;
+}
+
+.mo-dashboard-insight-card__hit {
+    flex: 1 1 auto;
+    display: grid;
+    grid-template-rows: auto 1fr;
+    align-content: stretch;
+    min-height: 0;
+    cursor: pointer;
+    border-radius: 12px;
+    margin: -4px -4px 0;
+    padding: 4px 4px 2px;
+    outline: none;
+    transition: background 0.18s ease;
+}
+
+.mo-dashboard-insight-card__hit:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+[data-theme="light"] .mo-dashboard-insight-card__hit:hover {
+    background: rgba(15, 23, 42, 0.04);
+}
+
+.mo-dashboard-insight-card__hit:focus-visible {
+    box-shadow: 0 0 0 2px var(--primary);
+}
+
+.mo-dashboard-insight-card__hit .insight-core-number {
+    align-self: end;
+}
+
+.mo-dashboard-insight-card__route {
+    flex-shrink: 0;
+    margin-top: 10px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+[data-theme="light"] .mo-dashboard-insight-card__route {
+    border-top-color: rgba(15, 23, 42, 0.08);
+}
+
+.mo-dashboard-route-chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    text-align: left;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--card-border);
+    background: rgba(0, 0, 0, 0.18);
+    color: var(--text);
+    cursor: pointer;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
+}
+[data-theme="light"] .mo-dashboard-route-chip {
+    background: rgba(255, 255, 255, 0.72);
+}
+
+.mo-dashboard-route-chip:hover {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 1px var(--primary-glow);
+    transform: translateY(-1px);
+}
+
+.mo-dashboard-route-chip:focus-visible {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+}
+
+.mo-dashboard-route-chip__icon {
+    font-size: 22px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.mo-dashboard-route-chip__text {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.mo-dashboard-route-chip__label {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.mo-dashboard-route-chip__hint {
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+.mo-dashboard-route-chip__chev {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--primary);
+    flex-shrink: 0;
+}
+
+.mo-dashboard-ai-card .insight-core-number {
+    font-size: clamp(26px, 3vw, 36px);
 }
 
 /* 四卡等宽铺满，避免 auto-fit 产生空白轨导致「整体偏左」观感 */
@@ -3613,79 +3796,6 @@ html:not([data-theme="light"]) .job-detail-modal input[type="datetime-local"]::-
 #moApp .routes { flex: 1; min-height: 0; overflow-y: auto; }
 #moApp .routes > .route { display: none; }
 #moApp .routes > .route.active { display: block; }
-
-.mo-recruitment-overview-hero {
-    position: relative;
-    margin-bottom: 20px;
-    padding: 22px 24px 20px;
-    border-radius: 18px;
-    border: 2px solid var(--primary);
-    background: linear-gradient(135deg, rgba(0, 242, 254, 0.12), rgba(139, 92, 246, 0.1));
-    box-shadow: 0 0 0 1px var(--primary-glow), 0 20px 48px var(--shadow);
-}
-[data-theme="light"] .mo-recruitment-overview-hero {
-    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(139, 92, 246, 0.08));
-}
-
-.mo-recruitment-overview-hero__badge {
-    display: inline-block;
- font-size: 11px;
- font-weight: 800;
- letter-spacing: 0.06em;
- text-transform: uppercase;
- color: var(--primary);
- margin-bottom: 10px;
- padding: 4px 10px;
- border-radius: 999px;
- border: 1px solid var(--primary-glow);
- background: rgba(0, 0, 0, 0.2);
-}
-[data-theme="light"] .mo-recruitment-overview-hero__badge {
-    background: rgba(255, 255, 255, 0.65);
-}
-.mo-recruitment-overview-hero__title {
- margin: 0 0 8px;
- font-size: clamp(1.6rem, 3vw, 2.1rem);
- font-weight: 800;
- line-height: 1.15;
- color: var(--text);
-}
-.mo-recruitment-overview-hero__lead { margin: 0; max-width: 52rem; font-size: 14px; line-height: 1.55; }
-
-.mo-dash-module-shortcuts {
- display: grid;
- grid-template-columns: repeat(2, minmax(0, 1fr));
- gap: 14px;
- margin-bottom: 22px;
-}
-@media (max-width: 768px) { .mo-dash-module-shortcuts { grid-template-columns: 1fr; } }
-
-.mo-dash-module-shortcut {
- display: flex;
- align-items: center;
- gap: 14px;
- width: 100%;
- text-align: left;
- padding: 16px 18px;
- border-radius: 16px;
- border: 1px solid var(--card-border);
- background: var(--card);
- color: var(--text);
- cursor: pointer;
- transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.15s ease;
- box-shadow: 0 12px 28px var(--shadow);
-}
-.mo-dash-module-shortcut:hover {
- border-color: var(--primary);
- box-shadow: 0 0 0 1px var(--primary-glow), 0 16px 36px var(--shadow);
- transform: translateY(-2px);
-}
-.mo-dash-module-shortcut:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.mo-dash-module-shortcut__icon { font-size: 28px; line-height: 1; flex-shrink: 0; }
-.mo-dash-module-shortcut__text { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-.mo-dash-module-shortcut__label { font-size: 16px; font-weight: 700; color: var(--text); }
-.mo-dash-module-shortcut__hint { font-size: 12px; line-height: 1.4; }
-.mo-dash-module-shortcut__chev { font-size: 20px; font-weight: 700; color: var(--primary); flex-shrink: 0; }
 
 /* MB-35 Shortlist（MO 应聘筛选） */
 .mo-applicant-card__hint--split {
