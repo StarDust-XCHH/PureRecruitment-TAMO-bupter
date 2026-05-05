@@ -27,6 +27,10 @@ Manages MO user authentication and profile operations:
 - File: `mountDataTAMObupter/mo/mo-application-comments.json`
 - Append/list MO comments per `applicationId` (MO-only storage)
 
+### `MoApplicantShortlistDao`
+- File: `mountDataTAMObupter/mo/mo-applicant-shortlist.json`
+- MO-only shortlist rows per `(moId, courseCode, applicationId)`; does not change TA applications
+
 ### `MoTaApplicationsMutationDao`
 - Controlled writes to TA `applications.json` (e.g. set `UNDER_REVIEW` when MO marks an application read)
 - Does not modify TA module Java code; used from MO servlets/DAO only

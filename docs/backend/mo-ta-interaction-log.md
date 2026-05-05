@@ -87,6 +87,7 @@ This log tracks MO-side changes that interact with TA-side interfaces or TA data
 - **MO-only data files** (under `mountDataTAMObupter/mo/`):
   - `mo-application-read-state.json` — schema `mo` / entity `mo-application-read-state`; items: `moId`, `applicationId`, `lastReadAt`.
   - `mo-application-comments.json` — schema `mo` / entity `mo-application-comments`; items group `comments[]` by `applicationId`.
+  - `mo-applicant-shortlist.json` — schema `mo` / entity `mo-applicant-shortlist`; items: `moId`, `courseCode`, `applicationId`, optional `taId` / `name`, `addedAt`.
 
 - **Compatibility**: `MoRecruitmentDao.decideApplication(courseCode, taId, decision, comment)` (4-arg) still resolves `moId` from the job’s `ownerMoId` for local tools; HTTP clients should pass `moId` explicitly on the 5-arg path.
 
