@@ -6,7 +6,6 @@
 
     modules.dashboard = function initDashboard(app) {
         const dashOpenJobs = document.getElementById('dashOpenJobs');
-        const dashCandidates = document.getElementById('dashCandidates');
         const dashAccepted = document.getElementById('dashAccepted');
         const dashPending = document.getElementById('dashPending');
         const refreshDashboardBtn = document.getElementById('refreshDashboardBtn');
@@ -58,8 +57,8 @@
                 dashWorkflowHint.hidden = false;
                 dashWorkflowHint.textContent =
                     t(
-                        '当前有 ' + p + ' 条申请待决策，建议在总览下方入口或侧栏进入「人选投递」优先处理。',
-                        'There are ' + p + ' applications pending decision. Open Candidate applications from the dashboard shortcuts or the sidebar.'
+                        '当前有 ' + p + ' 条申请待决策，建议在「待决策」卡片底部进入「人选投递」，或使用侧栏优先处理。',
+                        'There are ' + p + ' applications pending decision. Use the link under Pending decision on the dashboard or the sidebar to open Candidate applications.'
                     );
             } else {
                 dashWorkflowHint.hidden = true;
@@ -90,28 +89,6 @@
                 seen.add(applicantIdentityKey(item));
             });
             return seen.size;
-        }
-
-        function groupApplicantsByCourse(applicants) {
-            var buckets = {};
-            (applicants || []).forEach(function (item) {
-                var code = item.courseCode != null && String(item.courseCode).trim() !== ''
-                    ? String(item.courseCode).trim()
-                    : '—';
-                var cname = item.courseName != null && String(item.courseName).trim() !== ''
-                    ? String(item.courseName).trim()
-                    : '';
-                var key = code + '\x01' + cname;
-                if (!buckets[key]) {
-                    buckets[key] = { courseCode: code, courseName: cname, items: [] };
-                }
-                buckets[key].items.push(item);
-            });
-            return Object.keys(buckets).sort(function (a, b) {
-                return a.localeCompare(b, 'zh-CN');
-            }).map(function (k) {
-                return buckets[k];
-            });
         }
 
         function computeStats(jobs, applicants) {
@@ -311,110 +288,6 @@
             }
         }
 
-        /** 课程分组内：左栏姓名/TA/投递；右栏状态 +「查看详情」（状态正下方） */
-        function appendApplicantRowCompact(ul, item) {
-            if (!ul || !item) return;
-            const li = document.createElement('li');
-            li.className = 'mo-dash-cand-item mo-dash-cand-item--compact';
-
-            const wrap = document.createElement('div');
-            wrap.className = 'mo-dash-cand-item__compact-wrap';
-
-            const main = document.createElement('div');
-            main.className = 'mo-dash-cand-item__compact-main';
-
-            const nameRow = document.createElement('div');
-            nameRow.className = 'mo-dash-cand-item__row';
-            const nameEl = document.createElement('span');
-            nameEl.className = 'mo-dash-cand-item__name';
-            nameEl.textContent = item.name || item.taId || '—';
-            nameRow.appendChild(nameEl);
-            if (item.unread) {
-                const unreadEl = document.createElement('span');
-                unreadEl.className = 'mo-dash-cand-item__unread';
-                unreadEl.textContent = t('未读', 'Unread');
-                unreadEl.setAttribute('title', t('未读投递', 'Unread submission'));
-                nameRow.appendChild(unreadEl);
-            }
-            main.appendChild(nameRow);
-
-            const tid = item.taId != null && String(item.taId).trim() !== '' ? String(item.taId).trim() : '';
-            if (tid) {
-                const meta = document.createElement('div');
-                meta.className = 'mo-dash-cand-item__meta muted';
-                meta.textContent = tid;
-                main.appendChild(meta);
-            }
-            const subStr = formatSubmittedShort(item.submittedAt);
-            if (subStr) {
-                const dtEl = document.createElement('div');
-                dtEl.className = 'mo-dash-cand-item__dt muted';
-                dtEl.textContent = t('投递 · ', 'Submitted · ') + subStr;
-                main.appendChild(dtEl);
-            }
-
-            const aside = document.createElement('div');
-            aside.className = 'mo-dash-cand-item__compact-aside';
-            const statusEl = document.createElement('span');
-            statusEl.className = 'mo-dash-cand-item__status';
-            statusEl.textContent = applicantStatusLabel(item.status);
-            aside.appendChild(statusEl);
-            attachApplicantDetailButton(aside, item, 'compact-aside');
-
-            wrap.appendChild(main);
-            wrap.appendChild(aside);
-            li.appendChild(wrap);
-            ul.appendChild(li);
-        }
-
-        function populateCandidatesPoolModal() {
-            const applicants = Array.isArray(latestApplicants) ? latestApplicants : [];
-            const uniq = uniqueTaCount(applicants);
-            const nApps = applicants.length;
-            const countEl = document.getElementById('candidatesPoolCountLine');
-            const emptyEl = document.getElementById('candidatesPoolEmpty');
-            const groupedEl = document.getElementById('candidatesPoolGrouped');
-            if (countEl) {
-                countEl.textContent =
-                    t(
-                        '共 ' + uniq + ' 位候选 TA（每人计一次），' + nApps + ' 条投递；与总览「候选池规模」人数一致。',
-                        uniq + ' unique TA candidates, ' + nApps + ' submissions in total; consistent with the Candidate Pool card.'
-                    );
-            }
-            if (groupedEl) {
-                groupedEl.innerHTML = '';
-                const groups = groupApplicantsByCourse(applicants);
-                groups.forEach(function (g, idx) {
-                    const details = document.createElement('details');
-                    details.className = 'mo-dash-cand-group mo-dash-cand-group--accordion';
-                    if (idx === 0) {
-                        details.setAttribute('open', '');
-                    }
-                    const summary = document.createElement('summary');
-                    summary.className = 'mo-dash-cand-group__summary';
-                    var title = g.courseCode;
-                    if (g.courseName) {
-                        title += ' · ' + g.courseName;
-                    }
-                    summary.textContent = t(
-                        title + '（' + g.items.length + ' 条）',
-                        title + ' (' + g.items.length + ')'
-                    );
-                    const ul = document.createElement('ul');
-                    ul.className = 'mo-dash-cand-list mo-dash-cand-list--in-group';
-                    g.items.forEach(function (item) {
-                        appendApplicantRowCompact(ul, item);
-                    });
-                    details.appendChild(summary);
-                    details.appendChild(ul);
-                    groupedEl.appendChild(details);
-                });
-            }
-            if (emptyEl) {
-                emptyEl.hidden = applicants.length > 0;
-            }
-        }
-
         function populateAcceptedModal() {
             const applicants = Array.isArray(latestApplicants) ? latestApplicants : [];
             const hired = applicants.filter(function (item) {
@@ -445,8 +318,8 @@
             const listEl = document.getElementById('pendingListDetail');
             if (countEl) {
                 countEl.textContent = t(
-                    '共 ' + pending.length + ' 条待决策；人数与总览「待决策」一致。',
-                    pending.length + ' applications pending decision; consistent with the Pending Decision card.'
+                    '共 ' + pending.length + ' 条待决策；与总览「待决策」卡片数字一致。',
+                    pending.length + ' applications pending decision; matches the Pending decision figure on the dashboard.'
                 );
             }
             if (listEl) {
@@ -467,7 +340,6 @@
             const pending = applicants.filter(isPendingDecision).length;
 
             if (dashOpenJobs) dashOpenJobs.textContent = String(jobs.length);
-            if (dashCandidates) dashCandidates.textContent = String(uniqueTaCount(applicants));
             if (dashAccepted) dashAccepted.textContent = String(accepted);
             if (dashPending) dashPending.textContent = String(pending);
 
@@ -538,14 +410,22 @@
             );
         });
 
-        document.querySelectorAll('[data-modal-target="candidates-pool"]').forEach(function (node) {
+        document.querySelectorAll('[data-modal-target="candidates-pipeline"]').forEach(function (node) {
             node.addEventListener(
                 'click',
                 function () {
-                    populateCandidatesPoolModal();
+                    populatePendingModal();
                 },
                 true
             );
+        });
+
+        document.querySelectorAll('.mo-dashboard-insight-card__hit[role="button"]').forEach(function (hit) {
+            hit.addEventListener('keydown', function (e) {
+                if (e.key !== 'Enter' && e.key !== ' ') return;
+                e.preventDefault();
+                hit.click();
+            });
         });
 
         document.querySelectorAll('[data-modal-target="accepted-list"]').forEach(function (node) {
@@ -553,16 +433,6 @@
                 'click',
                 function () {
                     populateAcceptedModal();
-                },
-                true
-            );
-        });
-
-        document.querySelectorAll('[data-modal-target="pending-list"]').forEach(function (node) {
-            node.addEventListener(
-                'click',
-                function () {
-                    populatePendingModal();
                 },
                 true
             );

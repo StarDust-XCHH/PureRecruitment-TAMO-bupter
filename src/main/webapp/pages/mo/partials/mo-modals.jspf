@@ -414,16 +414,16 @@
         </div>
     </div>
 
-    <div class="ta-modal-panel mo-summary-modal wide" data-modal="candidates-pool" role="dialog" aria-labelledby="modalCandidatesTitle">
+    <div class="ta-modal-panel mo-summary-modal wide" data-modal="candidates-pipeline" role="dialog" aria-labelledby="modalPipelineTitle">
         <button class="modal-close" type="button" data-i18n-aria-label="modal.closeAria" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head">
-            <h3 id="modalCandidatesTitle" data-i18n="modal.candidatesPool.title" data-i18n-zh="候选池明细" data-i18n-en="Candidate pool detail">候选池明细</h3>
-            <p class="muted" data-i18n-html="下方按课程列出投递明细。人数与总览「候选池规模」一致：同一位 TA 若投递多门课，在人数上仍只计<strong>一名</strong>候选人。|Applications are listed by module below. The count matches dashboard “Candidate Pool”: if one TA applies to several modules, they still count as <strong>one</strong> candidate.">下方按课程列出投递明细。人数与总览「候选池规模」一致：同一位 TA 若投递多门课，在人数上仍只计<strong>一名</strong>候选人。</p>
+            <h3 id="modalPipelineTitle" data-i18n="modal.pending.title" data-i18n-zh="待决策申请" data-i18n-en="Pending applications">待决策申请</h3>
+            <p class="muted" data-i18n="modal.pending.subtitle" data-i18n-zh="尚未录用或拒绝的申请均在此列出，人数与总览「待决策」卡片一致。请在侧栏「人选投递」或「应聘筛选」中处理。" data-i18n-en="Applications not yet hired or rejected; count matches the Pending decision card. Handle them in Candidate applications or Applicant Screening in the sidebar.">尚未录用或拒绝的申请均在此列出，人数与总览「待决策」卡片一致。请在侧栏「人选投递」或「应聘筛选」中处理。</p>
         </div>
         <div class="modal-body mo-summary-modal__body">
-            <p class="mo-dash-modal-count" id="candidatesPoolCountLine" aria-live="polite"></p>
-            <p class="mo-summary-empty muted" id="candidatesPoolEmpty" hidden data-i18n="modal.candidatesPool.empty" data-i18n-zh="暂无候选人数据。请到侧栏「应聘筛选」查看，或等待 TA 投递。" data-i18n-en="No candidates yet. Open Applicant Screening in the sidebar, or wait for applications.">暂无候选人数据。请到侧栏「应聘筛选」查看，或等待 TA 投递。</p>
-            <div class="mo-dash-cand-grouped" id="candidatesPoolGrouped"></div>
+            <p class="mo-dash-modal-count" id="pendingListCountLine" aria-live="polite"></p>
+            <p class="mo-summary-empty muted" id="pendingListEmpty" hidden data-i18n="modal.pending.empty" data-i18n-zh="暂无待决策申请。" data-i18n-en="No pending applications.">暂无待决策申请。</p>
+            <ul class="mo-dash-cand-list" id="pendingListDetail"></ul>
         </div>
     </div>
 
@@ -440,16 +440,14 @@
         </div>
     </div>
 
-    <div class="ta-modal-panel mo-summary-modal wide" data-modal="pending-list" role="dialog" aria-labelledby="modalPendingTitle">
+    <div class="ta-modal-panel mo-summary-modal wide" data-modal="mo-ai-assistant" role="dialog" aria-labelledby="modalMoAiTitle">
         <button class="modal-close" type="button" data-i18n-aria-label="modal.closeAria" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head">
-            <h3 id="modalPendingTitle" data-i18n="modal.pending.title" data-i18n-zh="待决策申请" data-i18n-en="Pending applications">待决策申请</h3>
-            <p class="muted" data-i18n="modal.pending.subtitle" data-i18n-zh="尚未录用或拒绝的申请均在此列出，人数与总览「待决策」一致。请在侧栏「应聘筛选」中处理。" data-i18n-en="Applications not yet hired or rejected; count matches dashboard “Pending”. Handle them in Applicant Screening.">尚未录用或拒绝的申请均在此列出，人数与总览「待决策」一致。请在侧栏「应聘筛选」中处理。</p>
+            <h3 id="modalMoAiTitle" data-i18n="modal.moAi.title" data-i18n-zh="MO AI 助理" data-i18n-en="MO AI Assistant">MO AI 助理</h3>
+            <p class="muted" data-i18n="modal.moAi.subtitle" data-i18n-zh="与 TA 侧一致的对话能力预留位：后续可围绕岗位说明、简历摘要与筛选建议接入服务。" data-i18n-en="Reserved for the same style of assistant as the TA workspace: job briefs, resume summaries, and screening suggestions will plug in here.">与 TA 侧一致的对话能力预留位：后续可围绕岗位说明、简历摘要与筛选建议接入服务。</p>
         </div>
         <div class="modal-body mo-summary-modal__body">
-            <p class="mo-dash-modal-count" id="pendingListCountLine" aria-live="polite"></p>
-            <p class="mo-summary-empty muted" id="pendingListEmpty" hidden data-i18n="modal.pending.empty" data-i18n-zh="暂无待决策申请。" data-i18n-en="No pending applications.">暂无待决策申请。</p>
-            <ul class="mo-dash-cand-list" id="pendingListDetail"></ul>
+            <p class="muted" data-i18n="modal.moAi.body" data-i18n-zh="当前未连接后端 AI 服务。总览最右侧卡片为固定入口；接口与权限就绪后即可在此打开对话面板。" data-i18n-en="No AI backend is connected yet. The rightmost dashboard card is the fixed entry point; the chat panel will open here once APIs and permissions are ready.">当前未连接后端 AI 服务。总览最右侧卡片为固定入口；接口与权限就绪后即可在此打开对话面板。</p>
         </div>
     </div>
 

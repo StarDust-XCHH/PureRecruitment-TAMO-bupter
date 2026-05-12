@@ -1,23 +1,54 @@
 <div class="route" id="route-applicants" data-route="applicants">
     <div class="card jobs-hall-card">
-        <div class="overview-top">
-            <div>
-                <h1 data-i18n="applicants.title" data-i18n-zh="人选投递" data-i18n-en="Candidate applications">人选投递</h1>
-                <p class="muted" data-i18n="applicants.desc" data-i18n-zh="查看投递、资料与流程状态，并作出录用或拒绝；候选人将看到与您操作一致的最新状态。意向人选请使用侧栏「候选短名单」。" data-i18n-en="Review submissions, profiles, and workflow status, then hire or reject. Candidates see updates matching your actions. Use Shortlist in the sidebar for your shortlist.">查看投递、资料与流程状态，并作出录用或拒绝；候选人将看到与您操作一致的最新状态。意向人选请使用侧栏「候选短名单」。</p>
-            </div>
-            <div class="overview-badges mo-jobs-toolbar mo-applicants-header-tools">
-                <button id="refreshApplicantsBtn" class="refresh-btn pill" type="button" data-i18n-aria-label="applicants.refreshAria" data-i18n-aria-label-zh="刷新列表" data-i18n-aria-label-en="Refresh">
-                    <span class="refresh-icon">↻</span>
-                    <span class="refresh-text" data-i18n="applicants.refresh" data-i18n-zh="刷新列表" data-i18n-en="Refresh">刷新列表</span>
-                </button>
+        <div class="overview-top mo-applicants-overview-top">
+            <div class="mo-applicants-overview-top__inner">
+                <div class="mo-applicants-overview-top__title-row">
+                    <h1 data-i18n="applicants.title" data-i18n-zh="人选投递" data-i18n-en="Candidate applications">人选投递</h1>
+                    <button id="refreshApplicantsBtn" class="refresh-btn pill" type="button" data-i18n-aria-label="applicants.refreshAria" data-i18n-aria-label-zh="刷新列表" data-i18n-aria-label-en="Refresh">
+                        <span class="refresh-icon">↻</span>
+                        <span class="refresh-text" data-i18n="applicants.refresh" data-i18n-zh="刷新列表" data-i18n-en="Refresh">刷新列表</span>
+                    </button>
+                </div>
+                <p class="muted mo-applicants-overview-top__desc" data-i18n="applicants.desc" data-i18n-zh="在此筛选并处理投递；侧栏可管理短名单。" data-i18n-en="Filter and act on applications here. Use the sidebar for your shortlist.">在此筛选并处理投递；侧栏可管理短名单。</p>
             </div>
         </div>
 
-        <div class="mo-applicants-toolbar">
-            <label for="applicantCourseSelect" data-i18n="applicants.filterLabel" data-i18n-zh="选择课程岗位" data-i18n-en="Module">选择课程岗位</label>
-            <select id="applicantCourseSelect"></select>
-            <button type="button" class="mo-applicants-toolbar__clear" id="clearApplicantCourseFilterBtn" hidden aria-label="清除课程筛选，恢复全部课程" data-i18n="applicants.clearFilter" data-i18n-zh="清除筛选" data-i18n-en="Clear filter" data-i18n-aria-label="applicants.clearFilterAria" data-i18n-aria-label-zh="清除课程筛选，恢复全部课程" data-i18n-aria-label-en="Clear module filter and restore all modules">清除筛选</button>
-            <span class="muted" id="applicantsStatusText"></span>
+        <div class="mo-applicants-toolbar mo-applicants-toolbar--stacked" role="search" aria-label="Applicant filters" data-i18n-aria-label="applicants.filtersRegionAria" data-i18n-aria-label-zh="人选投递筛选" data-i18n-aria-label-en="Applicant filters">
+            <div class="mo-applicants-filters mo-applicants-filters--layout">
+                <div class="mo-applicants-filter-field mo-applicants-filter-field--module">
+                    <label for="applicantCourseSelect" data-i18n="applicants.filterLabel" data-i18n-zh="课程岗位" data-i18n-en="Module">课程岗位</label>
+                    <select id="applicantCourseSelect"></select>
+                </div>
+                <div class="mo-applicants-filter-field mo-applicants-filter-field--status">
+                    <label for="applicantStatusSelect" data-i18n="applicants.filterStatus" data-i18n-zh="状态" data-i18n-en="Status">状态</label>
+                    <select id="applicantStatusSelect"></select>
+                </div>
+                <div class="mo-applicants-filter-field mo-applicants-filter-field--term">
+                    <label for="applicantSemesterSelect" data-i18n="applicants.filterSemester" data-i18n-zh="学期" data-i18n-en="Term">学期</label>
+                    <select id="applicantSemesterSelect"></select>
+                </div>
+                <div class="mo-applicants-filter-field mo-applicants-filter-field--reset">
+                    <span class="mo-applicants-filter-field__label-spacer" aria-hidden="true">&nbsp;</span>
+                    <button type="button" class="mo-applicants-toolbar__clear mo-applicants-filter-field__reset-btn" id="clearApplicantFiltersBtn" disabled
+                        data-i18n="applicants.resetFilters" data-i18n-zh="重置筛选" data-i18n-en="Reset filters"
+                        data-i18n-aria-label="applicants.resetFiltersAria" data-i18n-aria-label-zh="清除全部筛选条件" data-i18n-aria-label-en="Clear all filters">重置筛选</button>
+                </div>
+
+                <div class="mo-applicants-filter-field mo-applicants-filter-field--search mo-applicants-filter-field--search-span">
+                    <label for="applicantSearchInput" data-i18n="applicants.filterSearch" data-i18n-zh="搜索" data-i18n-en="Search">搜索</label>
+                    <input type="search" id="applicantSearchInput" class="mo-applicants-filter-search" autocomplete="off"
+                        data-i18n-placeholder="applicants.filterSearchPh" data-i18n-placeholder-zh="姓名、TA ID、课程编号或名称…" data-i18n-placeholder-en="Name, TA ID, module code or title…"
+                        placeholder="姓名、TA ID、课程编号或名称…" />
+                </div>
+                <div class="mo-applicants-filter-field mo-applicants-filter-field--checks mo-applicants-filter-field--unread-col">
+                    <span class="mo-applicants-filter-field__label-spacer" aria-hidden="true">&nbsp;</span>
+                    <label class="mo-applicants-filter-check">
+                        <input type="checkbox" id="applicantUnreadOnly" />
+                        <span data-i18n="applicants.filterUnreadOnly" data-i18n-zh="仅未读" data-i18n-en="Unread only">仅未读</span>
+                    </label>
+                </div>
+            </div>
+            <span class="muted mo-applicants-toolbar__status" id="applicantsStatusText"></span>
         </div>
 
         <div class="mo-applicant-list course-board" id="applicantList"></div>
@@ -25,7 +56,7 @@
         <div class="empty-state" id="applicantEmptyState" hidden>
             <div class="empty-state__icon">🗂️</div>
             <h3 data-i18n="applicants.emptyTitle" data-i18n-zh="暂无候选人" data-i18n-en="No applicants">暂无候选人</h3>
-            <p data-i18n="applicants.emptyDesc" data-i18n-zh="暂无符合条件的投递记录；可切换上方课程筛选或前往课程管理发布岗位。" data-i18n-en="No applications match the current filter. Change the filter above or post an opening in Module Management.">暂无符合条件的投递记录；可切换上方课程筛选或前往课程管理发布岗位。</p>
+            <p data-i18n="applicants.emptyDesc" data-i18n-zh="暂无符合当前筛选的投递；可放宽课程、状态、学期或清空搜索，或前往课程管理发布岗位。" data-i18n-en="No rows match the current filters. Widen module, status, term, or clear search—or post an opening in Module Management.">暂无符合当前筛选的投递；可放宽课程、状态、学期或清空搜索，或前往课程管理发布岗位。</p>
         </div>
     </div>
 </div>
