@@ -22,6 +22,9 @@ public class MoApplicationDecisionServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         try {
             JsonObject body = JsonParser.parseReader(req.getReader()).getAsJsonObject();
+            String jobId = body.has("jobId") && !body.get("jobId").isJsonNull()
+                    ? body.get("jobId").getAsString().trim()
+                    : "";
             String courseCode = body.has("courseCode") && !body.get("courseCode").isJsonNull()
                     ? body.get("courseCode").getAsString()
                     : "";
@@ -38,7 +41,12 @@ public class MoApplicationDecisionServlet extends HttpServlet {
                     ? body.get("moId").getAsString().trim()
                     : "";
 
-            JsonObject payload = recruitmentDao.decideApplication(courseCode, taId, moId, decision, comment);
+            if (jobId.isBlank()) {
+                writeJson(resp, 400, gson.toJsonTree(ApiResponse.failure("缺少 jobId")).getAsJsonObject());
+                return;
+            }
+
+            JsonObject payload = recruitmentDao.decideApplicationForJob(jobId, courseCode, taId, moId, decision, comment);
             writeJson(resp, 200, payload);
         } catch (IllegalArgumentException ex) {
             writeJson(resp, 400, gson.toJsonTree(ApiResponse.failure(ex.getMessage())).getAsJsonObject());

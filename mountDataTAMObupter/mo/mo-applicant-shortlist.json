@@ -3,16 +3,7 @@
     "schema": "mo",
     "entity": "mo-applicant-shortlist",
     "version": "1.0",
-    "updatedAt": "2026-05-02T06:31:39.913082100Z"
+    "updatedAt": "2026-05-05T17:36:42.540590300Z"
   },
-  "items": [
-    {
-      "moId": "MO-6601L9",
-      "courseCode": "EBT0009",
-      "applicationId": "APP-TA-24341-EBT0009-20260423T035006Z",
-      "taId": "TA-24341",
-      "name": "Ton",
-      "addedAt": "2026-05-02T06:31:39.913082100Z"
-    }
-  ]
+  "items": []
 }

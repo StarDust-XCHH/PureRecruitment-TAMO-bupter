@@ -53,22 +53,24 @@ public final class MoApplicantShortlistDao {
     }
 
     /**
-     * @return true 若新插入；false 若已存在同键（幂等）
+     * @return true 若新插入；false 若已存在同键（幂等）。同一条申请在同一 MO 下仅一行；{@code jobId} 用于区分同课号多岗位。
      */
-    public synchronized boolean addEntry(String canonicalMoId, String courseCode, String applicationId, String taId, String name) throws IOException {
+    public synchronized boolean addEntry(String canonicalMoId, String jobId, String courseCode, String applicationId, String taId, String name) throws IOException {
         String m = trim(canonicalMoId);
+        String jid = trim(jobId);
         String cc = trim(courseCode);
         String aid = trim(applicationId);
-        if (m.isBlank() || cc.isBlank() || aid.isBlank()) {
-            throw new IllegalArgumentException("moId、courseCode、applicationId 不能为空");
+        if (m.isBlank() || jid.isBlank() || cc.isBlank() || aid.isBlank()) {
+            throw new IllegalArgumentException("moId、jobId、courseCode、applicationId 不能为空");
         }
         JsonObject root = ensureRoot();
         JsonArray items = root.getAsJsonArray("items");
-        if (findIndex(items, m, cc, aid) >= 0) {
+        if (findIndex(items, m, aid) >= 0) {
             return false;
         }
         JsonObject row = new JsonObject();
         row.addProperty("moId", m);
+        row.addProperty("jobId", jid);
         row.addProperty("courseCode", cc);
         row.addProperty("applicationId", aid);
         row.addProperty("taId", trim(taId));
@@ -81,18 +83,17 @@ public final class MoApplicantShortlistDao {
     }
 
     /**
-     * @return true 若删除了一行
+     * @return true 若删除了一行（按 moId + applicationId，申请全局唯一）
      */
-    public synchronized boolean removeEntry(String canonicalMoId, String courseCode, String applicationId) throws IOException {
+    public synchronized boolean removeEntry(String canonicalMoId, String applicationId) throws IOException {
         String m = trim(canonicalMoId);
-        String cc = trim(courseCode);
         String aid = trim(applicationId);
-        if (m.isBlank() || cc.isBlank() || aid.isBlank()) {
-            throw new IllegalArgumentException("moId、courseCode、applicationId 不能为空");
+        if (m.isBlank() || aid.isBlank()) {
+            throw new IllegalArgumentException("moId、applicationId 不能为空");
         }
         JsonObject root = ensureRoot();
         JsonArray items = root.getAsJsonArray("items");
-        int idx = findIndex(items, m, cc, aid);
+        int idx = findIndex(items, m, aid);
         if (idx < 0) {
             return false;
         }
@@ -102,7 +103,7 @@ public final class MoApplicantShortlistDao {
         return true;
     }
 
-    private static int findIndex(JsonArray items, String moId, String courseCode, String applicationId) {
+    private static int findIndex(JsonArray items, String moId, String applicationId) {
         for (int i = 0; i < items.size(); i++) {
             JsonElement el = items.get(i);
             if (!el.isJsonObject()) {
@@ -110,7 +111,6 @@ public final class MoApplicantShortlistDao {
             }
             JsonObject row = el.getAsJsonObject();
             if (moId.equalsIgnoreCase(trim(getAsString(row, "moId")))
-                    && courseCode.equalsIgnoreCase(trim(getAsString(row, "courseCode")))
                     && applicationId.equalsIgnoreCase(trim(getAsString(row, "applicationId")))) {
                 return i;
             }

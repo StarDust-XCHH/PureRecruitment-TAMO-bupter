@@ -110,6 +110,7 @@ public class TaJobBoardServlet extends HttpServlet {
         JsonArray checklist = buildChecklist(item, ownerMoName, taRecruitCount, campus);
 
         taItem.addProperty("courseCode", courseCode);
+        taItem.addProperty("jobId", readString(item, "jobId", ""));
         taItem.addProperty("courseName", courseName);
         taItem.addProperty("ownerMoName", ownerMoName);
         taItem.addProperty("studentCount", studentCount);

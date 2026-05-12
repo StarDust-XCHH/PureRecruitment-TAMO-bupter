@@ -19,7 +19,8 @@ public class MoApplicantsServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        String courseCode = req.getParameter("courseCode");
+        String jobId = req.getParameter("jobId") == null ? "" : req.getParameter("jobId").trim();
+        String courseCode = req.getParameter("courseCode") == null ? "" : req.getParameter("courseCode").trim();
         String moId = req.getParameter("moId") == null ? "" : req.getParameter("moId").trim();
         if (moId.isBlank()) {
             writeJson(resp, 400, gson.toJsonTree(ApiResponse.failure("缺少 moId 参数")).getAsJsonObject());
@@ -28,10 +29,13 @@ public class MoApplicantsServlet extends HttpServlet {
 
         try {
             JsonObject payload;
-            if (courseCode == null || courseCode.trim().isBlank()) {
+            if (jobId.isBlank() && courseCode.isBlank()) {
                 payload = recruitmentDao.getApplicantsForAllMoCourses(moId);
+            } else if (!jobId.isBlank()) {
+                payload = recruitmentDao.getApplicantsForJob(jobId, moId, courseCode);
             } else {
-                payload = recruitmentDao.getApplicantsForCourse(courseCode.trim(), moId);
+                writeJson(resp, 400, gson.toJsonTree(ApiResponse.failure("按岗位筛选时必须提供 jobId（不可仅使用 courseCode）")).getAsJsonObject());
+                return;
             }
             writeJson(resp, 200, payload);
         } catch (IllegalArgumentException ex) {

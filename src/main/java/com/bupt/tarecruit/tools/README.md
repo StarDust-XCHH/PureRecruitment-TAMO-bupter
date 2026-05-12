@@ -8,7 +8,7 @@
 
 ## `DevApplicationDataCleanupTool`
 
-**用途**：测试环境下一次性对齐 **TA 申请 / TA AI / MO 申请旁路 JSON**（已读状态、申请评论），避免只清 TA 后 MO 侧仍引用旧 `applicationId`。类名刻意不用 `Ta*` 前缀，以免与 **`TaSubmissionCleanupTool`** 等 TA 专用工具混淆。
+**用途**：测试环境下一次性对齐 **TA 申请 / TA AI / MO 申请旁路 JSON**（已读状态、申请评论、**候选短名单** `mo-applicant-shortlist.json`），避免只清 TA 后 MO 侧仍引用旧 `applicationId`。类名刻意不用 `Ta*` 前缀，以免与 **`TaSubmissionCleanupTool`** 等 TA 专用工具混淆。
 
 结束前会调用 **`MoRecruitmentDao.syncAllPublishedJobApplicationStatsFromTa()`**，仅刷新 **`recruitment-courses.json`** 中与申请相关的统计字段；本工具**不直接改写**课程文件。
 
@@ -23,7 +23,7 @@ mvn -q -DskipTests compile exec:java -Dexec.mainClass=com.bupt.tarecruit.tools.D
 - **无命令行参数**：终端交互菜单选模式（无 stdin 时退化为「全部清理」）。
 - **有参数**：`--mo-only` | `--ta-only` | `--skip-ai`（与菜单选项对应，见类 Javadoc）。
 
-**可编程调用**：`resetMoApplicationSidecarFiles()` 仅重置 MO 两个结构化文件。
+**可编程调用**：`resetMoApplicationSidecarFiles()` 仅重置 MO 三个申请旁路结构化文件（已读、评论、短名单）。
 
 更完整的说明与 Windows 脚本见 **[`../../../../../../tools/ta-mo-submission-cleanup/README.md`](../../../../../../tools/ta-mo-submission-cleanup/README.md)**（由本文件到仓库 `tools/ta-mo-submission-cleanup/` 的相对路径）。
 

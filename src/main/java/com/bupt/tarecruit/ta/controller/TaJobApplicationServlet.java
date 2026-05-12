@@ -42,6 +42,7 @@ public class TaJobApplicationServlet extends HttpServlet {
         resp.setCharacterEncoding("UTF-8");
 
         String taId = trim(req.getParameter("taId"));
+        String jobId = trim(req.getParameter("jobId"));
         String courseCode = trim(req.getParameter("courseCode"));
         Part resumePart;
         try {
@@ -53,6 +54,10 @@ public class TaJobApplicationServlet extends HttpServlet {
 
         if (taId.isEmpty()) {
             ServletJsonResponseWriter.write(resp, 400, ApiResponse.failure("缺少 TA 标识"));
+            return;
+        }
+        if (jobId.isEmpty()) {
+            ServletJsonResponseWriter.write(resp, 400, ApiResponse.failure("缺少岗位标识 jobId"));
             return;
         }
         if (courseCode.isEmpty()) {
@@ -84,6 +89,7 @@ public class TaJobApplicationServlet extends HttpServlet {
             TaAccountDao.ApplicationSubmitResult result = taAccountDao.createApplication(
                     new TaAccountDao.ApplicationCreateInput(
                             taId,
+                            jobId,
                             courseCode,
                             originalFileName,
                             contentType,

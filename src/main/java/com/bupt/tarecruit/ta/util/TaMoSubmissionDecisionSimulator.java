@@ -1,5 +1,6 @@
 package com.bupt.tarecruit.ta.util;
 
+import com.bupt.tarecruit.common.dao.RecruitmentCoursesDao;
 import com.bupt.tarecruit.mo.dao.MoRecruitmentDao;
 import com.google.gson.JsonObject;
 
@@ -7,12 +8,13 @@ import com.google.gson.JsonObject;
  * 独立运行的 MO -> TA 申请状态模拟工具。
  * <p>
  * 说明：
- * 1. 不修改 MO 模块代码，仅直接调用 {@link MoRecruitmentDao#decideApplication(String, String, String, String)}
+ * 1. 直接调用 {@link MoRecruitmentDao}：首参为已发布岗位的 {@code jobId} 时走 {@code decideApplicationForJob}，否则仍按 {@code courseCode} 走四参 {@code decideApplication}
  * 2. 用于本地模拟 MO 对 TA 已提交简历的处理结果（录用 / 拒绝）
  * 3. 运行后，TA 侧申请状态页可通过既有后端接口读取到最新结果
  * <p>
  * 命令示例（项目根目录）：
  * <pre>
+ * mvn -q -DskipTests compile exec:java -Dexec.mainClass=com.bupt.tarecruit.ta.util.TaMoSubmissionDecisionSimulator -Dexec.args="JOB-ID-FROM-BOARD TA-10001 selected optional-comment"
  * mvn -q -DskipTests compile exec:java -Dexec.mainClass=com.bupt.tarecruit.ta.util.TaMoSubmissionDecisionSimulator -Dexec.args="CS101 TA-10001 selected 已进入后续排班流程"
  * mvn -q -DskipTests compile exec:java -Dexec.mainClass=com.bupt.tarecruit.ta.util.TaMoSubmissionDecisionSimulator -Dexec.args="CS101 TA-10001 rejected 本轮岗位名额已满，感谢投递"
  * </pre>
@@ -66,10 +68,21 @@ public final class TaMoSubmissionDecisionSimulator {
         }
 
         MoRecruitmentDao recruitmentDao = new MoRecruitmentDao();
-        JsonObject result = recruitmentDao.decideApplication(courseCode, taId, decision, comment);
+        JsonObject result;
+        JsonObject maybeJob = RecruitmentCoursesDao.findNormalizedJobByJobId(courseCode);
+        if (maybeJob != null) {
+            String moId = trim(getString(maybeJob, "ownerMoId"));
+            if (moId.isEmpty()) {
+                printUsageAndExit("岗位 JSON 缺少 ownerMoId，无法用 jobId 路径决策");
+                return;
+            }
+            result = recruitmentDao.decideApplicationForJob(courseCode, "", taId, moId, decision, comment);
+        } else {
+            result = recruitmentDao.decideApplication(courseCode, taId, decision, comment);
+        }
 
         System.out.println("[TA-MO-SIMULATOR] 执行完成");
-        System.out.println("[TA-MO-SIMULATOR] courseCode = " + courseCode);
+        System.out.println("[TA-MO-SIMULATOR] firstArg = " + courseCode + (maybeJob != null ? " (按 jobId)" : " (按 courseCode)"));
         System.out.println("[TA-MO-SIMULATOR] taId = " + taId);
         System.out.println("[TA-MO-SIMULATOR] decision = " + decision);
         System.out.println("[TA-MO-SIMULATOR] status = " + getString(result, "status"));
@@ -172,9 +185,10 @@ public final class TaMoSubmissionDecisionSimulator {
 
     private static void printUsageAndExit(String message) {
         System.err.println("[TA-MO-SIMULATOR] " + message);
-        System.err.println("用法: <courseCode> <taId> <decision:selected|rejected> [comment...]");
-        System.err.println("示例1: CS101 TA-10001 selected 已进入后续排班流程");
-        System.err.println("示例2: EBU9900 TA-10258 rejected 本轮岗位名额已满");
+        System.err.println("用法: <jobId 或 courseCode> <taId> <decision:selected|rejected> [comment...]");
+        System.err.println("示例1（课号）: CS101 TA-10001 selected 已进入后续排班流程");
+        System.err.println("示例2（岗位 ID）: 已发布岗位的 jobId TA-10001 selected 已进入后续排班流程");
+        System.err.println("示例3: EBU9900 TA-10258 rejected 本轮岗位名额已满");
         System.err.println("补充: 若不传参运行，将自动读取最新一条已投递申请，并提示你选择 通过/拒绝");
         System.exit(1);
     }

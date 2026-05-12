@@ -27,6 +27,7 @@
 | `Path moSettings()` | 无 | **`<root>/mo/settings.json`**。 |
 | `Path moApplicationReadState()` | 无 | **`<root>/mo/mo-application-read-state.json`**（MO 申请人已读记录）。 |
 | `Path moApplicationComments()` | 无 | **`<root>/mo/mo-application-comments.json`**（MO 对申请的评论）。 |
+| `Path moApplicantShortlist()` | 无 | **`<root>/mo/mo-applicant-shortlist.json`**（MO 候选短名单，按申请去重）。 |
 | `Path taDir()` | 无 | **`<root>/ta`**。 |
 | `Path moRecruitmentCourses()` | 无 | **`<root>/common/recruitment-courses.json`**（岗位板）。 |
 | `Path taAccounts()` | 无 | **`<root>/ta/tas.json`**。 |

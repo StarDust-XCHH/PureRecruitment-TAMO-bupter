@@ -1,34 +1,5 @@
 {
   "schema": "ta-application-status.v1",
   "version": 1,
-  "items": [
-    {
-      "applicationId": "APP-TA-24341-EBT0009-20260423T035006Z",
-      "taId": "TA-24341",
-      "courseCode": "EBT0009",
-      "courseName": "Introduction to Machine Learning 340",
-      "jobSlug": "ebt0009",
-      "ownerMoId": "MO-6601L9",
-      "tags": [],
-      "timeline": [],
-      "details": [],
-      "notifications": [],
-      "comments": [],
-      "status": "审核中",
-      "statusTone": "warn",
-      "summary": "MO 已撤回此前结论，申请重新进入审核流程。",
-      "moComment": "MO 已撤回此前结论，申请重新进入审核流程。",
-      "nextAction": "课程负责人将重新审核该申请。",
-      "nextStep": "课程负责人将重新审核该申请。",
-      "updatedAt": "2026-04-23T03:52:30.712950700Z",
-      "category": "MO 招聘流程",
-      "matchLevel": "中"
-    }
-  ],
-  "meta": {
-    "schema": "ta",
-    "entity": "application-status",
-    "version": "1.0",
-    "updatedAt": "2026-04-23T03:52:30.712950700Z"
-  }
+  "items": []
 }

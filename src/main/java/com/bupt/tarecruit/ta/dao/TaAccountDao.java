@@ -3,6 +3,8 @@ package com.bupt.tarecruit.ta.dao;
 import com.bupt.tarecruit.common.config.DataMountPaths;
 import com.bupt.tarecruit.common.dao.RecruitmentCoursesDao;
 import com.bupt.tarecruit.common.util.AuthUtils;
+import com.bupt.tarecruit.common.util.MoTaApplicationStatusMatcher;
+import com.bupt.tarecruit.common.util.TaApplicationUniqueKeys;
 import com.bupt.tarecruit.mo.dao.MoRecruitmentDao;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -405,6 +407,9 @@ public class TaAccountDao {
         if (input == null || trim(input.taId()).isEmpty()) {
             return ApplicationSubmitResult.failure(400, "缺少 TA 标识");
         }
+        if (trim(input.jobId()).isEmpty()) {
+            return ApplicationSubmitResult.failure(400, "缺少岗位标识 jobId");
+        }
         if (trim(input.courseCode()).isEmpty()) {
             return ApplicationSubmitResult.failure(400, "缺少课程编号");
         }
@@ -428,30 +433,44 @@ public class TaAccountDao {
             saveRecords(PROFILE_DATA_PATH, PROFILE_SCHEMA, PROFILE_ENTITY, profiles);
         }
 
-        JsonObject course = RecruitmentCoursesDao.findNormalizedJobByCourseCode(trim(input.courseCode()));
+        JsonObject course = RecruitmentCoursesDao.findNormalizedJobByJobId(trim(input.jobId()));
         if (course == null) {
-            return ApplicationSubmitResult.failure(404, "未找到对应课程或课程尚未开放申请");
+            return ApplicationSubmitResult.failure(404, "未找到对应岗位或岗位尚未开放申请");
+        }
+        String taId = trim(input.taId());
+        String resolvedCourseCode = trim(getAsString(course, "courseCode")).toUpperCase(Locale.ROOT);
+        if (resolvedCourseCode.isEmpty()) {
+            return ApplicationSubmitResult.failure(404, "岗位数据缺少课程编号");
+        }
+        String providedCourse = trim(input.courseCode()).toUpperCase(Locale.ROOT);
+        if (!providedCourse.isEmpty() && !providedCourse.equals(resolvedCourseCode)) {
+            return ApplicationSubmitResult.failure(400, "课程编号与岗位 jobId 不一致");
+        }
+        String courseCode = resolvedCourseCode;
+        String jobId = trim(getAsString(course, "jobId"));
+        if (jobId.isEmpty()) {
+            return ApplicationSubmitResult.failure(404, "岗位数据缺少 jobId");
+        }
+        if (!trim(input.jobId()).equalsIgnoreCase(jobId)) {
+            return ApplicationSubmitResult.failure(400, "请求中的 jobId 与规范化岗位不一致");
         }
 
         ensureStructuredJsonFile(APPLICATION_DATA_PATH, APPLICATION_SCHEMA, APPLICATION_ENTITY, buildDefaultApplicationsRoot());
         ensureStructuredJsonFile(APPLICATION_EVENT_PATH, APPLICATION_SCHEMA, APPLICATION_EVENT_ENTITY, buildDefaultApplicationEventsRoot());
         JsonObject applicationRoot = loadStructuredJson(APPLICATION_DATA_PATH, APPLICATION_SCHEMA, APPLICATION_ENTITY);
         JsonArray applicationItems = applicationRoot.getAsJsonArray("items");
-
-        String taId = trim(input.taId());
-        String courseCode = trim(input.courseCode()).toUpperCase(Locale.ROOT);
-        String uniqueKey = buildUniqueKey(taId, courseCode);
+        String uniqueKey = TaApplicationUniqueKeys.canonical(taId, courseCode, jobId);
         for (JsonElement element : applicationItems) {
             if (!element.isJsonObject()) {
                 continue;
             }
             JsonObject existing = element.getAsJsonObject();
-            if (uniqueKey.equalsIgnoreCase(getAsString(existing, "uniqueKey")) && getAsBoolean(existing, "active", true)) {
+            if (conflictsWithExistingApplication(existing, uniqueKey)) {
                 return ApplicationSubmitResult.failure(409, "你已申请过该课程，请勿重复投递");
             }
         }
 
-        String applicationId = buildApplicationId(taId, courseCode);
+        String applicationId = buildApplicationId(taId, courseCode, jobId);
         String submittedAt = Instant.now().toString();
         String extension = normalizeResumeExtension(input.originalFileName(), input.contentType());
         Path courseDir = DataMountPaths.taResumeCourseDir(taId, courseCode);
@@ -502,6 +521,7 @@ public class TaAccountDao {
 
             JsonObject payload = new JsonObject();
             payload.addProperty("applicationId", applicationId);
+            payload.addProperty("jobId", jobId);
             payload.addProperty("courseCode", courseCode);
             payload.addProperty("courseName", getAsString(course, "courseName"));
             payload.addProperty("status", "SUBMITTED");
@@ -615,6 +635,10 @@ public class TaAccountDao {
         normalized.addProperty("applicationId", applicationId);
         normalized.addProperty("taId", getAsString(item, "taId"));
         normalized.addProperty("courseCode", firstNonBlank(getAsString(item, "courseCode"), getAsString(courseSnapshot, "courseCode")));
+        String snapJobId = trim(getAsString(courseSnapshot, "jobId"));
+        if (!snapJobId.isBlank()) {
+            normalized.addProperty("jobId", snapJobId);
+        }
         normalized.addProperty("courseName", firstNonBlank(getAsString(courseSnapshot, "courseName"), "未命名岗位"));
         normalized.addProperty("status", statusLabel);
         normalized.addProperty("statusCode", statusCode);
@@ -769,24 +793,18 @@ public class TaAccountDao {
             return null;
         }
         String taId = getAsString(applicationItem, "taId");
+        String applicationId = getAsString(applicationItem, "applicationId");
         String courseCode = getAsString(applicationItem, "courseCode");
         JsonObject courseSnapshot = applicationItem.has("courseSnapshot") && applicationItem.get("courseSnapshot").isJsonObject()
                 ? applicationItem.getAsJsonObject("courseSnapshot") : new JsonObject();
-        String courseName = getAsString(courseSnapshot, "courseName");
+        String jobId = getAsString(courseSnapshot, "jobId");
         JsonObject latest = null;
         for (JsonElement element : moStatusItems) {
             if (!element.isJsonObject()) {
                 continue;
             }
             JsonObject item = element.getAsJsonObject();
-            if (!taId.equalsIgnoreCase(getAsString(item, "taId"))) {
-                continue;
-            }
-            String jobSlug = trimToEmpty(getAsString(item, "jobSlug")).toLowerCase(Locale.ROOT);
-            String courseCodeSlug = trimToEmpty(courseCode).toLowerCase(Locale.ROOT);
-            boolean matched = (!courseCodeSlug.isBlank() && jobSlug.equals(courseCodeSlug))
-                    || (!courseName.isBlank() && courseName.equalsIgnoreCase(getAsString(item, "courseName")));
-            if (!matched) {
+            if (!MoTaApplicationStatusMatcher.moStatusRowMatchesTaContext(item, taId, applicationId, jobId, courseCode)) {
                 continue;
             }
             if (latest == null || getAsString(item, "updatedAt").compareTo(getAsString(latest, "updatedAt")) > 0) {
@@ -837,12 +855,25 @@ public class TaAccountDao {
         }
     }
 
-    private String buildApplicationId(String taId, String courseCode) {
-        return "APP-" + taId + "-" + courseCode + "-" + APPLICATION_TIME_FORMATTER.format(Instant.now());
+    private String buildApplicationId(String taId, String courseCode, String jobId) {
+        String time = APPLICATION_TIME_FORMATTER.format(Instant.now());
+        String j = trim(jobId);
+        if (j.isEmpty()) {
+            return "APP-" + taId + "-" + courseCode + "-" + time;
+        }
+        String jobSeg = j.replaceAll("[^A-Za-z0-9]+", "-").replaceAll("(^-|-$)", "");
+        if (jobSeg.length() > 40) {
+            jobSeg = jobSeg.substring(0, 40);
+        }
+        return "APP-" + taId + "-" + courseCode + "-" + jobSeg + "-" + time;
     }
 
-    private String buildUniqueKey(String taId, String courseCode) {
-        return taId.toUpperCase(Locale.ROOT) + "::" + courseCode.toUpperCase(Locale.ROOT);
+    /** 与 {@link TaApplicationUniqueKeys} 一致：仅同规范 {@code uniqueKey} 视为同一岗位实例的重复投递。 */
+    private boolean conflictsWithExistingApplication(JsonObject existing, String newCanonicalKey) {
+        if (!getAsBoolean(existing, "active", true)) {
+            return false;
+        }
+        return trim(newCanonicalKey).equalsIgnoreCase(trim(getAsString(existing, "uniqueKey")));
     }
 
     private String normalizeResumeExtension(String fileName, String contentType) {
@@ -1278,6 +1309,7 @@ public class TaAccountDao {
     }
 
     public record ApplicationCreateInput(String taId,
+                                         String jobId,
                                          String courseCode,
                                          String originalFileName,
                                          String contentType,

@@ -2,6 +2,7 @@ package com.bupt.tarecruit.mo.dao;
 
 import com.bupt.tarecruit.common.config.DataMountPaths;
 import com.bupt.tarecruit.common.dao.RecruitmentCoursesDao;
+import com.bupt.tarecruit.common.util.TaApplicationUniqueKeys;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -54,14 +55,24 @@ public final class MoTaApplicationsMutationDao {
     }
 
     public synchronized JsonObject findApplicationByTaAndCourse(String taId, String courseCode) throws IOException {
+        return findApplicationByTaAndCourse(taId, courseCode, "");
+    }
+
+    /**
+     * 在 TA+课程编号基础上，可选按 {@code courseSnapshot.jobId} 与岗位 {@code jobId} 对齐。
+     * 当 {@code jobId} 非空时，快照中须带有相同 {@code jobId}，且不与仅含历史 {@code uniqueKey} 的记录混淆。
+     */
+    public synchronized JsonObject findApplicationByTaAndCourse(String taId, String courseCode, String jobId) throws IOException {
         String t = trim(taId);
         String c = trim(courseCode).toUpperCase(Locale.ROOT);
+        String j = trim(jobId);
         if (t.isEmpty() || c.isEmpty()) {
             return null;
         }
         JsonObject root = loadRoot();
         JsonArray items = root.getAsJsonArray("items");
-        String uniqueKey = t.toUpperCase(Locale.ROOT) + "::" + c;
+        String canonicalKey = TaApplicationUniqueKeys.canonical(t, c, j);
+        String canonicalCourseOnly = TaApplicationUniqueKeys.canonical(t, c, "");
         JsonObject latest = null;
         String latestUpdated = "";
         for (JsonElement element : items) {
@@ -72,9 +83,25 @@ public final class MoTaApplicationsMutationDao {
             if (!t.equalsIgnoreCase(getAsString(item, "taId"))) {
                 continue;
             }
+            JsonObject snap = item.has("courseSnapshot") && item.get("courseSnapshot").isJsonObject()
+                    ? item.getAsJsonObject("courseSnapshot")
+                    : new JsonObject();
+            String snapJob = trim(getAsString(snap, "jobId"));
+            if (!j.isEmpty()) {
+                if (snapJob.isEmpty() || !j.equalsIgnoreCase(snapJob)) {
+                    continue;
+                }
+            }
             String cc = trim(getAsString(item, "courseCode")).toUpperCase(Locale.ROOT);
             String uk = trim(getAsString(item, "uniqueKey")).toUpperCase(Locale.ROOT);
-            if (!c.equals(cc) && !uniqueKey.equalsIgnoreCase(uk)) {
+            boolean keyOrCodeMatch;
+            if (!j.isEmpty()) {
+                keyOrCodeMatch = c.equals(cc) && canonicalKey.equalsIgnoreCase(uk);
+            } else {
+                keyOrCodeMatch = c.equals(cc)
+                        && (canonicalCourseOnly.equalsIgnoreCase(uk));
+            }
+            if (!keyOrCodeMatch) {
                 continue;
             }
             boolean active = !item.has("active") || item.get("active").isJsonNull() || item.get("active").getAsBoolean();
@@ -137,6 +164,7 @@ public final class MoTaApplicationsMutationDao {
         if (job == null) {
             return;
         }
+        String needleJobId = trim(getAsString(job, "jobId"));
         if (!Files.exists(PATH)) {
             return;
         }
@@ -152,6 +180,15 @@ public final class MoTaApplicationsMutationDao {
             String ic = trim(getAsString(item, "courseCode")).toUpperCase(Locale.ROOT);
             if (!c.equals(ic)) {
                 continue;
+            }
+            if (!needleJobId.isEmpty()) {
+                JsonObject prevSnap = item.has("courseSnapshot") && item.get("courseSnapshot").isJsonObject()
+                        ? item.getAsJsonObject("courseSnapshot")
+                        : new JsonObject();
+                String prevJob = trim(getAsString(prevSnap, "jobId"));
+                if (!prevJob.isEmpty() && !needleJobId.equalsIgnoreCase(prevJob)) {
+                    continue;
+                }
             }
             item.add("courseSnapshot", snapshot.deepCopy());
             changed = true;
