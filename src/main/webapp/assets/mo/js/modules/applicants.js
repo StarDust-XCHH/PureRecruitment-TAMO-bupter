@@ -61,6 +61,7 @@
         let applicantPageIndex = 1;
         /** 从课程详情「进入应聘筛选」预选的课程编码，在岗位下拉加载后再应用 */
         let pendingApplicantJobId = null;
+        let pendingApplicantStatus = null;
 
         function getMoId() {
             const u = typeof app.getMoUser === 'function' ? app.getMoUser() : null;
@@ -1515,11 +1516,20 @@
                     } catch (e) { /* 短名单同步失败不阻塞人选投递 */ }
                     updateShortlistNavBadge();
                 }
+                var hadPreset = false;
                 if (pendingApplicantJobId) {
+                    hadPreset = true;
                     var preset = pendingApplicantJobId;
                     pendingApplicantJobId = null;
                     app.setApplicantCourse(preset);
-                } else {
+                }
+                if (pendingApplicantStatus) {
+                    hadPreset = true;
+                    var presetStatus = pendingApplicantStatus;
+                    pendingApplicantStatus = null;
+                    app.setApplicantStatusFilter(presetStatus);
+                }
+                if (!hadPreset) {
                     loadApplicants();
                 }
             });
@@ -1553,6 +1563,32 @@
             pendingApplicantJobId = c || null;
             if (typeof app.activateRoute === 'function') {
                 app.activateRoute('applicants');
+            }
+        };
+
+        app.navigateToApplicantsWithStatus = function (status) {
+            var s = status == null ? '' : String(status).trim();
+            pendingApplicantStatus = s || null;
+            if (typeof app.activateRoute === 'function') {
+                app.activateRoute('applicants');
+            }
+        };
+
+        app.setApplicantStatusFilter = function (status) {
+            if (!statusSelect) return;
+            buildStatusFilterOptions();
+            var raw = status == null ? '' : String(status).trim();
+            if (Array.from(statusSelect.options).some(function (o) { return o.value === raw; })) {
+                statusSelect.value = raw;
+            } else {
+                statusSelect.value = '';
+            }
+            applicantPageIndex = 1;
+            updateApplicantFiltersResetVisibility();
+            if (applicantListCache.length) {
+                renderApplicants();
+            } else {
+                loadApplicants();
             }
         };
 

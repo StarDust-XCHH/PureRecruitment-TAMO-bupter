@@ -58,6 +58,12 @@
         document.querySelectorAll('#moApp [data-mo-go-route]').forEach(function (btn) {
             btn.addEventListener('click', function () {
                 const r = btn.getAttribute('data-mo-go-route');
+                const applicantStatus = btn.getAttribute('data-mo-applicant-status');
+                if (r === 'applicants' && applicantStatus
+                    && typeof app.navigateToApplicantsWithStatus === 'function') {
+                    app.navigateToApplicantsWithStatus(applicantStatus);
+                    return;
+                }
                 if (!r) return;
                 const targetNav = document.querySelector('#moApp .nav-item[data-route="' + r + '"]');
                 if (targetNav) {

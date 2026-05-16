@@ -984,6 +984,11 @@ legend.mo-field-label:has(.mo-req) {
     flex-shrink: 0;
 }
 
+.mo-dashboard-route-chip--hired:hover {
+    border-color: #0d9488;
+    box-shadow: 0 0 0 1px rgba(13, 148, 136, 0.35);
+}
+
 .mo-dashboard-ai-card .insight-core-number {
     font-size: clamp(26px, 3vw, 36px);
 }

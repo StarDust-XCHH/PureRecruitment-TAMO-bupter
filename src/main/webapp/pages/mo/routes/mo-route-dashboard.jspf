@@ -65,15 +65,27 @@
                         </button>
                     </div>
                 </div>
-                <div class="insight-card" data-modal-target="accepted-list">
-                    <div class="insight-card-header">
-                        <span class="insight-icon">✅</span>
-                        <div>
-                            <p class="insight-label" data-i18n="dashboard.hired" data-i18n-zh="已录用" data-i18n-en="Hired">已录用</p>
-                            <p class="insight-subtitle" data-i18n="dashboard.hiredHint" data-i18n-zh="点击查看已录用名单" data-i18n-en="View hired">点击查看已录用名单</p>
+                <div class="insight-card mo-dashboard-insight-card">
+                    <div class="mo-dashboard-insight-card__hit" data-modal-target="accepted-list" tabindex="0" role="button" data-i18n-aria-label="dashboard.hiredHitAria" data-i18n-aria-label-zh="已录用：查看已录用名单" data-i18n-aria-label-en="Hired: view hired list">
+                        <div class="insight-card-header">
+                            <span class="insight-icon">✅</span>
+                            <div>
+                                <p class="insight-label" data-i18n="dashboard.hired" data-i18n-zh="已录用" data-i18n-en="Hired">已录用</p>
+                                <p class="insight-subtitle" data-i18n="dashboard.hiredHint" data-i18n-zh="点击查看已录用名单" data-i18n-en="View hired">点击查看已录用名单</p>
+                            </div>
                         </div>
+                        <div class="insight-core-number accent-positive" id="dashAccepted">--</div>
                     </div>
-                    <div class="insight-core-number" id="dashAccepted">--</div>
+                    <div class="mo-dashboard-insight-card__route">
+                        <button type="button" class="mo-dashboard-route-chip mo-dashboard-route-chip--applicants mo-dashboard-route-chip--hired" data-mo-go-route="applicants" data-mo-applicant-status="已录用" data-i18n-aria-label="dashboard.gotoHiredList" data-i18n-aria-label-zh="进入人选投递并筛选已录用" data-i18n-aria-label-en="Candidate applications filtered to hired">
+                            <span class="mo-dashboard-route-chip__icon" aria-hidden="true">✅</span>
+                            <span class="mo-dashboard-route-chip__text">
+                                <span class="mo-dashboard-route-chip__label" data-i18n="dashboard.gotoHiredList" data-i18n-zh="查看已录用名单" data-i18n-en="View hired list">查看已录用名单</span>
+                                <span class="mo-dashboard-route-chip__hint muted" data-i18n="dashboard.gotoHiredListHint" data-i18n-zh="跳转人选投递，状态筛选为已录用" data-i18n-en="Open Candidate applications with status Hired">跳转人选投递，状态筛选为已录用</span>
+                            </span>
+                            <span class="mo-dashboard-route-chip__chev" aria-hidden="true">→</span>
+                        </button>
+                    </div>
                 </div>
                 <div class="insight-card upcoming-card ai-assistant-card mo-dashboard-ai-card" data-modal-target="mo-ai-assistant">
                     <div class="insight-card-header">
