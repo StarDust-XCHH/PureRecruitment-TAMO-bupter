@@ -27,7 +27,8 @@
             jobs: [],
             page: 1,
             pageSize: 4,
-            filteredJobs: []
+            filteredJobs: [],
+            hiredByJobId: {}
         };
 
         /** 申请截止：与 datetime-local 一致，按本机本地墙钟解析，提交为 UTC ISO */
@@ -105,6 +106,11 @@
             }
         }
         const jobSearchInput = document.getElementById('jobSearchInput');
+        const jobSemesterFilter = document.getElementById('jobSemesterFilter');
+        const jobCampusFilter = document.getElementById('jobCampusFilter');
+        const jobStatusFilter = document.getElementById('jobStatusFilter');
+        const jobFillFilter = document.getElementById('jobFillFilter');
+        const clearJobFiltersBtn = document.getElementById('clearJobFiltersBtn');
         const openCoursesCount = document.getElementById('openCoursesCount');
         const refreshJobsBtn = document.getElementById('refreshJobsBtn');
         const openJobPublishModalBtn = document.getElementById('openJobPublishModalBtn');
@@ -497,6 +503,148 @@
 
         function getDisplayLocation(item) {
             return item && item.campus ? item.campus : '--';
+        }
+
+        function getCampusDisplayForCard(item) {
+            var raw = String(getDisplayLocation(item) || '').trim().toLowerCase();
+            if (raw === 'shahe') return 'Shahe Campus';
+            if (raw === 'main') return 'Main Campus';
+            return getDisplayLocation(item);
+        }
+
+        function getJobId(item) {
+            return item && item.jobId != null ? String(item.jobId).trim() : '';
+        }
+
+        function getJobCapacity(item) {
+            return item && item.taRecruitCount != null && Number(item.taRecruitCount) >= 0
+                ? Number(item.taRecruitCount)
+                : 0;
+        }
+
+        function getJobStatusNormalized(item) {
+            var st = String((item && (item.recruitmentStatus || item.status)) || 'OPEN').trim().toUpperCase();
+            return st === 'CLOSED' ? 'CLOSED' : 'OPEN';
+        }
+
+        function getHiredCountForJob(item) {
+            var jobId = getJobId(item);
+            if (!jobId) return 0;
+            return Number(state.hiredByJobId[jobId] || 0);
+        }
+
+        function isJobFilled(item) {
+            var cap = getJobCapacity(item);
+            if (cap <= 0) return false;
+            return getHiredCountForJob(item) >= cap;
+        }
+
+        function semesterSortValue(item) {
+            var sem = String((item && item.semester) || '').trim();
+            var m = sem.match(/^(\d{4})-(Spring|Fall)$/i);
+            if (!m) return -1;
+            var year = Number(m[1]) || 0;
+            var term = String(m[2] || '').toLowerCase() === 'fall' ? 2 : 1;
+            return year * 10 + term;
+        }
+
+        function courseCodeForSort(item) {
+            var code = String((item && item.courseCode) || '').trim();
+            if (code) return code;
+            return String((item && item.jobId) || '').trim();
+        }
+
+        function compareJobsDefaultOrder(a, b) {
+            var statusRankA = getJobStatusNormalized(a) === 'OPEN' ? 0 : 1;
+            var statusRankB = getJobStatusNormalized(b) === 'OPEN' ? 0 : 1;
+            if (statusRankA !== statusRankB) return statusRankA - statusRankB;
+
+            var semA = semesterSortValue(a);
+            var semB = semesterSortValue(b);
+            if (semA !== semB) return semB - semA;
+
+            var fillRankA = isJobFilled(a) ? 1 : 0; // 未满在前
+            var fillRankB = isJobFilled(b) ? 1 : 0;
+            if (fillRankA !== fillRankB) return fillRankA - fillRankB;
+
+            return courseCodeForSort(a).localeCompare(courseCodeForSort(b), undefined, {
+                numeric: true,
+                sensitivity: 'base'
+            });
+        }
+
+        function setHiredCountsFromApplicants(items) {
+            var m = {};
+            (items || []).forEach(function (x) {
+                if (!x || x.status !== '已录用') return;
+                var jid = x.jobId != null ? String(x.jobId).trim() : '';
+                if (!jid) return;
+                m[jid] = (m[jid] || 0) + 1;
+            });
+            state.hiredByJobId = m;
+        }
+
+        async function loadApplicantsForHiringSummary() {
+            var moId = getMoIdForApi();
+            if (!moId) {
+                state.hiredByJobId = {};
+                return;
+            }
+            try {
+                var res = await fetch(
+                    apiUrl('/api/mo/applicants') + '?moId=' + encodeURIComponent(moId),
+                    { headers: { Accept: 'application/json' } }
+                );
+                var payload = await res.json();
+                if (!res.ok || payload.success === false) {
+                    state.hiredByJobId = {};
+                    return;
+                }
+                setHiredCountsFromApplicants(Array.isArray(payload.items) ? payload.items : []);
+            } catch (e) {
+                state.hiredByJobId = {};
+            }
+        }
+
+        function updateJobsFilterResetButton() {
+            if (!clearJobFiltersBtn) return;
+            var active = false;
+            if (jobSemesterFilter && (jobSemesterFilter.value || '').trim()) active = true;
+            if (jobCampusFilter && (jobCampusFilter.value || '').trim()) active = true;
+            if (jobStatusFilter && (jobStatusFilter.value || '').trim()) active = true;
+            if (jobFillFilter && (jobFillFilter.value || '').trim()) active = true;
+            clearJobFiltersBtn.disabled = !active;
+        }
+
+        function renderJobsFilterOptions() {
+            if (!jobSemesterFilter || !jobCampusFilter) return;
+            var prevSem = (jobSemesterFilter.value || '').trim();
+            var prevCampus = (jobCampusFilter.value || '').trim();
+            var semSet = new Set();
+            var campusSet = new Set();
+            (state.jobs || []).forEach(function (item) {
+                var sem = item && item.semester != null ? String(item.semester).trim() : '';
+                var campus = item && item.campus != null ? String(item.campus).trim() : '';
+                if (sem) semSet.add(sem);
+                if (campus) campusSet.add(campus);
+            });
+            var semesters = Array.from(semSet).sort();
+            var campuses = Array.from(campusSet).sort();
+
+            jobSemesterFilter.innerHTML =
+                '<option value="">' + t('全部学期', 'All semesters') + '</option>' +
+                semesters.map(function (s) {
+                    return '<option value="' + s + '">' + s + '</option>';
+                }).join('');
+            jobCampusFilter.innerHTML =
+                '<option value="">' + t('全部校区', 'All campuses') + '</option>' +
+                campuses.map(function (s) {
+                    return '<option value="' + s + '">' + s + '</option>';
+                }).join('');
+
+            if (prevSem && semesters.indexOf(prevSem) >= 0) jobSemesterFilter.value = prevSem;
+            if (prevCampus && campuses.indexOf(prevCampus) >= 0) jobCampusFilter.value = prevCampus;
+            updateJobsFilterResetButton();
         }
 
         /** 岗位技能标签：系统固定标签 + Other 自定义（requiredSkills.customSkills[].name），去重 */
@@ -1344,6 +1492,10 @@
 
         function renderBoard() {
             const keyword = (jobSearchInput.value || '').trim().toLowerCase();
+            var semesterFilterVal = jobSemesterFilter ? String(jobSemesterFilter.value || '').trim() : '';
+            var campusFilterVal = jobCampusFilter ? String(jobCampusFilter.value || '').trim() : '';
+            var statusFilterVal = jobStatusFilter ? String(jobStatusFilter.value || '').trim() : '';
+            var fillFilterVal = jobFillFilter ? String(jobFillFilter.value || '').trim() : '';
             state.filteredJobs = state.jobs.filter(function (item) {
                 const text = [
                     item.courseCode || item.jobId,
@@ -1359,8 +1511,15 @@
                         }).join(' ')
                         : '')
                 ].join(' ').toLowerCase();
-                return !keyword || text.includes(keyword);
+                if (keyword && !text.includes(keyword)) return false;
+                if (semesterFilterVal && String(item.semester || '').trim() !== semesterFilterVal) return false;
+                if (campusFilterVal && String(item.campus || '').trim() !== campusFilterVal) return false;
+                if (statusFilterVal && getJobStatusNormalized(item) !== statusFilterVal) return false;
+                if (fillFilterVal === 'full' && !isJobFilled(item)) return false;
+                if (fillFilterVal === 'not_full' && isJobFilled(item)) return false;
+                return true;
             });
+            state.filteredJobs.sort(compareJobsDefaultOrder);
 
             const totalPages = Math.max(1, Math.ceil(state.filteredJobs.length / state.pageSize));
             if (state.page > totalPages) state.page = 1;
@@ -1375,35 +1534,32 @@
                 card.setAttribute('role', 'button');
                 
                 // 获取状态样式
-                const status = item.recruitmentStatus || item.status || 'OPEN';
+                const status = getJobStatusNormalized(item);
                 const statusClass = status === 'OPEN' ? 'status-open' : 'status-closed';
+                const filled = isJobFilled(item);
+                const fillClass = filled ? 'course-fill-state--full' : 'course-fill-state--not-full';
+                const fillText = filled ? t('已满', 'Filled') : t('未满', 'Not full');
                 
                 card.innerHTML =
                     '<div class="course-card-topline">' +
                         '<span class="job-code">' + getDisplayCode(item) + '</span>' +
-                        '<span class="course-status ' + statusClass + '">' + status + '</span>' +
+                        '<span class="course-status-group">' +
+                            '<span class="course-status ' + statusClass + '">' + status + '</span>' +
+                            '<span class="course-fill-state ' + fillClass + '">' + fillText + '</span>' +
+                        '</span>' +
                     '</div>' +
                     '<h4 class="course-card-title">' + (item.courseName || t('未命名岗位', 'Untitled opening')) + '</h4>' +
                     '<p class="course-card-description">' + (item.recruitmentBrief || item.courseDescription || t('暂无描述', 'No description')) + '</p>' +
                     '<div class="job-tags">' + buildCourseCardTagsHtml(item) + '</div>' +
-                    '<div class="course-meta-stack">' +
-                        '<div class="course-meta-item">' +
-                            '<span class="course-meta-label">' + t('学期', 'Semester') + '</span>' +
-                            '<strong>' + (item.semester || '--') + '</strong>' +
+                    '<div class="course-meta-footer">' +
+                        '<div class="course-meta-tags-row">' +
+                            '<span class="pill course-meta-tag">' + (item.semester || '--') + '</span>' +
+                            '<span class="pill course-meta-tag">' + getCampusDisplayForCard(item) + '</span>' +
+                            '<span class="pill course-meta-tag">' + t('TA 职位', 'TA Positions') + ': ' + getHiredCountForJob(item) + ' / ' + getJobCapacity(item) + '</span>' +
                         '</div>' +
-                        '<div class="course-meta-item">' +
-                            '<span class="course-meta-label">' + t('校区', 'Campus') + '</span>' +
-                            '<strong>' + getDisplayLocation(item) + '</strong>' +
-                        '</div>' +
-                        '<div class="course-meta-item">' +
-                            '<span class="course-meta-label">' + t('TA 招聘', 'TA Positions') + '</span>' +
-                            '<strong>' + (item.taRecruitCount || 0) + t(' 人', '') + '</strong>' +
-                        '</div>' +
+                        '<span class="course-card-hint-inline">' + t('点击查看详情', 'View details') + ' <span aria-hidden="true">→</span></span>' +
                     '</div>' +
-                    '<div class="course-card-hint">' +
-                        '<span>' + t('点击查看详情', 'View details') + '</span>' +
-                        '<span aria-hidden="true">→</span>' +
-                    '</div>';
+                    '';
                 
                 card.addEventListener('click', function () {
                     renderDetail(item);
@@ -1457,6 +1613,8 @@
                 );
                 const payload = await res.json();
                 state.jobs = Array.isArray(payload.items) ? payload.items : [];
+                await loadApplicantsForHiringSummary();
+                renderJobsFilterOptions();
                 state.page = 1;
                 renderBoard();
             } catch (err) {
@@ -1915,6 +2073,45 @@
             state.page = 1;
             renderBoard();
         });
+        if (jobSemesterFilter) {
+            jobSemesterFilter.addEventListener('change', function () {
+                state.page = 1;
+                updateJobsFilterResetButton();
+                renderBoard();
+            });
+        }
+        if (jobCampusFilter) {
+            jobCampusFilter.addEventListener('change', function () {
+                state.page = 1;
+                updateJobsFilterResetButton();
+                renderBoard();
+            });
+        }
+        if (jobStatusFilter) {
+            jobStatusFilter.addEventListener('change', function () {
+                state.page = 1;
+                updateJobsFilterResetButton();
+                renderBoard();
+            });
+        }
+        if (jobFillFilter) {
+            jobFillFilter.addEventListener('change', function () {
+                state.page = 1;
+                updateJobsFilterResetButton();
+                renderBoard();
+            });
+        }
+        if (clearJobFiltersBtn) {
+            clearJobFiltersBtn.addEventListener('click', function () {
+                if (jobSemesterFilter) jobSemesterFilter.value = '';
+                if (jobCampusFilter) jobCampusFilter.value = '';
+                if (jobStatusFilter) jobStatusFilter.value = '';
+                if (jobFillFilter) jobFillFilter.value = '';
+                state.page = 1;
+                updateJobsFilterResetButton();
+                renderBoard();
+            });
+        }
         refreshJobsBtn.addEventListener('click', function () {
             if (typeof app.refreshMoWorkspaceAll === 'function') {
                 void app.refreshMoWorkspaceAll();

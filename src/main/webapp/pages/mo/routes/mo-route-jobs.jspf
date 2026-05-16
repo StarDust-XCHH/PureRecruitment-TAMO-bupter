@@ -42,6 +42,43 @@
 
         </label>
 
+        <div class="mo-jobs-filters" role="search" aria-label="Module filters"
+             data-i18n-aria-label="jobs.filtersRegionAria" data-i18n-aria-label-zh="课程筛选" data-i18n-aria-label-en="Module filters">
+            <div class="mo-jobs-filter-field">
+                <label for="jobSemesterFilter" data-i18n="jobs.filterSemester" data-i18n-zh="学期" data-i18n-en="Semester">学期</label>
+                <select id="jobSemesterFilter">
+                    <option value="" data-i18n="jobs.filterAllSemester" data-i18n-zh="全部学期" data-i18n-en="All semesters">全部学期</option>
+                </select>
+            </div>
+            <div class="mo-jobs-filter-field">
+                <label for="jobCampusFilter" data-i18n="jobs.filterCampus" data-i18n-zh="校区" data-i18n-en="Campus">校区</label>
+                <select id="jobCampusFilter">
+                    <option value="" data-i18n="jobs.filterAllCampus" data-i18n-zh="全部校区" data-i18n-en="All campuses">全部校区</option>
+                </select>
+            </div>
+            <div class="mo-jobs-filter-field">
+                <label for="jobStatusFilter" data-i18n="jobs.filterStatus" data-i18n-zh="开放状态" data-i18n-en="Status">开放状态</label>
+                <select id="jobStatusFilter">
+                    <option value="" data-i18n="jobs.filterAllStatus" data-i18n-zh="全部状态" data-i18n-en="All statuses">全部状态</option>
+                    <option value="OPEN">OPEN</option>
+                    <option value="CLOSED">CLOSED</option>
+                </select>
+            </div>
+            <div class="mo-jobs-filter-field">
+                <label for="jobFillFilter" data-i18n="jobs.filterFillState" data-i18n-zh="是否已满" data-i18n-en="Filled">是否已满</label>
+                <select id="jobFillFilter">
+                    <option value="" data-i18n="jobs.filterAllFillState" data-i18n-zh="全部" data-i18n-en="All">全部</option>
+                    <option value="not_full" data-i18n="jobs.filterNotFull" data-i18n-zh="未满" data-i18n-en="Not full">未满</option>
+                    <option value="full" data-i18n="jobs.filterFull" data-i18n-zh="已满" data-i18n-en="Full">已满</option>
+                </select>
+            </div>
+            <div class="mo-jobs-filter-field mo-jobs-filter-field--reset">
+                <span class="mo-jobs-filter-field__label-spacer" aria-hidden="true">&nbsp;</span>
+                <button type="button" class="mo-jobs-filter-reset" id="clearJobFiltersBtn" disabled
+                        data-i18n="jobs.resetFilters" data-i18n-zh="重置筛选" data-i18n-en="Reset filters">重置筛选</button>
+            </div>
+        </div>
+
         <div class="job-board course-board" id="jobBoard"></div>
 
         <div class="job-pagination" aria-label="岗位分页" id="jobPagination" data-i18n-aria-label="jobs.paginationAria" data-i18n-aria-label-zh="岗位分页" data-i18n-aria-label-en="Pagination"></div>
