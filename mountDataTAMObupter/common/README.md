@@ -1,7 +1,45 @@
+# `common/` 数据文件说明
+
+本目录存放 MO–TA 共享及部分 MO 只读参考数据。
+
+| 文件 | 用途 |
+| --- | --- |
+| `recruitment-courses.json` | 已发布招聘岗位板（MO/TA 读写，见下文字段说明） |
+| `modules-catalog.json` | 官方课程编码 → 名称目录（MO 发布岗位时自动匹配课程名） |
+
+---
+
+## `modules-catalog.json`
+
+课程编码与英文课程名称对照表，供 MO 端「发布岗位」表单在填写 **Module code** 时实时匹配并填入 **Opening / module name**。
+
+**数据来源：** 从 [QMPlus](https://www.qmplus.com/) 获取的 **Diet 列表**中提取并整理为本 JSON；非运行时从 QMPlus 拉取，更新目录时需重新导出后覆盖本文件。
+
+**读取方式：** `DataMountPaths.modulesCatalog()` → `GET /api/mo/modules-catalog`（及 `/api/common/modules-catalog`）。
+
+### 顶层结构
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `schema` | string | 固定为 `modules-catalog`。 |
+| `version` | string | 契约版本，当前为 `1.0`。 |
+| `source` | string | 数据来源说明（如 QMPlus Diet 列表）。 |
+| `updatedAt` | string | ISO-8601，最近一次整理/写入时间。 |
+| `count` | number | 与 `modules` 长度一致。 |
+| `modules` | array | 课程条目列表。 |
+
+### `modules[]` 字段
+
+| 字段 | 类型 | 说明 |
+| --- | --- | --- |
+| `code` | string | 课程编码，如 `EBU6304`（三位字母前缀 + 四位数字）。 |
+| `name` | string | 课程英文名称，如 `Software Engineering`。 |
+
+---
+
 # `recruitment-courses.json` 字段说明
 
-本目录存放 **MO–TA 共享** 的招聘岗位数据文件：`recruitment-courses.json`。  
-契约与接口细节以仓库内 `docs/mo-job-board-api-v2.md` 为准；此处为字段速查。
+**MO–TA 共享** 招聘岗位数据；契约与接口细节以仓库内 `docs/mo-job-board-api-v2.md` 为准；以下为字段速查。
 
 ---
 
