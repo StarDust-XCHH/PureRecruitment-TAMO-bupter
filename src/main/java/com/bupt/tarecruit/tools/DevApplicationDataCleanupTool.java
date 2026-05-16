@@ -2,6 +2,7 @@ package com.bupt.tarecruit.tools;
 
 import com.bupt.tarecruit.common.config.DataMountPaths;
 import com.bupt.tarecruit.mo.dao.MoRecruitmentDao;
+import com.bupt.tarecruit.mo.util.MoAiDataCleanupTool;
 import com.bupt.tarecruit.ta.util.TaAiDataCleanupTool;
 import com.bupt.tarecruit.ta.util.TaSubmissionCleanupTool;
 
@@ -15,13 +16,13 @@ import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 
 /**
- * 测试环境用：<strong>TA 申请数据 + TA AI 数据 + MO 侧与申请相关的旁路 JSON</strong> 一次性对齐清理。
+ * 测试环境用：<strong>TA 申请数据 + TA/MO AI 数据 + MO 侧与申请相关的旁路 JSON</strong> 一次性对齐清理。
  * <p>
  * 典型场景：只运行了 {@link TaSubmissionCleanupTool} 后，{@code mo-application-read-state.json}、
  * {@code mo-application-comments.json}、{@code mo-applicant-shortlist.json} 仍引用已不存在的 {@code applicationId}，
  * 导致未读红点、评论、短名单等残留；
  * 本工具在<strong>不修改</strong>既有 {@link TaSubmissionCleanupTool} / {@link TaAiDataCleanupTool} 源码的前提下，
- * 通过调用其 {@code main} 并重写 MO 侧三个申请旁路文件，使双端与「零申请」状态一致。
+ * 通过调用其 {@code main}、{@link MoAiDataCleanupTool} 并重写 MO 侧三个申请旁路文件，使双端与「零申请」状态一致。
  * 清理结束后会调用 {@link MoRecruitmentDao#syncAllPublishedJobApplicationStatsFromTa()}，按当前 TA 数据重算并写回
  * {@code recruitment-courses.json} 中的申请/已录用统计；本工具<strong>不直接改写</strong>课程 JSON。
  * <p>
@@ -32,7 +33,7 @@ import java.time.Instant;
  *     <li>（无参）— 在终端打印菜单，由数字键选择模式；若 stdin 不可用则退化为「全部清理」</li>
  *     <li>{@code --mo-only} — 仅重置 MO 申请旁路三个 JSON（TA 已手动清过或仅需修不同步）</li>
  *     <li>{@code --ta-only} — 仅调用两个 TA 工具，不写 MO 文件</li>
- *     <li>{@code --skip-ai} — 跳过 {@link TaAiDataCleanupTool}，其余与无参相同</li>
+ *     <li>{@code --skip-ai} — 跳过 {@link TaAiDataCleanupTool} 与 {@link MoAiDataCleanupTool}，其余与无参相同</li>
  * </ul>
  * <p>
  * 运行示例（仓库根目录）：见 {@code tools/ta-mo-submission-cleanup/README.md}。
@@ -122,10 +123,10 @@ public final class DevApplicationDataCleanupTool {
         try (BufferedReader in = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8))) {
             System.out.println();
             System.out.println("[DUAL-CLEANUP] 请选择清理模式（输入数字后回车）：");
-            System.out.println("  1 — TA 申请 + TA AI + MO 已读/评论/短名单（推荐，等同原无参行为）");
-            System.out.println("  2 — 仅 MO 已读/评论/短名单 JSON（--mo-only）");
+            System.out.println("  1 — TA 申请 + TA/MO AI + MO 已读/评论/短名单（推荐，等同原无参行为）");
+            System.out.println("  2 — 仅 MO 已读/评论/短名单 + MO AI（--mo-only）");
             System.out.println("  3 — 仅 TA（申请 + AI，不写 MO）（--ta-only）");
-            System.out.println("  4 — TA 申请 + MO（已读/评论/短名单），跳过 TA AI（--skip-ai）");
+            System.out.println("  4 — TA 申请 + MO（已读/评论/短名单），跳过 TA/MO AI（--skip-ai）");
             System.out.println("  0 — 退出");
             System.out.print("> ");
             System.out.flush();
@@ -197,6 +198,12 @@ public final class DevApplicationDataCleanupTool {
         if (runMo) {
             System.out.println("[DUAL-CLEANUP] --- MO：已读状态 + 申请评论 + 候选短名单 ---");
             resetMoApplicationSidecarFiles();
+            if (!mode.skipAi) {
+                System.out.println("[DUAL-CLEANUP] --- MO：AI 数据（复用 MoAiDataCleanupTool）---");
+                MoAiDataCleanupTool.main(new String[0]);
+            } else {
+                System.out.println("[DUAL-CLEANUP] --- 已跳过 MO AI（--skip-ai）---");
+            }
         }
 
         System.out.println("[DUAL-CLEANUP] --- 课程岗位：MoRecruitmentDao 按 TA 数据同步申请/已录用统计 ---");

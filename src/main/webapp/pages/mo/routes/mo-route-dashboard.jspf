@@ -91,12 +91,12 @@
                     <div class="insight-card-header">
                         <span class="insight-icon assistant-icon" aria-hidden="true"></span>
                         <div>
-                            <p class="insight-label" data-i18n="dashboard.moAi.label" data-i18n-zh="MO AI 助理" data-i18n-en="MO AI Assistant">MO AI 助理</p>
-                            <p class="insight-subtitle" data-i18n="dashboard.moAi.subtitle" data-i18n-zh="与 TA 侧一致的对话入口（预留）" data-i18n-en="Same-style chat entry as TA (reserved)">与 TA 侧一致的对话入口（预留）</p>
+                            <p class="insight-label" data-i18n="dashboard.moAi.label" data-i18n-zh="MO AI Assistant" data-i18n-en="MO AI Assistant">MO AI Assistant</p>
+                            <p class="insight-subtitle" data-i18n="dashboard.moAi.subtitle" data-i18n-zh="Open AI chat" data-i18n-en="Open AI chat">Open AI chat</p>
                         </div>
                     </div>
-                    <div class="insight-core-number accent-ai" data-i18n="dashboard.moAi.placeholder" data-i18n-zh="预留" data-i18n-en="Reserved">—</div>
-                    <p class="insight-meta" data-i18n="dashboard.moAi.meta" data-i18n-zh="点击了解接入计划 ｜ 筛选与岗位上下文将接入此处" data-i18n-en="Tap for rollout notes | Screening and role context will connect here">点击了解接入计划 ｜ 筛选与岗位上下文将接入此处</p>
+                    <div class="insight-core-number accent-ai" id="moDashboardAiStatus">—</div>
+                    <p class="insight-meta" id="moDashboardAiMeta" data-i18n="dashboard.moAi.meta" data-i18n-zh="Job briefs, resume summaries, screening tips | requires TONGYI_API_KEY" data-i18n-en="Job briefs, resume summaries, screening tips | requires TONGYI_API_KEY">Job briefs, resume summaries, screening tips | requires TONGYI_API_KEY</p>
                 </div>
             </div>
         </div>

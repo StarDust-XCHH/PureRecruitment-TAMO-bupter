@@ -11,19 +11,25 @@
 
         function openModal(name) {
             if (!overlay) return;
+            var isAiAssistant = name === 'mo-ai-assistant';
             overlay.classList.add('show');
+            overlay.classList.toggle('ai-assistant-overlay', isAiAssistant);
             overlay.setAttribute('aria-hidden', 'false');
             panels.forEach(function (panel) {
-                panel.classList.toggle('active', panel.dataset.modal === name);
+                var active = panel.dataset.modal === name;
+                panel.classList.toggle('active', active);
+                panel.classList.toggle('is-landscape-modal', active && isAiAssistant);
             });
             if (name === 'settings' && userTrigger) userTrigger.setAttribute('aria-expanded', 'true');
         }
 
         function closeAllModals() {
             if (!overlay) return;
-            overlay.classList.remove('show');
+            overlay.classList.remove('show', 'ai-assistant-overlay');
             overlay.setAttribute('aria-hidden', 'true');
-            panels.forEach(function (panel) { panel.classList.remove('active'); });
+            panels.forEach(function (panel) {
+                panel.classList.remove('active', 'is-landscape-modal');
+            });
             if (userTrigger) userTrigger.setAttribute('aria-expanded', 'false');
         }
 

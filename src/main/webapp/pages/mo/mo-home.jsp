@@ -46,6 +46,7 @@
 <script src="${pageContext.request.contextPath}/assets/mo/js/modules/shortlist-store.js"></script>
 <script src="${pageContext.request.contextPath}/assets/mo/js/modules/applicants.js"></script>
 <script src="${pageContext.request.contextPath}/assets/mo/js/modules/dashboard.js"></script>
+<script src="${pageContext.request.contextPath}/assets/mo/js/modules/mo-ai-assistant.js"></script>
 <script src="${pageContext.request.contextPath}/assets/mo/js/modules/profile.js"></script>
 <script src="${pageContext.request.contextPath}/assets/mo/js/modules/onboarding.js"></script>
 <script src="${pageContext.request.contextPath}/assets/mo/js/mo-home.js"></script>
