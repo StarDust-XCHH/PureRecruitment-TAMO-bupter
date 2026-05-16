@@ -62,6 +62,7 @@
         /** 从课程详情「进入应聘筛选」预选的课程编码，在岗位下拉加载后再应用 */
         let pendingApplicantJobId = null;
         let pendingApplicantStatus = null;
+        let pendingApplicantUnreadOnly = false;
 
         function getMoId() {
             const u = typeof app.getMoUser === 'function' ? app.getMoUser() : null;
@@ -171,6 +172,9 @@
             var n = store && moId ? store.totalCount(moId) : 0;
             navShortlistBadge.textContent = String(n);
             navShortlistBadge.hidden = n === 0;
+            if (typeof app.onShortlistCountUpdated === 'function') {
+                app.onShortlistCountUpdated(n);
+            }
         }
 
         function getJobByJobId(jobId) {
@@ -1529,7 +1533,20 @@
                     pendingApplicantStatus = null;
                     app.setApplicantStatusFilter(presetStatus);
                 }
+                if (pendingApplicantUnreadOnly) {
+                    hadPreset = true;
+                    pendingApplicantUnreadOnly = false;
+                    if (unreadOnly) {
+                        unreadOnly.checked = true;
+                    }
+                    applicantPageIndex = 1;
+                    updateApplicantFiltersResetVisibility();
+                }
                 if (!hadPreset) {
+                    loadApplicants();
+                } else if (applicantListCache.length) {
+                    renderApplicants();
+                } else {
                     loadApplicants();
                 }
             });
@@ -1569,6 +1586,13 @@
         app.navigateToApplicantsWithStatus = function (status) {
             var s = status == null ? '' : String(status).trim();
             pendingApplicantStatus = s || null;
+            if (typeof app.activateRoute === 'function') {
+                app.activateRoute('applicants');
+            }
+        };
+
+        app.navigateToApplicantsUnreadOnly = function () {
+            pendingApplicantUnreadOnly = true;
             if (typeof app.activateRoute === 'function') {
                 app.activateRoute('applicants');
             }

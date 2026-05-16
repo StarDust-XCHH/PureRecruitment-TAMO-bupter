@@ -59,6 +59,12 @@
             btn.addEventListener('click', function () {
                 const r = btn.getAttribute('data-mo-go-route');
                 const applicantStatus = btn.getAttribute('data-mo-applicant-status');
+                const applicantUnread = btn.getAttribute('data-mo-applicant-unread');
+                if (r === 'applicants' && applicantUnread === 'true'
+                    && typeof app.navigateToApplicantsUnreadOnly === 'function') {
+                    app.navigateToApplicantsUnreadOnly();
+                    return;
+                }
                 if (r === 'applicants' && applicantStatus
                     && typeof app.navigateToApplicantsWithStatus === 'function') {
                     app.navigateToApplicantsWithStatus(applicantStatus);

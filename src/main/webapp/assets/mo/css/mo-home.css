@@ -827,6 +827,26 @@ legend.mo-field-label:has(.mo-req) {
     margin-top: 4px;
 }
 
+.mo-dashboard-key-metrics {
+    margin-top: 20px;
+}
+
+.mo-dashboard-card .mo-dashboard-stat-grid.mo-dashboard-stat-grid--key-metrics {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 900px) {
+    .mo-dashboard-card .mo-dashboard-stat-grid.mo-dashboard-stat-grid--key-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 520px) {
+    .mo-dashboard-card .mo-dashboard-stat-grid.mo-dashboard-stat-grid--key-metrics {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
 .mo-dashboard-card .overview-top.mo-dashboard-overview-top {
     display: flex;
     flex-wrap: wrap;
@@ -865,14 +885,19 @@ legend.mo-field-label:has(.mo-req) {
     letter-spacing: 0.03em;
 }
 
-/* 带底部模块入口的指标卡：上半区打开弹窗，底部为独立路由按钮 */
+/* 指标卡：整卡可点击跳转，仅保留上半区内容高度 */
 .mo-dashboard-card .mo-dashboard-insight-card {
     display: flex;
     flex-direction: column;
     grid-template-rows: none;
     cursor: default;
     gap: 0;
-    padding-bottom: 14px;
+    padding: 0;
+    overflow: hidden;
+}
+
+.mo-dashboard-card .mo-dashboard-insight-card--nav-only {
+    padding-bottom: 0;
 }
 
 .mo-dashboard-insight-card__hit {
@@ -880,12 +905,20 @@ legend.mo-field-label:has(.mo-req) {
     display: flex;
     flex-direction: column;
     min-height: 0;
+    height: 100%;
     cursor: pointer;
-    border-radius: 12px;
-    margin: -4px -4px 0;
-    padding: 4px 4px 2px;
+    border-radius: inherit;
+    margin: 0;
+    padding: 14px 14px 12px;
     outline: none;
     transition: background 0.18s ease;
+}
+
+.mo-dashboard-insight-card--nav-only.mo-dashboard-ai-card .mo-dashboard-insight-card__hit.is-disabled,
+.mo-dashboard-insight-card__hit[aria-disabled="true"] {
+    cursor: not-allowed;
+    opacity: 0.58;
+    pointer-events: none;
 }
 
 .mo-dashboard-card-metric {
@@ -897,9 +930,75 @@ legend.mo-field-label:has(.mo-req) {
     align-self: stretch;
 }
 
+.mo-dashboard-card-metric--split {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 10px 12px;
+}
+
 .mo-dashboard-card-metric .insight-core-number {
     margin: 0;
     padding: 0;
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+.mo-dashboard-card-go {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    margin-left: auto;
+    padding: 2px 0 4px;
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 1.25;
+    color: var(--primary, #6366f1);
+    letter-spacing: 0.02em;
+}
+
+.mo-dashboard-card-go__icon {
+    font-size: 18px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.mo-dashboard-ai-card .mo-dashboard-card-go__icon {
+    font-size: 16px;
+}
+
+.mo-dashboard-card-go__text {
+    max-width: 10rem;
+    text-align: right;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 14px;
+}
+
+.mo-dashboard-card-go__arrow {
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1;
+    transition: transform 0.18s ease;
+}
+
+.mo-dashboard-insight-card__hit:hover .mo-dashboard-card-go {
+    color: var(--primary, #6366f1);
+}
+
+.mo-dashboard-insight-card__hit:hover .mo-dashboard-card-go__arrow {
+    transform: translateX(4px);
+}
+
+.mo-dashboard-insight-card__hit.is-disabled .mo-dashboard-card-go,
+.mo-dashboard-insight-card__hit[aria-disabled="true"] .mo-dashboard-card-go {
+    opacity: 0.45;
+}
+
+[data-theme="light"] .mo-dashboard-card-go {
+    color: #4f46e5;
 }
 
 .mo-dashboard-insight-card__hit:hover {
@@ -991,6 +1090,11 @@ legend.mo-field-label:has(.mo-req) {
 
 .mo-dashboard-ai-card__hit {
     cursor: pointer;
+}
+
+.mo-dashboard-ai-card .insight-subtitle .mo-dashboard-ai-status {
+    display: block;
+    margin-top: 4px;
 }
 
 .mo-dashboard-ai-card__footer .mo-dashboard-ai-status {

@@ -366,35 +366,9 @@
         <button class="modal-close" type="button" data-i18n-aria-label="modal.closeAria" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head">
             <h3 id="modalSummaryTitle" data-i18n="modal.summary.title" data-i18n-zh="招聘数据摘要" data-i18n-en="Recruitment summary">招聘数据摘要</h3>
-            <p class="muted" data-i18n="modal.summary.subtitle" data-i18n-zh="汇总当前岗位与申请情况；每次打开时会更新未读申请条数。" data-i18n-en="Aggregates openings and applications; unread counts refresh when you open this.">汇总当前岗位与申请情况；每次打开时会更新未读申请条数。</p>
+            <p class="muted" data-i18n="modal.summary.subtitle" data-i18n-zh="汇总当前开放岗位；关键指标见总览页。" data-i18n-en="Lists your open modules; key metrics are on the dashboard.">汇总当前开放岗位；关键指标见总览页。</p>
         </div>
         <div class="modal-body mo-summary-modal__body">
-            <section class="mo-summary-section" aria-labelledby="summarySnapshotHeading">
-                <h4 class="mo-summary-section__title" id="summarySnapshotHeading" data-i18n="modal.summary.keyMetrics" data-i18n-zh="关键指标" data-i18n-en="Key metrics">关键指标</h4>
-                <div class="mo-summary-snapshot" role="group">
-                    <div class="mo-summary-snapshot__item">
-                        <span class="mo-summary-snapshot__label" data-i18n="modal.summary.openOpenings" data-i18n-zh="开放岗位" data-i18n-en="Open openings">开放岗位</span>
-                        <strong class="mo-summary-snapshot__value" id="summarySnapshotOpen">—</strong>
-                    </div>
-                    <div class="mo-summary-snapshot__item">
-                        <span class="mo-summary-snapshot__label" data-i18n="modal.summary.candidateTa" data-i18n-zh="候选 TA（每人计一次）" data-i18n-en="Candidate TAs (unique)">候选 TA（每人计一次）</span>
-                        <strong class="mo-summary-snapshot__value" id="summarySnapshotCandidates">—</strong>
-                    </div>
-                    <div class="mo-summary-snapshot__item">
-                        <span class="mo-summary-snapshot__label" data-i18n="dashboard.hired" data-i18n-zh="已录用" data-i18n-en="Hired">已录用</span>
-                        <strong class="mo-summary-snapshot__value" id="summarySnapshotAccepted">—</strong>
-                    </div>
-                    <div class="mo-summary-snapshot__item">
-                        <span class="mo-summary-snapshot__label" data-i18n="dashboard.pendingDecision" data-i18n-zh="待决策" data-i18n-en="Pending Decision">待决策</span>
-                        <strong class="mo-summary-snapshot__value" id="summarySnapshotPending">—</strong>
-                    </div>
-                    <div class="mo-summary-snapshot__item mo-summary-snapshot__item--accent">
-                        <span class="mo-summary-snapshot__label" data-i18n="modal.summary.unreadApps" data-i18n-zh="未读申请" data-i18n-en="Unread applications">未读申请</span>
-                        <strong class="mo-summary-snapshot__value" id="summarySnapshotUnread">—</strong>
-                    </div>
-                </div>
-            </section>
-
             <section class="mo-summary-section" aria-labelledby="summaryJobsHeading">
                 <h4 class="mo-summary-section__title" id="summaryJobsHeading" data-i18n="modal.summary.currentOpen" data-i18n-zh="当前开放岗位" data-i18n-en="Current open openings">当前开放岗位</h4>
                 <p class="mo-summary-empty muted" id="summaryJobEmpty" hidden data-i18n="modal.summary.noOpenJobs" data-i18n-zh="暂无已发布岗位，请前往侧栏「课程管理」发布。" data-i18n-en="No published openings yet. Post one from Module Management in the sidebar.">暂无已发布岗位，请前往侧栏「课程管理」发布。</p>
