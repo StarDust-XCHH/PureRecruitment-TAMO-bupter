@@ -470,8 +470,8 @@
                     data-i18n-en="AI service status">AI service status</strong>
             <span id="moAiAssistantServiceText"
                   data-i18n="modal.moAi.serviceChecking"
-                  data-i18n-zh="Checking server-side API configuration…"
-                  data-i18n-en="Checking server-side API configuration…">Checking server-side API configuration…</span>
+                  data-i18n-zh="Checking connection…"
+                  data-i18n-en="Checking connection…">Checking connection…</span>
         </div>
         <div class="modal-body ai-assistant-body ai-assistant-body-landscape" id="moAiAssistantModalBody">
             <section class="ai-assistant-chat-shell">

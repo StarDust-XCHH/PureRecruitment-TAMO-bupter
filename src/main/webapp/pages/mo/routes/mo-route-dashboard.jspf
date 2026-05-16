@@ -5,7 +5,7 @@
                 <div class="mo-dashboard-masthead__badge" data-i18n="dashboard.heroBadge" data-i18n-zh="当前视图 · 招聘总览" data-i18n-en="Current view · Recruitment overview">当前视图 · 招聘总览</div>
                 <h2 class="mo-dashboard-masthead__title" id="moOverviewHeroTitle" data-i18n="dashboard.heroTitle" data-i18n-zh="招聘总览" data-i18n-en="Recruitment overview">招聘总览</h2>
                 <p class="mo-dashboard-masthead__subtitle muted" data-i18n="dashboard.title" data-i18n-zh="数据总览" data-i18n-en="Metrics overview">数据总览</p>
-                <p class="mo-dashboard-masthead__desc muted" data-i18n="dashboard.desc" data-i18n-zh="点击指标数字区域可打开摘要或待决策明细；「开放岗位」摘要中含候选规模等指标；「待决策」卡片与弹窗仅展示待处理申请条数与名单。最右侧为 MO AI 助理预留位（与 TA 侧一致）。与侧栏「招聘总览」为同一数据源。" data-i18n-en="Tap the metric area for the recruitment summary or the pending list. Open modules summary includes candidate scale; the Pending decision card and modal only show pending counts and rows. The rightmost tile reserves the MO AI assistant. Same data as Recruitment Dashboard in the sidebar.">点击指标数字区域可打开摘要或待决策明细；「开放岗位」摘要中含候选规模等指标；「待决策」卡片与弹窗仅展示待处理申请条数与名单。最右侧为 MO AI 助理预留位（与 TA 侧一致）。与侧栏「招聘总览」为同一数据源。</p>
+                <p class="mo-dashboard-masthead__desc muted" data-i18n="dashboard.desc" data-i18n-zh="Tap a metric card for summaries or pending-application details. Open modules includes candidate scale; Pending decision shows pending counts and the list only." data-i18n-en="Tap a metric card for summaries or pending-application details. Open modules includes candidate scale; Pending decision shows pending counts and the list only.">Tap a metric card for summaries or pending-application details. Open modules includes candidate scale; Pending decision shows pending counts and the list only.</p>
             </div>
             <div class="mo-dashboard-masthead__actions">
                 <div class="overview-badges mo-jobs-toolbar">
@@ -30,7 +30,9 @@
                                 <p class="insight-subtitle" data-i18n="dashboard.openModulesHint" data-i18n-zh="点击查看数据摘要" data-i18n-en="View summary">点击查看数据摘要</p>
                             </div>
                         </div>
-                        <div class="insight-core-number" id="dashOpenJobs">--</div>
+                        <div class="mo-dashboard-card-metric">
+                            <div class="insight-core-number" id="dashOpenJobs">--</div>
+                        </div>
                     </div>
                     <div class="mo-dashboard-insight-card__route">
                         <button type="button" class="mo-dashboard-route-chip mo-dashboard-route-chip--jobs" data-mo-go-route="jobs" data-i18n-aria-label="dashboard.gotoJobs" data-i18n-aria-label-zh="进入课程管理" data-i18n-aria-label-en="Module management">
@@ -52,7 +54,9 @@
                                 <p class="insight-subtitle" data-i18n="dashboard.pendingCardSubtitle" data-i18n-zh="仅显示待处理条数；单击查看待决策名单" data-i18n-en="Pending count only; tap for the pending list">仅显示待处理条数；单击查看待决策名单</p>
                             </div>
                         </div>
-                        <div class="insight-core-number accent-warn" id="dashPending">--</div>
+                        <div class="mo-dashboard-card-metric">
+                            <div class="insight-core-number accent-warn" id="dashPending">--</div>
+                        </div>
                     </div>
                     <div class="mo-dashboard-insight-card__route">
                         <button type="button" class="mo-dashboard-route-chip mo-dashboard-route-chip--applicants" data-mo-go-route="applicants" data-i18n-aria-label="dashboard.gotoApplicants" data-i18n-aria-label-zh="进入人选投递" data-i18n-aria-label-en="Candidate applications">
@@ -74,7 +78,9 @@
                                 <p class="insight-subtitle" data-i18n="dashboard.hiredHint" data-i18n-zh="点击查看已录用名单" data-i18n-en="View hired">点击查看已录用名单</p>
                             </div>
                         </div>
-                        <div class="insight-core-number accent-positive" id="dashAccepted">--</div>
+                        <div class="mo-dashboard-card-metric">
+                            <div class="insight-core-number accent-positive" id="dashAccepted">--</div>
+                        </div>
                     </div>
                     <div class="mo-dashboard-insight-card__route">
                         <button type="button" class="mo-dashboard-route-chip mo-dashboard-route-chip--applicants mo-dashboard-route-chip--hired" data-mo-go-route="applicants" data-mo-applicant-status="已录用" data-i18n-aria-label="dashboard.gotoHiredList" data-i18n-aria-label-zh="进入人选投递并筛选已录用" data-i18n-aria-label-en="Candidate applications filtered to hired">
@@ -87,16 +93,23 @@
                         </button>
                     </div>
                 </div>
-                <div class="insight-card upcoming-card ai-assistant-card mo-dashboard-ai-card" data-modal-target="mo-ai-assistant">
-                    <div class="insight-card-header">
-                        <span class="insight-icon assistant-icon" aria-hidden="true"></span>
-                        <div>
-                            <p class="insight-label" data-i18n="dashboard.moAi.label" data-i18n-zh="MO AI Assistant" data-i18n-en="MO AI Assistant">MO AI Assistant</p>
-                            <p class="insight-subtitle" data-i18n="dashboard.moAi.subtitle" data-i18n-zh="Open AI chat" data-i18n-en="Open AI chat">Open AI chat</p>
+                <div class="insight-card upcoming-card ai-assistant-card mo-dashboard-insight-card mo-dashboard-ai-card" data-modal-target="mo-ai-assistant">
+                    <div class="mo-dashboard-insight-card__hit mo-dashboard-ai-card__hit">
+                        <div class="insight-card-header">
+                            <span class="insight-icon assistant-icon" aria-hidden="true"></span>
+                            <div>
+                                <p class="insight-label" data-i18n="dashboard.moAi.label" data-i18n-zh="MO AI Assistant" data-i18n-en="MO AI Assistant">MO AI Assistant</p>
+                                <p class="insight-subtitle" data-i18n="dashboard.moAi.subtitle" data-i18n-zh="Open AI chat" data-i18n-en="Open AI chat">Open AI chat</p>
+                            </div>
+                        </div>
+                        <div class="mo-dashboard-card-metric">
+                            <div class="insight-core-number accent-ai" id="moDashboardAiHours">24h</div>
+                            <p class="mo-dashboard-ai-status" id="moDashboardAiStatus" aria-live="polite">&#8212;</p>
                         </div>
                     </div>
-                    <div class="insight-core-number accent-ai" id="moDashboardAiStatus">—</div>
-                    <p class="insight-meta" id="moDashboardAiMeta" data-i18n="dashboard.moAi.meta" data-i18n-zh="Job briefs, resume summaries, screening tips | requires TONGYI_API_KEY" data-i18n-en="Job briefs, resume summaries, screening tips | requires TONGYI_API_KEY">Job briefs, resume summaries, screening tips | requires TONGYI_API_KEY</p>
+                    <div class="mo-dashboard-ai-card__footer">
+                        <p class="insight-meta" id="moDashboardAiMeta" data-i18n="dashboard.moAi.meta" data-i18n-zh="Screening summaries, job briefs, and resume insights" data-i18n-en="Screening summaries, job briefs, and resume insights">Screening summaries, job briefs, and resume insights</p>
+                    </div>
                 </div>
             </div>
         </div>

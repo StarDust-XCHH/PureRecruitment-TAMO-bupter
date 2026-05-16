@@ -865,15 +865,6 @@ legend.mo-field-label:has(.mo-req) {
     letter-spacing: 0.03em;
 }
 
-/* 四卡大数字底对齐：标题单行/多行时，数字仍在各自弹性区内贴底，四卡数字同一水平线 */
-.mo-dashboard-card .mo-dashboard-stat-grid .insight-card {
-    grid-template-rows: auto 1fr;
-    align-content: stretch;
-}
-.mo-dashboard-card .mo-dashboard-stat-grid .insight-card .insight-core-number {
-    align-self: end;
-}
-
 /* 带底部模块入口的指标卡：上半区打开弹窗，底部为独立路由按钮 */
 .mo-dashboard-card .mo-dashboard-insight-card {
     display: flex;
@@ -886,9 +877,8 @@ legend.mo-field-label:has(.mo-req) {
 
 .mo-dashboard-insight-card__hit {
     flex: 1 1 auto;
-    display: grid;
-    grid-template-rows: auto 1fr;
-    align-content: stretch;
+    display: flex;
+    flex-direction: column;
     min-height: 0;
     cursor: pointer;
     border-radius: 12px;
@@ -896,6 +886,20 @@ legend.mo-field-label:has(.mo-req) {
     padding: 4px 4px 2px;
     outline: none;
     transition: background 0.18s ease;
+}
+
+.mo-dashboard-card-metric {
+    margin-top: auto;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    align-self: stretch;
+}
+
+.mo-dashboard-card-metric .insight-core-number {
+    margin: 0;
+    padding: 0;
 }
 
 .mo-dashboard-insight-card__hit:hover {
@@ -907,10 +911,6 @@ legend.mo-field-label:has(.mo-req) {
 
 .mo-dashboard-insight-card__hit:focus-visible {
     box-shadow: 0 0 0 2px var(--primary);
-}
-
-.mo-dashboard-insight-card__hit .insight-core-number {
-    align-self: end;
 }
 
 .mo-dashboard-insight-card__route {
@@ -989,8 +989,38 @@ legend.mo-field-label:has(.mo-req) {
     box-shadow: 0 0 0 1px rgba(13, 148, 136, 0.35);
 }
 
-.mo-dashboard-ai-card .insight-core-number {
-    font-size: clamp(26px, 3vw, 36px);
+.mo-dashboard-ai-card__hit {
+    cursor: pointer;
+}
+
+.mo-dashboard-card-metric .mo-dashboard-ai-status {
+    margin: 4px 0 0;
+    padding: 0;
+    font-size: clamp(13px, 1.2vw, 15px);
+    font-weight: 600;
+    line-height: 1.25;
+    letter-spacing: 0.02em;
+    text-align: left;
+    color: rgba(226, 232, 240, 0.82);
+}
+[data-theme="light"] .mo-dashboard-ai-status {
+    color: rgba(15, 23, 42, 0.62);
+}
+.mo-dashboard-ai-status.is-online {
+    color: #34d399;
+}
+[data-theme="light"] .mo-dashboard-ai-status.is-online {
+    color: #0d9488;
+}
+
+.mo-dashboard-ai-card__footer {
+    flex-shrink: 0;
+    margin-top: 10px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+[data-theme="light"] .mo-dashboard-ai-card__footer {
+    border-top-color: rgba(15, 23, 42, 0.08);
 }
 
 /* 四卡等宽铺满，避免 auto-fit 产生空白轨导致「整体偏左」观感 */

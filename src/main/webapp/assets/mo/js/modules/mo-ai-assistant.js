@@ -57,9 +57,20 @@
 
         function resolveDefaultAssistantMessage() {
             if (!state.serviceStatus.available) {
-                return state.serviceStatus.message || 'AI API is not configured on the server; assistant is disabled.';
+                return 'The AI assistant is not available right now. Please try again later or contact your administrator.';
             }
             return 'Hello, I am the MO workspace AI assistant. Ask a question directly, or upload a job brief or applicant resume first—I will use the session and attachments to suggest screening and hiring actions.';
+        }
+
+        function resolveUserFacingUnavailableMessage() {
+            return 'The AI assistant is not available right now.';
+        }
+
+        function resolveDashboardAiMetaText(available) {
+            if (available) {
+                return 'Tap to open chat';
+            }
+            return 'Assistant unavailable';
         }
 
         function formatFileSize(bytes) {
@@ -250,16 +261,11 @@
         function applyServiceStatus(serviceStatus) {
             state.serviceStatus = normalizeServiceStatus(serviceStatus);
             const available = state.serviceStatus.available;
-            const providerName = state.serviceStatus.provider || 'Not configured';
-            const statusMessage = state.serviceStatus.message || 'AI service status unknown';
-
             if (serviceBanner) {
                 serviceBanner.dataset.available = available ? 'true' : 'false';
             }
             if (serviceText) {
-                serviceText.textContent = available
-                    ? 'Service: ' + providerName + ' · ' + statusMessage
-                    : 'Service unavailable · ' + statusMessage;
+                serviceText.textContent = available ? 'Ready to chat' : resolveUserFacingUnavailableMessage();
             }
             if (composerInput) {
                 composerInput.disabled = !available || state.isSending;
@@ -286,11 +292,10 @@
                 return;
             }
             const available = state.serviceStatus.available;
-            statusEl.textContent = available ? 'Online' : '—';
+            statusEl.textContent = available ? 'Online' : 'Offline';
+            statusEl.classList.toggle('is-online', available);
             if (metaEl) {
-                metaEl.textContent = available
-                    ? 'Open chat | ' + (state.serviceStatus.message || 'qwen-long')
-                    : (state.serviceStatus.message || 'Set environment variable TONGYI_API_KEY');
+                metaEl.textContent = resolveDashboardAiMetaText(available);
             }
         }
 
@@ -704,7 +709,7 @@
                 if (composerHint) {
                     composerHint.textContent = nextHint || (state.serviceStatus.available
                         ? 'Switched to a new blank session. Enter a new question; use the sidebar for history.'
-                        : (state.serviceStatus.message || 'AI service is currently unavailable'));
+                        : resolveUserFacingUnavailableMessage());
                 }
                 if (state.serviceStatus.available) {
                     setStatus('Ready');
@@ -864,7 +869,7 @@
                 return;
             }
             if (!state.serviceStatus.available) {
-                window.alert(state.serviceStatus.message || 'AI service is currently unavailable。');
+                window.alert(resolveUserFacingUnavailableMessage());
                 return;
             }
             if (state.isSending) {
@@ -962,7 +967,7 @@
                 return;
             }
             if (!state.serviceStatus.available) {
-                window.alert(state.serviceStatus.message || 'AI service is currently unavailable。');
+                window.alert(resolveUserFacingUnavailableMessage());
                 return;
             }
             try {
@@ -1014,7 +1019,7 @@
 
         async function uploadPendingFile(file, meta) {
             if (!state.serviceStatus.available) {
-                throw new Error(state.serviceStatus.message || 'AI service unavailable; cannot upload attachments');
+                throw new Error(resolveUserFacingUnavailableMessage());
             }
             const moId = resolveMoId();
             if (!moId) throw new Error('MO identity missing. Please sign in again.');
