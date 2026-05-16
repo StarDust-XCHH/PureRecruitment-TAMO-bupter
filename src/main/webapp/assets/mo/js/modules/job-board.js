@@ -2168,8 +2168,8 @@
                 resetPublishModuleCodeInputs();
                 requestAnimationFrame(function () {
                     if (typeof app.syncPublishJobNav === 'function') app.syncPublishJobNav();
-                    const first = document.getElementById('courseNameInput');
-                    if (first && typeof first.focus === 'function') first.focus();
+                    const codeNum = document.getElementById('courseCodeNumberInput');
+                    if (codeNum && typeof codeNum.focus === 'function') codeNum.focus();
                 });
             });
         }
