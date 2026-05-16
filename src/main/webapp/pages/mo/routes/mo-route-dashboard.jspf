@@ -104,11 +104,31 @@
                         </div>
                         <div class="mo-dashboard-card-metric">
                             <div class="insight-core-number accent-ai" id="moDashboardAiHours">24h</div>
-                            <p class="mo-dashboard-ai-status" id="moDashboardAiStatus" aria-live="polite">&#8212;</p>
                         </div>
                     </div>
                     <div class="mo-dashboard-ai-card__footer">
-                        <p class="insight-meta" id="moDashboardAiMeta" data-i18n="dashboard.moAi.meta" data-i18n-zh="Screening summaries, job briefs, and resume insights" data-i18n-en="Screening summaries, job briefs, and resume insights">Screening summaries, job briefs, and resume insights</p>
+                        <button type="button" class="mo-dashboard-route-chip mo-dashboard-route-chip--ai-footer"
+                                id="moDashboardAiActionBtn"
+                                data-modal-target="mo-ai-assistant"
+                                disabled
+                                aria-disabled="true">
+                            <span class="mo-dashboard-route-chip__icon" aria-hidden="true">✦</span>
+                            <span class="mo-dashboard-route-chip__text">
+                                <span class="mo-dashboard-route-chip__label"
+                                      data-i18n="dashboard.moAi.openChatLabel"
+                                      data-i18n-zh="Open AI chat"
+                                      data-i18n-en="Open AI chat">Open AI chat</span>
+                                <span class="mo-dashboard-ai-status"
+                                      id="moDashboardAiStatus"
+                                      aria-live="polite">Offline</span>
+                                <span class="mo-dashboard-route-chip__hint muted"
+                                      id="moDashboardAiMeta"
+                                      data-i18n="dashboard.moAi.meta"
+                                      data-i18n-zh="Tap to open chat"
+                                      data-i18n-en="Tap to open chat">Tap to open chat</span>
+                            </span>
+                            <span class="mo-dashboard-route-chip__chev" aria-hidden="true">→</span>
+                        </button>
                     </div>
                 </div>
             </div>

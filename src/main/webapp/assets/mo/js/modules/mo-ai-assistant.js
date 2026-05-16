@@ -288,12 +288,17 @@
         function updateDashboardAiCard() {
             const statusEl = document.getElementById('moDashboardAiStatus');
             const metaEl = document.getElementById('moDashboardAiMeta');
+            const actionBtn = document.getElementById('moDashboardAiActionBtn');
             if (!statusEl) {
                 return;
             }
             const available = state.serviceStatus.available;
             statusEl.textContent = available ? 'Online' : 'Offline';
             statusEl.classList.toggle('is-online', available);
+            if (actionBtn) {
+                actionBtn.disabled = !available;
+                actionBtn.setAttribute('aria-disabled', (!available).toString());
+            }
             if (metaEl) {
                 metaEl.textContent = resolveDashboardAiMetaText(available);
             }
