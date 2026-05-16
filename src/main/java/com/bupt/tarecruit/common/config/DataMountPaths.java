@@ -97,6 +97,11 @@ public final class DataMountPaths {
         return root().resolve("common").resolve("recruitment-courses.json");
     }
 
+    /** Official module code → name catalog for MO publish form autofill. */
+    public static Path modulesCatalog() {
+        return root().resolve("common").resolve("modules-catalog.json");
+    }
+
     public static Path taAccounts() {
         return taDir().resolve("tas.json");
     }

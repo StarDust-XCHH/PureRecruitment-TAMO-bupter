@@ -35,7 +35,7 @@ import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.trim;
 
 public class MoRecruitmentDao {
 
-    private static final Pattern MODULE_CODE_PATTERN = Pattern.compile("^(EBU|CBU|BBU|BBC)\\d{4}$");
+    private static final Pattern MODULE_CODE_PATTERN = Pattern.compile("^(EBU|CBU|BBU|BBC|EBC|BBF)\\d{4}$");
     private static final Path TA_APPLICATION_STATUS = DataMountPaths.taApplicationStatus();
     private static final String TA_SCHEMA = "ta";
     private static final String TA_ENTITY_APPLICATION_STATUS = "application-status";
@@ -1345,7 +1345,7 @@ public class MoRecruitmentDao {
         }
         if (!MODULE_CODE_PATTERN.matcher(code).matches()) {
             throw new IllegalArgumentException(
-                    "课程编号格式无效，须为 EBU/CBU/BBU/BBC 加四位数字，如 EBU6304");
+                    "课程编号格式无效，须为有效前缀加四位数字，如 EBU6304");
         }
         return code;
     }

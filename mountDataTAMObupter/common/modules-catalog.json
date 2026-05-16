@@ -1,0 +1,293 @@
+{
+  "schema": "modules-catalog",
+  "version": "1.0",
+  "source": "Modules_List.md",
+  "updatedAt": "2026-05-16T14:39:23.000Z",
+  "count": 71,
+  "modules": [
+    {
+      "code": "BBC3502",
+      "name": "Computer Fundamentals and Programming"
+    },
+    {
+      "code": "BBC4031",
+      "name": "New Horizons English 1"
+    },
+    {
+      "code": "BBC4032",
+      "name": "New Horizons English 2"
+    },
+    {
+      "code": "BBC4102",
+      "name": "Introduction to Electronic Systems"
+    },
+    {
+      "code": "BBC4104",
+      "name": "Communication Skills"
+    },
+    {
+      "code": "BBC4108",
+      "name": "Data Structures"
+    },
+    {
+      "code": "BBC4111",
+      "name": "Engineering Mathematics 2"
+    },
+    {
+      "code": "BBC4114",
+      "name": "Discrete Mathematics"
+    },
+    {
+      "code": "BBC4200",
+      "name": "Introduction to Internet of Things"
+    },
+    {
+      "code": "BBC4301",
+      "name": "Formal Language and Automata"
+    },
+    {
+      "code": "BBC4374",
+      "name": "Signals and Systems Theory"
+    },
+    {
+      "code": "BBC4911",
+      "name": "Advanced Mathematics 1"
+    },
+    {
+      "code": "BBC4913",
+      "name": "Linear Algebra"
+    },
+    {
+      "code": "BBC4921",
+      "name": "Advanced Mathematics 2"
+    },
+    {
+      "code": "BBC4923",
+      "name": "Physics D"
+    },
+    {
+      "code": "BBC4924",
+      "name": "Physics C"
+    },
+    {
+      "code": "BBC4941",
+      "name": "Probability Theory and Stochastic Processes"
+    },
+    {
+      "code": "BBC5210",
+      "name": "Electric and Magnetic Fields"
+    },
+    {
+      "code": "BBC6201",
+      "name": "Internet of Things Engineering Practice"
+    },
+    {
+      "code": "BBC6406",
+      "name": "Wireless Sensor Networks"
+    },
+    {
+      "code": "BBC6521",
+      "name": "Project"
+    },
+    {
+      "code": "BBC6601",
+      "name": "Natural Language Processing"
+    },
+    {
+      "code": "BBC6701",
+      "name": "Information Theory"
+    },
+    {
+      "code": "BBF6000",
+      "name": "Chinese Compulsory Topics"
+    },
+    {
+      "code": "BBU6031",
+      "name": "Business Technology Strategy"
+    },
+    {
+      "code": "BBU6302",
+      "name": "Principles of Telecommunication Systems"
+    },
+    {
+      "code": "BBU6504",
+      "name": "Data Mining"
+    },
+    {
+      "code": "CBU5201",
+      "name": "Machine Learning"
+    },
+    {
+      "code": "EBC3002",
+      "name": "Personal Development Plan & Entrepreneurial Skills 1"
+    },
+    {
+      "code": "EBC4002",
+      "name": "Personal Development Plan & Entrepreneurial Skills 2"
+    },
+    {
+      "code": "EBC5002",
+      "name": "Personal Development Plan & Entrepreneurial Skills 3"
+    },
+    {
+      "code": "EBC6010",
+      "name": "Engineering Environment (Telecom)"
+    },
+    {
+      "code": "EBC6012",
+      "name": "Engineering Environment (IoT)"
+    },
+    {
+      "code": "EBC6013",
+      "name": "Engineering Environment (EIE)"
+    },
+    {
+      "code": "EBC6014",
+      "name": "Engineering Environment (IST)"
+    },
+    {
+      "code": "EBU4202",
+      "name": "Digital Circuit Design"
+    },
+    {
+      "code": "EBU4211",
+      "name": "Object-Oriented Programming"
+    },
+    {
+      "code": "EBU4213",
+      "name": "AI Foundations and Applications"
+    },
+    {
+      "code": "EBU5017",
+      "name": "AI Law"
+    },
+    {
+      "code": "EBU5042",
+      "name": "Advanced Network Programming"
+    },
+    {
+      "code": "EBU5204",
+      "name": "Operating systems"
+    },
+    {
+      "code": "EBU5212",
+      "name": "Communication and Networks"
+    },
+    {
+      "code": "EBU5303",
+      "name": "Multimedia Fundamentals"
+    },
+    {
+      "code": "EBU5315",
+      "name": "Interactive Media Design and Production"
+    },
+    {
+      "code": "EBU5376",
+      "name": "Digital Signal Processing"
+    },
+    {
+      "code": "EBU5402",
+      "name": "Enterprise Management"
+    },
+    {
+      "code": "EBU5408",
+      "name": "Digital Audio Fundamentals"
+    },
+    {
+      "code": "EBU5477",
+      "name": "Embedded Systems"
+    },
+    {
+      "code": "EBU5503",
+      "name": "Database Systems"
+    },
+    {
+      "code": "EBU5606",
+      "name": "Product Development and Marketing"
+    },
+    {
+      "code": "EBU6010",
+      "name": "Cryptography and Cyber Security"
+    },
+    {
+      "code": "EBU6018",
+      "name": "Advanced Transform Methods"
+    },
+    {
+      "code": "EBU6230",
+      "name": "Image and Video Processing"
+    },
+    {
+      "code": "EBU6231",
+      "name": "3D Graphics for Augmented and Virtual Reality"
+    },
+    {
+      "code": "EBU6232",
+      "name": "AI in Games"
+    },
+    {
+      "code": "EBU6304",
+      "name": "Software Engineering"
+    },
+    {
+      "code": "EBU6305",
+      "name": "Interactive Media Design and Production"
+    },
+    {
+      "code": "EBU6307",
+      "name": "Visual Computing"
+    },
+    {
+      "code": "EBU6308",
+      "name": "Computational Creativity"
+    },
+    {
+      "code": "EBU6335",
+      "name": "Digital Systems Design"
+    },
+    {
+      "code": "EBU6350",
+      "name": "Cognitive Robotic Systems"
+    },
+    {
+      "code": "EBU6366",
+      "name": "Microwave, Millimeterwave and Optical Transmission"
+    },
+    {
+      "code": "EBU6408",
+      "name": "Sensors and Radio Frequency Identification"
+    },
+    {
+      "code": "EBU6409",
+      "name": "Broadband Technologies and Fibre Optics"
+    },
+    {
+      "code": "EBU6410",
+      "name": "Wireless Technologies and Techniques"
+    },
+    {
+      "code": "EBU6475",
+      "name": "Microprocessor Systems Design"
+    },
+    {
+      "code": "EBU6501",
+      "name": "Middleware"
+    },
+    {
+      "code": "EBU6502",
+      "name": "Cloud Computing"
+    },
+    {
+      "code": "EBU6504",
+      "name": "Smart Infrastructure and Data Analytics"
+    },
+    {
+      "code": "EBU6505",
+      "name": "Reasoning and Agents"
+    },
+    {
+      "code": "EBU6506",
+      "name": "Deep Learning and Computer Vision"
+    }
+  ]
+}

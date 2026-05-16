@@ -4,8 +4,8 @@
     const moApp = window.MOApp = window.MOApp || {};
     const modules = moApp.modules = moApp.modules || {};
 
-    var MODULE_CODE_PREFIXES = ['EBU', 'CBU', 'BBU', 'BBC'];
-    var MODULE_CODE_PATTERN = /^(EBU|CBU|BBU|BBC)\d{4}$/;
+    var MODULE_CODE_PREFIXES = ['EBU', 'CBU', 'BBU', 'BBC', 'EBC', 'BBF'];
+    var MODULE_CODE_PATTERN = /^(EBU|CBU|BBU|BBC|EBC|BBF)\d{4}$/;
 
     var FALLBACK_SKILL_TAGS = [
         'Python', 'Java', 'C/C++', 'JavaScript', 'TypeScript', 'SQL', 'Linux', 'Git',
@@ -89,6 +89,8 @@
         var editFixedTags = new Set();
         var editTeachingWeeks = [];
         var weekPickerTarget = 'publish';
+        var moduleCatalogByCode = {};
+
         var skillPickerTarget = 'publish';
         var skillPickerWorkingSet = new Set();
         /** 技能弹窗内「Other」待确认的其他技能（与岗位 customSkills 对应，不写入系统标签库） */
@@ -475,6 +477,37 @@
 
         function getFixedTagsArrayFromSet(set) {
             return Array.from(set || []).map(function (s) { return String(s || '').trim(); }).filter(Boolean);
+        }
+
+        async function loadModulesCatalogFromApi() {
+            try {
+                const res = await fetch(apiUrl('/api/mo/modules-catalog'), { headers: { Accept: 'application/json' } });
+                if (!res.ok) return;
+                const payload = await res.json();
+                const modules = Array.isArray(payload.modules) ? payload.modules : [];
+                moduleCatalogByCode = {};
+                modules.forEach(function (m) {
+                    var code = String(m.code || '').trim().toUpperCase();
+                    var name = String(m.name || '').trim();
+                    if (code && name) moduleCatalogByCode[code] = name;
+                });
+            } catch (err) {
+                console.warn('[MO-JOBS] load modules catalog failed', err);
+            }
+        }
+
+        function tryAutofillPublishModuleName() {
+            var result = readPublishModuleCode();
+            if (!result.ok) return;
+            var matchedName = moduleCatalogByCode[result.code];
+            if (!matchedName) return;
+            var nameEl = document.getElementById('courseNameInput');
+            if (!nameEl) return;
+            if (!nameEl.value.trim() || nameEl.dataset.moAutoFilled === '1') {
+                nameEl.value = matchedName;
+                nameEl.dataset.moAutoFilled = '1';
+                nameEl.dataset.moAutoFilledCode = result.code;
+            }
         }
 
         async function loadSkillTagsFromApi() {
@@ -1019,16 +1052,33 @@
             var numEl = document.getElementById('courseCodeNumberInput');
             if (prefixEl) prefixEl.value = 'EBU';
             if (numEl) numEl.value = '';
+            var nameEl = document.getElementById('courseNameInput');
+            if (nameEl && nameEl.dataset.moAutoFilled === '1') {
+                nameEl.value = '';
+                delete nameEl.dataset.moAutoFilled;
+                delete nameEl.dataset.moAutoFilledCode;
+            }
         }
 
         function bindPublishModuleCodeInputs() {
             var numEl = document.getElementById('courseCodeNumberInput');
+            var prefixEl = document.getElementById('courseCodePrefixInput');
+            var nameEl = document.getElementById('courseNameInput');
             if (!numEl || numEl.dataset.moModuleCodeBound === '1') return;
             numEl.dataset.moModuleCodeBound = '1';
             numEl.addEventListener('input', function () {
                 var v = String(numEl.value || '').replace(/\D/g, '').slice(0, 4);
                 if (numEl.value !== v) numEl.value = v;
+                tryAutofillPublishModuleName();
             });
+            if (prefixEl) prefixEl.addEventListener('change', tryAutofillPublishModuleName);
+            if (nameEl && nameEl.dataset.moModuleNameBound !== '1') {
+                nameEl.dataset.moModuleNameBound = '1';
+                nameEl.addEventListener('input', function () {
+                    delete nameEl.dataset.moAutoFilled;
+                    delete nameEl.dataset.moAutoFilledCode;
+                });
+            }
         }
 
         function readPublishModuleCode() {
@@ -1065,7 +1115,7 @@
                 return {
                     ok: false,
                     code: '',
-                    msg: t('课程编码格式无效，请选择 EBU/CBU/BBU/BBC 并填写四位数字。', 'Invalid module code. Choose EBU, CBU, BBU, or BBC and enter four digits.'),
+                    msg: t('课程编码格式无效，请选择有效前缀并填写四位数字。', 'Invalid module code. Choose a valid prefix and enter four digits.'),
                     focusEl: numEl
                 };
             }
@@ -2228,7 +2278,7 @@
 
         app.refreshJobBoardLanguage = refreshJobBoardLanguage;
 
-        loadSkillTagsFromApi().then(function () {
+        Promise.all([loadSkillTagsFromApi(), loadModulesCatalogFromApi()]).then(function () {
             updatePublishTeachingWeeksSummary();
             updateEditTeachingWeeksSummary();
             updatePublishFixedSkillsSummary();
