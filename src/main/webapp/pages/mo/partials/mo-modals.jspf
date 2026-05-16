@@ -98,10 +98,19 @@
                                     <span class="mo-field-label" data-i18n-html="岗位/课程名称 <span class='mo-req' aria-hidden='true'>*</span>|Opening / module name <span class='mo-req' aria-hidden='true'>*</span>">岗位/课程名称 <span class="mo-req" aria-hidden="true">*</span></span>
                                     <input id="courseNameInput" required type="text" data-i18n-placeholder="modal.publish.phCourseName" data-i18n-placeholder-zh="如：Software Engineering TA (Semester)" data-i18n-placeholder-en="e.g. Software Engineering TA (Semester)" placeholder="如：Software Engineering TA (Semester)" aria-required="true" class="mo-field-input">
                                 </label>
-                                <label class="mo-field">
+                                <div class="mo-field">
                                     <span class="mo-field-label" data-i18n-html="课程编码 <span class='mo-req' aria-hidden='true'>*</span>|Module code <span class='mo-req' aria-hidden='true'>*</span>">课程编码 <span class="mo-req" aria-hidden="true">*</span></span>
-                                    <input id="courseCodeInput" required type="text" data-i18n-placeholder="modal.publish.phCourseCode" data-i18n-placeholder-zh="如：SE-TA-2026S" data-i18n-placeholder-en="e.g. SE-TA-2026S" placeholder="如：SE-TA-2026S" aria-required="true" class="mo-field-input">
-                                </label>
+                                    <div class="mo-module-code-combined" role="group" id="courseCodeCombinedGroup" aria-describedby="courseCodeHint" data-i18n-aria-label="modal.publish.moduleCodeGroup" data-i18n-aria-label-zh="课程编码" data-i18n-aria-label-en="Module code" aria-label="课程编码">
+                                        <select id="courseCodePrefixInput" class="mo-module-code-combined__prefix" required aria-required="true" data-i18n-aria-label="modal.publish.moduleCodePrefixAria" data-i18n-aria-label-zh="课程编码前缀" data-i18n-aria-label-en="Module code prefix" aria-label="课程编码前缀">
+                                            <option value="EBU" selected>EBU</option>
+                                            <option value="CBU">CBU</option>
+                                            <option value="BBU">BBU</option>
+                                            <option value="BBC">BBC</option>
+                                        </select>
+                                        <input id="courseCodeNumberInput" class="mo-module-code-combined__number" type="text" inputmode="numeric" autocomplete="off" maxlength="4" pattern="[0-9]{4}" required aria-required="true" data-i18n-placeholder="modal.publish.phCourseCodeSuffix" data-i18n-placeholder-zh="如 6304" data-i18n-placeholder-en="e.g. 6304" placeholder="6304" data-i18n-aria-label="modal.publish.moduleCodeSuffixAria" data-i18n-aria-label-zh="课程编码后四位数字" data-i18n-aria-label-en="Four-digit module code suffix" aria-label="课程编码后四位数字">
+                                    </div>
+<%--                                    <p class="mo-field-hint mo-module-code-hint" id="courseCodeHint" data-i18n="modal.publish.moduleCodeHint" data-i18n-zh="示例：EBU6304" data-i18n-en="Example: EBU6304">示例：EBU6304</p>--%>
+                                </div>
                                 <div class="mo-semester-status-group full">
                                     <div class="mo-publish-semester-status-row">
                                         <div class="mo-field mo-semester-field mo-semester-field--compact">

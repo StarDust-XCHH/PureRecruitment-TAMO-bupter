@@ -4,6 +4,9 @@
     const moApp = window.MOApp = window.MOApp || {};
     const modules = moApp.modules = moApp.modules || {};
 
+    var MODULE_CODE_PREFIXES = ['EBU', 'CBU', 'BBU', 'BBC'];
+    var MODULE_CODE_PATTERN = /^(EBU|CBU|BBU|BBC)\d{4}$/;
+
     var FALLBACK_SKILL_TAGS = [
         'Python', 'Java', 'C/C++', 'JavaScript', 'TypeScript', 'SQL', 'Linux', 'Git',
         'Data Structures', 'Algorithms', 'Machine Learning', 'Computer Networks',
@@ -1011,8 +1014,67 @@
             if (closedEl) closedEl.checked = v === 'CLOSED';
         }
 
+        function resetPublishModuleCodeInputs() {
+            var prefixEl = document.getElementById('courseCodePrefixInput');
+            var numEl = document.getElementById('courseCodeNumberInput');
+            if (prefixEl) prefixEl.value = 'EBU';
+            if (numEl) numEl.value = '';
+        }
+
+        function bindPublishModuleCodeInputs() {
+            var numEl = document.getElementById('courseCodeNumberInput');
+            if (!numEl || numEl.dataset.moModuleCodeBound === '1') return;
+            numEl.dataset.moModuleCodeBound = '1';
+            numEl.addEventListener('input', function () {
+                var v = String(numEl.value || '').replace(/\D/g, '').slice(0, 4);
+                if (numEl.value !== v) numEl.value = v;
+            });
+        }
+
+        function readPublishModuleCode() {
+            var prefixEl = document.getElementById('courseCodePrefixInput');
+            var numEl = document.getElementById('courseCodeNumberInput');
+            if (!prefixEl || !numEl) {
+                return {
+                    ok: false,
+                    code: '',
+                    msg: t('请填写课程编码。', 'Enter the module code.'),
+                    focusEl: numEl || prefixEl
+                };
+            }
+            var prefix = String(prefixEl.value || 'EBU').trim().toUpperCase();
+            var digits = String(numEl.value || '').trim();
+            if (!digits) {
+                return {
+                    ok: false,
+                    code: '',
+                    msg: t('请填写课程编码后四位数字。', 'Enter the four-digit module code suffix.'),
+                    focusEl: numEl
+                };
+            }
+            if (digits.length !== 4) {
+                return {
+                    ok: false,
+                    code: '',
+                    msg: t('课程编码须为前缀加四位数字，如 EBU6304。', 'Module code must be a prefix plus four digits (e.g. EBU6304).'),
+                    focusEl: numEl
+                };
+            }
+            var code = prefix + digits;
+            if (MODULE_CODE_PREFIXES.indexOf(prefix) < 0 || !MODULE_CODE_PATTERN.test(code)) {
+                return {
+                    ok: false,
+                    code: '',
+                    msg: t('课程编码格式无效，请选择 EBU/CBU/BBU/BBC 并填写四位数字。', 'Invalid module code. Choose EBU, CBU, BBU, or BBC and enter four digits.'),
+                    focusEl: numEl
+                };
+            }
+            return { ok: true, code: code, focusEl: null };
+        }
+
         function resetPublishFormUi() {
             clearPublishSkillsInlineError();
+            resetPublishModuleCodeInputs();
             publishAssessments = [];
             publishCustomSkills = [];
             publishFixedTags.clear();
@@ -1539,25 +1601,28 @@
                 const filled = isJobFilled(item);
                 const fillClass = filled ? 'course-fill-state--full' : 'course-fill-state--not-full';
                 const fillText = filled ? t('已满', 'Filled') : t('未满', 'Not full');
+                const fillWithSlots = fillText + ' (' + getHiredCountForJob(item) + '/' + getJobCapacity(item) + ')';
                 
                 card.innerHTML =
                     '<div class="course-card-topline">' +
-                        '<span class="job-code">' + getDisplayCode(item) + '</span>' +
+                        '<div class="course-card-topline-main">' +
+                            '<span class="job-code">' + getDisplayCode(item) + '</span>' +
+                            '<span class="pill course-meta-tag course-meta-tag--topline">' + (item.semester || '--') + '</span>' +
+                            '<span class="pill course-meta-tag course-meta-tag--topline">' + getCampusDisplayForCard(item) + '</span>' +
+                        '</div>' +
                         '<span class="course-status-group">' +
                             '<span class="course-status ' + statusClass + '">' + status + '</span>' +
-                            '<span class="course-fill-state ' + fillClass + '">' + fillText + '</span>' +
+                            '<span class="course-fill-state ' + fillClass + '">' + fillWithSlots + '</span>' +
                         '</span>' +
                     '</div>' +
                     '<h4 class="course-card-title">' + (item.courseName || t('未命名岗位', 'Untitled opening')) + '</h4>' +
                     '<p class="course-card-description">' + (item.recruitmentBrief || item.courseDescription || t('暂无描述', 'No description')) + '</p>' +
-                    '<div class="job-tags">' + buildCourseCardTagsHtml(item) + '</div>' +
-                    '<div class="course-meta-footer">' +
-                        '<div class="course-meta-tags-row">' +
-                            '<span class="pill course-meta-tag">' + (item.semester || '--') + '</span>' +
-                            '<span class="pill course-meta-tag">' + getCampusDisplayForCard(item) + '</span>' +
-                            '<span class="pill course-meta-tag">' + t('TA 职位', 'TA Positions') + ': ' + getHiredCountForJob(item) + ' / ' + getJobCapacity(item) + '</span>' +
-                        '</div>' +
-                        '<span class="course-card-hint-inline">' + t('点击查看详情', 'View details') + ' <span aria-hidden="true">→</span></span>' +
+                    '<div class="course-skills-row">' +
+                        '<div class="job-tags">' + buildCourseCardTagsHtml(item) + '</div>' +
+                        '<span class="course-card-go" aria-hidden="true">' +
+                            '<span class="course-card-go__text">' + t('点击查看详情', 'View details') + '</span>' +
+                            '<span class="course-card-go__arrow">→</span>' +
+                        '</span>' +
                     '</div>' +
                     '';
                 
@@ -1671,7 +1736,8 @@
                 weeks: publishTeachingWeeks.slice().sort(function (a, b) { return a - b; })
             };
             const fixedSkills = getFixedTagsArrayFromSet(publishFixedTags);
-            const courseCodeInput = document.getElementById('courseCodeInput').value.trim();
+            const moduleCodeResult = readPublishModuleCode();
+            const courseCodeInput = moduleCodeResult.ok ? moduleCodeResult.code : '';
             const courseNameInput = document.getElementById('courseNameInput').value.trim();
             const semesterInput = buildSemesterFromPickers(
                 document.getElementById('semesterYearInput'),
@@ -1697,8 +1763,8 @@
                 publishReportValidationError(t('请填写岗位/课程名称。', 'Enter the opening / module name.'), 'basic-info', document.getElementById('courseNameInput'));
                 return;
             }
-            if (!courseCodeInput) {
-                publishReportValidationError(t('请填写课程编号。', 'Enter the module code.'), 'basic-info', document.getElementById('courseCodeInput'));
+            if (!moduleCodeResult.ok) {
+                publishReportValidationError(moduleCodeResult.msg, 'basic-info', moduleCodeResult.focusEl);
                 return;
             }
             if (!recruitmentStatusInput) {
@@ -2048,6 +2114,7 @@
             courseEditForm.addEventListener('submit', saveCourseEdit);
         }
 
+        bindPublishModuleCodeInputs();
         if (publishForm) publishForm.addEventListener('submit', publishJob);
         if (openJobPublishModalBtn && typeof app.openModal === 'function') {
             openJobPublishModalBtn.addEventListener('click', function () {
@@ -2062,6 +2129,7 @@
                 );
                 const oDl = document.getElementById('applicationDeadlineInput');
                 if (oDl) oDl.value = '';
+                resetPublishModuleCodeInputs();
                 requestAnimationFrame(function () {
                     if (typeof app.syncPublishJobNav === 'function') app.syncPublishJobNav();
                     const first = document.getElementById('courseNameInput');
