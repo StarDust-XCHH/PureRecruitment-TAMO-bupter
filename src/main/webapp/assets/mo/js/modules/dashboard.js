@@ -11,6 +11,7 @@
         const dashKeyCandidates = document.getElementById('dashKeyCandidates');
         const dashKeyUnread = document.getElementById('dashKeyUnread');
         const dashKeyShortlist = document.getElementById('dashKeyShortlist');
+        const dashKeyVacantTa = document.getElementById('dashKeyVacantTa');
         const refreshDashboardBtn = document.getElementById('refreshDashboardBtn');
         const dashWorkflowHint = document.getElementById('dashWorkflowHint');
 
@@ -89,6 +90,38 @@
             return seen.size;
         }
 
+        function countHiredForJob(applicants, jobId) {
+            var id = String(jobId || '').trim();
+            if (!id) return 0;
+            return (applicants || []).filter(function (x) {
+                return x && String(x.jobId || '').trim() === id && x.status === '已录用';
+            }).length;
+        }
+
+        function isJobRecruitmentOpen(job) {
+            if (!job) return false;
+            var st = String(job.recruitmentStatus || job.status || 'OPEN').trim().toUpperCase();
+            return st === 'OPEN';
+        }
+
+        /** 仅 OPEN 岗位：(taRecruitCount − 已录用) 之和，与短名单页剩余名额逻辑一致 */
+        function totalVacantTaSlots(jobs, applicants) {
+            var total = 0;
+            (jobs || []).forEach(function (job) {
+                if (!job || !isJobRecruitmentOpen(job)) return;
+                var jid = job.jobId != null && String(job.jobId).trim() !== ''
+                    ? String(job.jobId).trim()
+                    : '';
+                if (!jid) return;
+                var cap = job.taRecruitCount != null && Number(job.taRecruitCount) >= 0
+                    ? Number(job.taRecruitCount)
+                    : 0;
+                var hired = countHiredForJob(applicants, jid);
+                total += Math.max(0, cap - hired);
+            });
+            return total;
+        }
+
         function computeStats(jobs, applicants) {
             const acc = applicants.filter(function (item) { return item.status === '已录用'; }).length;
             const pend = applicants.filter(isPendingDecision).length;
@@ -96,7 +129,8 @@
                 open: jobs.length,
                 candidates: uniqueTaCount(applicants),
                 accepted: acc,
-                pending: pend
+                pending: pend,
+                vacantTa: totalVacantTaSlots(jobs, applicants)
             };
         }
 
@@ -154,6 +188,7 @@
         function updateKeyMetrics(jobs, applicants) {
             const st = computeStats(jobs, applicants);
             if (dashKeyCandidates) dashKeyCandidates.textContent = String(st.candidates);
+            if (dashKeyVacantTa) dashKeyVacantTa.textContent = String(st.vacantTa);
         }
 
         function populateSummaryModal() {

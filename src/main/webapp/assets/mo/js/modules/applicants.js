@@ -337,9 +337,9 @@
             renderApplicants();
         }
 
-        function countHiredForCourseInCache(courseCode) {
-            var code = String(courseCode || '').trim();
-            if (!code) return 0;
+        function countHiredForJobInCache(jobId) {
+            var id = String(jobId || '').trim();
+            if (!id) return 0;
             return applicantListCache.filter(function (x) {
                 return x && String(x.jobId || '').trim() === id && x.status === '已录用';
             }).length;

@@ -162,6 +162,26 @@
                         </div>
                     </div>
                 </div>
+                <div class="insight-card mo-dashboard-insight-card mo-dashboard-insight-card--nav-only">
+                    <div class="mo-dashboard-insight-card__hit" data-mo-go-route="jobs" tabindex="0" role="button"
+                         data-i18n-aria-label="dashboard.keyVacantTaHitAria" data-i18n-aria-label-zh="空缺 TA 数：进入课程管理" data-i18n-aria-label-en="Vacant TA slots: go to Module management">
+                        <div class="insight-card-header">
+                            <span class="insight-icon" aria-hidden="true">🎯</span>
+                            <div>
+                                <p class="insight-label" data-i18n="dashboard.vacantTaSlots" data-i18n-zh="空缺 TA 数" data-i18n-en="Vacant TA slots">空缺 TA 数</p>
+                                <p class="insight-subtitle" data-i18n="dashboard.keyVacantTaNavHint" data-i18n-zh="开放岗位剩余名额合计" data-i18n-en="Unfilled openings on OPEN modules only">开放岗位剩余名额合计</p>
+                            </div>
+                        </div>
+                        <div class="mo-dashboard-card-metric mo-dashboard-card-metric--split">
+                            <div class="insight-core-number" id="dashKeyVacantTa">--</div>
+                            <span class="mo-dashboard-card-go" aria-hidden="true">
+                                <span class="mo-dashboard-card-go__icon" aria-hidden="true">🎯</span>
+                                <span class="mo-dashboard-card-go__text" data-i18n="dashboard.cardGo.vacantTa" data-i18n-zh="查看岗位" data-i18n-en="View modules">查看岗位</span>
+                                <span class="mo-dashboard-card-go__arrow">→</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -832,7 +832,7 @@ legend.mo-field-label:has(.mo-req) {
 }
 
 .mo-dashboard-card .mo-dashboard-stat-grid.mo-dashboard-stat-grid--key-metrics {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 @media (max-width: 900px) {
