@@ -3918,13 +3918,13 @@ html:not([data-theme="light"]) .job-detail-modal input[type="datetime-local"]::-
 .course-job-card {
     border: 1px solid var(--card-border);
     border-radius: 12px;
-    padding: 16px;
+    padding: 14px 16px 12px;
     background: rgba(0, 0, 0, 0.2);
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
 [data-theme="light"] .course-job-card {
@@ -3940,6 +3940,12 @@ html:not([data-theme="light"]) .job-detail-modal input[type="datetime-local"]::-
 .course-job-card:focus {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
+}
+
+.course-job-card .job-tags {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
 }
 
 .course-card-topline {
@@ -3975,6 +3981,9 @@ html:not([data-theme="light"]) .job-detail-modal input[type="datetime-local"]::-
     flex-wrap: wrap;
     align-items: center;
     gap: 6px;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
 }
 
 .course-job-card .job-tags-more {
@@ -4055,13 +4064,13 @@ html:not([data-theme="light"]) .job-detail-modal input[type="datetime-local"]::-
 .course-job-card {
     border: 1px solid var(--card-border);
     border-radius: 12px;
-    padding: 16px;
+    padding: 14px 16px 12px;
     background: rgba(0, 0, 0, 0.2);
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
 [data-theme="light"] .course-job-card {
@@ -4077,6 +4086,12 @@ html:not([data-theme="light"]) .job-detail-modal input[type="datetime-local"]::-
 .course-job-card:focus {
     outline: 2px solid var(--primary);
     outline-offset: 2px;
+}
+
+.course-job-card .job-tags {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
 }
 
 .course-card-topline {
@@ -4112,6 +4127,9 @@ html:not([data-theme="light"]) .job-detail-modal input[type="datetime-local"]::-
     flex-wrap: wrap;
     align-items: center;
     gap: 6px;
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
 }
 
 .course-job-card .job-tags-more {
@@ -4266,10 +4284,12 @@ html:not([data-theme="light"]) .job-detail-modal input[type="datetime-local"]::-
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 10px 12px;
+    gap: 8px 10px;
     flex-wrap: wrap;
+    margin-top: 0;
+    padding-top: 6px;
+    padding-bottom: 0;
     border-top: 1px solid var(--card-border);
-    padding-top: 12px;
 }
 
 .course-card-hint-inline {
@@ -4277,6 +4297,8 @@ html:not([data-theme="light"]) .job-detail-modal input[type="datetime-local"]::-
     font-size: 0.85rem;
     color: var(--primary);
     white-space: nowrap;
+    border-top: none;
+    padding-top: 0;
 }
 
 .course-status-group {
