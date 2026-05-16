@@ -21,6 +21,7 @@
         'jobBoard',
         'applicants',
         'dashboard',
+        'aiAssistant',
         'profile',
         'onboarding'
     ].forEach(runModule);

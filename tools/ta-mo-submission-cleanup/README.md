@@ -4,8 +4,9 @@
 
 ## 作用
 
-- 复用 **`TaSubmissionCleanupTool.main`**、**`TaAiDataCleanupTool.main`**
+- 复用 **`TaSubmissionCleanupTool.main`**、**`TaAiDataCleanupTool.main`**、**`MoAiDataCleanupTool.main`**
 - 重置 **`mo-application-read-state.json`**、**`mo-application-comments.json`**、**`mo-applicant-shortlist.json`** 为空 `items`（与 `MoApplicantShortlistDao` 契约一致，**不删** `recruitment-courses.json` 课程行）
+- 清空 **`mountDataTAMObupter/mo/ai/`** 下会话 JSON、附件与导出（与 TA 侧 `ta/ai/` 对称）
 - 流程结束后调用 **`MoRecruitmentDao.syncAllPublishedJobApplicationStatsFromTa()`**，按当前 TA 投递与 **`application-status.json`** 重算并写回 **`recruitment-courses.json`** 中的申请/已录用等统计字段（本工具**不直接改写**课程 JSON）
 - **不删除**岗位条目：不清理 `recruitment-courses.json` 里的课程行本身；**不清理**账号类 JSON
 

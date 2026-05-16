@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import com.bupt.tarecruit.mo.service.MoTaApplicationReadService;
 
@@ -33,6 +34,8 @@ import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.getOptionalInt;
 import static com.bupt.tarecruit.common.util.GsonJsonObjectUtils.trim;
 
 public class MoRecruitmentDao {
+
+    private static final Pattern MODULE_CODE_PATTERN = Pattern.compile("^(EBU|CBU|BBU|BBC|EBC|BBF)\\d{4}$");
     private static final Path TA_APPLICATION_STATUS = DataMountPaths.taApplicationStatus();
     private static final String TA_SCHEMA = "ta";
     private static final String TA_ENTITY_APPLICATION_STATUS = "application-status";
@@ -123,10 +126,7 @@ public class MoRecruitmentDao {
             throw new IllegalArgumentException("课程名称不能为空");
         }
         String jobId = RecruitmentCoursesDao.allocateUniqueMoJobId();
-        String courseCode = trim(getAsString(input, "courseCode"));
-        if (courseCode.isEmpty()) {
-            throw new IllegalArgumentException("课程编号不能为空");
-        }
+        String courseCode = normalizeModuleCode(trim(getAsString(input, "courseCode")));
         String recruitmentStatus = firstNonBlank(
                 trim(getAsString(input, "recruitmentStatus")),
                 trim(getAsString(input, "status")));
@@ -1336,6 +1336,18 @@ public class MoRecruitmentDao {
         payload.addProperty("removed", removed);
         payload.addProperty("message", removed ? "已移出短名单" : "记录不存在");
         return payload;
+    }
+
+    private static String normalizeModuleCode(String raw) {
+        String code = trim(raw).toUpperCase(Locale.ROOT);
+        if (code.isEmpty()) {
+            throw new IllegalArgumentException("课程编号不能为空");
+        }
+        if (!MODULE_CODE_PATTERN.matcher(code).matches()) {
+            throw new IllegalArgumentException(
+                    "课程编号格式无效，须为有效前缀加四位数字，如 EBU6304");
+        }
+        return code;
     }
 
 }

@@ -97,6 +97,11 @@ public final class DataMountPaths {
         return root().resolve("common").resolve("recruitment-courses.json");
     }
 
+    /** Official module code → name catalog for MO publish form autofill. */
+    public static Path modulesCatalog() {
+        return root().resolve("common").resolve("modules-catalog.json");
+    }
+
     public static Path taAccounts() {
         return taDir().resolve("tas.json");
     }
@@ -159,6 +164,38 @@ public final class DataMountPaths {
 
     public static Path taAiExportRoot(String taId) {
         return taAiRoot().resolve("exports").resolve(safePathSegment(taId));
+    }
+
+    public static Path moAiRoot() {
+        return moDir().resolve("ai");
+    }
+
+    public static Path moAiConversationRoot() {
+        return moAiRoot().resolve("conversations");
+    }
+
+    public static Path moAiConversationFile(String moId) {
+        return moAiConversationRoot().resolve(safePathSegment(moId) + ".json");
+    }
+
+    public static Path moAiAttachmentRoot(String moId) {
+        return moAiRoot().resolve("attachments").resolve(safePathSegment(moId));
+    }
+
+    public static Path moAiAttachmentTempRoot(String moId) {
+        return moAiAttachmentRoot(moId).resolve("temp");
+    }
+
+    public static Path moAiAttachmentUploadedRoot(String moId) {
+        return moAiAttachmentRoot(moId).resolve("uploaded");
+    }
+
+    public static Path moAiAttachmentGeneratedRoot(String moId) {
+        return moAiAttachmentRoot(moId).resolve("generated");
+    }
+
+    public static Path moAiExportRoot(String moId) {
+        return moAiRoot().resolve("exports").resolve(safePathSegment(moId));
     }
 
     private static String safePathSegment(String value) {

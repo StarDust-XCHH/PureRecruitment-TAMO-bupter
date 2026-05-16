@@ -94,13 +94,23 @@
                         <div class="mo-publish-section full" id="basic-info">
                             <h4 class="mo-publish-section-title" data-i18n="modal.publish.sectionBasic" data-i18n-zh="基本信息" data-i18n-en="Basic information">基本信息</h4>
                             <div class="mo-form-grid">
+                                <div class="mo-field">
+                                    <span class="mo-field-label" data-i18n-html="课程编码 <span class='mo-req' aria-hidden='true'>*</span>|Module code <span class='mo-req' aria-hidden='true'>*</span>">课程编码 <span class="mo-req" aria-hidden="true">*</span></span>
+                                    <div class="mo-module-code-combined" role="group" id="courseCodeCombinedGroup" data-i18n-aria-label="modal.publish.moduleCodeGroup" data-i18n-aria-label-zh="课程编码" data-i18n-aria-label-en="Module code" aria-label="课程编码">
+                                        <select id="courseCodePrefixInput" class="mo-module-code-combined__prefix" required aria-required="true" data-i18n-aria-label="modal.publish.moduleCodePrefixAria" data-i18n-aria-label-zh="课程编码前缀" data-i18n-aria-label-en="Module code prefix" aria-label="课程编码前缀">
+                                            <option value="EBU" selected>EBU</option>
+                                            <option value="CBU">CBU</option>
+                                            <option value="BBU">BBU</option>
+                                            <option value="BBC">BBC</option>
+                                            <option value="EBC">EBC</option>
+                                            <option value="BBF">BBF</option>
+                                        </select>
+                                        <input id="courseCodeNumberInput" class="mo-module-code-combined__number" type="text" inputmode="numeric" autocomplete="off" maxlength="4" pattern="[0-9]{4}" required aria-required="true" data-i18n-placeholder="modal.publish.phCourseCodeSuffix" data-i18n-placeholder-zh="如 6304" data-i18n-placeholder-en="e.g. 6304" placeholder="6304" data-i18n-aria-label="modal.publish.moduleCodeSuffixAria" data-i18n-aria-label-zh="课程编码后四位数字" data-i18n-aria-label-en="Four-digit module code suffix" aria-label="课程编码后四位数字">
+                                    </div>
+                                </div>
                                 <label class="mo-field">
                                     <span class="mo-field-label" data-i18n-html="岗位/课程名称 <span class='mo-req' aria-hidden='true'>*</span>|Opening / module name <span class='mo-req' aria-hidden='true'>*</span>">岗位/课程名称 <span class="mo-req" aria-hidden="true">*</span></span>
-                                    <input id="courseNameInput" required type="text" data-i18n-placeholder="modal.publish.phCourseName" data-i18n-placeholder-zh="如：Software Engineering TA (Semester)" data-i18n-placeholder-en="e.g. Software Engineering TA (Semester)" placeholder="如：Software Engineering TA (Semester)" aria-required="true" class="mo-field-input">
-                                </label>
-                                <label class="mo-field">
-                                    <span class="mo-field-label" data-i18n-html="课程编码 <span class='mo-req' aria-hidden='true'>*</span>|Module code <span class='mo-req' aria-hidden='true'>*</span>">课程编码 <span class="mo-req" aria-hidden="true">*</span></span>
-                                    <input id="courseCodeInput" required type="text" data-i18n-placeholder="modal.publish.phCourseCode" data-i18n-placeholder-zh="如：SE-TA-2026S" data-i18n-placeholder-en="e.g. SE-TA-2026S" placeholder="如：SE-TA-2026S" aria-required="true" class="mo-field-input">
+                                    <input id="courseNameInput" required type="text" data-i18n-placeholder="modal.publish.phCourseName" data-i18n-placeholder-zh="如：Software Engineering" data-i18n-placeholder-en="e.g. Software Engineering" placeholder="如：Software Engineering" aria-required="true" class="mo-field-input">
                                 </label>
                                 <div class="mo-semester-status-group full">
                                     <div class="mo-publish-semester-status-row">
@@ -366,35 +376,9 @@
         <button class="modal-close" type="button" data-i18n-aria-label="modal.closeAria" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close" aria-label="关闭" data-modal-close>&times;</button>
         <div class="modal-head">
             <h3 id="modalSummaryTitle" data-i18n="modal.summary.title" data-i18n-zh="招聘数据摘要" data-i18n-en="Recruitment summary">招聘数据摘要</h3>
-            <p class="muted" data-i18n="modal.summary.subtitle" data-i18n-zh="汇总当前岗位与申请情况；每次打开时会更新未读申请条数。" data-i18n-en="Aggregates openings and applications; unread counts refresh when you open this.">汇总当前岗位与申请情况；每次打开时会更新未读申请条数。</p>
+            <p class="muted" data-i18n="modal.summary.subtitle" data-i18n-zh="汇总当前开放岗位；关键指标见总览页。" data-i18n-en="Lists your open modules; key metrics are on the dashboard.">汇总当前开放岗位；关键指标见总览页。</p>
         </div>
         <div class="modal-body mo-summary-modal__body">
-            <section class="mo-summary-section" aria-labelledby="summarySnapshotHeading">
-                <h4 class="mo-summary-section__title" id="summarySnapshotHeading" data-i18n="modal.summary.keyMetrics" data-i18n-zh="关键指标" data-i18n-en="Key metrics">关键指标</h4>
-                <div class="mo-summary-snapshot" role="group">
-                    <div class="mo-summary-snapshot__item">
-                        <span class="mo-summary-snapshot__label" data-i18n="modal.summary.openOpenings" data-i18n-zh="开放岗位" data-i18n-en="Open openings">开放岗位</span>
-                        <strong class="mo-summary-snapshot__value" id="summarySnapshotOpen">—</strong>
-                    </div>
-                    <div class="mo-summary-snapshot__item">
-                        <span class="mo-summary-snapshot__label" data-i18n="modal.summary.candidateTa" data-i18n-zh="候选 TA（每人计一次）" data-i18n-en="Candidate TAs (unique)">候选 TA（每人计一次）</span>
-                        <strong class="mo-summary-snapshot__value" id="summarySnapshotCandidates">—</strong>
-                    </div>
-                    <div class="mo-summary-snapshot__item">
-                        <span class="mo-summary-snapshot__label" data-i18n="dashboard.hired" data-i18n-zh="已录用" data-i18n-en="Hired">已录用</span>
-                        <strong class="mo-summary-snapshot__value" id="summarySnapshotAccepted">—</strong>
-                    </div>
-                    <div class="mo-summary-snapshot__item">
-                        <span class="mo-summary-snapshot__label" data-i18n="dashboard.pendingDecision" data-i18n-zh="待决策" data-i18n-en="Pending Decision">待决策</span>
-                        <strong class="mo-summary-snapshot__value" id="summarySnapshotPending">—</strong>
-                    </div>
-                    <div class="mo-summary-snapshot__item mo-summary-snapshot__item--accent">
-                        <span class="mo-summary-snapshot__label" data-i18n="modal.summary.unreadApps" data-i18n-zh="未读申请" data-i18n-en="Unread applications">未读申请</span>
-                        <strong class="mo-summary-snapshot__value" id="summarySnapshotUnread">—</strong>
-                    </div>
-                </div>
-            </section>
-
             <section class="mo-summary-section" aria-labelledby="summaryJobsHeading">
                 <h4 class="mo-summary-section__title" id="summaryJobsHeading" data-i18n="modal.summary.currentOpen" data-i18n-zh="当前开放岗位" data-i18n-en="Current open openings">当前开放岗位</h4>
                 <p class="mo-summary-empty muted" id="summaryJobEmpty" hidden data-i18n="modal.summary.noOpenJobs" data-i18n-zh="暂无已发布岗位，请前往侧栏「课程管理」发布。" data-i18n-en="No published openings yet. Post one from Module Management in the sidebar.">暂无已发布岗位，请前往侧栏「课程管理」发布。</p>
@@ -440,14 +424,150 @@
         </div>
     </div>
 
-    <div class="ta-modal-panel mo-summary-modal wide" data-modal="mo-ai-assistant" role="dialog" aria-labelledby="modalMoAiTitle">
-        <button class="modal-close" type="button" data-i18n-aria-label="modal.closeAria" data-i18n-aria-label-zh="关闭" data-i18n-aria-label-en="Close" aria-label="关闭" data-modal-close>&times;</button>
-        <div class="modal-head">
-            <h3 id="modalMoAiTitle" data-i18n="modal.moAi.title" data-i18n-zh="MO AI 助理" data-i18n-en="MO AI Assistant">MO AI 助理</h3>
-            <p class="muted" data-i18n="modal.moAi.subtitle" data-i18n-zh="与 TA 侧一致的对话能力预留位：后续可围绕岗位说明、简历摘要与筛选建议接入服务。" data-i18n-en="Reserved for the same style of assistant as the TA workspace: job briefs, resume summaries, and screening suggestions will plug in here.">与 TA 侧一致的对话能力预留位：后续可围绕岗位说明、简历摘要与筛选建议接入服务。</p>
+    <div class="ta-modal-panel wide ai-assistant-modal ai-assistant-modal-landscape" data-modal="mo-ai-assistant" role="dialog" aria-labelledby="modalMoAiPlannerTitle" aria-modal="true">
+        <button class="modal-close" type="button" aria-label="Close"
+                data-i18n-aria-label="modal.close"
+                data-i18n-zh="Close"
+                data-i18n-en="Close" data-modal-close>&times;</button>
+        <div class="modal-head ai-assistant-head">
+            <div>
+                <h3 id="modalMoAiPlannerTitle"
+                    data-i18n="modal.moAi.title"
+                    data-i18n-zh="MO AI Assistant"
+                    data-i18n-en="MO AI Assistant">MO AI Assistant</h3>
+                <p class="muted"
+                   data-i18n="modal.moAi.desc"
+                   data-i18n-zh="Continuous chat with job briefs and applicant resumes for screening and hiring advice."
+                   data-i18n-en="Continuous chat with job briefs and applicant resumes for screening and hiring advice.">Continuous chat with job briefs and applicant resumes for screening and hiring advice.</p>
+            </div>
+            <div class="ai-assistant-head-actions">
+                <button class="pill-btn ghost" type="button" id="moAiAssistantNewSessionBtn"
+                        data-i18n="modal.moAi.newSession"
+                        data-i18n-zh="New session"
+                        data-i18n-en="New session">New session</button>
+                <span class="ai-assistant-status" id="moAiAssistantStatusBadge">Ready</span>
+            </div>
         </div>
-        <div class="modal-body mo-summary-modal__body">
-            <p class="muted" data-i18n="modal.moAi.body" data-i18n-zh="当前未连接后端 AI 服务。总览最右侧卡片为固定入口；接口与权限就绪后即可在此打开对话面板。" data-i18n-en="No AI backend is connected yet. The rightmost dashboard card is the fixed entry point; the chat panel will open here once APIs and permissions are ready.">当前未连接后端 AI 服务。总览最右侧卡片为固定入口；接口与权限就绪后即可在此打开对话面板。</p>
+        <div class="ai-service-banner" id="moAiAssistantServiceBanner" data-available="false">
+            <strong data-i18n="modal.moAi.serviceStatus"
+                    data-i18n-zh="AI service status"
+                    data-i18n-en="AI service status">AI service status</strong>
+            <span id="moAiAssistantServiceText"
+                  data-i18n="modal.moAi.serviceChecking"
+                  data-i18n-zh="Checking connection…"
+                  data-i18n-en="Checking connection…">Checking connection…</span>
+        </div>
+        <div class="modal-body ai-assistant-body ai-assistant-body-landscape" id="moAiAssistantModalBody">
+            <section class="ai-assistant-chat-shell">
+                <div class="ai-chat-toolbar" aria-label="AI assistant quick actions"
+                     data-i18n-aria-label="modal.moAi.toolbarAria"
+                     data-i18n-zh="AI assistant quick actions"
+                     data-i18n-en="AI assistant quick actions">
+                    <button class="ai-chat-chip" type="button" data-ai-prompt="Based on the applicant resume I uploaded, list screening highlights and open questions."
+                            data-i18n="modal.moAi.quick.resume"
+                            data-i18n-zh="Resume screening"
+                            data-i18n-en="Resume screening">Resume screening</button>
+                    <button class="ai-chat-chip" type="button" data-ai-prompt="Based on the job brief I uploaded, produce a concise hiring summary."
+                            data-i18n="modal.moAi.quick.brief"
+                            data-i18n-zh="Job brief"
+                            data-i18n-en="Job brief">Job brief</button>
+                    <button class="ai-chat-chip" type="button" data-ai-prompt="Compare the applicant resume with the job requirements and recommend hire or pending decision."
+                            data-i18n="modal.moAi.quick.hire"
+                            data-i18n-zh="Hire advice"
+                            data-i18n-en="Hire advice">Hire advice</button>
+                    <button class="ai-chat-chip" type="button" data-ai-prompt="Summarize key points from my uploaded materials and provide a screening digest."
+                            data-i18n="modal.moAi.quick.summary"
+                            data-i18n-zh="Material summary"
+                            data-i18n-en="Material summary">Material summary</button>
+                </div>
+                <div class="ai-chat-thread" id="moAiAssistantThread" aria-live="polite"></div>
+            </section>
+            <aside class="ai-assistant-side">
+                <div class="ai-side-card">
+                    <div class="ai-side-card-head ai-side-card-head-collapsible">
+                        <div>
+                            <h4 data-i18n="modal.moAi.history.title"
+                                data-i18n-zh="Conversation history"
+                                data-i18n-en="Conversation history">Conversation history</h4>
+                            <span class="ai-side-card-note" id="moAiConversationHistoryCount">0 chats</span>
+                        </div>
+                        <button class="ai-side-toggle" type="button" id="moAiConversationHistoryToggle" data-expanded="false" aria-expanded="false" aria-controls="moAiAssistantSessionHistory"
+                                data-i18n="modal.moAi.expand"
+                                data-i18n-zh="Expand"
+                                data-i18n-en="Expand">Expand</button>
+                    </div>
+                    <div class="ai-session-history is-collapsed" id="moAiAssistantSessionHistory" data-collapsed="true"></div>
+                </div>
+                <div class="ai-side-card">
+                    <div class="ai-side-card-head ai-side-card-head-collapsible">
+                        <div>
+                            <h4 data-i18n="modal.moAi.attachments.title"
+                                data-i18n-zh="Pending attachments"
+                                data-i18n-en="Pending attachments">Pending attachments</h4>
+                            <span class="ai-side-card-note" id="moAiPendingAttachmentCount">0 files</span>
+                        </div>
+                        <button class="ai-side-toggle" type="button" id="moAiPendingAttachmentToggle" data-expanded="false" aria-expanded="false" aria-controls="moAiPendingAttachmentPanel"
+                                data-i18n="modal.moAi.expand"
+                                data-i18n-zh="Expand"
+                                data-i18n-en="Expand">Expand</button>
+                    </div>
+                    <div class="ai-side-collapsible-panel is-collapsed" id="moAiPendingAttachmentPanel" data-collapsed="true">
+                        <label class="ai-upload-dropzone" for="moAiAssistantFileInput">
+                            <input id="moAiAssistantFileInput" class="ai-upload-input" type="file" accept=".pdf,.doc,.docx,.txt,.md,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain,text/markdown" multiple>
+                            <span class="ai-upload-icon" aria-hidden="true">⤴</span>
+                            <strong data-i18n="modal.moAi.upload.title"
+                                    data-i18n-zh="Upload files for conversation analysis"
+                                    data-i18n-en="Upload files for conversation analysis">Upload files for conversation analysis</strong>
+                            <span data-i18n="modal.moAi.upload.hint"
+                                  data-i18n-zh="Supports PDF / Word / TXT / Markdown"
+                                  data-i18n-en="Supports PDF / Word / TXT / Markdown">Supports PDF / Word / TXT / Markdown</span>
+                        </label>
+                        <div class="ai-upload-filelist" id="moAiPendingAttachmentList"></div>
+                    </div>
+                </div>
+                <div class="ai-side-card ai-side-card-compact">
+                    <h4 data-i18n="modal.moAi.tips.title"
+                        data-i18n-zh="Usage tips for MOs"
+                        data-i18n-en="Usage tips for MOs">Usage tips for MOs</h4>
+                    <ul class="ai-feature-list">
+                        <li data-i18n="modal.moAi.tips.item1"
+                            data-i18n-zh="Upload job briefs, applicant resumes, and other materials before asking questions so answers fit your current recruitment and screening context."
+                            data-i18n-en="Upload job briefs, applicant resumes, and other materials before asking questions so answers fit your current recruitment and screening context.">Upload job briefs, applicant resumes, and other materials before asking questions so answers fit your current recruitment and screening context.</li>
+                        <li data-i18n="modal.moAi.tips.item2"
+                            data-i18n-zh="You can ask the AI for screening summaries, job-brief highlights, or hire/pending-decision recommendations."
+                            data-i18n-en="You can ask the AI for screening summaries, job-brief highlights, or hire/pending-decision recommendations.">You can ask the AI for screening summaries, job-brief highlights, or hire/pending-decision recommendations.</li>
+                        <li data-i18n="modal.moAi.tips.item3"
+                            data-i18n-zh="Use Conversation history to review past chats, or New session to start a blank conversation immediately."
+                            data-i18n-en="Use Conversation history to review past chats, or New session to start a blank conversation immediately.">Use Conversation history to review past chats, or New session to start a blank conversation immediately.</li>
+                    </ul>
+                </div>
+            </aside>
+            <section class="ai-composer" aria-label="AI assistant input area"
+                     data-i18n-aria-label="modal.moAi.composerAria"
+                     data-i18n-zh="AI assistant input area"
+                     data-i18n-en="AI assistant input area">
+                <div class="ai-composer-hint" id="moAiComposerHint"
+                     data-i18n="modal.moAi.composerHint"
+                     data-i18n-zh="Type a question directly, or upload a job brief or applicant resume before sending."
+                     data-i18n-en="Type a question directly, or upload a job brief or applicant resume before sending.">Type a question directly, or upload a job brief or applicant resume before sending.</div>
+                <div class="ai-composer-main ai-composer-main-stacked">
+                    <textarea class="ai-composer-input" id="moAiAssistantComposerInput" rows="3"
+                              placeholder="Message the MO AI assistant, e.g. summarize hire recommendations from my job brief and applicant resume."
+                              data-i18n-placeholder="modal.moAi.composerPlaceholder"
+                              data-i18n-zh="Message the MO AI assistant, e.g. summarize hire recommendations from my job brief and applicant resume."
+                              data-i18n-en="Message the MO AI assistant, e.g. summarize hire recommendations from my job brief and applicant resume."></textarea>
+                    <div class="ai-composer-actions ai-composer-actions-vertical">
+                        <label class="pill-btn ghost ai-attach-btn" for="moAiAssistantFileInput"
+                               data-i18n="modal.moAi.uploadAction"
+                               data-i18n-zh="Upload attachment"
+                               data-i18n-en="Upload attachment">Upload attachment</label>
+                        <button class="pill-btn ai-send-btn" type="button" id="moAiAssistantSendBtn"
+                                data-i18n="modal.moAi.send"
+                                data-i18n-zh="Send"
+                                data-i18n-en="Send">Send</button>
+                    </div>
+                </div>
+            </section>
         </div>
     </div>
 

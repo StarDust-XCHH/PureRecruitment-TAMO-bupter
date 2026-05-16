@@ -5,7 +5,7 @@
                 <div class="mo-dashboard-masthead__badge" data-i18n="dashboard.heroBadge" data-i18n-zh="当前视图 · 招聘总览" data-i18n-en="Current view · Recruitment overview">当前视图 · 招聘总览</div>
                 <h2 class="mo-dashboard-masthead__title" id="moOverviewHeroTitle" data-i18n="dashboard.heroTitle" data-i18n-zh="招聘总览" data-i18n-en="Recruitment overview">招聘总览</h2>
                 <p class="mo-dashboard-masthead__subtitle muted" data-i18n="dashboard.title" data-i18n-zh="数据总览" data-i18n-en="Metrics overview">数据总览</p>
-                <p class="mo-dashboard-masthead__desc muted" data-i18n="dashboard.desc" data-i18n-zh="点击指标数字区域可打开摘要或待决策明细；「开放岗位」摘要中含候选规模等指标；「待决策」卡片与弹窗仅展示待处理申请条数与名单。最右侧为 MO AI 助理预留位（与 TA 侧一致）。与侧栏「招聘总览」为同一数据源。" data-i18n-en="Tap the metric area for the recruitment summary or the pending list. Open modules summary includes candidate scale; the Pending decision card and modal only show pending counts and rows. The rightmost tile reserves the MO AI assistant. Same data as Recruitment Dashboard in the sidebar.">点击指标数字区域可打开摘要或待决策明细；「开放岗位」摘要中含候选规模等指标；「待决策」卡片与弹窗仅展示待处理申请条数与名单。最右侧为 MO AI 助理预留位（与 TA 侧一致）。与侧栏「招聘总览」为同一数据源。</p>
+                <p class="mo-dashboard-masthead__desc muted" data-i18n="dashboard.desc" data-i18n-zh="点击任意指标卡即可进入对应页面。" data-i18n-en="Tap any metric card to go to the related page.">点击任意指标卡即可进入对应页面。</p>
             </div>
             <div class="mo-dashboard-masthead__actions">
                 <div class="overview-badges mo-jobs-toolbar">
@@ -21,70 +21,166 @@
 
         <div class="mo-dashboard-stat-wrap">
             <div class="stat-grid insight-grid insight-grid-spaced mo-dashboard-stat-grid">
-                <div class="insight-card mo-dashboard-insight-card">
-                    <div class="mo-dashboard-insight-card__hit" data-modal-target="summary" tabindex="0" role="button" data-i18n-aria-label="dashboard.openModulesHint" data-i18n-aria-label-zh="开放岗位：查看数据摘要" data-i18n-aria-label-en="Open modules: view summary">
+                <div class="insight-card mo-dashboard-insight-card mo-dashboard-insight-card--nav-only">
+                    <div class="mo-dashboard-insight-card__hit" data-mo-go-route="jobs" tabindex="0" role="button" data-i18n-aria-label="dashboard.openModulesNavAria" data-i18n-aria-label-zh="开放岗位：进入课程管理" data-i18n-aria-label-en="Open modules: go to Module management">
                         <div class="insight-card-header">
                             <span class="insight-icon">📌</span>
                             <div>
                                 <p class="insight-label" data-i18n="dashboard.openModules" data-i18n-zh="开放岗位" data-i18n-en="Open Modules">开放岗位</p>
-                                <p class="insight-subtitle" data-i18n="dashboard.openModulesHint" data-i18n-zh="点击查看数据摘要" data-i18n-en="View summary">点击查看数据摘要</p>
+                                <p class="insight-subtitle" data-i18n="dashboard.openModulesNavHint" data-i18n-zh="点击进入课程管理" data-i18n-en="Tap to open Module management">点击进入课程管理</p>
                             </div>
                         </div>
-                        <div class="insight-core-number" id="dashOpenJobs">--</div>
-                    </div>
-                    <div class="mo-dashboard-insight-card__route">
-                        <button type="button" class="mo-dashboard-route-chip mo-dashboard-route-chip--jobs" data-mo-go-route="jobs" data-i18n-aria-label="dashboard.gotoJobs" data-i18n-aria-label-zh="进入课程管理" data-i18n-aria-label-en="Module management">
-                            <span class="mo-dashboard-route-chip__icon" aria-hidden="true">🧩</span>
-                            <span class="mo-dashboard-route-chip__text">
-                                <span class="mo-dashboard-route-chip__label" data-i18n="dashboard.gotoJobs" data-i18n-zh="进入课程管理" data-i18n-en="Module management">进入课程管理</span>
-                                <span class="mo-dashboard-route-chip__hint muted" data-i18n="dashboard.gotoJobsHint" data-i18n-zh="发布与维护岗位、浏览课程列表" data-i18n-en="Post openings and browse your modules">发布与维护岗位、浏览课程列表</span>
+                        <div class="mo-dashboard-card-metric mo-dashboard-card-metric--split">
+                            <div class="insight-core-number" id="dashOpenJobs">--</div>
+                            <span class="mo-dashboard-card-go" aria-hidden="true">
+                                <span class="mo-dashboard-card-go__icon" aria-hidden="true">🧩</span>
+                                <span class="mo-dashboard-card-go__text" data-i18n="dashboard.cardGo.jobs" data-i18n-zh="课程管理" data-i18n-en="Modules">课程管理</span>
+                                <span class="mo-dashboard-card-go__arrow">→</span>
                             </span>
-                            <span class="mo-dashboard-route-chip__chev" aria-hidden="true">→</span>
-                        </button>
+                        </div>
                     </div>
                 </div>
-                <div class="insight-card mo-dashboard-insight-card">
-                    <div class="mo-dashboard-insight-card__hit" data-modal-target="candidates-pipeline" tabindex="0" role="button" data-i18n-aria-label="dashboard.pendingHitAria" data-i18n-aria-label-zh="待决策：查看待处理申请列表" data-i18n-aria-label-en="Pending: view pending applications list">
+                <div class="insight-card mo-dashboard-insight-card mo-dashboard-insight-card--nav-only">
+                    <div class="mo-dashboard-insight-card__hit" data-mo-go-route="applicants" data-mo-applicant-status="__pending__" tabindex="0" role="button" data-i18n-aria-label="dashboard.pendingNavAria" data-i18n-aria-label-zh="待决策：进入人选投递" data-i18n-aria-label-en="Pending: go to Candidate applications">
                         <div class="insight-card-header">
                             <span class="insight-icon">🕒</span>
                             <div>
                                 <p class="insight-label" data-i18n="dashboard.pendingDecision" data-i18n-zh="待决策" data-i18n-en="Pending Decision">待决策</p>
-                                <p class="insight-subtitle" data-i18n="dashboard.pendingCardSubtitle" data-i18n-zh="仅显示待处理条数；单击查看待决策名单" data-i18n-en="Pending count only; tap for the pending list">仅显示待处理条数；单击查看待决策名单</p>
+                                <p class="insight-subtitle" data-i18n="dashboard.pendingNavHint" data-i18n-zh="点击查看待决策申请" data-i18n-en="Tap to review pending applications">点击查看待决策申请</p>
                             </div>
                         </div>
-                        <div class="insight-core-number accent-warn" id="dashPending">--</div>
-                    </div>
-                    <div class="mo-dashboard-insight-card__route">
-                        <button type="button" class="mo-dashboard-route-chip mo-dashboard-route-chip--applicants" data-mo-go-route="applicants" data-i18n-aria-label="dashboard.gotoApplicants" data-i18n-aria-label-zh="进入人选投递" data-i18n-aria-label-en="Candidate applications">
-                            <span class="mo-dashboard-route-chip__icon" aria-hidden="true">🧑‍🎓</span>
-                            <span class="mo-dashboard-route-chip__text">
-                                <span class="mo-dashboard-route-chip__label" data-i18n="dashboard.gotoApplicants" data-i18n-zh="进入人选投递" data-i18n-en="Candidate applications">进入人选投递</span>
-                                <span class="mo-dashboard-route-chip__hint muted" data-i18n="dashboard.gotoApplicantsHint" data-i18n-zh="按课程查看投递并作出决策" data-i18n-en="Review applications and make decisions">按课程查看投递并作出决策</span>
+                        <div class="mo-dashboard-card-metric mo-dashboard-card-metric--split">
+                            <div class="insight-core-number accent-warn" id="dashPending">--</div>
+                            <span class="mo-dashboard-card-go" aria-hidden="true">
+                                <span class="mo-dashboard-card-go__icon" aria-hidden="true">🕒</span>
+                                <span class="mo-dashboard-card-go__text" data-i18n="dashboard.cardGo.pending" data-i18n-zh="待决策" data-i18n-en="Pending">待决策</span>
+                                <span class="mo-dashboard-card-go__arrow">→</span>
                             </span>
-                            <span class="mo-dashboard-route-chip__chev" aria-hidden="true">→</span>
-                        </button>
-                    </div>
-                </div>
-                <div class="insight-card" data-modal-target="accepted-list">
-                    <div class="insight-card-header">
-                        <span class="insight-icon">✅</span>
-                        <div>
-                            <p class="insight-label" data-i18n="dashboard.hired" data-i18n-zh="已录用" data-i18n-en="Hired">已录用</p>
-                            <p class="insight-subtitle" data-i18n="dashboard.hiredHint" data-i18n-zh="点击查看已录用名单" data-i18n-en="View hired">点击查看已录用名单</p>
                         </div>
                     </div>
-                    <div class="insight-core-number" id="dashAccepted">--</div>
                 </div>
-                <div class="insight-card upcoming-card ai-assistant-card mo-dashboard-ai-card" data-modal-target="mo-ai-assistant">
-                    <div class="insight-card-header">
-                        <span class="insight-icon assistant-icon" aria-hidden="true"></span>
-                        <div>
-                            <p class="insight-label" data-i18n="dashboard.moAi.label" data-i18n-zh="MO AI 助理" data-i18n-en="MO AI Assistant">MO AI 助理</p>
-                            <p class="insight-subtitle" data-i18n="dashboard.moAi.subtitle" data-i18n-zh="与 TA 侧一致的对话入口（预留）" data-i18n-en="Same-style chat entry as TA (reserved)">与 TA 侧一致的对话入口（预留）</p>
+                <div class="insight-card mo-dashboard-insight-card mo-dashboard-insight-card--nav-only">
+                    <div class="mo-dashboard-insight-card__hit" data-mo-go-route="applicants" data-mo-applicant-status="已录用" tabindex="0" role="button" data-i18n-aria-label="dashboard.hiredNavAria" data-i18n-aria-label-zh="已录用：进入人选投递" data-i18n-aria-label-en="Hired: go to Candidate applications">
+                        <div class="insight-card-header">
+                            <span class="insight-icon">✅</span>
+                            <div>
+                                <p class="insight-label" data-i18n="dashboard.hired" data-i18n-zh="已录用" data-i18n-en="Hired">已录用</p>
+                                <p class="insight-subtitle" data-i18n="dashboard.hiredNavHint" data-i18n-zh="点击查看已录用名单" data-i18n-en="Tap to view hired applications">点击查看已录用名单</p>
+                            </div>
+                        </div>
+                        <div class="mo-dashboard-card-metric mo-dashboard-card-metric--split">
+                            <div class="insight-core-number accent-positive" id="dashAccepted">--</div>
+                            <span class="mo-dashboard-card-go" aria-hidden="true">
+                                <span class="mo-dashboard-card-go__icon" aria-hidden="true">✅</span>
+                                <span class="mo-dashboard-card-go__text" data-i18n="dashboard.cardGo.hired" data-i18n-zh="已录用" data-i18n-en="Hired">已录用</span>
+                                <span class="mo-dashboard-card-go__arrow">→</span>
+                            </span>
                         </div>
                     </div>
-                    <div class="insight-core-number accent-ai" data-i18n="dashboard.moAi.placeholder" data-i18n-zh="预留" data-i18n-en="Reserved">—</div>
-                    <p class="insight-meta" data-i18n="dashboard.moAi.meta" data-i18n-zh="点击了解接入计划 ｜ 筛选与岗位上下文将接入此处" data-i18n-en="Tap for rollout notes | Screening and role context will connect here">点击了解接入计划 ｜ 筛选与岗位上下文将接入此处</p>
+                </div>
+                <div class="insight-card upcoming-card ai-assistant-card mo-dashboard-insight-card mo-dashboard-ai-card mo-dashboard-insight-card--nav-only">
+                    <div class="mo-dashboard-insight-card__hit mo-dashboard-ai-card__hit" id="moDashboardAiHit" data-modal-target="mo-ai-assistant" tabindex="0" role="button">
+                        <div class="insight-card-header">
+                            <span class="insight-icon assistant-icon" aria-hidden="true"></span>
+                            <div>
+                                <p class="insight-label" data-i18n="dashboard.moAi.label" data-i18n-zh="MO AI Assistant" data-i18n-en="MO AI Assistant">MO AI Assistant</p>
+                                <p class="insight-subtitle" data-i18n="dashboard.moAi.subtitle" data-i18n-zh="点击打开 AI 对话" data-i18n-en="Tap to open AI chat"><span id="moDashboardAiStatus" class="mo-dashboard-ai-status" aria-live="polite">Offline</span></p>
+                            </div>
+                        </div>
+                        <div class="mo-dashboard-card-metric mo-dashboard-card-metric--split">
+                            <div class="insight-core-number accent-ai" id="moDashboardAiHours">24h</div>
+                            <span class="mo-dashboard-card-go" aria-hidden="true">
+                                <span class="mo-dashboard-card-go__icon" aria-hidden="true">✦</span>
+                                <span class="mo-dashboard-card-go__text" data-i18n="dashboard.cardGo.ai" data-i18n-zh="打开对话" data-i18n-en="Open chat">打开对话</span>
+                                <span class="mo-dashboard-card-go__arrow">→</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mo-dashboard-stat-wrap mo-dashboard-key-metrics">
+            <div class="stat-grid insight-grid insight-grid-spaced mo-dashboard-stat-grid mo-dashboard-stat-grid--key-metrics">
+                <div class="insight-card mo-dashboard-insight-card mo-dashboard-insight-card--nav-only">
+                    <div class="mo-dashboard-insight-card__hit" data-mo-go-route="applicants" tabindex="0" role="button"
+                         data-i18n-aria-label="dashboard.keyCandidatesHitAria" data-i18n-aria-label-zh="候选 TA：进入人选投递" data-i18n-aria-label-en="Candidate TAs: open Candidate applications">
+                        <div class="insight-card-header">
+                            <span class="insight-icon" aria-hidden="true">👥</span>
+                            <div>
+                                <p class="insight-label" data-i18n="modal.summary.candidateTa" data-i18n-zh="候选 TA（每人计一次）" data-i18n-en="Candidate TAs (unique)">候选 TA（每人计一次）</p>
+                                <p class="insight-subtitle" data-i18n="dashboard.keyCandidatesNavHint" data-i18n-zh="点击查看全部投递" data-i18n-en="Tap to view all applications">点击查看全部投递</p>
+                            </div>
+                        </div>
+                        <div class="mo-dashboard-card-metric mo-dashboard-card-metric--split">
+                            <div class="insight-core-number" id="dashKeyCandidates">--</div>
+                            <span class="mo-dashboard-card-go" aria-hidden="true">
+                                <span class="mo-dashboard-card-go__icon" aria-hidden="true">🧑‍🎓</span>
+                                <span class="mo-dashboard-card-go__text" data-i18n="dashboard.cardGo.applicants" data-i18n-zh="人选投递" data-i18n-en="Applications">人选投递</span>
+                                <span class="mo-dashboard-card-go__arrow">→</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-card mo-dashboard-insight-card mo-dashboard-insight-card--nav-only">
+                    <div class="mo-dashboard-insight-card__hit" data-mo-go-route="applicants" data-mo-applicant-unread="true" tabindex="0" role="button"
+                         data-i18n-aria-label="dashboard.keyUnreadHitAria" data-i18n-aria-label-zh="未读申请：进入人选投递" data-i18n-aria-label-en="Unread applications: open Candidate applications">
+                        <div class="insight-card-header">
+                            <span class="insight-icon" aria-hidden="true">📬</span>
+                            <div>
+                                <p class="insight-label" data-i18n="modal.summary.unreadApps" data-i18n-zh="未读申请" data-i18n-en="Unread applications">未读申请</p>
+                                <p class="insight-subtitle" data-i18n="dashboard.keyUnreadNavHint" data-i18n-zh="点击查看未读投递" data-i18n-en="Tap to review unread applications">点击查看未读投递</p>
+                            </div>
+                        </div>
+                        <div class="mo-dashboard-card-metric mo-dashboard-card-metric--split">
+                            <div class="insight-core-number accent-warn" id="dashKeyUnread">--</div>
+                            <span class="mo-dashboard-card-go" aria-hidden="true">
+                                <span class="mo-dashboard-card-go__icon" aria-hidden="true">📬</span>
+                                <span class="mo-dashboard-card-go__text" data-i18n="dashboard.cardGo.unread" data-i18n-zh="未读投递" data-i18n-en="Unread">未读投递</span>
+                                <span class="mo-dashboard-card-go__arrow">→</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-card mo-dashboard-insight-card mo-dashboard-insight-card--nav-only">
+                    <div class="mo-dashboard-insight-card__hit" data-mo-go-route="shortlist" tabindex="0" role="button"
+                         data-i18n-aria-label="dashboard.keyShortlistHitAria" data-i18n-aria-label-zh="短名单：进入候选短名单" data-i18n-aria-label-en="Shortlist: open Shortlist">
+                        <div class="insight-card-header">
+                            <span class="insight-icon" aria-hidden="true">⭐</span>
+                            <div>
+                                <p class="insight-label" data-i18n="dashboard.shortlistCount" data-i18n-zh="短名单" data-i18n-en="Shortlist">短名单</p>
+                                <p class="insight-subtitle" data-i18n="dashboard.keyShortlistNavHint" data-i18n-zh="点击进入短名单" data-i18n-en="Tap to open Shortlist">点击进入短名单</p>
+                            </div>
+                        </div>
+                        <div class="mo-dashboard-card-metric mo-dashboard-card-metric--split">
+                            <div class="insight-core-number accent-positive" id="dashKeyShortlist">--</div>
+                            <span class="mo-dashboard-card-go" aria-hidden="true">
+                                <span class="mo-dashboard-card-go__icon" aria-hidden="true">⭐</span>
+                                <span class="mo-dashboard-card-go__text" data-i18n="dashboard.cardGo.shortlist" data-i18n-zh="短名单" data-i18n-en="Shortlist">短名单</span>
+                                <span class="mo-dashboard-card-go__arrow">→</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="insight-card mo-dashboard-insight-card mo-dashboard-insight-card--nav-only">
+                    <div class="mo-dashboard-insight-card__hit" data-mo-go-route="jobs" tabindex="0" role="button"
+                         data-i18n-aria-label="dashboard.keyVacantTaHitAria" data-i18n-aria-label-zh="空缺 TA 数：进入课程管理" data-i18n-aria-label-en="Vacant TA slots: go to Module management">
+                        <div class="insight-card-header">
+                            <span class="insight-icon" aria-hidden="true">🎯</span>
+                            <div>
+                                <p class="insight-label" data-i18n="dashboard.vacantTaSlots" data-i18n-zh="空缺 TA 数" data-i18n-en="Vacant TA slots">空缺 TA 数</p>
+                                <p class="insight-subtitle" data-i18n="dashboard.keyVacantTaNavHint" data-i18n-zh="开放岗位剩余名额合计" data-i18n-en="Unfilled openings on OPEN modules only">开放岗位剩余名额合计</p>
+                            </div>
+                        </div>
+                        <div class="mo-dashboard-card-metric mo-dashboard-card-metric--split">
+                            <div class="insight-core-number" id="dashKeyVacantTa">--</div>
+                            <span class="mo-dashboard-card-go" aria-hidden="true">
+                                <span class="mo-dashboard-card-go__icon" aria-hidden="true">🎯</span>
+                                <span class="mo-dashboard-card-go__text" data-i18n="dashboard.cardGo.vacantTa" data-i18n-zh="查看岗位" data-i18n-en="View modules">查看岗位</span>
+                                <span class="mo-dashboard-card-go__arrow">→</span>
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

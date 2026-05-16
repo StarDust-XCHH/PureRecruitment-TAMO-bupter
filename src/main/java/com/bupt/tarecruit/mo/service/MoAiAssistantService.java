@@ -1,11 +1,10 @@
-package com.bupt.tarecruit.ta.service;
+package com.bupt.tarecruit.mo.service;
 
 import com.alibaba.dashscope.common.Message;
 import com.alibaba.dashscope.common.Role;
 import com.bupt.tarecruit.common.ai.AiProvider;
 import com.bupt.tarecruit.common.ai.QwenLongAiProvider;
-import com.bupt.tarecruit.ta.dao.TaAiConversationDao;
-import com.google.gson.Gson;
+import com.bupt.tarecruit.mo.dao.MoAiConversationDao;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -20,24 +19,23 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Consumer;
 
-public class TaAiAssistantService {
+public class MoAiAssistantService {
     private static final long MAX_ATTACHMENT_SIZE = 10L * 1024 * 1024;
     private static final int MAX_CHAT_HISTORY_MESSAGES = 12;
-    private static final Gson GSON = new Gson();
 
-    private final TaAiConversationDao conversationDao = new TaAiConversationDao();
+    private final MoAiConversationDao conversationDao = new MoAiConversationDao();
     private final AiProvider provider;
 
-    public TaAiAssistantService() {
-        this(new QwenLongAiProvider("你是 PureRecruitment TA 页面中的 AI 助理。请使用简体中文回答。"));
+    public MoAiAssistantService() {
+        this(new QwenLongAiProvider("You are the AI assistant in the PureRecruitment MO workspace. Reply in English."));
     }
 
-    TaAiAssistantService(AiProvider provider) {
+    MoAiAssistantService(AiProvider provider) {
         this.provider = Objects.requireNonNull(provider, "provider");
     }
 
-    public Map<String, Object> loadConversation(String taId) throws IOException {
-        Map<String, Object> data = new LinkedHashMap<>(conversationDao.getOrCreateConversation(taId).data());
+    public Map<String, Object> loadConversation(String moId) throws IOException {
+        Map<String, Object> data = new LinkedHashMap<>(conversationDao.getOrCreateConversation(moId).data());
         data.put("serviceStatus", buildServiceStatus());
         return data;
     }
@@ -46,7 +44,7 @@ public class TaAiAssistantService {
         return buildServiceStatus();
     }
 
-    public Map<String, Object> uploadPendingAttachment(String taId,
+    public Map<String, Object> uploadPendingAttachment(String moId,
                                                        String originalFileName,
                                                        String contentType,
                                                        long size,
@@ -56,11 +54,11 @@ public class TaAiAssistantService {
                                                        String courseCode,
                                                        String applicationId) throws IOException {
         if (size > MAX_ATTACHMENT_SIZE) {
-            throw new IOException("AI 附件大小不能超过 10MB");
+            throw new IOException("AI attachment size cannot exceed 10MB");
         }
         byte[] bytes = readAllBytes(inputStream, MAX_ATTACHMENT_SIZE);
-        TaAiConversationDao.PendingAttachment attachment = conversationDao.createPendingAttachment(
-                taId,
+        MoAiConversationDao.PendingAttachment attachment = conversationDao.createPendingAttachment(
+                moId,
                 originalFileName,
                 contentType,
                 size > 0 ? size : bytes.length,
@@ -81,30 +79,30 @@ public class TaAiAssistantService {
         result.put("sourcePath", attachment.sourcePath());
         result.put("courseCode", attachment.courseCode());
         result.put("applicationId", attachment.applicationId());
-        result.put("pendingAttachments", conversationDao.listPendingAttachments(taId));
+        result.put("pendingAttachments", conversationDao.listPendingAttachments(moId));
         result.put("serviceStatus", buildServiceStatus());
         return result;
     }
 
-    public Map<String, Object> removePendingAttachment(String taId, String attachmentId) throws IOException {
-        conversationDao.removePendingAttachment(taId, attachmentId);
+    public Map<String, Object> removePendingAttachment(String moId, String attachmentId) throws IOException {
+        conversationDao.removePendingAttachment(moId, attachmentId);
         Map<String, Object> result = new LinkedHashMap<>();
-        result.put("pendingAttachments", conversationDao.listPendingAttachments(taId));
+        result.put("pendingAttachments", conversationDao.listPendingAttachments(moId));
         result.put("serviceStatus", buildServiceStatus());
         return result;
     }
 
-    public Map<String, Object> sendMessage(String taId,
+    public Map<String, Object> sendMessage(String moId,
                                            String sessionId,
                                            String message,
                                            List<String> attachmentIds,
                                            String scene,
                                            String title,
                                            Map<String, Object> context) throws IOException {
-        return sendMessageStream(taId, sessionId, message, attachmentIds, scene, title, context, null);
+        return sendMessageStream(moId, sessionId, message, attachmentIds, scene, title, context, null);
     }
 
-    public Map<String, Object> sendMessageStream(String taId,
+    public Map<String, Object> sendMessageStream(String moId,
                                                  String sessionId,
                                                  String message,
                                                  List<String> attachmentIds,
@@ -114,7 +112,9 @@ public class TaAiAssistantService {
                                                  Consumer<String> chunkConsumer) throws IOException {
         AiProvider.AiProviderStatus providerStatus = provider.getStatus();
         if (!providerStatus.available()) {
-            throw new IOException(providerStatus.message().isBlank() ? "当前 AI 服务不可用" : providerStatus.message());
+            throw new IOException(providerStatus.message().isBlank()
+                    ? "AI service is currently unavailable"
+                    : localizeUserMessage(providerStatus.message()));
         }
 
         String normalizedMessage = message == null ? "" : message.trim();
@@ -124,9 +124,9 @@ public class TaAiAssistantService {
         }
 
         List<String> effectiveAttachmentIds = attachmentIds == null ? List.of() : attachmentIds;
-        Map<String, Object> existingConversation = conversationDao.getOrCreateConversation(taId).data();
+        Map<String, Object> existingConversation = conversationDao.getOrCreateConversation(moId).data();
         AiProvider.AiChatRequest chatRequest = buildChatRequest(
-                taId,
+                moId,
                 resolvedSessionId,
                 normalizedMessage,
                 context,
@@ -135,24 +135,25 @@ public class TaAiAssistantService {
                 scene,
                 title
         );
-        AiProvider.AiChatResult aiChatResult = provider.chat(chatRequest, chunkConsumer);
+        AiProvider.AiChatResult aiChatResult;
+        try {
+            aiChatResult = provider.chat(chatRequest, chunkConsumer);
+        } catch (IOException ex) {
+            throw new IOException(localizeUserMessage(ex.getMessage()), ex);
+        }
 
         if (sessionId == null || sessionId.trim().isEmpty()) {
-            resolvedSessionId = conversationDao.createSession(taId, scene, title, context);
+            resolvedSessionId = conversationDao.createSession(moId, scene, title, context);
         }
 
-        List<TaAiConversationDao.PendingAttachment> linkedAttachments = new ArrayList<>();
         for (String attachmentId : effectiveAttachmentIds) {
-            TaAiConversationDao.PendingAttachment linkedAttachment = conversationDao.consumePendingAttachment(taId, attachmentId, resolvedSessionId);
-            if (linkedAttachment != null) {
-                linkedAttachments.add(linkedAttachment);
-            }
+            conversationDao.consumePendingAttachment(moId, attachmentId, resolvedSessionId);
         }
 
-        conversationDao.appendUserMessageAndPendingAttachments(taId, resolvedSessionId, normalizedMessage, scene, effectiveAttachmentIds, context);
+        conversationDao.appendUserMessageAndPendingAttachments(moId, resolvedSessionId, normalizedMessage, scene, effectiveAttachmentIds, context);
 
         Map<String, Object> snapshot = conversationDao.appendAssistantResult(
-                taId,
+                moId,
                 resolvedSessionId,
                 aiChatResult.text(),
                 null,
@@ -167,23 +168,23 @@ public class TaAiAssistantService {
         result.put("generatedFileName", "");
         result.put("artifact", null);
         result.put("conversation", snapshot);
-        result.put("pendingAttachments", conversationDao.listPendingAttachments(taId));
+        result.put("pendingAttachments", conversationDao.listPendingAttachments(moId));
         result.put("serviceStatus", buildServiceStatus());
         return result;
     }
 
-    public TaAiConversationDao.DownloadFile getGeneratedFile(String taId, String sessionId, String attachmentId) throws IOException {
-        return conversationDao.findGeneratedFile(taId, sessionId, attachmentId);
+    public MoAiConversationDao.DownloadFile getGeneratedFile(String moId, String sessionId, String attachmentId) throws IOException {
+        return conversationDao.findGeneratedFile(moId, sessionId, attachmentId);
     }
 
-    private AiProvider.AiChatRequest buildChatRequest(String taId,
-                                           String sessionId,
-                                           String currentMessage,
-                                           Map<String, Object> context,
-                                           Map<String, Object> conversation,
-                                           List<String> attachmentIds,
-                                           String scene,
-                                           String title) throws IOException {
+    private AiProvider.AiChatRequest buildChatRequest(String moId,
+                                                      String sessionId,
+                                                      String currentMessage,
+                                                      Map<String, Object> context,
+                                                      Map<String, Object> conversation,
+                                                      List<String> attachmentIds,
+                                                      String scene,
+                                                      String title) throws IOException {
         List<Message> providerMessages = new ArrayList<>();
         String systemPrompt = buildSystemPrompt(context);
 
@@ -200,15 +201,13 @@ public class TaAiAssistantService {
             currentSession = new LinkedHashMap<>();
             currentSession.put("sessionId", sessionId);
             currentSession.put("scene", scene == null ? "general_chat" : scene);
-            currentSession.put("title", title == null ? "AI 助理对话" : title);
+            currentSession.put("title", title == null ? "MO AI Chat" : title);
             currentSession.put("messages", List.of());
             currentSession.put("attachments", List.of());
             currentSession.put("context", context == null ? Map.of() : new LinkedHashMap<>(context));
         }
 
-        List<Map<String, Object>> messages = currentSession == null
-                ? List.of()
-                : castList(currentSession.get("messages"));
+        List<Map<String, Object>> messages = castList(currentSession.get("messages"));
         int startIndex = Math.max(0, messages.size() - MAX_CHAT_HISTORY_MESSAGES);
         for (int i = startIndex; i < messages.size(); i++) {
             Map<String, Object> item = messages.get(i);
@@ -235,7 +234,7 @@ public class TaAiAssistantService {
 
         List<AiProvider.AiAttachmentRef> attachmentRefs = new ArrayList<>();
         for (String attachmentId : attachmentIds == null ? List.<String>of() : attachmentIds) {
-            TaAiConversationDao.PendingAttachment attachment = conversationDao.findPendingAttachment(taId, attachmentId);
+            MoAiConversationDao.PendingAttachment attachment = conversationDao.findPendingAttachment(moId, attachmentId);
             if (attachment == null) {
                 continue;
             }
@@ -254,24 +253,24 @@ public class TaAiAssistantService {
 
         Map<String, Object> requestContext = context == null ? new LinkedHashMap<>() : new LinkedHashMap<>(context);
         requestContext.put("_systemPrompt", systemPrompt);
-        return new AiProvider.AiChatRequest(taId, sessionId, currentMessage, requestContext, providerMessages, attachmentRefs);
+        return new AiProvider.AiChatRequest(moId, sessionId, currentMessage, requestContext, providerMessages, attachmentRefs);
     }
 
     private String buildSystemPrompt(Map<String, Object> context) {
         StringBuilder prompt = new StringBuilder();
-        prompt.append("你是 PureRecruitment TA 页面中的 AI 助理。")
-                .append("你的职责是基于 TA 当前问题、历史会话和上传材料，提供真实、直接、可执行的建议。")
-                .append("请使用简体中文回答，避免编造未在材料中出现的具体事实。")
-                .append("如果用户上传了文件，请优先结合文件内容分析；如果文件暂时不可读取，请明确说明。")
-                .append("回答请尽量结构化，必要时使用分点。不要声称已经生成或导出了 PDF，除非用户明确询问且系统真的提供了该能力。")
-                .append("输出时请直接给出正文内容，不要使用```markdown或```text代码块包裹整段回答。");
+        prompt.append("You are the AI assistant in the PureRecruitment MO workspace.")
+                .append("Use the MO recruitment context, conversation history, and uploaded materials (job briefs, applicant resumes, etc.) to give honest, direct, actionable screening and hiring advice.")
+                .append("Reply in English. Do not invent facts that are not supported by the materials.")
+                .append("If the user uploaded files, prioritize their content; if a file is not readable yet, say so clearly.")
+                .append("Structure answers with bullet points when helpful. Do not claim a PDF was generated or exported unless the user explicitly asks and the system actually provides that capability.")
+                .append("Return plain text only; do not wrap the entire answer in ```markdown or ```text fences.");
 
         if (context != null && !context.isEmpty()) {
             String courseCode = String.valueOf(context.getOrDefault("courseCode", "")).trim();
             String applicationId = String.valueOf(context.getOrDefault("applicationId", "")).trim();
             String sourcePath = String.valueOf(context.getOrDefault("sourcePath", "")).trim();
             if (!courseCode.isEmpty() || !applicationId.isEmpty() || !sourcePath.isEmpty()) {
-                prompt.append(" 当前业务上下文：");
+                prompt.append(" Current context:");
                 if (!courseCode.isEmpty()) {
                     prompt.append("courseCode=").append(courseCode).append("; ");
                 }
@@ -306,9 +305,62 @@ public class TaAiAssistantService {
         result.put("provider", status.providerName());
         result.put("available", status.available());
         result.put("configured", status.configured());
-        result.put("message", status.message());
+        result.put("message", localizeUserMessage(status.message()));
         result.put("defaultProvider", true);
         return result;
+    }
+
+    private String localizeUserMessage(String message) {
+        String normalized = message == null ? "" : message.trim();
+        if (normalized.isEmpty()) {
+            return "AI service status unknown";
+        }
+        if (normalized.contains("TONGYI_API_KEY") && normalized.contains("禁用")) {
+            return "TONGYI_API_KEY is not set on the server; AI assistant is disabled.";
+        }
+        if (normalized.contains("已连接默认服务")) {
+            return "Connected: qwen-long";
+        }
+        if (normalized.contains("TONGYI_API_KEY") && normalized.contains("无法调用")) {
+            return "TONGYI_API_KEY is not set on the server; cannot call AI service.";
+        }
+        if ("AI 服务未返回有效内容".equals(normalized)) {
+            return "AI service returned no valid content.";
+        }
+        if (normalized.startsWith("AI 服务调用失败:")) {
+            return "AI service call failed:" + normalized.substring("AI 服务调用失败:".length());
+        }
+        if (normalized.startsWith("找不到附件文件:")) {
+            return "Attachment file not found:" + normalized.substring("找不到附件文件:".length());
+        }
+        if (normalized.startsWith("附件解析时间过长，请稍后重试：")) {
+            return "Attachment parsing took too long, try again later:" + normalized.substring("附件解析时间过长，请稍后重试：".length());
+        }
+        if (normalized.startsWith("附件解析失败：")) {
+            return "Attachment parsing failed:" + normalized.substring("附件解析失败：".length());
+        }
+        if (normalized.startsWith("附件解析检测失败:")) {
+            return "Attachment parsing check failed:" + normalized.substring("附件解析检测失败:".length());
+        }
+        if (normalized.startsWith("附件上传失败")) {
+            return "Attachment upload failed" + normalized.substring("附件上传失败".length());
+        }
+        if (normalized.startsWith("无法解析 file_id:")) {
+            return "Cannot parse file_id:" + normalized.substring("无法解析 file_id:".length());
+        }
+        if ("附件仍在解析中，请稍后重试".equals(normalized)) {
+            return "Attachment is still being parsed; try again later.";
+        }
+        if ("AI 服务调用异常".equals(normalized)) {
+            return "AI service error";
+        }
+        if ("等待附件解析时被中断".equals(normalized)) {
+            return "Interrupted while waiting for attachment parsing";
+        }
+        if (normalized.startsWith("文件尚未完成解析:")) {
+            return "File parsing not complete yet:" + normalized.substring("文件尚未完成解析:".length());
+        }
+        return normalized;
     }
 
     private byte[] readAllBytes(InputStream inputStream, long maxSize) throws IOException {
@@ -319,12 +371,11 @@ public class TaAiAssistantService {
             while ((read = in.read(buffer)) != -1) {
                 total += read;
                 if (total > maxSize) {
-                    throw new IOException("AI 附件大小不能超过 10MB");
+                    throw new IOException("AI attachment size cannot exceed 10MB");
                 }
                 outputStream.write(buffer, 0, read);
             }
             return outputStream.toByteArray();
         }
     }
-
 }

@@ -8,15 +8,14 @@
         const dashOpenJobs = document.getElementById('dashOpenJobs');
         const dashAccepted = document.getElementById('dashAccepted');
         const dashPending = document.getElementById('dashPending');
+        const dashKeyCandidates = document.getElementById('dashKeyCandidates');
+        const dashKeyUnread = document.getElementById('dashKeyUnread');
+        const dashKeyShortlist = document.getElementById('dashKeyShortlist');
+        const dashKeyVacantTa = document.getElementById('dashKeyVacantTa');
         const refreshDashboardBtn = document.getElementById('refreshDashboardBtn');
         const dashWorkflowHint = document.getElementById('dashWorkflowHint');
 
         const summaryEls = {
-            open: document.getElementById('summarySnapshotOpen'),
-            candidates: document.getElementById('summarySnapshotCandidates'),
-            accepted: document.getElementById('summarySnapshotAccepted'),
-            pending: document.getElementById('summarySnapshotPending'),
-            unread: document.getElementById('summarySnapshotUnread'),
             jobList: document.getElementById('summaryJobList'),
             jobEmpty: document.getElementById('summaryJobEmpty'),
             nextHint: document.getElementById('summaryNextHint')
@@ -91,6 +90,38 @@
             return seen.size;
         }
 
+        function countHiredForJob(applicants, jobId) {
+            var id = String(jobId || '').trim();
+            if (!id) return 0;
+            return (applicants || []).filter(function (x) {
+                return x && String(x.jobId || '').trim() === id && x.status === '已录用';
+            }).length;
+        }
+
+        function isJobRecruitmentOpen(job) {
+            if (!job) return false;
+            var st = String(job.recruitmentStatus || job.status || 'OPEN').trim().toUpperCase();
+            return st === 'OPEN';
+        }
+
+        /** 仅 OPEN 岗位：(taRecruitCount − 已录用) 之和，与短名单页剩余名额逻辑一致 */
+        function totalVacantTaSlots(jobs, applicants) {
+            var total = 0;
+            (jobs || []).forEach(function (job) {
+                if (!job || !isJobRecruitmentOpen(job)) return;
+                var jid = job.jobId != null && String(job.jobId).trim() !== ''
+                    ? String(job.jobId).trim()
+                    : '';
+                if (!jid) return;
+                var cap = job.taRecruitCount != null && Number(job.taRecruitCount) >= 0
+                    ? Number(job.taRecruitCount)
+                    : 0;
+                var hired = countHiredForJob(applicants, jid);
+                total += Math.max(0, cap - hired);
+            });
+            return total;
+        }
+
         function computeStats(jobs, applicants) {
             const acc = applicants.filter(function (item) { return item.status === '已录用'; }).length;
             const pend = applicants.filter(isPendingDecision).length;
@@ -98,20 +129,72 @@
                 open: jobs.length,
                 candidates: uniqueTaCount(applicants),
                 accepted: acc,
-                pending: pend
+                pending: pend,
+                vacantTa: totalVacantTaSlots(jobs, applicants)
             };
+        }
+
+        function shortlistStore() {
+            return typeof window.MoShortlistStore !== 'undefined' ? window.MoShortlistStore : null;
+        }
+
+        function updateDashKeyShortlistDisplay(moId) {
+            if (!dashKeyShortlist) return;
+            const store = shortlistStore();
+            const m = moId || getMoId();
+            if (!store || !m) {
+                dashKeyShortlist.textContent = '—';
+                return;
+            }
+            dashKeyShortlist.textContent = String(store.totalCount(m));
+        }
+
+        function refreshDashKeyUnread(moId) {
+            if (!dashKeyUnread) return;
+            const m = moId || getMoId();
+            if (!m) {
+                dashKeyUnread.textContent = '—';
+                return;
+            }
+            dashKeyUnread.textContent = '…';
+            fetch(apiUrl('/api/mo/applicants/unread-count') + '?moId=' + encodeURIComponent(m), {
+                headers: { Accept: 'application/json' }
+            })
+                .then(function (res) { return res.json(); })
+                .then(function (payload) {
+                    const n = typeof payload.unreadCount === 'number' ? payload.unreadCount : 0;
+                    if (dashKeyUnread) dashKeyUnread.textContent = String(n);
+                })
+                .catch(function () {
+                    if (dashKeyUnread) dashKeyUnread.textContent = '—';
+                });
+        }
+
+        async function syncDashKeyShortlist(moId) {
+            const m = moId || getMoId();
+            const store = shortlistStore();
+            if (!dashKeyShortlist || !store || !m) {
+                updateDashKeyShortlistDisplay(m);
+                return;
+            }
+            try {
+                await store.syncFromServer(m);
+            } catch (e) {
+                /* keep last cached count if any */
+            }
+            updateDashKeyShortlistDisplay(m);
+        }
+
+        function updateKeyMetrics(jobs, applicants) {
+            const st = computeStats(jobs, applicants);
+            if (dashKeyCandidates) dashKeyCandidates.textContent = String(st.candidates);
+            if (dashKeyVacantTa) dashKeyVacantTa.textContent = String(st.vacantTa);
         }
 
         function populateSummaryModal() {
             const jobs = typeof app.getJobs === 'function' ? app.getJobs() : [];
             const applicants = Array.isArray(latestApplicants) ? latestApplicants : [];
             const st = computeStats(jobs, applicants);
-
-            if (summaryEls.open) summaryEls.open.textContent = String(st.open);
-            if (summaryEls.candidates) summaryEls.candidates.textContent = String(st.candidates);
-            if (summaryEls.accepted) summaryEls.accepted.textContent = String(st.accepted);
-            if (summaryEls.pending) summaryEls.pending.textContent = String(st.pending);
-            if (summaryEls.unread) summaryEls.unread.textContent = '…';
 
             if (summaryEls.jobList) {
                 summaryEls.jobList.innerHTML = '';
@@ -169,22 +252,6 @@
                 }
             }
 
-            const moId = getMoId();
-            if (!moId || !summaryEls.unread) {
-                if (summaryEls.unread) summaryEls.unread.textContent = moId ? '—' : '—';
-                return;
-            }
-            fetch(apiUrl('/api/mo/applicants/unread-count') + '?moId=' + encodeURIComponent(moId), {
-                headers: { Accept: 'application/json' }
-            })
-                .then(function (res) { return res.json(); })
-                .then(function (payload) {
-                    const n = typeof payload.unreadCount === 'number' ? payload.unreadCount : 0;
-                    if (summaryEls.unread) summaryEls.unread.textContent = String(n);
-                })
-                .catch(function () {
-                    if (summaryEls.unread) summaryEls.unread.textContent = '—';
-                });
         }
 
         function attachApplicantDetailButton(hostEl, item, layout) {
@@ -343,6 +410,9 @@
             if (dashAccepted) dashAccepted.textContent = String(accepted);
             if (dashPending) dashPending.textContent = String(pending);
 
+            updateKeyMetrics(jobs, applicants);
+            updateDashKeyShortlistDisplay(getMoId());
+            refreshDashKeyUnread(getMoId());
             updateWorkflowHint(pending);
         }
 
@@ -384,6 +454,7 @@
                 if (typeof app.runLoadApplicants === 'function') {
                     await app.runLoadApplicants();
                 }
+                await syncDashKeyShortlist(moId);
             } catch (e) {
                 render();
             } finally {
@@ -398,27 +469,13 @@
             latestApplicants = items || [];
             render();
         };
+        app.onApplicantUnreadCount = function (n) {
+            if (dashKeyUnread) dashKeyUnread.textContent = String(typeof n === 'number' ? n : 0);
+        };
+        app.onShortlistCountUpdated = function (n) {
+            if (dashKeyShortlist) dashKeyShortlist.textContent = String(typeof n === 'number' ? n : 0);
+        };
         app.loadDashboard = render;
-
-        document.querySelectorAll('[data-modal-target="summary"]').forEach(function (node) {
-            node.addEventListener(
-                'click',
-                function () {
-                    populateSummaryModal();
-                },
-                true
-            );
-        });
-
-        document.querySelectorAll('[data-modal-target="candidates-pipeline"]').forEach(function (node) {
-            node.addEventListener(
-                'click',
-                function () {
-                    populatePendingModal();
-                },
-                true
-            );
-        });
 
         document.querySelectorAll('.mo-dashboard-insight-card__hit[role="button"]').forEach(function (hit) {
             hit.addEventListener('keydown', function (e) {
@@ -426,16 +483,6 @@
                 e.preventDefault();
                 hit.click();
             });
-        });
-
-        document.querySelectorAll('[data-modal-target="accepted-list"]').forEach(function (node) {
-            node.addEventListener(
-                'click',
-                function () {
-                    populateAcceptedModal();
-                },
-                true
-            );
         });
 
         app.refreshMoWorkspaceAll = refreshMoWorkspaceAll;
@@ -447,5 +494,6 @@
         }
 
         render();
+        void syncDashKeyShortlist(getMoId());
     };
 })();

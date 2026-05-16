@@ -4,6 +4,9 @@
     const moApp = window.MOApp = window.MOApp || {};
     const modules = moApp.modules = moApp.modules || {};
 
+    var MODULE_CODE_PREFIXES = ['EBU', 'CBU', 'BBU', 'BBC', 'EBC', 'BBF'];
+    var MODULE_CODE_PATTERN = /^(EBU|CBU|BBU|BBC|EBC|BBF)\d{4}$/;
+
     var FALLBACK_SKILL_TAGS = [
         'Python', 'Java', 'C/C++', 'JavaScript', 'TypeScript', 'SQL', 'Linux', 'Git',
         'Data Structures', 'Algorithms', 'Machine Learning', 'Computer Networks',
@@ -27,7 +30,8 @@
             jobs: [],
             page: 1,
             pageSize: 4,
-            filteredJobs: []
+            filteredJobs: [],
+            hiredByJobId: {}
         };
 
         /** 申请截止：与 datetime-local 一致，按本机本地墙钟解析，提交为 UTC ISO */
@@ -85,6 +89,8 @@
         var editFixedTags = new Set();
         var editTeachingWeeks = [];
         var weekPickerTarget = 'publish';
+        var moduleCatalogByCode = {};
+
         var skillPickerTarget = 'publish';
         var skillPickerWorkingSet = new Set();
         /** 技能弹窗内「Other」待确认的其他技能（与岗位 customSkills 对应，不写入系统标签库） */
@@ -105,6 +111,11 @@
             }
         }
         const jobSearchInput = document.getElementById('jobSearchInput');
+        const jobSemesterFilter = document.getElementById('jobSemesterFilter');
+        const jobCampusFilter = document.getElementById('jobCampusFilter');
+        const jobStatusFilter = document.getElementById('jobStatusFilter');
+        const jobFillFilter = document.getElementById('jobFillFilter');
+        const clearJobFiltersBtn = document.getElementById('clearJobFiltersBtn');
         const openCoursesCount = document.getElementById('openCoursesCount');
         const refreshJobsBtn = document.getElementById('refreshJobsBtn');
         const openJobPublishModalBtn = document.getElementById('openJobPublishModalBtn');
@@ -468,6 +479,35 @@
             return Array.from(set || []).map(function (s) { return String(s || '').trim(); }).filter(Boolean);
         }
 
+        async function loadModulesCatalogFromApi() {
+            try {
+                const res = await fetch(apiUrl('/api/mo/modules-catalog'), { headers: { Accept: 'application/json' } });
+                if (!res.ok) return;
+                const payload = await res.json();
+                const modules = Array.isArray(payload.modules) ? payload.modules : [];
+                moduleCatalogByCode = {};
+                modules.forEach(function (m) {
+                    var code = String(m.code || '').trim().toUpperCase();
+                    var name = String(m.name || '').trim();
+                    if (code && name) moduleCatalogByCode[code] = name;
+                });
+            } catch (err) {
+                console.warn('[MO-JOBS] load modules catalog failed', err);
+            }
+        }
+
+        function syncPublishModuleNameFromCode() {
+            var nameEl = document.getElementById('courseNameInput');
+            if (!nameEl) return;
+            var result = readPublishModuleCode();
+            if (!result.ok) {
+                nameEl.value = '';
+                return;
+            }
+            var matchedName = moduleCatalogByCode[result.code];
+            nameEl.value = matchedName || '';
+        }
+
         async function loadSkillTagsFromApi() {
             try {
                 const res = await fetch(apiUrl('/api/mo/skill-tags'), { headers: { Accept: 'application/json' } });
@@ -497,6 +537,148 @@
 
         function getDisplayLocation(item) {
             return item && item.campus ? item.campus : '--';
+        }
+
+        function getCampusDisplayForCard(item) {
+            var raw = String(getDisplayLocation(item) || '').trim().toLowerCase();
+            if (raw === 'shahe') return 'Shahe Campus';
+            if (raw === 'main') return 'Main Campus';
+            return getDisplayLocation(item);
+        }
+
+        function getJobId(item) {
+            return item && item.jobId != null ? String(item.jobId).trim() : '';
+        }
+
+        function getJobCapacity(item) {
+            return item && item.taRecruitCount != null && Number(item.taRecruitCount) >= 0
+                ? Number(item.taRecruitCount)
+                : 0;
+        }
+
+        function getJobStatusNormalized(item) {
+            var st = String((item && (item.recruitmentStatus || item.status)) || 'OPEN').trim().toUpperCase();
+            return st === 'CLOSED' ? 'CLOSED' : 'OPEN';
+        }
+
+        function getHiredCountForJob(item) {
+            var jobId = getJobId(item);
+            if (!jobId) return 0;
+            return Number(state.hiredByJobId[jobId] || 0);
+        }
+
+        function isJobFilled(item) {
+            var cap = getJobCapacity(item);
+            if (cap <= 0) return false;
+            return getHiredCountForJob(item) >= cap;
+        }
+
+        function semesterSortValue(item) {
+            var sem = String((item && item.semester) || '').trim();
+            var m = sem.match(/^(\d{4})-(Spring|Fall)$/i);
+            if (!m) return -1;
+            var year = Number(m[1]) || 0;
+            var term = String(m[2] || '').toLowerCase() === 'fall' ? 2 : 1;
+            return year * 10 + term;
+        }
+
+        function courseCodeForSort(item) {
+            var code = String((item && item.courseCode) || '').trim();
+            if (code) return code;
+            return String((item && item.jobId) || '').trim();
+        }
+
+        function compareJobsDefaultOrder(a, b) {
+            var statusRankA = getJobStatusNormalized(a) === 'OPEN' ? 0 : 1;
+            var statusRankB = getJobStatusNormalized(b) === 'OPEN' ? 0 : 1;
+            if (statusRankA !== statusRankB) return statusRankA - statusRankB;
+
+            var semA = semesterSortValue(a);
+            var semB = semesterSortValue(b);
+            if (semA !== semB) return semB - semA;
+
+            var fillRankA = isJobFilled(a) ? 1 : 0; // 未满在前
+            var fillRankB = isJobFilled(b) ? 1 : 0;
+            if (fillRankA !== fillRankB) return fillRankA - fillRankB;
+
+            return courseCodeForSort(a).localeCompare(courseCodeForSort(b), undefined, {
+                numeric: true,
+                sensitivity: 'base'
+            });
+        }
+
+        function setHiredCountsFromApplicants(items) {
+            var m = {};
+            (items || []).forEach(function (x) {
+                if (!x || x.status !== '已录用') return;
+                var jid = x.jobId != null ? String(x.jobId).trim() : '';
+                if (!jid) return;
+                m[jid] = (m[jid] || 0) + 1;
+            });
+            state.hiredByJobId = m;
+        }
+
+        async function loadApplicantsForHiringSummary() {
+            var moId = getMoIdForApi();
+            if (!moId) {
+                state.hiredByJobId = {};
+                return;
+            }
+            try {
+                var res = await fetch(
+                    apiUrl('/api/mo/applicants') + '?moId=' + encodeURIComponent(moId),
+                    { headers: { Accept: 'application/json' } }
+                );
+                var payload = await res.json();
+                if (!res.ok || payload.success === false) {
+                    state.hiredByJobId = {};
+                    return;
+                }
+                setHiredCountsFromApplicants(Array.isArray(payload.items) ? payload.items : []);
+            } catch (e) {
+                state.hiredByJobId = {};
+            }
+        }
+
+        function updateJobsFilterResetButton() {
+            if (!clearJobFiltersBtn) return;
+            var active = false;
+            if (jobSemesterFilter && (jobSemesterFilter.value || '').trim()) active = true;
+            if (jobCampusFilter && (jobCampusFilter.value || '').trim()) active = true;
+            if (jobStatusFilter && (jobStatusFilter.value || '').trim()) active = true;
+            if (jobFillFilter && (jobFillFilter.value || '').trim()) active = true;
+            clearJobFiltersBtn.disabled = !active;
+        }
+
+        function renderJobsFilterOptions() {
+            if (!jobSemesterFilter || !jobCampusFilter) return;
+            var prevSem = (jobSemesterFilter.value || '').trim();
+            var prevCampus = (jobCampusFilter.value || '').trim();
+            var semSet = new Set();
+            var campusSet = new Set();
+            (state.jobs || []).forEach(function (item) {
+                var sem = item && item.semester != null ? String(item.semester).trim() : '';
+                var campus = item && item.campus != null ? String(item.campus).trim() : '';
+                if (sem) semSet.add(sem);
+                if (campus) campusSet.add(campus);
+            });
+            var semesters = Array.from(semSet).sort();
+            var campuses = Array.from(campusSet).sort();
+
+            jobSemesterFilter.innerHTML =
+                '<option value="">' + t('全部学期', 'All semesters') + '</option>' +
+                semesters.map(function (s) {
+                    return '<option value="' + s + '">' + s + '</option>';
+                }).join('');
+            jobCampusFilter.innerHTML =
+                '<option value="">' + t('全部校区', 'All campuses') + '</option>' +
+                campuses.map(function (s) {
+                    return '<option value="' + s + '">' + s + '</option>';
+                }).join('');
+
+            if (prevSem && semesters.indexOf(prevSem) >= 0) jobSemesterFilter.value = prevSem;
+            if (prevCampus && campuses.indexOf(prevCampus) >= 0) jobCampusFilter.value = prevCampus;
+            updateJobsFilterResetButton();
         }
 
         /** 岗位技能标签：系统固定标签 + Other 自定义（requiredSkills.customSkills[].name），去重 */
@@ -863,8 +1045,72 @@
             if (closedEl) closedEl.checked = v === 'CLOSED';
         }
 
+        function resetPublishModuleCodeInputs() {
+            var prefixEl = document.getElementById('courseCodePrefixInput');
+            var numEl = document.getElementById('courseCodeNumberInput');
+            if (prefixEl) prefixEl.value = 'EBU';
+            if (numEl) numEl.value = '';
+            var nameEl = document.getElementById('courseNameInput');
+            if (nameEl) nameEl.value = '';
+        }
+
+        function bindPublishModuleCodeInputs() {
+            var numEl = document.getElementById('courseCodeNumberInput');
+            var prefixEl = document.getElementById('courseCodePrefixInput');
+            if (!numEl || numEl.dataset.moModuleCodeBound === '1') return;
+            numEl.dataset.moModuleCodeBound = '1';
+            numEl.addEventListener('input', function () {
+                var v = String(numEl.value || '').replace(/\D/g, '').slice(0, 4);
+                if (numEl.value !== v) numEl.value = v;
+                syncPublishModuleNameFromCode();
+            });
+            if (prefixEl) prefixEl.addEventListener('change', syncPublishModuleNameFromCode);
+        }
+
+        function readPublishModuleCode() {
+            var prefixEl = document.getElementById('courseCodePrefixInput');
+            var numEl = document.getElementById('courseCodeNumberInput');
+            if (!prefixEl || !numEl) {
+                return {
+                    ok: false,
+                    code: '',
+                    msg: t('请填写课程编码。', 'Enter the module code.'),
+                    focusEl: numEl || prefixEl
+                };
+            }
+            var prefix = String(prefixEl.value || 'EBU').trim().toUpperCase();
+            var digits = String(numEl.value || '').trim();
+            if (!digits) {
+                return {
+                    ok: false,
+                    code: '',
+                    msg: t('请填写课程编码后四位数字。', 'Enter the four-digit module code suffix.'),
+                    focusEl: numEl
+                };
+            }
+            if (digits.length !== 4) {
+                return {
+                    ok: false,
+                    code: '',
+                    msg: t('课程编码须为前缀加四位数字，如 EBU6304。', 'Module code must be a prefix plus four digits (e.g. EBU6304).'),
+                    focusEl: numEl
+                };
+            }
+            var code = prefix + digits;
+            if (MODULE_CODE_PREFIXES.indexOf(prefix) < 0 || !MODULE_CODE_PATTERN.test(code)) {
+                return {
+                    ok: false,
+                    code: '',
+                    msg: t('课程编码格式无效，请选择有效前缀并填写四位数字。', 'Invalid module code. Choose a valid prefix and enter four digits.'),
+                    focusEl: numEl
+                };
+            }
+            return { ok: true, code: code, focusEl: null };
+        }
+
         function resetPublishFormUi() {
             clearPublishSkillsInlineError();
+            resetPublishModuleCodeInputs();
             publishAssessments = [];
             publishCustomSkills = [];
             publishFixedTags.clear();
@@ -1344,6 +1590,10 @@
 
         function renderBoard() {
             const keyword = (jobSearchInput.value || '').trim().toLowerCase();
+            var semesterFilterVal = jobSemesterFilter ? String(jobSemesterFilter.value || '').trim() : '';
+            var campusFilterVal = jobCampusFilter ? String(jobCampusFilter.value || '').trim() : '';
+            var statusFilterVal = jobStatusFilter ? String(jobStatusFilter.value || '').trim() : '';
+            var fillFilterVal = jobFillFilter ? String(jobFillFilter.value || '').trim() : '';
             state.filteredJobs = state.jobs.filter(function (item) {
                 const text = [
                     item.courseCode || item.jobId,
@@ -1359,8 +1609,15 @@
                         }).join(' ')
                         : '')
                 ].join(' ').toLowerCase();
-                return !keyword || text.includes(keyword);
+                if (keyword && !text.includes(keyword)) return false;
+                if (semesterFilterVal && String(item.semester || '').trim() !== semesterFilterVal) return false;
+                if (campusFilterVal && String(item.campus || '').trim() !== campusFilterVal) return false;
+                if (statusFilterVal && getJobStatusNormalized(item) !== statusFilterVal) return false;
+                if (fillFilterVal === 'full' && !isJobFilled(item)) return false;
+                if (fillFilterVal === 'not_full' && isJobFilled(item)) return false;
+                return true;
             });
+            state.filteredJobs.sort(compareJobsDefaultOrder);
 
             const totalPages = Math.max(1, Math.ceil(state.filteredJobs.length / state.pageSize));
             if (state.page > totalPages) state.page = 1;
@@ -1375,35 +1632,35 @@
                 card.setAttribute('role', 'button');
                 
                 // 获取状态样式
-                const status = item.recruitmentStatus || item.status || 'OPEN';
+                const status = getJobStatusNormalized(item);
                 const statusClass = status === 'OPEN' ? 'status-open' : 'status-closed';
+                const filled = isJobFilled(item);
+                const fillClass = filled ? 'course-fill-state--full' : 'course-fill-state--not-full';
+                const fillText = filled ? t('已满', 'Filled') : t('未满', 'Not full');
+                const fillWithSlots = fillText + ' (' + getHiredCountForJob(item) + '/' + getJobCapacity(item) + ')';
                 
                 card.innerHTML =
                     '<div class="course-card-topline">' +
-                        '<span class="job-code">' + getDisplayCode(item) + '</span>' +
-                        '<span class="course-status ' + statusClass + '">' + status + '</span>' +
+                        '<div class="course-card-topline-main">' +
+                            '<span class="job-code">' + getDisplayCode(item) + '</span>' +
+                            '<span class="pill course-meta-tag course-meta-tag--topline">' + (item.semester || '--') + '</span>' +
+                            '<span class="pill course-meta-tag course-meta-tag--topline">' + getCampusDisplayForCard(item) + '</span>' +
+                        '</div>' +
+                        '<span class="course-status-group">' +
+                            '<span class="course-status ' + statusClass + '">' + status + '</span>' +
+                            '<span class="course-fill-state ' + fillClass + '">' + fillWithSlots + '</span>' +
+                        '</span>' +
                     '</div>' +
                     '<h4 class="course-card-title">' + (item.courseName || t('未命名岗位', 'Untitled opening')) + '</h4>' +
                     '<p class="course-card-description">' + (item.recruitmentBrief || item.courseDescription || t('暂无描述', 'No description')) + '</p>' +
-                    '<div class="job-tags">' + buildCourseCardTagsHtml(item) + '</div>' +
-                    '<div class="course-meta-stack">' +
-                        '<div class="course-meta-item">' +
-                            '<span class="course-meta-label">' + t('学期', 'Semester') + '</span>' +
-                            '<strong>' + (item.semester || '--') + '</strong>' +
-                        '</div>' +
-                        '<div class="course-meta-item">' +
-                            '<span class="course-meta-label">' + t('校区', 'Campus') + '</span>' +
-                            '<strong>' + getDisplayLocation(item) + '</strong>' +
-                        '</div>' +
-                        '<div class="course-meta-item">' +
-                            '<span class="course-meta-label">' + t('TA 招聘', 'TA Positions') + '</span>' +
-                            '<strong>' + (item.taRecruitCount || 0) + t(' 人', '') + '</strong>' +
-                        '</div>' +
+                    '<div class="course-skills-row">' +
+                        '<div class="job-tags">' + buildCourseCardTagsHtml(item) + '</div>' +
+                        '<span class="course-card-go" aria-hidden="true">' +
+                            '<span class="course-card-go__text">' + t('点击查看详情', 'View details') + '</span>' +
+                            '<span class="course-card-go__arrow">→</span>' +
+                        '</span>' +
                     '</div>' +
-                    '<div class="course-card-hint">' +
-                        '<span>' + t('点击查看详情', 'View details') + '</span>' +
-                        '<span aria-hidden="true">→</span>' +
-                    '</div>';
+                    '';
                 
                 card.addEventListener('click', function () {
                     renderDetail(item);
@@ -1457,6 +1714,8 @@
                 );
                 const payload = await res.json();
                 state.jobs = Array.isArray(payload.items) ? payload.items : [];
+                await loadApplicantsForHiringSummary();
+                renderJobsFilterOptions();
                 state.page = 1;
                 renderBoard();
             } catch (err) {
@@ -1513,7 +1772,8 @@
                 weeks: publishTeachingWeeks.slice().sort(function (a, b) { return a - b; })
             };
             const fixedSkills = getFixedTagsArrayFromSet(publishFixedTags);
-            const courseCodeInput = document.getElementById('courseCodeInput').value.trim();
+            const moduleCodeResult = readPublishModuleCode();
+            const courseCodeInput = moduleCodeResult.ok ? moduleCodeResult.code : '';
             const courseNameInput = document.getElementById('courseNameInput').value.trim();
             const semesterInput = buildSemesterFromPickers(
                 document.getElementById('semesterYearInput'),
@@ -1539,8 +1799,8 @@
                 publishReportValidationError(t('请填写岗位/课程名称。', 'Enter the opening / module name.'), 'basic-info', document.getElementById('courseNameInput'));
                 return;
             }
-            if (!courseCodeInput) {
-                publishReportValidationError(t('请填写课程编号。', 'Enter the module code.'), 'basic-info', document.getElementById('courseCodeInput'));
+            if (!moduleCodeResult.ok) {
+                publishReportValidationError(moduleCodeResult.msg, 'basic-info', moduleCodeResult.focusEl);
                 return;
             }
             if (!recruitmentStatusInput) {
@@ -1890,6 +2150,7 @@
             courseEditForm.addEventListener('submit', saveCourseEdit);
         }
 
+        bindPublishModuleCodeInputs();
         if (publishForm) publishForm.addEventListener('submit', publishJob);
         if (openJobPublishModalBtn && typeof app.openModal === 'function') {
             openJobPublishModalBtn.addEventListener('click', function () {
@@ -1904,10 +2165,11 @@
                 );
                 const oDl = document.getElementById('applicationDeadlineInput');
                 if (oDl) oDl.value = '';
+                resetPublishModuleCodeInputs();
                 requestAnimationFrame(function () {
                     if (typeof app.syncPublishJobNav === 'function') app.syncPublishJobNav();
-                    const first = document.getElementById('courseNameInput');
-                    if (first && typeof first.focus === 'function') first.focus();
+                    const codeNum = document.getElementById('courseCodeNumberInput');
+                    if (codeNum && typeof codeNum.focus === 'function') codeNum.focus();
                 });
             });
         }
@@ -1915,6 +2177,45 @@
             state.page = 1;
             renderBoard();
         });
+        if (jobSemesterFilter) {
+            jobSemesterFilter.addEventListener('change', function () {
+                state.page = 1;
+                updateJobsFilterResetButton();
+                renderBoard();
+            });
+        }
+        if (jobCampusFilter) {
+            jobCampusFilter.addEventListener('change', function () {
+                state.page = 1;
+                updateJobsFilterResetButton();
+                renderBoard();
+            });
+        }
+        if (jobStatusFilter) {
+            jobStatusFilter.addEventListener('change', function () {
+                state.page = 1;
+                updateJobsFilterResetButton();
+                renderBoard();
+            });
+        }
+        if (jobFillFilter) {
+            jobFillFilter.addEventListener('change', function () {
+                state.page = 1;
+                updateJobsFilterResetButton();
+                renderBoard();
+            });
+        }
+        if (clearJobFiltersBtn) {
+            clearJobFiltersBtn.addEventListener('click', function () {
+                if (jobSemesterFilter) jobSemesterFilter.value = '';
+                if (jobCampusFilter) jobCampusFilter.value = '';
+                if (jobStatusFilter) jobStatusFilter.value = '';
+                if (jobFillFilter) jobFillFilter.value = '';
+                state.page = 1;
+                updateJobsFilterResetButton();
+                renderBoard();
+            });
+        }
         refreshJobsBtn.addEventListener('click', function () {
             if (typeof app.refreshMoWorkspaceAll === 'function') {
                 void app.refreshMoWorkspaceAll();
@@ -1963,7 +2264,7 @@
 
         app.refreshJobBoardLanguage = refreshJobBoardLanguage;
 
-        loadSkillTagsFromApi().then(function () {
+        Promise.all([loadSkillTagsFromApi(), loadModulesCatalogFromApi()]).then(function () {
             updatePublishTeachingWeeksSummary();
             updateEditTeachingWeeksSummary();
             updatePublishFixedSkillsSummary();

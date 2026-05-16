@@ -61,6 +61,8 @@
         let applicantPageIndex = 1;
         /** 从课程详情「进入应聘筛选」预选的课程编码，在岗位下拉加载后再应用 */
         let pendingApplicantJobId = null;
+        let pendingApplicantStatus = null;
+        let pendingApplicantUnreadOnly = false;
 
         function getMoId() {
             const u = typeof app.getMoUser === 'function' ? app.getMoUser() : null;
@@ -170,6 +172,9 @@
             var n = store && moId ? store.totalCount(moId) : 0;
             navShortlistBadge.textContent = String(n);
             navShortlistBadge.hidden = n === 0;
+            if (typeof app.onShortlistCountUpdated === 'function') {
+                app.onShortlistCountUpdated(n);
+            }
         }
 
         function getJobByJobId(jobId) {
@@ -332,9 +337,9 @@
             renderApplicants();
         }
 
-        function countHiredForCourseInCache(courseCode) {
-            var code = String(courseCode || '').trim();
-            if (!code) return 0;
+        function countHiredForJobInCache(jobId) {
+            var id = String(jobId || '').trim();
+            if (!id) return 0;
             return applicantListCache.filter(function (x) {
                 return x && String(x.jobId || '').trim() === id && x.status === '已录用';
             }).length;
@@ -1515,10 +1520,32 @@
                     } catch (e) { /* 短名单同步失败不阻塞人选投递 */ }
                     updateShortlistNavBadge();
                 }
+                var hadPreset = false;
                 if (pendingApplicantJobId) {
+                    hadPreset = true;
                     var preset = pendingApplicantJobId;
                     pendingApplicantJobId = null;
                     app.setApplicantCourse(preset);
+                }
+                if (pendingApplicantStatus) {
+                    hadPreset = true;
+                    var presetStatus = pendingApplicantStatus;
+                    pendingApplicantStatus = null;
+                    app.setApplicantStatusFilter(presetStatus);
+                }
+                if (pendingApplicantUnreadOnly) {
+                    hadPreset = true;
+                    pendingApplicantUnreadOnly = false;
+                    if (unreadOnly) {
+                        unreadOnly.checked = true;
+                    }
+                    applicantPageIndex = 1;
+                    updateApplicantFiltersResetVisibility();
+                }
+                if (!hadPreset) {
+                    loadApplicants();
+                } else if (applicantListCache.length) {
+                    renderApplicants();
                 } else {
                     loadApplicants();
                 }
@@ -1553,6 +1580,39 @@
             pendingApplicantJobId = c || null;
             if (typeof app.activateRoute === 'function') {
                 app.activateRoute('applicants');
+            }
+        };
+
+        app.navigateToApplicantsWithStatus = function (status) {
+            var s = status == null ? '' : String(status).trim();
+            pendingApplicantStatus = s || null;
+            if (typeof app.activateRoute === 'function') {
+                app.activateRoute('applicants');
+            }
+        };
+
+        app.navigateToApplicantsUnreadOnly = function () {
+            pendingApplicantUnreadOnly = true;
+            if (typeof app.activateRoute === 'function') {
+                app.activateRoute('applicants');
+            }
+        };
+
+        app.setApplicantStatusFilter = function (status) {
+            if (!statusSelect) return;
+            buildStatusFilterOptions();
+            var raw = status == null ? '' : String(status).trim();
+            if (Array.from(statusSelect.options).some(function (o) { return o.value === raw; })) {
+                statusSelect.value = raw;
+            } else {
+                statusSelect.value = '';
+            }
+            applicantPageIndex = 1;
+            updateApplicantFiltersResetVisibility();
+            if (applicantListCache.length) {
+                renderApplicants();
+            } else {
+                loadApplicants();
             }
         };
 
