@@ -496,18 +496,16 @@
             }
         }
 
-        function tryAutofillPublishModuleName() {
-            var result = readPublishModuleCode();
-            if (!result.ok) return;
-            var matchedName = moduleCatalogByCode[result.code];
-            if (!matchedName) return;
+        function syncPublishModuleNameFromCode() {
             var nameEl = document.getElementById('courseNameInput');
             if (!nameEl) return;
-            if (!nameEl.value.trim() || nameEl.dataset.moAutoFilled === '1') {
-                nameEl.value = matchedName;
-                nameEl.dataset.moAutoFilled = '1';
-                nameEl.dataset.moAutoFilledCode = result.code;
+            var result = readPublishModuleCode();
+            if (!result.ok) {
+                nameEl.value = '';
+                return;
             }
+            var matchedName = moduleCatalogByCode[result.code];
+            nameEl.value = matchedName || '';
         }
 
         async function loadSkillTagsFromApi() {
@@ -1053,32 +1051,20 @@
             if (prefixEl) prefixEl.value = 'EBU';
             if (numEl) numEl.value = '';
             var nameEl = document.getElementById('courseNameInput');
-            if (nameEl && nameEl.dataset.moAutoFilled === '1') {
-                nameEl.value = '';
-                delete nameEl.dataset.moAutoFilled;
-                delete nameEl.dataset.moAutoFilledCode;
-            }
+            if (nameEl) nameEl.value = '';
         }
 
         function bindPublishModuleCodeInputs() {
             var numEl = document.getElementById('courseCodeNumberInput');
             var prefixEl = document.getElementById('courseCodePrefixInput');
-            var nameEl = document.getElementById('courseNameInput');
             if (!numEl || numEl.dataset.moModuleCodeBound === '1') return;
             numEl.dataset.moModuleCodeBound = '1';
             numEl.addEventListener('input', function () {
                 var v = String(numEl.value || '').replace(/\D/g, '').slice(0, 4);
                 if (numEl.value !== v) numEl.value = v;
-                tryAutofillPublishModuleName();
+                syncPublishModuleNameFromCode();
             });
-            if (prefixEl) prefixEl.addEventListener('change', tryAutofillPublishModuleName);
-            if (nameEl && nameEl.dataset.moModuleNameBound !== '1') {
-                nameEl.dataset.moModuleNameBound = '1';
-                nameEl.addEventListener('input', function () {
-                    delete nameEl.dataset.moAutoFilled;
-                    delete nameEl.dataset.moAutoFilledCode;
-                });
-            }
+            if (prefixEl) prefixEl.addEventListener('change', syncPublishModuleNameFromCode);
         }
 
         function readPublishModuleCode() {
