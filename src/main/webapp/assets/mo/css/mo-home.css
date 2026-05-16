@@ -876,13 +876,49 @@ legend.mo-field-label:has(.mo-req) {
     margin-top: 4px;
     width: 100%;
     justify-items: stretch;
+    align-items: stretch;
 }
 
-/* MO 招聘总览四卡：主标题（开放岗位 / Open Modules 等）加大、加粗，中英文均适用 */
-.mo-dashboard-card .insight-label {
+.mo-dashboard-card .mo-dashboard-stat-grid .mo-dashboard-insight-card--nav-only {
+    height: 100%;
+}
+
+/* MO 招聘总览指标卡标题（开放岗位 / Open Modules 等七项）：加大、加粗、黑色 */
+.mo-dashboard-card .mo-dashboard-insight-card .insight-label {
     font-size: clamp(15px, 1.15vw, 18px);
     font-weight: 700;
     letter-spacing: 0.03em;
+    color: #0f172a;
+}
+
+[data-theme="light"] .mo-dashboard-card .mo-dashboard-insight-card .insight-label {
+    color: #0f172a;
+}
+
+[data-theme="dark"] .mo-dashboard-card .mo-dashboard-insight-card .insight-label {
+    color: #f8fafc;
+}
+
+/* 指标卡上方灰色提示：加深、略放大 */
+.mo-dashboard-card .insight-subtitle,
+.mo-dashboard-card .mo-dashboard-masthead__desc {
+    font-size: 14px;
+    line-height: 1.45;
+    color: rgba(226, 232, 240, 0.88);
+}
+
+[data-theme="light"] .mo-dashboard-card .insight-subtitle,
+[data-theme="light"] .mo-dashboard-card .mo-dashboard-masthead__desc {
+    color: rgba(15, 23, 42, 0.72);
+}
+
+.mo-dashboard-card .mo-dashboard-masthead__subtitle {
+    font-size: 13px;
+    color: rgba(226, 232, 240, 0.78);
+}
+
+[data-theme="light"] .mo-dashboard-card .mo-dashboard-masthead__subtitle {
+    color: rgba(15, 23, 42, 0.62);
 }
 
 /* 指标卡：整卡可点击跳转，仅保留上半区内容高度 */
@@ -898,6 +934,12 @@ legend.mo-field-label:has(.mo-req) {
 
 .mo-dashboard-card .mo-dashboard-insight-card--nav-only {
     padding-bottom: 0;
+    min-height: 160px;
+}
+
+.mo-dashboard-card .mo-dashboard-insight-card--nav-only .mo-dashboard-insight-card__hit {
+    min-height: 160px;
+    padding: 16px 16px 14px;
 }
 
 .mo-dashboard-insight-card__hit {
@@ -935,6 +977,8 @@ legend.mo-field-label:has(.mo-req) {
     align-items: flex-end;
     justify-content: space-between;
     gap: 10px 12px;
+    min-height: 3.25rem;
+    box-sizing: border-box;
 }
 
 .mo-dashboard-card-metric .insight-core-number {
@@ -942,6 +986,9 @@ legend.mo-field-label:has(.mo-req) {
     padding: 0;
     flex: 0 1 auto;
     min-width: 0;
+    align-self: flex-end;
+    line-height: 0.92;
+    display: block;
 }
 
 .mo-dashboard-card-go {
@@ -950,8 +997,9 @@ legend.mo-field-label:has(.mo-req) {
     gap: 6px;
     flex-shrink: 0;
     margin-left: auto;
-    padding: 2px 0 4px;
-    font-size: 14px;
+    align-self: flex-end;
+    padding: 0 0 2px;
+    font-size: 16px;
     font-weight: 600;
     line-height: 1.25;
     color: var(--primary, #6366f1);
@@ -959,13 +1007,13 @@ legend.mo-field-label:has(.mo-req) {
 }
 
 .mo-dashboard-card-go__icon {
-    font-size: 18px;
+    font-size: 20px;
     line-height: 1;
     flex-shrink: 0;
 }
 
 .mo-dashboard-ai-card .mo-dashboard-card-go__icon {
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .mo-dashboard-card-go__text {
@@ -974,7 +1022,7 @@ legend.mo-field-label:has(.mo-req) {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .mo-dashboard-card-go__arrow {
